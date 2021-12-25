@@ -6,57 +6,17 @@
  * Help from AbrarSyed
 */
 
-buildscript {
-    repositories {
-        mavenLocal()
-        maven { url = 'https://maven.minecraftforge.net/' }
-        maven { url = 'https://libraries.minecraft.net/' }
-        jcenter()
-        mavenCentral()
-        maven {
-            name = "sonatype"
-            url = "https://oss.sonatype.org/content/repositories/snapshots/"
-        }
-        maven {
-            url "https://plugins.gradle.org/m2/"
-        }
-        maven {
-            name "Parchment"
-            url "https://maven.parchmentmc.org"
-        }
-    }
-    dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
-        classpath 'io.freefair.gradle:lombok-plugin:6.3.0'
-        classpath 'org.parchmentmc:librarian:1.+'
-    }
+plugins {
+    id 'fabric-loom' version '0.10-SNAPSHOT'
+    id 'maven-publish'
+    id 'io.github.juuxel.loom-quiltflower-mini' version '1.+'
+    id 'org.quiltmc.quilt-mappings-on-loom' version '3.1.1'
 }
-
-apply plugin: 'net.minecraftforge.gradle'
-apply plugin: 'eclipse'
-apply plugin: 'maven-publish'
-apply plugin: 'io.freefair.lombok'
-apply plugin: 'org.parchmentmc.librarian.forgegradle'
 
 repositories {
     mavenLocal()
-    maven { // Vanilla
-        name 'Vanilla'
-        url 'https://libraries.minecraft.net/'
-    }
-    maven { // Forge
-        name 'ForgeFS'
-        url 'https://maven.minecraftforge.net/'
-    }
-    maven {
-        name 'DVS1 Maven FS'
-        url 'https://dvs1.progwml6.com/files/maven'
-    }
-    maven {
-        // for Yarn2MCP
-        name "yarn2mcp"
-        url "https://maven.tterrag.com/"
-    }
+    maven { url = "https://maven.parchmentmc.org" }
+    maven { url = "https://maven.shedaniel.me/" }
 }
 
 group = 'slimeknights.mantle'
@@ -92,7 +52,8 @@ if (System.getenv().ARTIFACT_VERSION != null) {
 
 version = "${minecraft_version}-${artifact_version}"
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+sourceCompatibility = JavaVersion.VERSION_17
+targetCompatibility = JavaVersion.VERSION_17
 
 sourceSets {
     main {
@@ -104,61 +65,29 @@ sourceSets {
     }
 }
 
-minecraft {
-    mappings channel: 'parchment', version: "${parchment_version}-${minecraft_version}"
-
-    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
-
+loom {
     runs {
-        client {
-            workingDirectory project.file('run')
+        datagen {
+            client()
 
-            // Recommended logging data for a userdev environment
-            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP,CORE'
+            name "Data Generation"
+            vmArg "-Dfabric-api.datagen"
+            vmArg "-Dfabric-api.datagen.output-dir=${file("src/generated/resources")}"
+            vmArg "-Dfabric-api.datagen.modid=create"
+            // from ae2
+            property "com.simibubi.create.existingData", file("src/main/resources").absolutePath
 
-            // Recommended logging level for the console
-            property 'forge.logging.console.level', 'debug'
-
-            mods {
-                mantle {
-                    source sourceSets.main
-                }
-            }
+            runDir "build/datagen"
         }
+    }
+}
+assemble.dependsOn runDatagen
 
-        server {
-            workingDirectory project.file('run')
+processResources {
+    inputs.property "version", project.version
 
-            // Recommended logging data for a userdev environment
-            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP,CORE'
-
-            // Recommended logging level for the console
-            property 'forge.logging.console.level', 'debug'
-
-            mods {
-                mantle {
-                    source sourceSets.main
-                }
-            }
-        }
-
-        data {
-            workingDirectory project.file('run')
-
-            // Recommended logging data for a userdev environment
-            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP,CORE'
-
-            // Recommended logging level for the console
-            property 'forge.logging.console.level', 'debug'
-
-            args '--mod', 'mantle', '--all', '--output', file('src/generated/resources/')
-
-            mods {
-                mantle {
-                    source sourceSets.main
-                }
-            }
-        }
+    filesMatching("fabric.mod.json") {
+        expand "version": project.version
     }
 }
 
@@ -167,12 +96,22 @@ configurations {
 }
                
 dependencies {
-    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+    minecraft "com.mojang:minecraft:${minecraft_version}"
 
-    // compile against the JEI API but do not include it at runtime
-    compileOnly fg.deobf("mezz.jei:jei-${minecraft_version}:${jei_version}:api")
-    // at runtime, use the full JEI jar
-    runtimeOnly fg.deobf("mezz.jei:jei-${minecraft_version}:${jei_version}")
+    mappings loom.layered {
+        it.addLayer(quiltMappings.mappings("org.quiltmc:quilt-mappings:1.18.1+build.4:v2")) // https://maven.quiltmc.org/#browse/browse:release
+        it.parchment("org.parchmentmc.data:parchment-1.18.1:BLEEDING-20211212.174449-1@zip") // https://ldtteam.jfrog.io/ui/native/parchmentmc-public/org/parchmentmc/data/parchment-1.18.1/BLEEDING-SNAPSHOT
+        it.officialMojangMappings {
+            setNameSyntheticMembers(false)
+        }
+    }
+
+    // compile against the REI API but do not include it at runtime
+    modCompileOnly("me.shedaniel:RoughlyEnoughItems-api-fabric:${project.rei_version}") { transitive = false }
+    // at runtime, use the full REI jar
+    modRuntimeOnly("me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}") { transitive = false }
+    // api for REI
+    modImplementation("dev.architectury:architectury-fabric:${project.architectury_version}")
 }
 
 def modsTomlSpec = copySpec{
@@ -215,7 +154,6 @@ processResources {
     exclude 'META-INF/mods.toml'
     finalizedBy replaceResources
 }
-
 
 jar {
     manifest {
