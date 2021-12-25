@@ -12,7 +12,7 @@ import net.minecraft.server.packs.resources.ReloadableResourceManager;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.level.GameType;
-import net.minecraftforge.api.distmarker.Dist;
+import net.fabricmc.api.EnvType;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.gui.ForgeIngameGui;
@@ -43,7 +43,7 @@ import slimeknights.mantle.util.OffhandCooldownTracker;
 import java.util.function.Function;
 
 @SuppressWarnings("unused")
-@EventBusSubscriber(modid = Mantle.modId, value = Dist.CLIENT, bus = Bus.MOD)
+@EventBusSubscriber(modid = Mantle.modId, value = EnvType.CLIENT, bus = Bus.MOD)
 public class ClientEvents {
   private static final Function<OffhandCooldownTracker,Float> COOLDOWN_TRACKER = OffhandCooldownTracker::getCooldown;
 

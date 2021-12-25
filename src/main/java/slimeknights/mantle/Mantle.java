@@ -76,12 +76,10 @@ public class Mantle implements ModInitializer {
     OffhandCooldownTracker.init();
 
     // inject our new signs into the tile entity type
-    event.enqueueWork(() -> {
-      ImmutableSet.Builder<Block> builder = ImmutableSet.builder();
-      builder.addAll(BlockEntityType.SIGN.validBlocks);
-      RegistrationHelper.forEachSignBlock(builder::add);
-      BlockEntityType.SIGN.validBlocks = builder.build();
-    });
+    ImmutableSet.Builder<Block> builder = ImmutableSet.builder();
+    builder.addAll(BlockEntityType.SIGN.validBlocks);
+    RegistrationHelper.forEachSignBlock(builder::add);
+    BlockEntityType.SIGN.validBlocks = builder.build();
   }
 
   private void registerRecipeSerializers(final RegistryEvent.Register<RecipeSerializer<?>> event) {

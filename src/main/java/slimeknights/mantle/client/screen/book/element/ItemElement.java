@@ -11,8 +11,8 @@ import net.minecraft.util.StringUtil;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import slimeknights.mantle.client.book.action.StringActionProcessor;
 
 import javax.annotation.Nullable;
@@ -20,7 +20,7 @@ import java.util.Collection;
 import java.util.List;
 
 @SuppressWarnings("unused")
-@OnlyIn(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 public class ItemElement extends SizedBookElement {
 
   public static final int ITEM_SIZE_HARDCODED = 16;

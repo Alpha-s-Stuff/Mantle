@@ -13,7 +13,7 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.api.distmarker.Dist;
+import net.fabricmc.api.EnvType;
 import net.minecraftforge.fml.DistExecutor;
 import slimeknights.mantle.util.BlockEntityHelper;
 
@@ -322,6 +322,6 @@ public class BaseContainerMenu<TILE extends BlockEntity> extends AbstractContain
     if (buf == null) {
       return null;
     }
-    return DistExecutor.unsafeCallWhenOn(Dist.CLIENT, () -> () -> BlockEntityHelper.getTile(type, Minecraft.getInstance().level, buf.readBlockPos()).orElse(null));
+    return DistExecutor.unsafeCallWhenOn(EnvType.CLIENT, () -> () -> BlockEntityHelper.getTile(type, Minecraft.getInstance().level, buf.readBlockPos()).orElse(null));
   }
 }

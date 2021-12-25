@@ -1,11 +1,11 @@
 package slimeknights.mantle.client.book.data.element;
 
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import slimeknights.mantle.client.book.repository.BookRepository;
 
-@OnlyIn(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 public class ImageData extends DataLocation {
 
   public static final ImageData MISSING = new ImageData();

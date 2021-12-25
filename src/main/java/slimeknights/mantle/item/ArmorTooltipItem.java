@@ -7,8 +7,8 @@ import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import slimeknights.mantle.util.TranslationHelper;
 
 import javax.annotation.Nullable;
@@ -23,7 +23,7 @@ public class ArmorTooltipItem extends ArmorItem {
   }
 
   @Override
-  @OnlyIn(Dist.CLIENT)
+  @Environment(EnvType.CLIENT)
   public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
     TranslationHelper.addOptionalTooltip(stack, tooltip);
     super.appendHoverText(stack, worldIn, tooltip, flagIn);

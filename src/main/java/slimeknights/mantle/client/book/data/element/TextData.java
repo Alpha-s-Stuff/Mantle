@@ -1,10 +1,10 @@
 package slimeknights.mantle.client.book.data.element;
 
 import net.minecraft.network.chat.Component;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 
-@OnlyIn(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 public class TextData {
 
   public static final TextData LINEBREAK = new TextData("\n");
