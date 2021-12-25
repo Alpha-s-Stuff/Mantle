@@ -17,6 +17,7 @@ repositories {
     mavenLocal()
     maven { url = "https://maven.parchmentmc.org" }
     maven { url = "https://maven.shedaniel.me/" }
+    maven { url = "https://cursemaven.com" }
 }
 
 group = 'slimeknights.mantle'
@@ -112,6 +113,10 @@ dependencies {
     modRuntimeOnly("me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}") { transitive = false }
     // api for REI
     modImplementation("dev.architectury:architectury-fabric:${project.architectury_version}")
+
+    modImplementation(include("curse.maven:forge-config-api-port-fabric-547434:${forge_config_version}"))
+
+    implementation(include("com.google.code.findbugs:jsr305:3.0.2"))
 }
 
 def modsTomlSpec = copySpec{

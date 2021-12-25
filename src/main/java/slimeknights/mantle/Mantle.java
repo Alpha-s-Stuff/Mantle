@@ -5,6 +5,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+
+import net.minecraftforge.api.ModLoadingContext;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.minecraftforge.common.crafting.CraftingHelper;
@@ -51,8 +53,8 @@ public class Mantle {
 
   /* Proxies for sides, used for graphics processing */
   public Mantle() {
-    ModLoadingContext.get().registerConfig(Type.CLIENT, Config.CLIENT_SPEC);
-    ModLoadingContext.get().registerConfig(Type.SERVER, Config.SERVER_SPEC);
+    ModLoadingContext.registerConfig(modId, Type.CLIENT, Config.CLIENT_SPEC);
+    ModLoadingContext.registerConfig(modId, Type.SERVER, Config.SERVER_SPEC);
 
     instance = this;
     IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
