@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "id": "create",
+  "version": "${version}",
+
+  "name": "Create: Refabricated",
+  "description": "A Fabric port of Create.",
+  "authors": [
+    "Create: Refabricated Team",
+    "Create Team"
+  ],
+  "contact": {
+    "sources": "https://github.com/Create-Fabric/Create-Refabricated"
+  },
+
+  "license": "MIT",
+  "icon": "logo.png",
+
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "slimeknights.mantle.Mantle"
+    ],
+    "client": [
+    ]
+  },
+
+  "mixins": [
+    "create.mixins.json",
+    "create_lib.mixins.json"
+  ],
+
+  "depends": {
+    "fabricloader": ">=0.12.12",
+    "fabric": ">=0.44.0",
+    "minecraft": ">=1.18.1",
+    "registrate-fabric": "*",
+    "flywheel": "*"
+  }
+}

@@ -9,6 +9,8 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.chunk.LevelChunk;
+
+import me.pepperbell.simplenetworking.SimpleChannel;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.NetworkEvent;
@@ -39,12 +41,7 @@ public class NetworkWrapper {
    * @param channelName  Unique packet channel name
    */
   public NetworkWrapper(ResourceLocation channelName) {
-    this.network = NetworkRegistry.ChannelBuilder
-      .named(channelName)
-      .clientAcceptedVersions(PROTOCOL_VERSION::equals)
-      .serverAcceptedVersions(PROTOCOL_VERSION::equals)
-      .networkProtocolVersion(() -> PROTOCOL_VERSION)
-      .simpleChannel();
+    this.network = new SimpleChannel(channelName);
   }
 
   /**

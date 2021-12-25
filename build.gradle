@@ -15,6 +15,7 @@ plugins {
 
 repositories {
     mavenLocal()
+    mavenCentral()
     maven { url = "https://maven.parchmentmc.org" }
     maven { url = "https://maven.shedaniel.me/" }
     maven { url = "https://cursemaven.com" }
@@ -115,8 +116,14 @@ dependencies {
     modImplementation("dev.architectury:architectury-fabric:${project.architectury_version}")
 
     modImplementation(include("curse.maven:forge-config-api-port-fabric-547434:${forge_config_version}"))
-
     implementation(include("com.google.code.findbugs:jsr305:3.0.2"))
+    modImplementation("net.fabricmc.fabric-api:fabric-api:${project.fabric_version}")
+
+//    compileOnly("org.projectlombok", "lombok", "1.18.22")
+//    annotationProcessor("org.projectlombok", "lombok", "1.18.22")
+//
+//    testCompileOnly("org.projectlombok", "lombok", "1.18.22")
+//    testAnnotationProcessor("org.projectlombok", "lombok", "1.18.22")
 }
 
 def modsTomlSpec = copySpec{

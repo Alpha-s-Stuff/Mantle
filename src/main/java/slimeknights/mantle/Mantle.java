@@ -6,6 +6,7 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 
+import net.fabricmc.api.ModInitializer;
 import net.minecraftforge.api.ModLoadingContext;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
@@ -43,8 +44,7 @@ import slimeknights.mantle.util.OffhandCooldownTracker;
  *
  * @author Sunstrike <sun@sunstrike.io>
  */
-@Mod(Mantle.modId)
-public class Mantle {
+public class Mantle implements ModInitializer {
   public static final String modId = "mantle";
   public static final Logger logger = LogManager.getLogger("Mantle");
 
@@ -52,7 +52,8 @@ public class Mantle {
   public static Mantle instance;
 
   /* Proxies for sides, used for graphics processing */
-  public Mantle() {
+  @Override
+  public void onInitialize() {
     ModLoadingContext.registerConfig(modId, Type.CLIENT, Config.CLIENT_SPEC);
     ModLoadingContext.registerConfig(modId, Type.SERVER, Config.SERVER_SPEC);
 
