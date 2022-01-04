@@ -8,7 +8,7 @@ import net.minecraft.tags.Tag;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.Tags.IOptionalNamedTag;
+import net.minecraftforge.common.Tags.Tag.Named;
 import net.minecraftforge.event.TagsUpdatedEvent;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 import slimeknights.mantle.Mantle;
@@ -100,7 +100,7 @@ public class TagPreference<T extends IForgeRegistryEntry<T>> {
   /** Gets the preference from a tag without going through the cache, internal logic behind {@link #getPreference(Tag)} */
   private Optional<T> getUncachedPreference(Tag<T> tag) {
     // if no items, empty optional
-    if (tag instanceof IOptionalNamedTag && ((IOptionalNamedTag<?>) tag).isDefaulted()) {
+    if (tag instanceof Tag.Named && ((Tag.Named<?>) tag).isDefaulted()) {
       return Optional.empty();
     }
     List<? extends T> elements = tag.getValues();

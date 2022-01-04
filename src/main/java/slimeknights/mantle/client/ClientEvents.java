@@ -12,6 +12,8 @@ import net.minecraft.server.packs.resources.ReloadableResourceManager;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.level.GameType;
+
+import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
@@ -43,12 +45,10 @@ import slimeknights.mantle.util.OffhandCooldownTracker;
 import java.util.function.Function;
 
 @SuppressWarnings("unused")
-@EventBusSubscriber(modid = Mantle.modId, value = EnvType.CLIENT, bus = Bus.MOD)
-public class ClientEvents {
+public class ClientEvents implements ClientModInitializer {
   private static final Function<OffhandCooldownTracker,Float> COOLDOWN_TRACKER = OffhandCooldownTracker::getCooldown;
 
-  @SubscribeEvent
-  static void clientSetup(FMLClientSetupEvent event) {
+  public void onInitializeClient() {
     ResourceManager manager = Minecraft.getInstance().getResourceManager();
     if (manager instanceof ReloadableResourceManager) {
       ((ReloadableResourceManager)manager).registerReloadListener(ModelHelper.LISTENER);
@@ -56,7 +56,7 @@ public class ClientEvents {
     event.enqueueWork(() -> RegistrationHelper.forEachWoodType(Sheets::addWoodType));
   }
 
-  @SubscribeEvent
+  // PAINNNNNN
   static void registerModelLoaders(ModelRegistryEvent event) {
     // standard models - useful in resource packs for any model
     ModelLoaderRegistry.registerLoader(Mantle.getResource("connected"), ConnectedModel.Loader.INSTANCE);

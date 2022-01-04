@@ -18,7 +18,7 @@ import java.util.function.Supplier;
 @Setter
 @RequiredArgsConstructor
 public class FluidBuilder {
-  private final FluidAttributes.Builder attributes;
+//  private final FluidAttributes.Builder attributes;
   private boolean canMultiply = false;
   private Supplier<? extends Item> bucket;
   private Supplier<? extends LiquidBlock> block;

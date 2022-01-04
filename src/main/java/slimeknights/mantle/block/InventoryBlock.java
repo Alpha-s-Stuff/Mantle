@@ -16,11 +16,11 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.network.NetworkHooks;
 import slimeknights.mantle.block.entity.INameableMenuProvider;
 import slimeknights.mantle.inventory.BaseContainerMenu;
+import slimeknights.mantle.lib.transfer.TransferUtil;
+import slimeknights.mantle.lib.transfer.item.IItemHandler;
+import slimeknights.mantle.lib.util.NetworkUtil;
 
 import javax.annotation.Nullable;
 
@@ -45,7 +45,7 @@ public abstract class InventoryBlock extends Block implements EntityBlock {
     if (!world.isClientSide()) {
       MenuProvider container = this.getMenuProvider(world.getBlockState(pos), world, pos);
       if (container != null && player instanceof ServerPlayer serverPlayer) {
-        NetworkHooks.openGui(serverPlayer, container, pos);
+        NetworkUtil.openGui(serverPlayer, container, pos);
         if (player.containerMenu instanceof BaseContainerMenu<?> menu) {
           menu.syncOnOpen(serverPlayer);
         }
@@ -103,7 +103,7 @@ public abstract class InventoryBlock extends Block implements EntityBlock {
     if (state.getBlock() != newState.getBlock()) {
       BlockEntity te = worldIn.getBlockEntity(pos);
       if (te != null) {
-        te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(inventory -> dropInventoryItems(state, worldIn, pos, inventory));
+        TransferUtil.getItemHandler(te).ifPresent(inventory -> dropInventoryItems(state, worldIn, pos, inventory));
         worldIn.updateNeighbourForOutputSignal(pos, this);
       }
     }

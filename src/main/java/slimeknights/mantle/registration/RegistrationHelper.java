@@ -33,17 +33,17 @@ public class RegistrationHelper {
     return null;
   }
 
-  /**
-   * Creates a supplier for a specific registry entry instance based on the delegate to a general instance.
-   * Note that this performs an unchecked cast, be certain that the right type is returned
-   * @param delegate  Delegate instance
-   * @param <I>  Forge registry type
-   * @return  Supplier for the given instance
-   */
-  @SuppressWarnings("unchecked")
-  public static <I extends IForgeRegistryEntry<? super I>> Supplier<I> castDelegate(IRegistryDelegate<? super I> delegate) {
-    return () -> (I) delegate.get();
-  }
+//  /**
+//   * Creates a supplier for a specific registry entry instance based on the delegate to a general instance.
+//   * Note that this performs an unchecked cast, be certain that the right type is returned
+//   * @param delegate  Delegate instance
+//   * @param <I>  Forge registry type
+//   * @return  Supplier for the given instance
+//   */
+//  @SuppressWarnings("unchecked")
+//  public static <I extends IForgeRegistryEntry<? super I>> Supplier<I> castDelegate(IRegistryDelegate<? super I> delegate) {
+//    return () -> (I) delegate.get();
+//  }
 
   /**
    * Handles missing mappings for the given registry

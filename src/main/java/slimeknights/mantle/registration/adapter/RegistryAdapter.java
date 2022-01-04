@@ -1,12 +1,9 @@
 package slimeknights.mantle.registration.adapter;
 
 import lombok.RequiredArgsConstructor;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.registries.IForgeRegistry;
-import net.minecraftforge.registries.IForgeRegistryEntry;
 
-import java.util.Objects;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceLocation;
 
 /**
  * A convenience wrapper for forge registries, to be used in combination with the {@link net.minecraftforge.event.RegistryEvent.Register} event.
@@ -15,18 +12,18 @@ import java.util.Objects;
  */
 @SuppressWarnings("WeakerAccess")
 @RequiredArgsConstructor
-public class RegistryAdapter<T extends IForgeRegistryEntry<T>> {
-  private final IForgeRegistry<T> registry;
+public class RegistryAdapter<T> {
+  private final Registry<T> registry;
   private final String modId;
 
-  /**
-   * Automatically creates determines the modid from the currently loading mod.
-   * If this results in the wrong namespace, use the other constructor where you can provide the modid.
-   * The modid is used as the namespace for resource locations, so if your mods id is "foo" it will register an item "bar" as "foo:bar".
-   */
-  public RegistryAdapter(IForgeRegistry<T> registry) {
-    this(registry, ModLoadingContext.get().getActiveContainer().getModId());
-  }
+//  /**
+//   * Automatically creates determines the modid from the currently loading mod.
+//   * If this results in the wrong namespace, use the other constructor where you can provide the modid.
+//   * The modid is used as the namespace for resource locations, so if your mods id is "foo" it will register an item "bar" as "foo:bar".
+//   */
+//  public RegistryAdapter(Registry<T> registry) {
+//    this(registry, ModLoadingContext.get().getActiveContainer().getModId());
+//  }
 
   /**
    * Construct a resource location that belongs to the given namespace. Usually your mod.
@@ -54,16 +51,16 @@ public class RegistryAdapter<T extends IForgeRegistryEntry<T>> {
     return this.register(entry, this.getResource(name));
   }
 
-  /**
-   * Registers an entry using the name from another entry
-   * @param entry  Entry to register
-   * @param name   Entry name to copy
-   * @param <I>    Value type
-   * @return  Registered entry
-   */
-  public <I extends T> I register(I entry, IForgeRegistryEntry<?> name) {
-    return this.register(entry, Objects.requireNonNull(name.getRegistryName()));
-  }
+//  /**
+//   * Registers an entry using the name from another entry
+//   * @param entry  Entry to register
+//   * @param name   Entry name to copy
+//   * @param <I>    Value type
+//   * @return  Registered entry
+//   */
+//  public <I extends T> I register(I entry, T name) {
+//    return this.register(entry, Objects.requireNonNull(name.getRegistryName()));
+//  }
 
   /**
    * General purpose backup registration method. In case you want to set a very specific resource location.
@@ -75,8 +72,6 @@ public class RegistryAdapter<T extends IForgeRegistryEntry<T>> {
    * @return Registry entry
    */
   public <I extends T> I register(I entry, ResourceLocation location) {
-    entry.setRegistryName(location);
-    registry.register(entry);
-    return entry;
+    return Registry.register(registry, location, entry);
   }
 }

@@ -1,14 +1,16 @@
 package slimeknights.mantle.registration.object;
 
 import lombok.Getter;
+
+import net.minecraft.tags.Tag;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.item.Item;
-import net.minecraft.tags.FluidTags;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.common.Tags.IOptionalNamedTag;
-import net.minecraftforge.fluids.ForgeFlowingFluid;
+
+import net.fabricmc.fabric.api.tag.TagFactory;
+import slimeknights.mantle.lib.fluid.SimpleFlowableFluid;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -20,16 +22,16 @@ import java.util.function.Supplier;
  * @param <F>  Fluid class
  */
 @SuppressWarnings("WeakerAccess")
-public class FluidObject<F extends ForgeFlowingFluid> implements Supplier<F>, ItemLike {
+public class FluidObject<F extends SimpleFlowableFluid> implements Supplier<F>, ItemLike {
   /** Fluid name, used for tag creation */
   @Getter @Nonnull
   protected final ResourceLocation id;
   /** Tag in the mod namespace, exact match */
   @Getter @Nonnull
-  private final IOptionalNamedTag<Fluid> localTag;
+  private final Tag.Named<Fluid> localTag;
   /** Tag in the forge namespace, crafting equivalence */
   @Getter @Nonnull
-  private final IOptionalNamedTag<Fluid> forgeTag;
+  private final Tag.Named<Fluid> forgeTag;
   private final Supplier<? extends F> still;
   private final Supplier<? extends F> flowing;
   @Nullable
@@ -38,8 +40,8 @@ public class FluidObject<F extends ForgeFlowingFluid> implements Supplier<F>, It
   /** Main constructor */
   public FluidObject(ResourceLocation id, String tagName, Supplier<? extends F> still, Supplier<? extends F> flowing, @Nullable Supplier<? extends LiquidBlock> block) {
     this.id = id;
-    this.localTag = FluidTags.createOptional(id);
-    this.forgeTag = FluidTags.createOptional(new ResourceLocation("forge", tagName));
+    this.localTag = TagFactory.FLUID.create(id);
+    this.forgeTag = TagFactory.FLUID.create(new ResourceLocation("c", tagName));
     this.still = still;
     this.flowing = flowing;
     this.block = block;

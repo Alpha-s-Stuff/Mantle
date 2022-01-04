@@ -1,5 +1,9 @@
 package slimeknights.mantle.util;
 
+import dev.onyxstudios.cca.api.v3.component.Component;
+import dev.onyxstudios.cca.api.v3.component.ComponentKey;
+import dev.onyxstudios.cca.api.v3.component.ComponentRegistry;
+import dev.onyxstudios.cca.api.v3.component.ComponentRegistryV3;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
@@ -28,7 +32,7 @@ import javax.annotation.Nullable;
  * Logic to handle offhand having its own cooldown
  */
 @RequiredArgsConstructor
-public class OffhandCooldownTracker implements ICapabilityProvider {
+public class OffhandCooldownTracker implements Component {
   public static final ResourceLocation KEY = Mantle.getResource("offhand_cooldown");
   public static final NonNullFunction<OffhandCooldownTracker,Float> COOLDOWN_TRACKER = OffhandCooldownTracker::getCooldown;
   private static final NonNullFunction<OffhandCooldownTracker,Boolean> ATTACK_READY = OffhandCooldownTracker::isAttackReady;
@@ -36,7 +40,7 @@ public class OffhandCooldownTracker implements ICapabilityProvider {
   /**
    * Capability instance for offhand cooldown
    */
-  public static final Capability<OffhandCooldownTracker> CAPABILITY = CapabilityManager.get(new CapabilityToken<>() {});
+  public static final ComponentKey<OffhandCooldownTracker> CAPABILITY = ComponentRegistry.getOrCreate(Mantle.getResource(""), OffhandCooldownTracker.class);
 
   /** Registers the capability and subscribes to event listeners */
   public static void init() {

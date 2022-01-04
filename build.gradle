@@ -19,6 +19,10 @@ repositories {
     maven { url = "https://maven.parchmentmc.org" }
     maven { url = "https://maven.shedaniel.me/" }
     maven { url = "https://cursemaven.com" }
+    maven {
+        name = 'Ladysnake Mods'
+        url = 'https://ladysnake.jfrog.io/artifactory/mods'
+    }
 }
 
 group = 'slimeknights.mantle'
@@ -121,6 +125,12 @@ dependencies {
 
     modImplementation(include("curse.maven:forge-config-api-port-fabric-547434:${forge_config_version}"))
     implementation(include("com.google.code.findbugs:jsr305:3.0.2"))
+
+    // cca
+    modImplementation "io.github.onyxstudios.Cardinal-Components-API:cardinal-components-base:3.0.0"
+    modImplementation "io.github.onyxstudios.Cardinal-Components-API:cardinal-components-entity:3.0.0"
+    include "io.github.onyxstudios.Cardinal-Components-API:cardinal-components-base:3.0.0"
+    include "io.github.onyxstudios.Cardinal-Components-API:cardinal-components-entity:3.0.0"
 
 //    compileOnly("org.projectlombok", "lombok", "1.18.22")
 //    annotationProcessor("org.projectlombok", "lombok", "1.18.22")

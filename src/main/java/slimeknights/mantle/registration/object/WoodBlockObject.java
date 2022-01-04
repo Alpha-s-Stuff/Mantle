@@ -1,6 +1,8 @@
 package slimeknights.mantle.registration.object;
 
 import lombok.Getter;
+
+import net.minecraft.tags.Tag;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.FenceBlock;
@@ -15,7 +17,9 @@ import net.minecraft.world.item.Item;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.common.Tags.IOptionalNamedTag;
+
+import net.fabricmc.fabric.api.tag.TagFactory;
+import net.minecraftforge.common.Tags.Tag.Named;
 
 import java.util.function.Supplier;
 
@@ -42,9 +46,9 @@ public class WoodBlockObject extends FenceBuildingBlockObject {
   private final Supplier<? extends WallSignBlock> wallSign;
   // tags
   @Getter
-  private final IOptionalNamedTag<Block> logBlockTag;
+  private final Tag.Named<Block> logBlockTag;
   @Getter
-  private final IOptionalNamedTag<Item> logItemTag;
+  private final Tag.Named<Item> logItemTag;
 
   public WoodBlockObject(ResourceLocation name, WoodType woodType, BuildingBlockObject planks,
                          Supplier<? extends Block> log, Supplier<? extends Block> strippedLog, Supplier<? extends Block> wood, Supplier<? extends Block> strippedWood,
@@ -65,8 +69,8 @@ public class WoodBlockObject extends FenceBuildingBlockObject {
     this.sign = sign;
     this.wallSign = wallSign;
     ResourceLocation tagName = new ResourceLocation(name.getNamespace(), name.getPath() + "_logs");
-    this.logBlockTag = BlockTags.createOptional(tagName);
-    this.logItemTag = ItemTags.createOptional(tagName);
+    this.logBlockTag = TagFactory.BLOCK.create(tagName);
+    this.logItemTag = TagFactory.ITEM.create(tagName);
   }
 
   public WoodBlockObject(ResourceLocation name, WoodType woodType, BuildingBlockObject planks,
@@ -75,7 +79,7 @@ public class WoodBlockObject extends FenceBuildingBlockObject {
                          Block pressurePlate, Block button, Block sign, Block wallSign) {
     super(planks, fence);
     this.woodType = woodType;
-    this.log = castDelegate(log.delegate);
+    this.log = castDelegate(log);
     this.strippedLog = castDelegate(strippedLog.delegate);
     this.wood = castDelegate(wood.delegate);
     this.strippedWood = castDelegate(strippedWood.delegate);

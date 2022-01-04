@@ -1,12 +1,15 @@
 package slimeknights.mantle;
 
 import com.google.common.collect.ImmutableSet;
+
+import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.minecraftforge.api.ModLoadingContext;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
@@ -26,6 +29,9 @@ import org.apache.logging.log4j.Logger;
 import slimeknights.mantle.command.MantleCommand;
 import slimeknights.mantle.config.Config;
 import slimeknights.mantle.item.LecternBookItem;
+import slimeknights.mantle.lib.crafting.CraftingHelper;
+import slimeknights.mantle.lib.loot.GlobalLootModifierSerializer;
+import slimeknights.mantle.lib.mixin.BlockEntityTypeAccessor;
 import slimeknights.mantle.loot.MantleLoot;
 import slimeknights.mantle.network.MantleNetwork;
 import slimeknights.mantle.recipe.crafting.ShapedFallbackRecipe;
@@ -58,19 +64,18 @@ public class Mantle implements ModInitializer {
     ModLoadingContext.registerConfig(modId, Type.SERVER, Config.SERVER_SPEC);
 
     instance = this;
-    IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
-    bus.addListener(EventPriority.NORMAL, false, FMLCommonSetupEvent.class, this::commonSetup);
+    commonSetup();
     bus.addListener(EventPriority.NORMAL, false, RegisterCapabilitiesEvent.class, this::registerCapabilities);
     bus.addGenericListener(RecipeSerializer.class, this::registerRecipeSerializers);
     bus.addGenericListener(GlobalLootModifierSerializer.class, MantleLoot::registerGlobalLootModifiers);
-    MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, PlayerInteractEvent.RightClickBlock.class, LecternBookItem::interactWithBlock);
+    UseBlockCallback.EVENT.register(LecternBookItem::interactWithBlock);
   }
 
   private void registerCapabilities(RegisterCapabilitiesEvent event) {
     OffhandCooldownTracker.register(event);
   }
 
-  private void commonSetup(final FMLCommonSetupEvent event) {
+  private void commonSetup() {
     MantleNetwork.registerPackets();
     MantleCommand.init();
     OffhandCooldownTracker.init();
@@ -79,11 +84,11 @@ public class Mantle implements ModInitializer {
     ImmutableSet.Builder<Block> builder = ImmutableSet.builder();
     builder.addAll(BlockEntityType.SIGN.validBlocks);
     RegistrationHelper.forEachSignBlock(builder::add);
-    BlockEntityType.SIGN.validBlocks = builder.build();
+    ((BlockEntityTypeAccessor)BlockEntityType.SIGN).setValidBlocks(builder.build());
   }
 
-  private void registerRecipeSerializers(final RegistryEvent.Register<RecipeSerializer<?>> event) {
-    RegistryAdapter<RecipeSerializer<?>> adapter = new RegistryAdapter<>(event.getRegistry());
+  private void registerRecipeSerializers() {
+    RegistryAdapter<RecipeSerializer<?>> adapter = new RegistryAdapter<>(Registry.RECIPE_SERIALIZER, Mantle.modId);
     adapter.register(new ShapedFallbackRecipe.Serializer(), "crafting_shaped_fallback");
     adapter.register(new ShapedRetexturedRecipe.Serializer(), "crafting_shaped_retextured");
 

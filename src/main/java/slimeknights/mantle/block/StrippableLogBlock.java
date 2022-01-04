@@ -21,12 +21,14 @@ public class StrippableLogBlock extends RotatedPillarBlock {
     this.stripped = stripped;
   }
 
-  @Nullable
-  @Override
-  public BlockState getToolModifiedState(BlockState state, Level world, BlockPos pos, Player player, ItemStack stack, ToolAction toolAction) {
-    if (toolAction == ToolActions.AXE_STRIP) {
-      return stripped.get().defaultBlockState().setValue(AXIS, state.getValue(AXIS));
-    }
-    return null;
-  }
+
+  // todo: port?
+//  @Nullable
+//  @Override
+//  public BlockState getToolModifiedState(BlockState state, Level world, BlockPos pos, Player player, ItemStack stack, ToolAction toolAction) {
+//    if (toolAction == ToolActions.AXE_STRIP) {
+//      return stripped.get().defaultBlockState().setValue(AXIS, state.getValue(AXIS));
+//    }
+//    return null;
+//  }
 }

@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
  */
 @SuppressWarnings({"unused", "WeakerAccess", "ClassCanBeRecord"})
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class EnumObject<T extends Enum<T>, I extends IForgeRegistryEntry<? super I>> {
+public class EnumObject<T extends Enum<T>, I> {
   /** Singleton empty object, type does not matter as it has no items */
   @SuppressWarnings({"rawtypes", "unchecked"})
   private static final EnumObject EMPTY = new EnumObject(Collections.emptyMap());
@@ -128,7 +128,7 @@ public class EnumObject<T extends Enum<T>, I extends IForgeRegistryEntry<? super
    * @return  Empty EnumObject
    */
   @SuppressWarnings("unchecked")
-  public static <T extends Enum<T>, I extends IForgeRegistryEntry<? super I>> EnumObject<T,I> empty() {
+  public static <T extends Enum<T>, I> EnumObject<T,I> empty() {
     return (EnumObject<T,I>) EMPTY;
   }
 

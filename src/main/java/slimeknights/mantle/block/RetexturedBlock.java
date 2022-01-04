@@ -10,6 +10,8 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.HitResult;
+
+import net.fabricmc.fabric.api.block.BlockPickInteractionAware;
 import slimeknights.mantle.block.entity.IRetexturedBlockEntity;
 import slimeknights.mantle.item.RetexturedBlockItem;
 import slimeknights.mantle.util.BlockEntityHelper;
@@ -20,7 +22,7 @@ import javax.annotation.Nullable;
  * Logic for a retexturable block. Use alongside {@link IRetexturedBlockEntity} and {@link slimeknights.mantle.item.RetexturedBlockItem}
  */
 @SuppressWarnings("WeakerAccess")
-public abstract class RetexturedBlock extends Block implements EntityBlock {
+public abstract class RetexturedBlock extends Block implements EntityBlock, BlockPickInteractionAware {
   public RetexturedBlock(Properties properties) {
     super(properties);
   }
@@ -32,7 +34,7 @@ public abstract class RetexturedBlock extends Block implements EntityBlock {
   }
 
   @Override
-  public ItemStack getCloneItemStack(BlockState state, HitResult target, BlockGetter world, BlockPos pos, Player player) {
+  public ItemStack getPickedStack(BlockState state, BlockGetter world, BlockPos pos, @org.jetbrains.annotations.Nullable Player player, @org.jetbrains.annotations.Nullable HitResult result) {
     return getPickBlock(world, pos, state);
   }
 

@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
 
-import static slimeknights.mantle.registration.RegistrationHelper.castDelegate;
-
 /**
  * Object containing a block with slab, stairs, and fence variants
  */
@@ -27,14 +25,14 @@ public class FenceBuildingBlockObject extends BuildingBlockObject {
     this.fence = fence;
   }
 
-  /**
-   * Creates a new object from a building block object plus a fence entry
-   * @param object  Previous building block object
-   * @param fence   Fence entry
-   */
-  public FenceBuildingBlockObject(BuildingBlockObject object, Block fence) {
-    this(object, castDelegate(fence.delegate));
-  }
+//  /**
+//   * Creates a new object from a building block object plus a fence entry
+//   * @param object  Previous building block object
+//   * @param fence   Fence entry
+//   */
+//  public FenceBuildingBlockObject(BuildingBlockObject object, Block fence) {
+//    this(object, castDelegate(fence.delegate));
+//  }
 
   /** Gets the fence for this block */
   public FenceBlock getFence() {
