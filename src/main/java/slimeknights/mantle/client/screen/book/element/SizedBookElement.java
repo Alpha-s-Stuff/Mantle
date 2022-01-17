@@ -1,9 +1,5 @@
 package slimeknights.mantle.client.screen.book.element;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-
-@Environment(EnvType.CLIENT)
 public abstract class SizedBookElement extends BookElement {
 
   public int width, height;

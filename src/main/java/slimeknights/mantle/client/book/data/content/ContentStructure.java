@@ -1,17 +1,16 @@
 package slimeknights.mantle.client.book.data.content;
 
-import net.minecraft.world.level.block.Blocks;
+import lombok.Getter;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
-import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.StringUtil;
-import net.minecraft.core.BlockPos;
+import net.minecraft.server.packs.resources.Resource;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import slimeknights.mantle.Mantle;
 import slimeknights.mantle.client.book.data.BookData;
+import slimeknights.mantle.client.book.data.element.TextData;
 import slimeknights.mantle.client.book.repository.BookRepository;
 import slimeknights.mantle.client.screen.book.ArrowButton;
 import slimeknights.mantle.client.screen.book.BookScreen;
@@ -24,15 +23,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-@Environment(EnvType.CLIENT)
 public class ContentStructure extends PageContent {
 
   public static final transient ResourceLocation ID = Mantle.getResource("structure");
 
+  @Getter
   public String title;
   public String data;
 
-  public String text;
+  public TextData[] description;
 
   public final transient StructureTemplate template = new StructureTemplate();
   public transient List<StructureTemplate.StructureBlockInfo> templateBlocks = new ArrayList<>();
@@ -87,12 +86,12 @@ public class ContentStructure extends PageContent {
     int structureSizeX = BookScreen.PAGE_WIDTH;
     int structureSizeY = BookScreen.PAGE_HEIGHT - y - 10;
 
-    if (!StringUtil.isNullOrEmpty(this.text)) {
+
+    if (this.description != null && this.description.length > 0) {
       offset = 15;
       structureSizeX -= 2 * offset;
       structureSizeY -= 2 * offset;
-
-      list.add(new TextElement(0, BookScreen.PAGE_HEIGHT - 10 - 2 * offset, BookScreen.PAGE_WIDTH, 2 * offset, this.text));
+      list.add(new TextElement(0, BookScreen.PAGE_HEIGHT - 10 - 2 * offset, BookScreen.PAGE_WIDTH, 2 * offset, this.description));
     }
 
     if (this.template != null && this.template.getSize() != BlockPos.ZERO) {

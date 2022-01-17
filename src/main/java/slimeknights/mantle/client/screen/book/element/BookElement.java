@@ -8,14 +8,12 @@ import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
+import net.minecraftforge.client.RenderProperties;
 import slimeknights.mantle.client.screen.book.BookScreen;
 
 import java.util.List;
 import java.util.Optional;
 
-@Environment(EnvType.CLIENT)
 public abstract class BookElement extends GuiComponent {
 
   public BookScreen parent;

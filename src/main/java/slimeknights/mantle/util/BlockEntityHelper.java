@@ -4,8 +4,11 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import slimeknights.mantle.Mantle;
 
 import javax.annotation.Nullable;
@@ -25,8 +28,8 @@ public class BlockEntityHelper {
    * @param <T>    Tile entity type
    * @return  Optional of the tile entity, empty if missing or wrong class
    */
-  public static <T> Optional<T> getTile(Class<T> clazz, @Nullable BlockGetter world, BlockPos pos) {
-    return getTile(clazz, world, pos, false);
+  public static <T> Optional<T> get(Class<T> clazz, @Nullable BlockGetter world, BlockPos pos) {
+    return get(clazz, world, pos, false);
   }
 
   /**
@@ -38,7 +41,7 @@ public class BlockEntityHelper {
    * @param <T>    Tile entity type
    * @return  Optional of the tile entity, empty if missing or wrong class
    */
-  public static <T> Optional<T>  getTile(Class<T> clazz, @Nullable BlockGetter world, BlockPos pos, boolean logWrongType) {
+  public static <T> Optional<T> get(Class<T> clazz, @Nullable BlockGetter world, BlockPos pos, boolean logWrongType) {
     if (!isBlockLoaded(world, pos)) {
       return Optional.empty();
     }
@@ -73,5 +76,18 @@ public class BlockEntityHelper {
       return ((LevelReader) world).hasChunkAt(pos);
     }
     return true;
+  }
+
+  /** Handles the unchecked cast for a block entity ticker */
+  @SuppressWarnings("unchecked")
+  @Nullable
+  public static <HAVE extends BlockEntity, RET extends BlockEntity> BlockEntityTicker<RET> castTicker(BlockEntityType<RET> expected, BlockEntityType<HAVE> have, BlockEntityTicker<? super HAVE> ticker) {
+    return have == expected ? (BlockEntityTicker<RET>)ticker : null;
+  }
+
+  /** Handles the unchecked cast for a block entity ticker */
+  @Nullable
+  public static <HAVE extends BlockEntity, RET extends BlockEntity> BlockEntityTicker<RET> serverTicker(Level level, BlockEntityType<RET> expected, BlockEntityType<HAVE> have, BlockEntityTicker<? super HAVE> ticker) {
+    return level.isClientSide ? null : castTicker(expected, have, ticker);
   }
 }

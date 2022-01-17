@@ -1,12 +1,13 @@
 package slimeknights.mantle.client.book.data.content;
 
+import lombok.Getter;
 import net.minecraft.client.Minecraft;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.CraftingRecipe;
-import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.core.NonNullList;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CraftingRecipe;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.Recipe;
 import net.minecraftforge.common.crafting.IShapedRecipe;
 import org.apache.commons.lang3.StringUtils;
 import slimeknights.mantle.Mantle;
@@ -41,8 +42,9 @@ public class ContentCrafting extends PageContent {
   public static final transient int SLOT_MARGIN = 5;
   public static final transient int SLOT_PADDING = 4;
 
+  @Getter
   public String title = "Crafting";
-  public String grid_size = "large";
+  public String grid_size = "auto";
   public IngredientData[][] grid;
   public IngredientData result;
   public TextData[] description;
@@ -63,13 +65,16 @@ public class ContentCrafting extends PageContent {
       y = getTitleHeight();
     }
 
-    if (this.grid_size.equalsIgnoreCase("small")) {
+    // Fallback for if grid size is not specified in a manual recipe
+    String size = this.grid_size.equalsIgnoreCase("auto") ? "large" : this.grid_size;
+
+    if (size.equalsIgnoreCase("small")) {
       x = BookScreen.PAGE_WIDTH / 2 - IMG_CRAFTING_SMALL.width / 2;
       height = y + IMG_CRAFTING_SMALL.height;
       list.add(new ImageElement(x, y, IMG_CRAFTING_SMALL.width, IMG_CRAFTING_SMALL.height, IMG_CRAFTING_SMALL, book.appearance.slotColor));
       resultX = x + X_RESULT_SMALL;
       resultY = y + Y_RESULT_SMALL;
-    } else if (this.grid_size.equalsIgnoreCase("large")) {
+    } else if (size.equalsIgnoreCase("large")) {
       x = BookScreen.PAGE_WIDTH / 2 - IMG_CRAFTING_LARGE.width / 2;
       height = y + IMG_CRAFTING_LARGE.height;
       list.add(new ImageElement(x, y, IMG_CRAFTING_LARGE.width, IMG_CRAFTING_LARGE.height, IMG_CRAFTING_LARGE, book.appearance.slotColor));
@@ -103,18 +108,23 @@ public class ContentCrafting extends PageContent {
 
     if (!StringUtils.isEmpty(recipe) && ResourceLocation.isValidResourceLocation(recipe)) {
       int w = 0, h = 0;
-      switch (grid_size.toLowerCase()) {
-        case "large":
-          w = h = 3;
-          break;
-        case "small":
-          w = h = 2;
-          break;
-      }
 
       assert Minecraft.getInstance().level != null;
       Recipe<?> recipe = Minecraft.getInstance().level.getRecipeManager().byKey(new ResourceLocation(this.recipe)).orElse(null);
       if (recipe instanceof CraftingRecipe) {
+        if(grid_size.equalsIgnoreCase("auto")) {
+          if(recipe.canCraftInDimensions(2, 2)) {
+            grid_size = "small";
+          } else {
+            grid_size = "large";
+          }
+        }
+
+        switch (grid_size.toLowerCase()) {
+          case "large" -> w = h = 3;
+          case "small" -> w = h = 2;
+        }
+
         if (!recipe.canCraftInDimensions(w, h)) {
           throw new BookLoadException("Recipe " + this.recipe + " cannot fit in a " + w + "x" + h + " crafting grid");
         }
@@ -123,9 +133,7 @@ public class ContentCrafting extends PageContent {
 
         NonNullList<Ingredient> ingredients = recipe.getIngredients();
 
-        if (recipe instanceof IShapedRecipe) {
-          IShapedRecipe<?> shaped = (IShapedRecipe<?>) recipe;
-
+        if (recipe instanceof IShapedRecipe<?> shaped) {
           grid = new IngredientData[shaped.getRecipeHeight()][shaped.getRecipeWidth()];
 
           for (int y = 0; y < grid.length; y++) {

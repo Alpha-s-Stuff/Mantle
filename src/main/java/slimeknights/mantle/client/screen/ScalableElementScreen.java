@@ -2,11 +2,8 @@ package slimeknights.mantle.client.screen;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.screens.Screen;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 
 // TODO: class needs some rewrites
-@Environment(EnvType.CLIENT)
 public class ScalableElementScreen extends ElementScreen {
 
   public ScalableElementScreen(int x, int y, int w, int h, int texW, int texH) {

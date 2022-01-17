@@ -3,8 +3,6 @@ package slimeknights.mantle.client.book.data;
 import com.google.gson.JsonElement;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 import net.minecraftforge.common.crafting.conditions.TrueCondition;
 import slimeknights.mantle.Mantle;
@@ -22,7 +20,6 @@ import java.lang.reflect.Modifier;
 import java.util.Collections;
 import java.util.Map;
 
-@Environment(EnvType.CLIENT)
 public class PageData implements IDataItem, IConditional {
 
   public String name = null;
@@ -85,6 +82,7 @@ public class PageData implements IDataItem, IConditional {
               this.content = BookLoader.getGson().fromJson(data, ctype);
             } catch (Exception e) {
               this.content = new ContentError("Failed to create a page of type \"" + this.type + "\", perhaps the page file \"" + this.data + "\" is missing or invalid?", e);
+              e.printStackTrace();
             }
           } else {
             this.content = new ContentError("Failed to create a page of type \"" + this.type + "\" as it is not registered.");
@@ -99,6 +97,7 @@ public class PageData implements IDataItem, IConditional {
           this.content = ctype.getDeclaredConstructor().newInstance();
         } catch (InstantiationException | IllegalAccessException | NullPointerException | NoSuchMethodException | InvocationTargetException e) {
           this.content = new ContentError("Failed to create a page of type \"" + this.type + "\".", e);
+          e.printStackTrace();
         }
       } else {
         this.content = new ContentError("Failed to create a page of type \"" + this.type + "\" as it is not registered.");
@@ -157,9 +156,17 @@ public class PageData implements IDataItem, IConditional {
     }
   }
 
+  /** Gets the title for the page data, which can be overridden by translation */
   public String getTitle() {
     String title = this.parent.parent.strings.get(this.parent.name + "." + this.name);
-    return title == null ? this.name : title;
+    if (title != null) {
+      return title;
+    }
+    title = content.getTitle();
+    if (title != null && !title.isEmpty()) {
+      return title;
+    }
+    return this.name;
   }
 
   @Override

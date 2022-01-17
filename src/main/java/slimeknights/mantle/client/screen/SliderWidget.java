@@ -2,11 +2,8 @@ package slimeknights.mantle.client.screen;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.util.Mth;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 
 // a vertical slider!
-@Environment(EnvType.CLIENT)
 public class SliderWidget extends Widget {
 
   // gui info

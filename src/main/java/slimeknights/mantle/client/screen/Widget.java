@@ -1,10 +1,7 @@
 package slimeknights.mantle.client.screen;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 
-@Environment(EnvType.CLIENT)
 public abstract class Widget {
 
   public int xPos;

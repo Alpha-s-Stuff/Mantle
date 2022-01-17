@@ -2,8 +2,6 @@ package slimeknights.mantle.util;
 
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 
 import java.util.function.Supplier;
 
@@ -25,7 +23,6 @@ public class SupplierCreativeTab extends CreativeModeTab {
     this.supplier = supplier;
   }
 
-  @Environment(EnvType.CLIENT)
   @Override
   public ItemStack makeIcon() {
     return supplier.get();

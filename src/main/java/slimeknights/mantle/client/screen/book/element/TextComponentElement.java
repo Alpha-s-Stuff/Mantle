@@ -4,8 +4,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.Font;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import slimeknights.mantle.client.book.action.StringActionProcessor;
 import slimeknights.mantle.client.book.data.element.TextComponentData;
 import slimeknights.mantle.client.screen.book.TextComponentDataRenderer;
@@ -14,13 +12,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-@Environment(EnvType.CLIENT)
 public class TextComponentElement extends SizedBookElement {
 
   public TextComponentData[] text;
   private final List<Component> tooltip = new ArrayList<Component>();
 
-  private boolean doAction = false;
+  private transient String lastAction = "";
 
   public TextComponentElement(int x, int y, int width, int height, String text) {
     this(x, y, width, height, new TextComponent(text));
@@ -42,12 +39,7 @@ public class TextComponentElement extends SizedBookElement {
 
   @Override
   public void draw(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks, Font fontRenderer) {
-    String action = TextComponentDataRenderer.drawText(matrixStack, this.x, this.y, this.width, this.height, this.text, mouseX, mouseY, fontRenderer, this.tooltip);
-
-    if (this.doAction) {
-      this.doAction = false;
-      StringActionProcessor.process(action, this.parent);
-    }
+    lastAction = TextComponentDataRenderer.drawText(matrixStack, this.x, this.y, this.width, this.height, this.text, mouseX, mouseY, fontRenderer, this.tooltip);
   }
 
   @Override
@@ -60,8 +52,8 @@ public class TextComponentElement extends SizedBookElement {
 
   @Override
   public void mouseClicked(double mouseX, double mouseY, int mouseButton) {
-    if (mouseButton == 0) {
-      this.doAction = true;
+    if (mouseButton == 0 && !lastAction.isEmpty()) {
+      StringActionProcessor.process(lastAction, this.parent);
     }
   }
 }

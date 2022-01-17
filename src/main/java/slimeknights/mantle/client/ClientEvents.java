@@ -8,14 +8,15 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.renderer.Sheets;
-import net.minecraft.server.packs.resources.ReloadableResourceManager;
-import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.client.renderer.blockentity.SignRenderer;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.level.GameType;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
+import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
+import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 import net.minecraftforge.client.gui.IIngameOverlay;
@@ -29,6 +30,8 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import slimeknights.mantle.Mantle;
 import slimeknights.mantle.client.book.BookLoader;
+import slimeknights.mantle.client.book.data.BookData;
+import slimeknights.mantle.client.book.repository.FileRepository;
 import slimeknights.mantle.client.model.FallbackModelLoader;
 import slimeknights.mantle.client.model.NBTKeyModel;
 import slimeknights.mantle.client.model.RetexturedModel;
@@ -39,6 +42,7 @@ import slimeknights.mantle.client.model.inventory.InventoryModel;
 import slimeknights.mantle.client.model.util.ColoredBlockModel;
 import slimeknights.mantle.client.model.util.MantleItemLayerModel;
 import slimeknights.mantle.client.model.util.ModelHelper;
+import slimeknights.mantle.registration.MantleRegistrations;
 import slimeknights.mantle.registration.RegistrationHelper;
 import slimeknights.mantle.util.OffhandCooldownTracker;
 
@@ -48,12 +52,22 @@ import java.util.function.Function;
 public class ClientEvents implements ClientModInitializer {
   private static final Function<OffhandCooldownTracker,Float> COOLDOWN_TRACKER = OffhandCooldownTracker::getCooldown;
 
-  public void onInitializeClient() {
-    ResourceManager manager = Minecraft.getInstance().getResourceManager();
-    if (manager instanceof ReloadableResourceManager) {
-      ((ReloadableResourceManager)manager).registerReloadListener(ModelHelper.LISTENER);
-    }
+  @SubscribeEvent
+  static void registerEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
+    event.registerBlockEntityRenderer(MantleRegistrations.SIGN, SignRenderer::new);
+  }
+
+  @SubscribeEvent
+  static void registerListeners(RegisterClientReloadListenersEvent event) {
+    event.registerReloadListener(ModelHelper.LISTENER);
+    event.registerReloadListener(new BookLoader());
+  }
+
+  @SubscribeEvent
+  static void clientSetup(FMLClientSetupEvent event) {
     event.enqueueWork(() -> RegistrationHelper.forEachWoodType(Sheets::addWoodType));
+
+    BookLoader.registerBook(Mantle.getResource("test"), new FileRepository(Mantle.getResource("books/test")));
   }
 
   // PAINNNNNN
@@ -76,10 +90,6 @@ public class ClientEvents implements ClientModInitializer {
 
   @SubscribeEvent
   static void commonSetup(FMLCommonSetupEvent event) {
-    ResourceManager manager = Minecraft.getInstance().getResourceManager();
-    if (manager instanceof ReloadableResourceManager) {
-      ((ReloadableResourceManager)manager).registerReloadListener(new BookLoader());
-    }
     MinecraftForge.EVENT_BUS.register(new ExtraHeartRenderHandler());
     MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, RenderGameOverlayEvent.PostLayer.class, ClientEvents::renderOffhandAttackIndicator);
   }

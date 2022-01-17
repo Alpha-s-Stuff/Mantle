@@ -3,8 +3,6 @@ package slimeknights.mantle.client.screen.book.element;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.Font;
 import net.minecraft.network.chat.Component;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import slimeknights.mantle.client.book.action.StringActionProcessor;
 import slimeknights.mantle.client.book.data.element.TextData;
 import slimeknights.mantle.client.screen.book.TextDataRenderer;
@@ -13,13 +11,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-@Environment(EnvType.CLIENT)
 public class TextElement extends SizedBookElement {
 
   public TextData[] text;
   private final List<Component> tooltip = new ArrayList<Component>();
 
-  private boolean doAction = false;
+  private transient String lastAction = "";
 
   public TextElement(int x, int y, int width, int height, String text) {
     this(x, y, width, height, new TextData(text));
@@ -37,12 +34,7 @@ public class TextElement extends SizedBookElement {
 
   @Override
   public void draw(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks, Font fontRenderer) {
-    String action = TextDataRenderer.drawText(matrixStack, this.x, this.y, this.width, this.height, this.text, mouseX, mouseY, fontRenderer, this.tooltip);
-
-    if (this.doAction) {
-      this.doAction = false;
-      StringActionProcessor.process(action, this.parent);
-    }
+    lastAction = TextDataRenderer.drawText(matrixStack, this.x, this.y, this.width, this.height, this.text, mouseX, mouseY, fontRenderer, this.tooltip);
   }
 
   @Override
@@ -55,8 +47,8 @@ public class TextElement extends SizedBookElement {
 
   @Override
   public void mouseClicked(double mouseX, double mouseY, int mouseButton) {
-    if (mouseButton == 0) {
-      this.doAction = true;
+    if (mouseButton == 0 && !lastAction.isEmpty()) {
+      StringActionProcessor.process(lastAction, this.parent);
     }
   }
 }
