@@ -1,7 +1,7 @@
 package slimeknights.mantle.lib.util;
 
 import com.mojang.math.Matrix4f;
-import com.simibubi.create.lib.extensions.Matrix4fExtensions;
+import slimeknights.mantle.lib.extensions.Matrix4fExtensions;
 
 public final class Matrix4fHelper {
 

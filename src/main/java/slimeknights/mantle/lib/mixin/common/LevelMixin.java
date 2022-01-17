@@ -1,8 +1,8 @@
 package slimeknights.mantle.lib.mixin.common;
 
-import com.simibubi.create.lib.block.WeakPowerCheckingBlock;
-import com.simibubi.create.lib.extensions.BlockStateExtensions;
-import com.simibubi.create.lib.util.MixinHelper;
+import slimeknights.mantle.lib.block.WeakPowerCheckingBlock;
+import slimeknights.mantle.lib.extensions.BlockStateExtensions;
+import slimeknights.mantle.lib.util.MixinHelper;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;

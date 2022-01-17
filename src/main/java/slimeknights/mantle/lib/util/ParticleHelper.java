@@ -1,6 +1,6 @@
 package slimeknights.mantle.lib.util;
 
-import com.simibubi.create.lib.mixin.accessor.ParticleAccessor;
+import slimeknights.mantle.lib.mixin.accessor.ParticleAccessor;
 
 import net.minecraft.client.particle.Particle;
 

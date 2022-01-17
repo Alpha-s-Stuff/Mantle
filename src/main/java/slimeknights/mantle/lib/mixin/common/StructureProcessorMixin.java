@@ -1,6 +1,6 @@
 package slimeknights.mantle.lib.mixin.common;
 
-import com.simibubi.create.lib.extensions.StructureProcessorExtensions;
+import slimeknights.mantle.lib.extensions.StructureProcessorExtensions;
 import org.spongepowered.asm.mixin.Mixin;
 
 import net.minecraft.core.BlockPos;

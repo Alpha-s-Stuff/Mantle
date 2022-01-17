@@ -1,6 +1,6 @@
 package slimeknights.mantle.lib.mixin.client;
 
-import com.simibubi.create.lib.event.KeyInputCallback;
+import slimeknights.mantle.lib.event.KeyInputCallback;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import org.spongepowered.asm.mixin.Mixin;

@@ -22,6 +22,7 @@ import net.minecraft.tags.Tag;
 import net.minecraft.util.GsonHelper;
 import org.apache.commons.io.IOUtils;
 import slimeknights.mantle.Mantle;
+import slimeknights.mantle.lib.mixin.accessor.TagContainerAccessor;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -67,14 +68,14 @@ public class DumpAllTagsCommand {
    * @return  Clickable text component
    */
   protected static Component getOutputComponent(File file) {
-    return new TextComponent(file.getAbsolutePath()).withStyle(style -> style.setUnderlined(true).withClickEvent(new ClickEvent(Action.OPEN_FILE, file.getAbsolutePath())));
+    return new TextComponent(file.getAbsolutePath()).withStyle(style -> style.withUnderlined(true).withClickEvent(new ClickEvent(Action.OPEN_FILE, file.getAbsolutePath())));
   }
 
   /** Dumps all tags to the game directory */
   private static int runAll(CommandContext<CommandSourceStack> context) {
     File output = getOutputFile(context);
     int tagsDumped = 0;
-    for (ResourceKey<? extends Registry<?>> key : SerializationTags.getInstance().collections.keySet()) {
+    for (ResourceKey<? extends Registry<?>> key : ((TagContainerAccessor)SerializationTags.getInstance()).getCollections().keySet()) {
       ResourceLocation name = key.location();
       tagsDumped += runForFolder(context, name, TagCollectionArgument.getTagFolder(name), output);
     }

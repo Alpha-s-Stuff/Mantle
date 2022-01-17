@@ -1,6 +1,6 @@
 package slimeknights.mantle.lib.mixin.common;
 
-import com.simibubi.create.lib.block.CustomPathNodeTypeBlock;
+import slimeknights.mantle.lib.block.CustomPathNodeTypeBlock;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;

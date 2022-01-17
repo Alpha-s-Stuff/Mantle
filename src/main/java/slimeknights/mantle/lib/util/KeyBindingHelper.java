@@ -1,7 +1,7 @@
 package slimeknights.mantle.lib.util;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import com.simibubi.create.lib.mixin.accessor.KeyMappingAccessor;
+import slimeknights.mantle.lib.mixin.accessor.KeyMappingAccessor;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 

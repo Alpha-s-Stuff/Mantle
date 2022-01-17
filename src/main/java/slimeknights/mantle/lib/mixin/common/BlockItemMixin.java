@@ -1,6 +1,6 @@
 package slimeknights.mantle.lib.mixin.common;
 
-import com.simibubi.create.lib.event.BlockPlaceCallback;
+import slimeknights.mantle.lib.event.BlockPlaceCallback;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;

@@ -1,8 +1,8 @@
 package slimeknights.mantle.lib.mixin.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.simibubi.create.lib.event.RenderHandCallback;
-import com.simibubi.create.lib.extensions.ItemExtensions;
+import slimeknights.mantle.lib.event.RenderHandCallback;
+import slimeknights.mantle.lib.extensions.ItemExtensions;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import org.spongepowered.asm.mixin.Mixin;

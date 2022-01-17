@@ -1,8 +1,8 @@
 package slimeknights.mantle.lib.mixin.common;
 
-import com.simibubi.create.lib.item.CustomMaxCountItem;
-import com.simibubi.create.lib.util.MixinHelper;
-import com.simibubi.create.lib.util.NBTSerializable;
+import slimeknights.mantle.lib.item.CustomMaxCountItem;
+import slimeknights.mantle.lib.util.MixinHelper;
+import slimeknights.mantle.lib.util.NBTSerializable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;

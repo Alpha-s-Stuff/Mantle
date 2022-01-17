@@ -1,7 +1,7 @@
 package slimeknights.mantle.lib.util;
 
 import com.mojang.math.Vector3f;
-import com.simibubi.create.lib.mixin.accessor.Vector3fAccessor;
+import slimeknights.mantle.lib.mixin.accessor.Vector3fAccessor;
 
 public final class Vector3fHelper {
 	public static void setX(Vector3f vector, float x) {

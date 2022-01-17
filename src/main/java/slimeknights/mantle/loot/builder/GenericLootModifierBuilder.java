@@ -5,6 +5,8 @@ import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.minecraftforge.common.data.GlobalLootModifierProvider;
 import net.minecraftforge.common.loot.GlobalLootModifierSerializer;
 import net.minecraftforge.common.loot.LootModifier;
+import slimeknights.mantle.lib.loot.GlobalLootModifierSerializer;
+import slimeknights.mantle.lib.loot.LootModifier;
 
 import java.util.function.Function;
 

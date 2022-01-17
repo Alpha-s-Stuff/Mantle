@@ -1,10 +1,10 @@
 package slimeknights.mantle.lib.mixin.client;
 
-import com.simibubi.create.lib.event.ClientWorldEvents;
-import com.simibubi.create.lib.event.InstanceRegistrationCallback;
-import com.simibubi.create.lib.event.LeftClickAirCallback;
-import com.simibubi.create.lib.event.ParticleManagerRegistrationCallback;
-import com.simibubi.create.lib.event.RenderTickStartCallback;
+import slimeknights.mantle.lib.event.ClientWorldEvents;
+import slimeknights.mantle.lib.event.InstanceRegistrationCallback;
+import slimeknights.mantle.lib.event.LeftClickAirCallback;
+import slimeknights.mantle.lib.event.ParticleManagerRegistrationCallback;
+import slimeknights.mantle.lib.event.RenderTickStartCallback;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import org.jetbrains.annotations.Nullable;

@@ -18,7 +18,7 @@
 	- All utility classes should be final and have a private nullary (empty) constructor. This constructor should go at the very end before inner classes, if there are any.
 
 4. **Organization**
-	- Regular mixins should go into the `com.simibubi.create.lib.mixin` package.
-	- Accessor mixins should go into the `com.simibubi.create.lib.mixin.accessor` package.
-	- Extension interfaces should go into the `com.simibubi.create.lib.extensions` package.
-	- Helper/utility classes should go into the `com.simibubi.create.lib.util` package.
+	- Regular mixins should go into the `slimeknights.mantle.lib.mixin` package.
+	- Accessor mixins should go into the `slimeknights.mantle.lib.mixin.accessor` package.
+	- Extension interfaces should go into the `slimeknights.mantle.lib.extensions` package.
+	- Helper/utility classes should go into the `slimeknights.mantle.lib.util` package.

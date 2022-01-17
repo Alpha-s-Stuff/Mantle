@@ -5,6 +5,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.SerializationTags;
 import net.minecraft.tags.Tag;
+import net.minecraft.tags.TagContainer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.common.MinecraftForge;
@@ -13,6 +14,8 @@ import net.minecraftforge.event.TagsUpdatedEvent;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 import slimeknights.mantle.Mantle;
 import slimeknights.mantle.config.Config;
+import slimeknights.mantle.lib.event.TagsUpdatedCallback;
+import slimeknights.mantle.lib.util.RegistryHelper;
 import slimeknights.mantle.util.LogicHelper;
 
 import java.util.Comparator;
@@ -27,17 +30,17 @@ import java.util.Optional;
  * Utility that helps get the preferred item from a tag based on mod ID.
  * @param <T>  Registry type
  */
-public class TagPreference<T extends IForgeRegistryEntry<T>> {
+public class TagPreference<T> {
   /** Just an alphabetically late RL to simplify null checks */
   private static final ResourceLocation DEFAULT_ID = new ResourceLocation("zzzzz:zzzzz"); // simplfies null checks
   /** Map of each tag type to the preference instance for that type */
   private static final Map<ResourceKey<?>, TagPreference<?>> PREFERENCE_MAP = new IdentityHashMap<>();
 
   /** Comparator to decide which registry entry is preferred */
-  private static final Comparator<IForgeRegistryEntry<?>> ENTRY_COMPARATOR = (a, b) -> {
+  private static final Comparator<?> ENTRY_COMPARATOR = (a, b) -> {
     // first get registry names, use default ID if null (unlikely)
-    ResourceLocation idA = Objects.requireNonNullElse(a.getRegistryName(), DEFAULT_ID);
-    ResourceLocation idB = Objects.requireNonNullElse(b.getRegistryName(), DEFAULT_ID);
+    ResourceLocation idA = Objects.requireNonNullElse(RegistryHelper.getRegistryKey(a), DEFAULT_ID);
+    ResourceLocation idB = Objects.requireNonNullElse(RegistryHelper.getRegistryKey(b), DEFAULT_ID);
     // first compare preferences
     List<? extends String> entries = Config.TAG_PREFERENCES.get();
     int size = entries.size();
@@ -57,7 +60,7 @@ public class TagPreference<T extends IForgeRegistryEntry<T>> {
    * @return  Tag preference instance
    */
   @SuppressWarnings("unchecked")
-  public static <T extends IForgeRegistryEntry<T>> TagPreference<T> getInstance(ResourceKey<Registry<T>> key) {
+  public static <T> TagPreference<T> getInstance(ResourceKey<Registry<T>> key) {
     // should always be the right instance as only we add entries to the map
     return (TagPreference<T>) PREFERENCE_MAP.computeIfAbsent(key, c -> new TagPreference<>(key));
   }
@@ -86,14 +89,14 @@ public class TagPreference<T extends IForgeRegistryEntry<T>> {
 
   private TagPreference(ResourceKey<Registry<T>> key) {
     this.key = key;
-    MinecraftForge.EVENT_BUS.addListener(this::clearCache);
+    TagsUpdatedCallback.EVENT.register(this::clearCache);
   }
 
   /**
    * Clears the tag cache from the event
-   * @param event  Tag event
+   * @param container  Tag Container
    */
-  private void clearCache(TagsUpdatedEvent event) {
+  private void clearCache(TagContainer container) {
     preferenceCache.clear();
   }
 

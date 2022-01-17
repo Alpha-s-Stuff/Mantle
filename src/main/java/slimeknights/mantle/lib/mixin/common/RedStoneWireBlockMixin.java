@@ -1,7 +1,7 @@
 package slimeknights.mantle.lib.mixin.common;
 
-import com.simibubi.create.lib.block.CanConnectRedstoneBlock;
-import com.simibubi.create.lib.mixin.accessor.RedStoneWireBlockAccessor;
+import slimeknights.mantle.lib.block.CanConnectRedstoneBlock;
+import slimeknights.mantle.lib.mixin.accessor.RedStoneWireBlockAccessor;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;

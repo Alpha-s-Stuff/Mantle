@@ -2,7 +2,7 @@ package slimeknights.mantle.lib.util;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.simibubi.create.lib.mixin.accessor.ItemRendererAccessor;
+import slimeknights.mantle.lib.mixin.accessor.ItemRendererAccessor;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import java.util.List;

@@ -1,6 +1,6 @@
 package slimeknights.mantle.lib.util;
 
-import com.simibubi.create.lib.mixin.accessor.GameRendererAccessor;
+import slimeknights.mantle.lib.mixin.accessor.GameRendererAccessor;
 
 import net.minecraft.client.Camera;
 import net.minecraft.client.renderer.GameRenderer;

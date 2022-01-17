@@ -1,77 +1,77 @@
 package slimeknights.mantle.client.model.util;
 
-import net.minecraft.client.resources.model.ModelState;
-import net.minecraft.client.resources.model.UnbakedModel;
-import net.minecraft.client.renderer.block.model.ItemTransforms;
-import net.minecraft.client.resources.model.Material;
-import net.minecraftforge.client.model.IModelConfiguration;
-import net.minecraftforge.client.model.geometry.IModelGeometryPart;
+import slimeknights.mantle.lib.mixin.accessor.BlockModelAccessor;
 
 import javax.annotation.Nullable;
+
+import net.minecraft.client.renderer.block.model.BlockModel;
+import net.minecraft.client.renderer.block.model.ItemTransforms;
+import net.minecraft.client.resources.model.Material;
 
 /**
  * Wrapper around a {@link IModelConfiguration} instance to allow easier extending, mostly for dynamic textures
  */
 @SuppressWarnings("WeakerAccess")
-public class ModelConfigurationWrapper implements IModelConfiguration {
-  private final IModelConfiguration base;
+public class ModelConfigurationWrapper extends BlockModel {
+  private final BlockModel base;
 
   /**
    * Creates a new configuration wrapper
    * @param base  Base model configuration
    */
-  public ModelConfigurationWrapper(IModelConfiguration base) {
+  public ModelConfigurationWrapper(BlockModel base) {
+    super(base.parentLocation, base.getElements(), ((BlockModelAccessor)base).getTextureMap(), base.hasAmbientOcclusion(), base.getGuiLight(), base.getTransforms(), base.getOverrides());
     this.base = base;
   }
 
   @Nullable
   @Override
-  public UnbakedModel getOwnerModel() {
-    return base.getOwnerModel();
+  public BlockModel getRootModel() {
+    return base.getRootModel();
+  }
+
+//  @Override
+//  public String getModelName() {
+//    return base.();
+//  }
+
+  @Override
+  public boolean hasTexture(String name) {
+    return base.hasTexture(name);
   }
 
   @Override
-  public String getModelName() {
-    return base.getModelName();
+  public Material getMaterial(String name) {
+    return base.getMaterial(name);
   }
 
   @Override
-  public boolean isTexturePresent(String name) {
-    return base.isTexturePresent(name);
+  public boolean isResolved() {
+    return base.isResolved();
   }
 
-  @Override
-  public Material resolveTexture(String name) {
-    return base.resolveTexture(name);
-  }
+//  @Override
+//  public boolean isSideLit() {
+//    return base.isSideLit();
+//  }
+
+//  @Override
+//  public boolean useSmoothLighting() {
+//    return base.useSmoothLighting();
+//  }
 
   @Override
-  public boolean isShadedInGui() {
-    return base.isShadedInGui();
+  public ItemTransforms getTransforms() {
+    return base.getTransforms();
   }
 
-  @Override
-  public boolean isSideLit() {
-    return base.isSideLit();
-  }
+//  @Override
+//  public ModelState getCombinedTransform() {
+//    return base.getCombinedTransform();
+//  }
 
-  @Override
-  public boolean useSmoothLighting() {
-    return base.useSmoothLighting();
-  }
-
-  @Override
-  public ItemTransforms getCameraTransforms() {
-    return base.getCameraTransforms();
-  }
-
-  @Override
-  public ModelState getCombinedTransform() {
-    return base.getCombinedTransform();
-  }
-
-  @Override
-  public boolean getPartVisibility(IModelGeometryPart part, boolean fallback) {
-    return base.getPartVisibility(part, fallback);
-  }
+//  @Override
+//  public boolean getPartVisibility(IModelGeometryPart part, boolean fallback) {
+//    return base.getPartVisibility(part, fallback);
+//  }
 }

@@ -1,5 +1,6 @@
 package slimeknights.mantle.command;
 
+import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import net.minecraft.commands.CommandSourceStack;
@@ -9,8 +10,8 @@ import net.minecraft.commands.synchronization.ArgumentTypes;
 import net.minecraft.commands.synchronization.EmptyArgumentSerializer;
 import net.minecraft.commands.synchronization.SuggestionProviders;
 import net.minecraft.world.level.GameRules;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.RegisterCommandsEvent;
+
+import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import slimeknights.mantle.Mantle;
 
 import java.util.function.Consumer;
@@ -47,7 +48,7 @@ public class MantleCommand {
     });
 
     // add command listener
-    MinecraftForge.EVENT_BUS.addListener(MantleCommand::registerCommand);
+    CommandRegistrationCallback.EVENT.register(MantleCommand::registerCommand);
   }
 
   /** Registers a sub command for the root Mantle command */
@@ -58,7 +59,7 @@ public class MantleCommand {
   }
 
   /** Event listener to register the Mantle command */
-  private static void registerCommand(RegisterCommandsEvent event) {
+  private static void registerCommand(CommandDispatcher<CommandSourceStack> dispatcher, boolean dedicated) {
     LiteralArgumentBuilder<CommandSourceStack> builder = Commands.literal("mantle");
 
     // sub commands
@@ -69,7 +70,7 @@ public class MantleCommand {
     register(builder, "tags_for", TagsForCommand::register);
 
     // register final command
-    event.getDispatcher().register(builder);
+    dispatcher.register(builder);
   }
 
   /* Helpers */

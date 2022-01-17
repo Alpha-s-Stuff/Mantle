@@ -2,8 +2,8 @@ package slimeknights.mantle.lib.mixin.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Matrix4f;
-import com.simibubi.create.lib.block.CustomRenderBoundingBoxBlockEntity;
-import com.simibubi.create.lib.extensions.AbstractTextureExtension;
+import slimeknights.mantle.lib.block.CustomRenderBoundingBoxBlockEntity;
+import slimeknights.mantle.lib.extensions.AbstractTextureExtension;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import org.jetbrains.annotations.Nullable;

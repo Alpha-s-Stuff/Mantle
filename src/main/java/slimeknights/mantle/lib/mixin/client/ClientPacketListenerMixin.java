@@ -1,8 +1,8 @@
 package slimeknights.mantle.lib.mixin.client;
 
-import com.simibubi.create.lib.block.CustomDataPacketHandlingBlockEntity;
-import com.simibubi.create.lib.entity.ExtraSpawnDataEntity;
-import com.simibubi.create.lib.extensions.ClientboundAddEntityPacketExtensions;
+import slimeknights.mantle.lib.block.CustomDataPacketHandlingBlockEntity;
+import slimeknights.mantle.lib.entity.ExtraSpawnDataEntity;
+import slimeknights.mantle.lib.extensions.ClientboundAddEntityPacketExtensions;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import org.spongepowered.asm.mixin.Final;

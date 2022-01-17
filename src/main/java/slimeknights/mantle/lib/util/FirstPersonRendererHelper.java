@@ -1,6 +1,6 @@
 package slimeknights.mantle.lib.util;
 
-import com.simibubi.create.lib.mixin.accessor.ItemInHandRendererAccessor;
+import slimeknights.mantle.lib.mixin.accessor.ItemInHandRendererAccessor;
 
 import net.minecraft.client.renderer.ItemInHandRenderer;
 import net.minecraft.world.item.ItemStack;

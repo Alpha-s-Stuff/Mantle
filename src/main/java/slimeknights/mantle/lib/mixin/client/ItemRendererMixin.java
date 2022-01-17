@@ -1,7 +1,7 @@
 package slimeknights.mantle.lib.mixin.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.simibubi.create.lib.render.TransformTypeDependentItemBakedModel;
+import slimeknights.mantle.lib.render.TransformTypeDependentItemBakedModel;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import org.spongepowered.asm.mixin.Mixin;

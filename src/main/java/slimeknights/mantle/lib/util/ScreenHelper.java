@@ -1,7 +1,7 @@
 package slimeknights.mantle.lib.util;
 
-import com.simibubi.create.lib.event.RenderTooltipBorderColorCallback;
-import com.simibubi.create.lib.mixin.accessor.ScreenAccessor;
+import slimeknights.mantle.lib.event.RenderTooltipBorderColorCallback;
+import slimeknights.mantle.lib.mixin.accessor.ScreenAccessor;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;

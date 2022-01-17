@@ -16,18 +16,18 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandlerModifiable;
-import net.minecraftforge.items.wrapper.InvWrapper;
+import org.jetbrains.annotations.Nullable;
+import slimeknights.mantle.lib.transfer.item.IItemHandler;
+import slimeknights.mantle.lib.transfer.item.IItemHandlerModifiable;
+import slimeknights.mantle.lib.transfer.item.InvWrapper;
+import slimeknights.mantle.lib.transfer.item.ItemTransferable;
+import slimeknights.mantle.lib.util.LazyOptional;
 import slimeknights.mantle.util.ItemStackList;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 // Updated version of InventoryLogic in Mantle. Also contains a few bugfixes DOES NOT OVERRIDE createMenu
-public abstract class InventoryBlockEntity extends NameableBlockEntity implements Container, MenuProvider, Nameable {
+public abstract class InventoryBlockEntity extends NameableBlockEntity implements Container, MenuProvider, Nameable, ItemTransferable {
   private static final String TAG_INVENTORY_SIZE = "InventorySize";
   private static final String TAG_ITEMS = "Items";
   private static final String TAG_SLOT = "Slot";
@@ -58,16 +58,13 @@ public abstract class InventoryBlockEntity extends NameableBlockEntity implement
 
   @Nonnull
   @Override
-  public <T> LazyOptional<T> getCapability(Capability<T> capability, @Nullable Direction facing) {
-    if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
-      return this.itemHandlerCap.cast();
-    }
-    return super.getCapability(capability, facing);
+  public LazyOptional<IItemHandler> getItemHandler(@Nullable Direction direction) {
+    return this.itemHandlerCap.cast();
   }
 
-  @Override
+  //  @Override
   public void invalidateCaps() {
-    super.invalidateCaps();
+//    super.invalidateCaps();
     this.itemHandlerCap.invalidate();
   }
 
@@ -222,7 +219,7 @@ public abstract class InventoryBlockEntity extends NameableBlockEntity implement
   
   @Override
   public void saveAdditional(CompoundTag tags) {
-    super.save(tags);
+    super.saveAdditional(tags);
     this.writeInventoryToNBT(tags);
   }
 

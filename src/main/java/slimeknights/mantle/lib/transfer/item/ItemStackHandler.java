@@ -1,6 +1,6 @@
 package slimeknights.mantle.lib.transfer.item;
 
-import com.simibubi.create.lib.util.NBTSerializable;
+import slimeknights.mantle.lib.util.NBTSerializable;
 import java.util.Arrays;
 
 import net.minecraft.nbt.CompoundTag;

@@ -14,6 +14,7 @@ import net.minecraftforge.fluids.FluidAttributes;
 import net.minecraftforge.fluids.FluidStack;
 import slimeknights.mantle.client.model.fluid.FluidCuboid;
 import slimeknights.mantle.client.model.fluid.FluidCuboid.FluidFace;
+import slimeknights.mantle.lib.transfer.fluid.FluidStack;
 
 import java.util.List;
 

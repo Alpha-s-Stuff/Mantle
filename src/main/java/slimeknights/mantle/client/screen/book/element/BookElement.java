@@ -10,7 +10,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraftforge.client.RenderProperties;
 import slimeknights.mantle.client.screen.book.BookScreen;
 
 import java.util.List;
@@ -22,7 +21,7 @@ public abstract class BookElement extends GuiComponent {
   public BookScreen parent;
 
   protected Minecraft mc = Minecraft.getInstance();
-  protected TextureManager renderEngine = this.mc.textureManager;
+  protected TextureManager renderEngine = this.mc.getTextureManager();
 
   public int x, y;
 
@@ -52,7 +51,7 @@ public abstract class BookElement extends GuiComponent {
     List<Component> list = stack.getTooltipLines(this.mc.player, this.mc.options.advancedItemTooltips ? TooltipFlag.Default.ADVANCED : TooltipFlag.Default.NORMAL);
 
 
-    Font font = RenderProperties.get(stack).getFont(stack);
+    Font font = mc.gui.getFont();
     if (font == null) {
       font = fontRenderer;
     }
@@ -67,7 +66,7 @@ public abstract class BookElement extends GuiComponent {
     int oldHeight = parent.height;
     parent.width = BookScreen.PAGE_WIDTH;
     parent.height = BookScreen.PAGE_HEIGHT;
-    parent.renderTooltip(matrixStack, textLines, Optional.empty(), x, y, font);
+    parent.renderTooltip(matrixStack, textLines, Optional.empty(), x, y);
     parent.width = oldWidth;
     parent.height = oldHeight;
   }

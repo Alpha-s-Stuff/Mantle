@@ -1,6 +1,6 @@
 package slimeknights.mantle.lib.util;
 
-import com.simibubi.create.lib.mixin.accessor.BiomeManagerAccessor;
+import slimeknights.mantle.lib.mixin.accessor.BiomeManagerAccessor;
 
 import net.minecraft.world.level.biome.BiomeManager;
 

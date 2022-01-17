@@ -1,4 +1,4 @@
-package com.simibubi.create.lib.mixin.accessor;
+package slimeknights.mantle.lib.mixin.accessor;
 
 import java.util.Set;
 

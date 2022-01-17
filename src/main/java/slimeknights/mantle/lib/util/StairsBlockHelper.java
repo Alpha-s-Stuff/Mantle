@@ -1,6 +1,6 @@
 package slimeknights.mantle.lib.util;
 
-import com.simibubi.create.lib.mixin.accessor.StairBlockAccessor;
+import slimeknights.mantle.lib.mixin.accessor.StairBlockAccessor;
 
 import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour.Properties;

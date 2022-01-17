@@ -1,6 +1,6 @@
 package slimeknights.mantle.lib.mixin.common;
 
-import com.simibubi.create.lib.event.MobEntitySetTargetCallback;
+import slimeknights.mantle.lib.event.MobEntitySetTargetCallback;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;

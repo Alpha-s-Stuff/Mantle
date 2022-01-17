@@ -1,7 +1,7 @@
 package slimeknights.mantle.lib.util;
 
-import com.simibubi.create.lib.extensions.LanguageInfoExtensions;
-import com.simibubi.create.lib.mixin.accessor.MinecraftAccessor;
+import slimeknights.mantle.lib.extensions.LanguageInfoExtensions;
+import slimeknights.mantle.lib.mixin.accessor.MinecraftAccessor;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import java.util.Locale;

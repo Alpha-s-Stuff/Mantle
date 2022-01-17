@@ -1,6 +1,6 @@
 package slimeknights.mantle.lib.mixin.common;
 
-import com.simibubi.create.lib.extensions.BlockStateExtensions;
+import slimeknights.mantle.lib.extensions.BlockStateExtensions;
 import org.spongepowered.asm.mixin.Mixin;
 
 import net.minecraft.world.level.block.state.BlockState;

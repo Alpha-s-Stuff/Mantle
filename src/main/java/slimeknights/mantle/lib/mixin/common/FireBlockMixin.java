@@ -1,7 +1,7 @@
 package slimeknights.mantle.lib.mixin.common;
 
-import com.simibubi.create.lib.extensions.BlockStateExtensions;
-import com.simibubi.create.lib.extensions.FireBlockExtensions;
+import slimeknights.mantle.lib.extensions.BlockStateExtensions;
+import slimeknights.mantle.lib.extensions.FireBlockExtensions;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;

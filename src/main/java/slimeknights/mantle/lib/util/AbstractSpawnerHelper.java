@@ -1,6 +1,6 @@
 package slimeknights.mantle.lib.util;
 
-import com.simibubi.create.lib.mixin.accessor.BaseSpawnerAccessor;
+import slimeknights.mantle.lib.mixin.accessor.BaseSpawnerAccessor;
 
 import net.minecraft.util.random.SimpleWeightedRandomList;
 import net.minecraft.world.level.BaseSpawner;

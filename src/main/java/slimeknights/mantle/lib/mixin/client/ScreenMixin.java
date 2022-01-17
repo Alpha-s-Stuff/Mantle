@@ -1,8 +1,8 @@
 package slimeknights.mantle.lib.mixin.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.simibubi.create.lib.event.RenderTooltipBorderColorCallback;
-import com.simibubi.create.lib.util.ScreenHelper;
+import slimeknights.mantle.lib.event.RenderTooltipBorderColorCallback;
+import slimeknights.mantle.lib.util.ScreenHelper;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import org.spongepowered.asm.mixin.Mixin;

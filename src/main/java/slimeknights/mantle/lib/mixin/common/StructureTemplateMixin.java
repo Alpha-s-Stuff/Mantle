@@ -1,9 +1,9 @@
 package slimeknights.mantle.lib.mixin.common;
 
 import com.google.common.collect.Lists;
-import com.simibubi.create.lib.extensions.StructureProcessorExtensions;
-import com.simibubi.create.lib.extensions.StructureTemplateExtensions;
-import com.simibubi.create.lib.mixin.accessor.StructureTemplateAccessor;
+import slimeknights.mantle.lib.extensions.StructureProcessorExtensions;
+import slimeknights.mantle.lib.extensions.StructureTemplateExtensions;
+import slimeknights.mantle.lib.mixin.accessor.StructureTemplateAccessor;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;

@@ -1,7 +1,7 @@
 package slimeknights.mantle.lib.mixin.common;
 
-import com.simibubi.create.lib.event.DataPackReloadCallback;
-import com.simibubi.create.lib.util.MixinHelper;
+import slimeknights.mantle.lib.event.DataPackReloadCallback;
+import slimeknights.mantle.lib.util.MixinHelper;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;

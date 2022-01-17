@@ -1,7 +1,7 @@
 package slimeknights.mantle.lib.mixin.client;
 
 import com.mojang.blaze3d.pipeline.RenderTarget;
-import com.simibubi.create.lib.extensions.RenderTargetExtensions;
+import slimeknights.mantle.lib.extensions.RenderTargetExtensions;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;

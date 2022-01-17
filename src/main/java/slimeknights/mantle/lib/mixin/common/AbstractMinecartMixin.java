@@ -2,10 +2,10 @@ package slimeknights.mantle.lib.mixin.common;
 
 import com.simibubi.create.content.contraptions.components.structureMovement.train.capability.CapabilityMinecartController;
 import com.simibubi.create.content.contraptions.components.structureMovement.train.capability.MinecartController;
-import com.simibubi.create.lib.block.MinecartPassHandlerBlock;
-import com.simibubi.create.lib.extensions.AbstractMinecartExtensions;
-import com.simibubi.create.lib.util.MinecartAndRailUtil;
-import com.simibubi.create.lib.util.MixinHelper;
+import slimeknights.mantle.lib.block.MinecartPassHandlerBlock;
+import slimeknights.mantle.lib.extensions.AbstractMinecartExtensions;
+import slimeknights.mantle.lib.util.MinecartAndRailUtil;
+import slimeknights.mantle.lib.util.MixinHelper;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;

@@ -2,6 +2,8 @@ package slimeknights.mantle.util;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+
+import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
@@ -31,7 +33,7 @@ public final class RetexturedHelper {
    */
   public static Block getBlock(String name) {
     if (!name.isEmpty()) {
-      Block block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(name));
+      Block block = Registry.BLOCK.get(new ResourceLocation(name));
       if (block != null) {
         return block;
       }

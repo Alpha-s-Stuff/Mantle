@@ -1,6 +1,6 @@
 package slimeknights.mantle.lib.util;
 
-import com.simibubi.create.lib.mixin.accessor.FontAccessor;
+import slimeknights.mantle.lib.mixin.accessor.FontAccessor;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 

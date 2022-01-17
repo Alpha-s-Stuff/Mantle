@@ -1,7 +1,7 @@
 package slimeknights.mantle.lib.mixin.common;
 
-import com.simibubi.create.lib.entity.ExtraSpawnDataEntity;
-import com.simibubi.create.lib.extensions.ClientboundAddEntityPacketExtensions;
+import slimeknights.mantle.lib.entity.ExtraSpawnDataEntity;
+import slimeknights.mantle.lib.extensions.ClientboundAddEntityPacketExtensions;
 import io.netty.buffer.Unpooled;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;

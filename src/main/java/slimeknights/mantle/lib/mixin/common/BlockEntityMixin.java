@@ -1,9 +1,9 @@
 package slimeknights.mantle.lib.mixin.common;
 
-import com.simibubi.create.lib.extensions.BlockEntityExtensions;
-import com.simibubi.create.lib.util.MixinHelper;
-import com.simibubi.create.lib.util.NBTSerializable;
-import com.simibubi.create.lib.util.TileEntityHelper;
+import slimeknights.mantle.lib.extensions.BlockEntityExtensions;
+import slimeknights.mantle.lib.util.MixinHelper;
+import slimeknights.mantle.lib.util.NBTSerializable;
+import slimeknights.mantle.lib.util.TileEntityHelper;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;

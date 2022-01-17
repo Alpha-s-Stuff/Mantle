@@ -1,6 +1,6 @@
 package slimeknights.mantle.lib.util;
 
-import com.simibubi.create.lib.mixin.accessor.MinecraftServerAccessor;
+import slimeknights.mantle.lib.mixin.accessor.MinecraftServerAccessor;
 
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.storage.LevelStorageSource;

@@ -1,8 +1,8 @@
 package slimeknights.mantle.lib.mixin.client;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.simibubi.create.lib.event.FogEvents;
-import com.simibubi.create.lib.event.FogEvents.ColorData;
+import slimeknights.mantle.lib.event.FogEvents;
+import slimeknights.mantle.lib.event.FogEvents.ColorData;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import org.spongepowered.asm.mixin.Mixin;

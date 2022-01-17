@@ -1,8 +1,8 @@
 package slimeknights.mantle.lib.mixin.common;
 
 import com.mojang.math.Matrix4f;
-import com.simibubi.create.lib.extensions.Matrix4fExtensions;
-import com.simibubi.create.lib.util.MixinHelper;
+import slimeknights.mantle.lib.extensions.Matrix4fExtensions;
+import slimeknights.mantle.lib.util.MixinHelper;
 import org.jetbrains.annotations.Contract;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;

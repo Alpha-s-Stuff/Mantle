@@ -2,8 +2,8 @@ package slimeknights.mantle.client.model.data;
 
 import com.google.common.base.Preconditions;
 import lombok.RequiredArgsConstructor;
-import net.minecraftforge.client.model.data.IModelData;
-import net.minecraftforge.client.model.data.ModelProperty;
+import slimeknights.mantle.lib.model.IModelData;
+import slimeknights.mantle.lib.model.ModelProperty;
 
 import javax.annotation.Nullable;
 

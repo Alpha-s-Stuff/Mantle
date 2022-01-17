@@ -5,21 +5,9 @@ import com.google.gson.JsonSyntaxException;
 import io.netty.handler.codec.DecoderException;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import net.minecraft.world.level.material.Fluid;
-import net.minecraft.world.level.material.Fluids;
-import net.minecraft.world.Container;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.world.item.crafting.RecipeType;
-import net.minecraft.world.item.crafting.RecipeManager;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.world.level.ItemLike;
-import net.minecraft.util.GsonHelper;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.registries.ForgeRegistries;
+import slimeknights.mantle.lib.mixin.accessor.RecipeManagerAccessor;
+import slimeknights.mantle.lib.transfer.fluid.FluidStack;
 import slimeknights.mantle.recipe.IMultiRecipe;
-
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -27,6 +15,19 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import net.minecraft.core.Registry;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.Fluids;
 
 /**
  * Helpers used in creation of recipes
@@ -60,7 +61,7 @@ public class RecipeHelper {
    * @return  List of recipes from the manager
    */
   public static <I extends Container, T extends Recipe<I>, C extends T> List<C> getRecipes(RecipeManager manager, RecipeType<T> type, Class<C> clazz) {
-    return manager.byType(type).values().stream()
+    return ((RecipeManagerAccessor)manager).callByType(type).values().stream()
                   .filter(clazz::isInstance)
                   .map(clazz::cast)
                   .collect(Collectors.toList());
@@ -78,7 +79,7 @@ public class RecipeHelper {
    * @return  Recipe list
    */
   public static <I extends Container, T extends Recipe<I>, C extends T> List<C> getUIRecipes(RecipeManager manager, RecipeType<T> type, Class<C> clazz, Predicate<? super C> filter) {
-    return manager.byType(type).values().stream()
+    return ((RecipeManagerAccessor)manager).callByType(type).values().stream()
                   .filter(clazz::isInstance)
                   .map(clazz::cast)
                   .filter(filter)
@@ -125,7 +126,7 @@ public class RecipeHelper {
    * @return  List of flattened recipes from the manager
    */
   public static <I extends Container, T extends Recipe<I>, C> List<C> getJEIRecipes(RecipeManager manager, RecipeType<T> type, Class<C> clazz) {
-    return getJEIRecipes(manager.byType(type).values().stream(), clazz);
+    return getJEIRecipes(((RecipeManagerAccessor)manager).callByType(type).values().stream(), clazz);
   }
 
 
@@ -138,7 +139,7 @@ public class RecipeHelper {
    */
   public static JsonObject serializeFluidStack(FluidStack stack) {
     JsonObject json = new JsonObject();
-    json.addProperty("fluid", Objects.requireNonNull(stack.getFluid().getRegistryName()).toString());
+    json.addProperty("fluid", Objects.requireNonNull(Registry.FLUID.getKey(stack.getFluid())).toString());
     json.addProperty("amount", stack.getAmount());
     return json;
   }
@@ -151,7 +152,7 @@ public class RecipeHelper {
    */
   public static FluidStack deserializeFluidStack(JsonObject json) {
     String fluidName = GsonHelper.getAsString(json, "fluid");
-    Fluid fluid = ForgeRegistries.FLUIDS.getValue(new ResourceLocation(fluidName));
+    Fluid fluid = Registry.FLUID.get(new ResourceLocation(fluidName));
     if (fluid == null || fluid == Fluids.EMPTY) {
       throw new JsonSyntaxException("Unknown fluid " + fluidName);
     }
@@ -169,7 +170,7 @@ public class RecipeHelper {
    * @throws JsonSyntaxException  If the key is missing, or the value is not the right class
    */
   public static <C> C deserializeItem(String name, String key, Class<C> clazz) {
-    Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(name));
+    Item item = Registry.ITEM.get(new ResourceLocation(name));
     if (item == null) {
       throw new JsonSyntaxException("Invalid " + key + ": Unknown item " + name + "'");
     }
@@ -202,7 +203,7 @@ public class RecipeHelper {
   public static <T> T readItem(FriendlyByteBuf buffer, Class<T> clazz) {
     Item item = readItem(buffer);
     if (!clazz.isInstance(item)) {
-      throw new DecoderException("Invalid item '" + item.getRegistryName() + "', must be " + clazz.getSimpleName());
+      throw new DecoderException("Invalid item '" + Registry.ITEM.getKey(item) + "', must be " + clazz.getSimpleName());
     }
     return clazz.cast(item);
   }

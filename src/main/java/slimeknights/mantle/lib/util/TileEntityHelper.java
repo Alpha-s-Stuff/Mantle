@@ -1,6 +1,6 @@
 package slimeknights.mantle.lib.util;
 
-import com.simibubi.create.lib.extensions.BlockEntityExtensions;
+import slimeknights.mantle.lib.extensions.BlockEntityExtensions;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntity;

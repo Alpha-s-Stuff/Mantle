@@ -14,6 +14,7 @@ import net.minecraftforge.common.loot.GlobalLootModifierSerializer;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.registries.ObjectHolder;
 import slimeknights.mantle.Mantle;
+import slimeknights.mantle.lib.loot.GlobalLootModifierSerializer;
 import slimeknights.mantle.loot.condition.BlockTagLootCondition;
 import slimeknights.mantle.loot.condition.ContainsItemModifierLootCondition;
 import slimeknights.mantle.loot.condition.EmptyModifierLootCondition;

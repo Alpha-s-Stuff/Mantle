@@ -1,9 +1,9 @@
 package slimeknights.mantle.lib.util;
 
 import com.simibubi.create.content.contraptions.components.structureMovement.train.capability.MinecartController;
-import com.simibubi.create.lib.extensions.AbstractMinecartExtensions;
-import com.simibubi.create.lib.extensions.BaseRailBlockExtensions;
-import com.simibubi.create.lib.mixin.accessor.AbstractMinecartAccessor;
+import slimeknights.mantle.lib.extensions.AbstractMinecartExtensions;
+import slimeknights.mantle.lib.extensions.BaseRailBlockExtensions;
+import slimeknights.mantle.lib.mixin.accessor.AbstractMinecartAccessor;
 
 import javax.annotation.Nullable;
 

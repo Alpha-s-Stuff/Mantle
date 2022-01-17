@@ -1,6 +1,6 @@
 package slimeknights.mantle.lib.util;
 
-import com.simibubi.create.lib.mixin.accessor.DamageSourceAccessor;
+import slimeknights.mantle.lib.mixin.accessor.DamageSourceAccessor;
 
 import net.minecraft.world.damagesource.DamageSource;
 

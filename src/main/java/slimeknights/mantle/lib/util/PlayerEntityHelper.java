@@ -1,6 +1,6 @@
 package slimeknights.mantle.lib.util;
 
-import com.simibubi.create.lib.mixin.accessor.PlayerAccessor;
+import slimeknights.mantle.lib.mixin.accessor.PlayerAccessor;
 
 import net.minecraft.world.entity.player.Player;
 

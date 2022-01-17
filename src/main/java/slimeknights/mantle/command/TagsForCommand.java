@@ -1,5 +1,6 @@
 package slimeknights.mantle.command;
 
+import com.jamieswhiteshirt.reachentityattributes.ReachEntityAttributes;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -44,6 +45,13 @@ import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import net.minecraftforge.fluids.capability.templates.EmptyFluidHandler;
+import slimeknights.mantle.lib.mixin.accessor.ItemAccessor;
+import slimeknights.mantle.lib.transfer.TransferUtil;
+import slimeknights.mantle.lib.transfer.fluid.EmptyFluidHandler;
+import slimeknights.mantle.lib.transfer.fluid.FluidStack;
+import slimeknights.mantle.lib.transfer.fluid.IFluidHandler;
+import slimeknights.mantle.lib.transfer.fluid.IFluidHandlerItem;
+import slimeknights.mantle.lib.util.LazyOptional;
 
 import java.util.Collection;
 import java.util.Map;
@@ -143,7 +151,7 @@ public class TagsForCommand {
   /** Item tags for held item */
   private static int heldItem(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
     Item item = context.getSource().getPlayerOrException().getMainHandItem().getItem();
-    return printOwningTags(context, SerializationTags.getInstance().getOrEmpty(Registry.ITEM_REGISTRY), Registry.ITEM_REGISTRY.location(), Objects.requireNonNull(item.getRegistryName()), item);
+    return printOwningTags(context, SerializationTags.getInstance().getOrEmpty(Registry.ITEM_REGISTRY), Registry.ITEM_REGISTRY.location(), Objects.requireNonNull(Registry.ITEM.getKey(item)), item);
   }
 
   /** Block tags for held item */
@@ -152,7 +160,7 @@ public class TagsForCommand {
     Item item = source.getPlayerOrException().getMainHandItem().getItem();
     Block block = Block.byItem(item);
     if (block != Blocks.AIR) {
-      return printOwningTags(context, SerializationTags.getInstance().getOrEmpty(Registry.BLOCK_REGISTRY), Registry.BLOCK_REGISTRY.location(), Objects.requireNonNull(block.getRegistryName()), block);
+      return printOwningTags(context, SerializationTags.getInstance().getOrEmpty(Registry.BLOCK_REGISTRY), Registry.BLOCK_REGISTRY.location(), Objects.requireNonNull(Registry.BLOCK.getKey(block)), block);
     }
     source.sendSuccess(NO_HELD_BLOCK, true);
     return 0;
@@ -162,14 +170,14 @@ public class TagsForCommand {
   private static int heldFluid(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
     CommandSourceStack source = context.getSource();
     ItemStack stack = source.getPlayerOrException().getMainHandItem();
-    LazyOptional<IFluidHandlerItem> capability = stack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY);
+    LazyOptional<IFluidHandlerItem> capability = TransferUtil.getFluidHandlerItem(stack);
     if (capability.isPresent()) {
       IFluidHandler handler = capability.map(h -> (IFluidHandler) h).orElse(EmptyFluidHandler.INSTANCE);
       if (handler.getTanks() > 0) {
         FluidStack fluidStack = handler.getFluidInTank(0);
         if (!fluidStack.isEmpty()) {
           Fluid fluid = fluidStack.getFluid();
-          return printOwningTags(context, SerializationTags.getInstance().getOrEmpty(Registry.FLUID_REGISTRY), Registry.FLUID_REGISTRY.location(), Objects.requireNonNull(fluid.getRegistryName()), fluid);
+          return printOwningTags(context, SerializationTags.getInstance().getOrEmpty(Registry.FLUID_REGISTRY), Registry.FLUID_REGISTRY.location(), Objects.requireNonNull(Registry.FLUID.getKey(fluid)), fluid);
         }
       }
     }
@@ -184,7 +192,7 @@ public class TagsForCommand {
     Potion potion = PotionUtils.getPotion(stack);
     if (potion != Potions.EMPTY) {
       ResourceLocation registry = Registry.POTION_REGISTRY.location();
-      return printOwningTags(context, SerializationTags.getInstance().getOrEmpty(Registry.POTION_REGISTRY), registry, Objects.requireNonNull(potion.getRegistryName()), potion);
+      return printOwningTags(context, SerializationTags.getInstance().getOrEmpty(Registry.POTION_REGISTRY), registry, Objects.requireNonNull(Registry.POTION.getKey(potion)), potion);
     }
     source.sendSuccess(NO_HELD_POTION, true);
     return 0;
@@ -201,7 +209,7 @@ public class TagsForCommand {
       TagCollection<Enchantment> enchantmentTags = SerializationTags.getInstance().getOrEmpty(Registry.ENCHANTMENT_REGISTRY);
       // print tags for each contained enchantment
       for (Enchantment enchantment : enchantments.keySet()) {
-        totalTags += printOwningTags(context, enchantmentTags, registry, Objects.requireNonNull(enchantment.getRegistryName()), enchantment);
+        totalTags += printOwningTags(context, enchantmentTags, registry, Objects.requireNonNull(Registry.ENCHANTMENT.getKey(enchantment)), enchantment);
       }
       return totalTags;
     }
@@ -215,7 +223,7 @@ public class TagsForCommand {
     ItemStack stack = source.getPlayerOrException().getMainHandItem();
     if (stack.getItem() instanceof SpawnEggItem egg) {
       EntityType<?> type = egg.getType(stack.getTag());
-      return printOwningTags(context, SerializationTags.getInstance().getOrEmpty(Registry.ENTITY_TYPE_REGISTRY), Registry.ENTITY_TYPE_REGISTRY.location(), Objects.requireNonNull(type.getRegistryName()), type);
+      return printOwningTags(context, SerializationTags.getInstance().getOrEmpty(Registry.ENTITY_TYPE_REGISTRY), Registry.ENTITY_TYPE_REGISTRY.location(), Objects.requireNonNull(Registry.ENTITY_TYPE.getKey(type)), type);
     }
     source.sendSuccess(NO_HELD_ENTITY, true);
     return 0;
@@ -234,13 +242,13 @@ public class TagsForCommand {
     CommandSourceStack source = context.getSource();
     Player player = source.getPlayerOrException();
     Level level = source.getLevel();
-    BlockHitResult blockTrace = Item.getPlayerPOVHitResult(level, player, ClipContext.Fluid.NONE);
+    BlockHitResult blockTrace = ItemAccessor.callGetPlayerPOVHitResult(level, player, ClipContext.Fluid.NONE);
     if (blockTrace.getType() == HitResult.Type.BLOCK) {
       BlockEntity be = level.getBlockEntity(blockTrace.getBlockPos());
       if (be != null) {
         BlockEntityType<?> type = be.getType();
         ResourceLocation registry = Registry.BLOCK_ENTITY_TYPE_REGISTRY.location();
-        return printOwningTags(context, SerializationTags.getInstance().getOrEmpty(Registry.BLOCK_ENTITY_TYPE_REGISTRY), registry, Objects.requireNonNull(type.getRegistryName()), type);
+        return printOwningTags(context, SerializationTags.getInstance().getOrEmpty(Registry.BLOCK_ENTITY_TYPE_REGISTRY), registry, Objects.requireNonNull(Registry.BLOCK_ENTITY_TYPE.getKey(type)), type);
       }
     }
     // failed
@@ -259,13 +267,13 @@ public class TagsForCommand {
     Player player = source.getPlayerOrException();
     Vec3 start = player.getEyePosition(1F);
     Vec3 look = player.getLookAngle();
-    double range = Objects.requireNonNull(player.getAttribute(ForgeMod.REACH_DISTANCE.get())).getValue();
+    double range = Objects.requireNonNull(player.getAttribute(ReachEntityAttributes.REACH)).getValue();
     Vec3 direction = start.add(look.x * range, look.y * range, look.z * range);
     AABB bb = player.getBoundingBox().expandTowards(look.x * range, look.y * range, look.z * range).expandTowards(1, 1, 1);
     EntityHitResult entityTrace = ProjectileUtil.getEntityHitResult(source.getLevel(), player, start, direction, bb, e -> true);
     if (entityTrace != null) {
       EntityType<?> target = entityTrace.getEntity().getType();
-      return printOwningTags(context, SerializationTags.getInstance().getOrEmpty(Registry.ENTITY_TYPE_REGISTRY), Registry.ENTITY_TYPE_REGISTRY.location(), Objects.requireNonNull(target.getRegistryName()), target);
+      return printOwningTags(context, SerializationTags.getInstance().getOrEmpty(Registry.ENTITY_TYPE_REGISTRY), Registry.ENTITY_TYPE_REGISTRY.location(), Objects.requireNonNull(Registry.ENTITY_TYPE.getKey(target)), target);
     }
     // failed
     source.sendSuccess(NO_TARGETED_ENTITY, true);

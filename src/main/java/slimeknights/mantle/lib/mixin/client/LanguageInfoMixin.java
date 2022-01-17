@@ -1,6 +1,6 @@
 package slimeknights.mantle.lib.mixin.client;
 
-import com.simibubi.create.lib.extensions.LanguageInfoExtensions;
+import slimeknights.mantle.lib.extensions.LanguageInfoExtensions;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import org.spongepowered.asm.mixin.Final;

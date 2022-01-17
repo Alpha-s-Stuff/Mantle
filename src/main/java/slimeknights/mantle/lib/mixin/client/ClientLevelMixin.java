@@ -1,7 +1,7 @@
 package slimeknights.mantle.lib.mixin.client;
 
-import com.simibubi.create.lib.event.ClientWorldEvents;
-import com.simibubi.create.lib.util.MixinHelper;
+import slimeknights.mantle.lib.event.ClientWorldEvents;
+import slimeknights.mantle.lib.util.MixinHelper;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import org.spongepowered.asm.mixin.Final;

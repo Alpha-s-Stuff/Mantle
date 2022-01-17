@@ -34,6 +34,8 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
+
+import net.fabricmc.fabric.api.renderer.v1.model.FabricBakedModel;
 import net.minecraftforge.client.model.IModelConfiguration;
 import net.minecraftforge.client.model.IModelLoader;
 import net.minecraftforge.client.model.data.IModelData;
@@ -45,6 +47,7 @@ import slimeknights.mantle.client.model.util.DynamicBakedWrapper;
 import slimeknights.mantle.client.model.util.ExtraTextureConfiguration;
 import slimeknights.mantle.client.model.util.ModelTextureIteratable;
 import slimeknights.mantle.client.model.util.SimpleBlockModel;
+import slimeknights.mantle.lib.model.ModelProperty;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -66,7 +69,7 @@ import java.util.function.Predicate;
  * Model that handles generating variants for connected textures
  */
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public class ConnectedModel implements IModelGeometry<ConnectedModel> {
+public class ConnectedModel implements BakedModel, FabricBakedModel {
 
   /** Property of the connections cache key. Contains a 6 bit number with each bit representing a direction */
   private static final ModelProperty<Byte> CONNECTIONS = new ModelProperty<>();

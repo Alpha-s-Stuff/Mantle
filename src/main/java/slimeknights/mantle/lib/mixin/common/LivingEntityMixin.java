@@ -1,11 +1,11 @@
 package slimeknights.mantle.lib.mixin.common;
 
-import com.simibubi.create.lib.event.LivingEntityEvents;
-import com.simibubi.create.lib.extensions.BlockStateExtensions;
-import com.simibubi.create.lib.extensions.EntityExtensions;
-import com.simibubi.create.lib.item.EntitySwingListenerItem;
-import com.simibubi.create.lib.item.EquipmentItem;
-import com.simibubi.create.lib.util.MixinHelper;
+import slimeknights.mantle.lib.event.LivingEntityEvents;
+import slimeknights.mantle.lib.extensions.BlockStateExtensions;
+import slimeknights.mantle.lib.extensions.EntityExtensions;
+import slimeknights.mantle.lib.item.EntitySwingListenerItem;
+import slimeknights.mantle.lib.item.EquipmentItem;
+import slimeknights.mantle.lib.util.MixinHelper;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import org.spongepowered.asm.mixin.Mixin;

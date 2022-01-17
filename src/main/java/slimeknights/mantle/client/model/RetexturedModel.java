@@ -13,6 +13,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -41,6 +42,7 @@ import slimeknights.mantle.client.model.util.ModelHelper;
 import slimeknights.mantle.client.model.util.ModelTextureIteratable;
 import slimeknights.mantle.client.model.util.SimpleBlockModel;
 import slimeknights.mantle.item.RetexturedBlockItem;
+import slimeknights.mantle.lib.model.IModelData;
 import slimeknights.mantle.util.RetexturedHelper;
 
 import javax.annotation.Nonnull;
@@ -151,13 +153,13 @@ public class RetexturedModel implements IModelGeometry<RetexturedModel> {
     /** Cache of texture name to baked model */
     private final Map<ResourceLocation,BakedModel> cache = new HashMap<>();
     /* Properties for rebaking */
-    private final IModelConfiguration owner;
+    private final BlockModel owner;
     private final SimpleBlockModel model;
     private final ModelState transform;
     /** List of texture names that are retextured */
     private final Set<String> retextured;
 
-    public Baked(BakedModel baked, IModelConfiguration owner, SimpleBlockModel model, ModelState transform, Set<String> retextured) {
+    public Baked(BakedModel baked, BlockModel owner, SimpleBlockModel model, ModelState transform, Set<String> retextured) {
       super(baked);
       this.model = model;
       this.owner = owner;
@@ -226,7 +228,7 @@ public class RetexturedModel implements IModelGeometry<RetexturedModel> {
      * @param retextured  Set of textures that should be retextured
      * @param texture     New texture to replace those in the set
      */
-    public RetexturedConfiguration(IModelConfiguration base, Set<String> retextured, ResourceLocation texture) {
+    public RetexturedConfiguration(BlockModel base, Set<String> retextured, ResourceLocation texture) {
       super(base);
       this.retextured = retextured;
       this.texture = ModelLoaderRegistry.blockMaterial(texture);

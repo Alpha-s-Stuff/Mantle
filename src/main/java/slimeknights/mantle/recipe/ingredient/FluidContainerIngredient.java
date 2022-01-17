@@ -7,6 +7,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.material.Fluid;
+
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.minecraftforge.common.crafting.IIngredientSerializer;
 import net.minecraftforge.fluids.FluidAttributes;
 import net.minecraftforge.fluids.FluidStack;
@@ -50,7 +52,7 @@ public class FluidContainerIngredient extends Ingredient {
 
   /** Creates an instance from a fluid ingredient with a display container */
   public static FluidContainerIngredient fromFluid(FluidObject<?> fluid, boolean forgeTag) {
-    return fromIngredient(FluidIngredient.of(forgeTag ? fluid.getForgeTag() : fluid.getLocalTag(), FluidAttributes.BUCKET_VOLUME), Ingredient.of(fluid));
+    return fromIngredient(FluidIngredient.of(forgeTag ? fluid.getForgeTag() : fluid.getLocalTag(), FluidConstants.BUCKET), Ingredient.of(fluid));
   }
 
   @Override

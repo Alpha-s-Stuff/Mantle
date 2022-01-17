@@ -1,7 +1,7 @@
 package slimeknights.mantle.lib.mixin.client;
 
-import com.simibubi.create.lib.extensions.BlockParticleOptionExtensions;
-import com.simibubi.create.lib.extensions.TerrainParticle$ProviderExtensions;
+import slimeknights.mantle.lib.extensions.BlockParticleOptionExtensions;
+import slimeknights.mantle.lib.extensions.TerrainParticle$ProviderExtensions;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import org.spongepowered.asm.mixin.Mixin;

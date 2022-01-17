@@ -1,8 +1,8 @@
 package slimeknights.mantle.lib.mixin.common;
 
-import com.simibubi.create.lib.block.SlopeCreationCheckingRailBlock;
-import com.simibubi.create.lib.mixin.accessor.RailStateAccessor;
-import com.simibubi.create.lib.util.MixinHelper;
+import slimeknights.mantle.lib.block.SlopeCreationCheckingRailBlock;
+import slimeknights.mantle.lib.mixin.accessor.RailStateAccessor;
+import slimeknights.mantle.lib.util.MixinHelper;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;

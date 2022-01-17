@@ -4,7 +4,14 @@
   "package": "slimeknights.mantle.lib.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "BlockEntityTypeAccessor"
+    "BlockEntityTypeAccessor",
+    "accessor.BlockModelAccessor",
+    "accessor.ItemAccessor",
+    "accessor.ModelBakeryAccessor",
+    "accessor.RecipeManagerAccessor",
+    "accessor.TagContainerAccessor",
+    "accessor.Vector3fAccessor",
+    "common.TagContainerMixin"
   ],
   "injectors": {
     "defaultRequire": 1

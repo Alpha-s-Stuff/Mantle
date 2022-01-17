@@ -1,7 +1,7 @@
 package slimeknights.mantle.lib.mixin.client;
 
-import com.simibubi.create.lib.item.BlockUseBypassingItem;
-import com.simibubi.create.lib.item.UseFirstBehaviorItem;
+import slimeknights.mantle.lib.item.BlockUseBypassingItem;
+import slimeknights.mantle.lib.item.UseFirstBehaviorItem;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import org.spongepowered.asm.mixin.Final;

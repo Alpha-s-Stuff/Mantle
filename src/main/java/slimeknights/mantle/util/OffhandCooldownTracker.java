@@ -4,6 +4,8 @@ import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentRegistry;
 import dev.onyxstudios.cca.api.v3.component.ComponentRegistryV3;
+import dev.onyxstudios.cca.api.v3.entity.EntityComponentFactoryRegistry;
+import dev.onyxstudios.cca.api.v3.entity.EntityComponentInitializer;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
@@ -22,6 +24,7 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.common.util.NonNullFunction;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import slimeknights.mantle.Mantle;
+import slimeknights.mantle.lib.util.NonNullFunction;
 import slimeknights.mantle.network.MantleNetwork;
 import slimeknights.mantle.network.packet.SwingArmPacket;
 
@@ -32,7 +35,7 @@ import javax.annotation.Nullable;
  * Logic to handle offhand having its own cooldown
  */
 @RequiredArgsConstructor
-public class OffhandCooldownTracker implements Component {
+public class OffhandCooldownTracker implements Component, EntityComponentInitializer {
   public static final ResourceLocation KEY = Mantle.getResource("offhand_cooldown");
   public static final NonNullFunction<OffhandCooldownTracker,Float> COOLDOWN_TRACKER = OffhandCooldownTracker::getCooldown;
   private static final NonNullFunction<OffhandCooldownTracker,Boolean> ATTACK_READY = OffhandCooldownTracker::isAttackReady;
@@ -40,10 +43,12 @@ public class OffhandCooldownTracker implements Component {
   /**
    * Capability instance for offhand cooldown
    */
-  public static final ComponentKey<OffhandCooldownTracker> CAPABILITY = ComponentRegistry.getOrCreate(Mantle.getResource(""), OffhandCooldownTracker.class);
+  public static final ComponentKey<OffhandCooldownTracker> CAPABILITY = ComponentRegistry.getOrCreate(KEY, OffhandCooldownTracker.class);
 
   /** Registers the capability and subscribes to event listeners */
-  public static void init() {
+  @Override
+  public void registerEntityComponentFactories(EntityComponentFactoryRegistry registry) {
+    registry.registerForPlayers(CAPABILITY, (player1 -> new OffhandCooldownTracker(player1)));
     MinecraftForge.EVENT_BUS.addGenericListener(Entity.class, OffhandCooldownTracker::attachCapability);
   }
 

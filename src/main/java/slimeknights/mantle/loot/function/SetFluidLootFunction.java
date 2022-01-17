@@ -12,6 +12,8 @@ import net.minecraft.util.GsonHelper;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
+import slimeknights.mantle.lib.transfer.TransferUtil;
+import slimeknights.mantle.lib.transfer.fluid.FluidStack;
 import slimeknights.mantle.loot.MantleLoot;
 import slimeknights.mantle.recipe.helper.RecipeHelper;
 
@@ -32,9 +34,9 @@ public class SetFluidLootFunction extends LootItemConditionalFunction {
 
   @Override
   protected ItemStack run(ItemStack stack, LootContext context) {
-    return stack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY)
+    return TransferUtil.getFluidHandlerItem(stack)
                 .map(handler -> {
-                  handler.fill(fluid.copy(), FluidAction.EXECUTE);
+                  handler.fill(fluid.copy(), false);
                   return handler.getContainer();
                 }).orElse(stack);
   }

@@ -6,6 +6,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import com.mojang.datafixers.util.Pair;
 import lombok.RequiredArgsConstructor;
+import slimeknights.mantle.lib.model.IModelLoader;
+
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -17,10 +19,6 @@ import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.GsonHelper;
-import net.minecraftforge.client.model.IModelConfiguration;
-import net.minecraftforge.client.model.IModelLoader;
-import net.minecraftforge.client.model.geometry.IModelGeometry;
-import net.minecraftforge.fml.ModList;
 
 import java.util.Collection;
 import java.util.Set;
@@ -30,7 +28,7 @@ import java.util.function.Function;
  * Loads the first model from a list of models that has a loaded mod ID, ideal for optional CTM model support
  */
 @RequiredArgsConstructor
-public class FallbackModelLoader implements IModelLoader<FallbackModelLoader.BlockModelWrapper> {
+public class FallbackModelLoader extends IModelLoader<FallbackModelLoader.BlockModelWrapper> {
   /** Loader instance */
   public static final FallbackModelLoader INSTANCE = new FallbackModelLoader();
 

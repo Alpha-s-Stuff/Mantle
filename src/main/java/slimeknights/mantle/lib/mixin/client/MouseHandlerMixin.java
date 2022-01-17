@@ -1,7 +1,7 @@
 package slimeknights.mantle.lib.mixin.client;
 
-import com.simibubi.create.lib.event.MouseButtonCallback;
-import com.simibubi.create.lib.event.MouseScrolledCallback;
+import slimeknights.mantle.lib.event.MouseButtonCallback;
+import slimeknights.mantle.lib.event.MouseScrolledCallback;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import org.spongepowered.asm.mixin.Mixin;

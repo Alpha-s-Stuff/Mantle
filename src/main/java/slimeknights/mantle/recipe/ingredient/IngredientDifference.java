@@ -13,6 +13,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.common.crafting.IIngredientSerializer;
 import slimeknights.mantle.Mantle;
+import slimeknights.mantle.lib.crafting.IIngredientSerializer;
 import slimeknights.mantle.util.JsonHelper;
 
 import javax.annotation.Nullable;

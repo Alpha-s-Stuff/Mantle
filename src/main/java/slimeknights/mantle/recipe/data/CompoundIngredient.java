@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * Simply an extension of the forge class because the constructor is not public for some dumb reason
  */
-public class CompoundIngredient extends net.minecraftforge.common.crafting.CompoundIngredient {
+public class CompoundIngredient extends slimeknights.mantle.lib.crafting.CompoundIngredient {
   protected CompoundIngredient(List<Ingredient> children) {
     super(children);
   }

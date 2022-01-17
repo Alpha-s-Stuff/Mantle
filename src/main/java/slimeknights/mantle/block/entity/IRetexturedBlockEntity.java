@@ -3,9 +3,9 @@ package slimeknights.mantle.block.entity;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraftforge.client.model.data.IModelData;
 import slimeknights.mantle.block.RetexturedBlock;
 import slimeknights.mantle.client.model.data.SinglePropertyData;
+import slimeknights.mantle.lib.model.IModelData;
 import slimeknights.mantle.util.RetexturedHelper;
 
 /**

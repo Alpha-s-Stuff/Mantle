@@ -13,6 +13,7 @@ import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
+import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ReloadableResourceManager;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -24,10 +25,11 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraftforge.registries.ForgeRegistries;
 import slimeknights.mantle.Mantle;
 import slimeknights.mantle.client.model.fluid.FluidCuboid;
 import slimeknights.mantle.client.render.FluidRenderer;
+import slimeknights.mantle.lib.mixin.accessor.ModelBakeryAccessor;
+import slimeknights.mantle.lib.mixin.accessor.Vector3fAccessor;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -116,14 +118,14 @@ public class FaucetFluidLoader extends SimpleJsonResourceReloadListener {
         // all others are block
         JsonObject json = GsonHelper.convertToJsonObject(entry.getValue(), "");
         JsonObject variants = GsonHelper.getAsJsonObject(json, "variants");
-        Block block = ForgeRegistries.BLOCKS.getValue(location);
+        Block block = Registry.BLOCK.get(location);
         if(block != null && block != Blocks.AIR) {
           StateDefinition<Block,BlockState> container = block.getStateDefinition();
           List<BlockState> validStates = container.getPossibleStates();
           for (Entry<String, JsonElement> variant : variants.entrySet()) {
             // parse fluid
             FaucetFluid fluid = FaucetFluid.fromJson(GsonHelper.convertToJsonObject(variant.getValue(), variant.getKey()), defaultFluid);
-            validStates.stream().filter(ModelBakery.predicate(container, variant.getKey())).forEach(state -> fluidMap.put(state, fluid));
+            validStates.stream().filter(ModelBakeryAccessor.callPredicate(container, variant.getKey())).forEach(state -> fluidMap.put(state, fluid));
           }
         } else {
           Mantle.logger.debug("Skipping loading faucet fluid model '{}' as no coorsponding block exists", location);
@@ -256,7 +258,7 @@ public class FaucetFluidLoader extends SimpleJsonResourceReloadListener {
         int value = element.getAsInt();
         return def.stream().map(cuboid -> {
           Vector3f from = cuboid.getFrom().copy();
-          from.setY(value);
+          ((Vector3fAccessor)(Object)from).setY(value);
           return new FluidCuboid(from, cuboid.getTo(), cuboid.getFaces());
         }).collect(Collectors.toList());
       } else {

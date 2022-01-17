@@ -2,7 +2,7 @@ package slimeknights.mantle.lib.mixin.client;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.simibubi.create.lib.event.OverlayRenderCallback;
+import slimeknights.mantle.lib.event.OverlayRenderCallback;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import org.spongepowered.asm.mixin.Final;

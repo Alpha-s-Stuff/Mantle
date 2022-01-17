@@ -2,7 +2,7 @@ package slimeknights.mantle.lib.mixin.compat.lithium;
 
 import com.google.common.collect.ImmutableList;
 import com.simibubi.create.foundation.ponder.PonderWorld;
-import com.simibubi.create.lib.mixin.accessor.EntityAccessor;
+import slimeknights.mantle.lib.mixin.accessor.EntityAccessor;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;

@@ -4,9 +4,11 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.client.model.data.IModelData;
-import net.minecraftforge.common.util.Lazy;
+
+import net.fabricmc.fabric.api.rendering.data.v1.RenderAttachmentBlockEntity;
 import slimeknights.mantle.block.RetexturedBlock;
+import slimeknights.mantle.lib.model.IModelData;
+import slimeknights.mantle.lib.util.Lazy;
 import slimeknights.mantle.util.RetexturedHelper;
 
 import javax.annotation.Nonnull;
@@ -14,7 +16,7 @@ import javax.annotation.Nonnull;
 /**
  * Minimal implementation for {@link IRetexturedBlockEntity}, use alongside {@link RetexturedBlock} and {@link slimeknights.mantle.item.RetexturedBlockItem}
  */
-public class RetexturedBlockEntity extends MantleBlockEntity implements IRetexturedBlockEntity {
+public class RetexturedBlockEntity extends MantleBlockEntity implements IRetexturedBlockEntity, RenderAttachmentBlockEntity {
 
   /** Lazy value of model data as it will not change after first fetch */
   private final Lazy<IModelData> data = Lazy.of(this::getRetexturedModelData);
@@ -24,7 +26,7 @@ public class RetexturedBlockEntity extends MantleBlockEntity implements IRetextu
 
   @Nonnull
   @Override
-  public IModelData getModelData() {
+  public Object getRenderAttachmentData() {
     return data.get();
   }
 

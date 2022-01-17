@@ -1,7 +1,7 @@
 package slimeknights.mantle.lib.util;
 
-import com.simibubi.create.lib.extensions.EntityExtensions;
-import com.simibubi.create.lib.mixin.accessor.EntityAccessor;
+import slimeknights.mantle.lib.extensions.EntityExtensions;
+import slimeknights.mantle.lib.mixin.accessor.EntityAccessor;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.Entity;

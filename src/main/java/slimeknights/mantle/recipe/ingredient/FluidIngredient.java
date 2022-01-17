@@ -15,8 +15,7 @@ import net.minecraft.tags.Tag;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.registries.ForgeRegistries;
+import slimeknights.mantle.lib.transfer.fluid.FluidStack;
 import slimeknights.mantle.util.JsonHelper;
 
 import java.util.Arrays;
@@ -47,7 +46,7 @@ public abstract class FluidIngredient {
    * @param fluid  Fluid to check
    * @return  Amount of the fluid needed
    */
-  public abstract int getAmount(Fluid fluid);
+  public abstract long getAmount(Fluid fluid);
 
   /**
    * Checks if the given fluid stack argument matches this ingredient
@@ -93,8 +92,8 @@ public abstract class FluidIngredient {
     Collection<FluidStack> fluids = getAllFluids();
     buffer.writeInt(fluids.size());
     for (FluidStack stack : fluids) {
-      buffer.writeUtf(Objects.requireNonNull(stack.getFluid().getRegistryName()).toString());
-      buffer.writeInt(stack.getAmount());
+      buffer.writeUtf(Objects.requireNonNull(Registry.FLUID.getKey(stack.getFluid())).toString());
+      buffer.writeLong(stack.getAmount());
     }
   }
 
@@ -109,7 +108,7 @@ public abstract class FluidIngredient {
    * @param amount  Minimum fluid amount
    * @return  Fluid ingredient for this fluid
    */
-  public static FluidIngredient of(Fluid fluid, int amount) {
+  public static FluidIngredient of(Fluid fluid, long amount) {
     return new FluidIngredient.FluidMatch(fluid, amount);
   }
 
@@ -128,7 +127,7 @@ public abstract class FluidIngredient {
    * @param amount  Minimum fluid amount
    * @return  Fluid ingredient from a tag
    */
-  public static FluidIngredient of(Tag<Fluid> fluid, int amount) {
+  public static FluidIngredient of(Tag<Fluid> fluid, long amount) {
     return new FluidIngredient.TagMatch(fluid, amount);
   }
 
@@ -222,7 +221,7 @@ public abstract class FluidIngredient {
     int count = buffer.readInt();
     FluidIngredient[] ingredients = new FluidIngredient[count];
     for (int i = 0; i < count; i++) {
-      Fluid fluid = ForgeRegistries.FLUIDS.getValue(new ResourceLocation(buffer.readUtf(32767)));
+      Fluid fluid = Registry.FLUID.get(new ResourceLocation(buffer.readUtf(32767)));
       if (fluid == null) {
         fluid = Fluids.EMPTY;
       }
@@ -252,7 +251,7 @@ public abstract class FluidIngredient {
     }
 
     @Override
-    public int getAmount(Fluid fluid) {
+    public long getAmount(Fluid fluid) {
       return 0;
     }
 
@@ -273,7 +272,7 @@ public abstract class FluidIngredient {
   @AllArgsConstructor(access=AccessLevel.PRIVATE)
   private static class FluidMatch extends FluidIngredient {
     private final Fluid fluid;
-    private final int amount;
+    private final long amount;
 
     @Override
     public boolean test(Fluid fluid) {
@@ -281,7 +280,7 @@ public abstract class FluidIngredient {
     }
 
     @Override
-    public int getAmount(Fluid fluid) {
+    public long getAmount(Fluid fluid) {
       return amount;
     }
 
@@ -293,7 +292,7 @@ public abstract class FluidIngredient {
     @Override
     public JsonElement serialize() {
       JsonObject object = new JsonObject();
-      object.addProperty("name", Objects.requireNonNull(fluid.getRegistryName()).toString());
+      object.addProperty("name", Objects.requireNonNull(Registry.FLUID.getKey(fluid)).toString());
       object.addProperty("amount", amount);
       return object;
     }
@@ -303,8 +302,8 @@ public abstract class FluidIngredient {
       // count
       buffer.writeInt(1);
       // single fluid
-      buffer.writeUtf(Objects.requireNonNull(fluid.getRegistryName()).toString());
-      buffer.writeInt(amount);
+      buffer.writeUtf(Objects.requireNonNull(Registry.FLUID.getKey(fluid)).toString());
+      buffer.writeLong(amount);
     }
 
     /**
@@ -314,7 +313,7 @@ public abstract class FluidIngredient {
      */
     private static FluidMatch deserialize(JsonObject json) {
       String fluidName = GsonHelper.getAsString(json, "name");
-      Fluid fluid = ForgeRegistries.FLUIDS.getValue(new ResourceLocation(fluidName));
+      Fluid fluid = Registry.FLUID.get(new ResourceLocation(fluidName));
       if (fluid == null || fluid == Fluids.EMPTY) {
         throw new JsonSyntaxException("Unknown fluid '" + fluidName + "'");
       }
@@ -329,7 +328,7 @@ public abstract class FluidIngredient {
   @AllArgsConstructor(access=AccessLevel.PRIVATE)
   private static class TagMatch extends FluidIngredient {
     private final Tag<Fluid> tag;
-    private final int amount;
+    private final long amount;
 
     @Override
     public boolean test(Fluid fluid) {
@@ -337,7 +336,7 @@ public abstract class FluidIngredient {
     }
 
     @Override
-    public int getAmount(Fluid fluid) {
+    public long getAmount(Fluid fluid) {
       return amount;
     }
 
@@ -387,10 +386,10 @@ public abstract class FluidIngredient {
     }
 
     @Override
-    public int getAmount(Fluid fluid) {
+    public long getAmount(Fluid fluid) {
       return ingredients.stream()
                         .filter(ingredient -> ingredient.test(fluid))
-                        .mapToInt(ingredient -> ingredient.getAmount(fluid))
+                        .mapToLong(ingredient -> ingredient.getAmount(fluid))
                         .findFirst()
                         .orElse(0);
     }
