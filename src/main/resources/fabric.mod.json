@@ -25,7 +25,7 @@
     ]
   },
 
-  "accessWidener": "src/main/resources/mantle.aw",
+  "accessWidener": "src/main/resources/mantle.accesswidener",
   "mixins": [
     "create.mixins.json",
     "create_lib.mixins.json"

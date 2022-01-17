@@ -78,7 +78,7 @@ sourceSets {
 }
 
 loom {
-    accessWidenerPath = file("src/main/resources/mantle.aw")
+    accessWidenerPath = file("src/main/resources/mantle.accesswidener")
     runs {
         datagen {
             client()
