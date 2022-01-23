@@ -2,23 +2,19 @@ package slimeknights.mantle.client.render;
 
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import net.minecraft.client.renderer.ShaderInstance;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.RegisterShadersEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.minecraft.server.packs.resources.ResourceManager;
 import slimeknights.mantle.Mantle;
+import slimeknights.mantle.lib.event.RegisterShadersCallback;
 
 import java.io.IOException;
 
-@Mod.EventBusSubscriber(modid = Mantle.modId, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class MantleShaders {
 
   private static ShaderInstance blockFullBrightShader;
 
-  @SubscribeEvent
-  static void registerShaders(RegisterShadersEvent event) throws IOException {
-    event.registerShader(
-      new ShaderInstance(event.getResourceManager(), Mantle.getResource("block_fullbright"), DefaultVertexFormat.BLOCK),
+  public static void registerShaders(ResourceManager resourceManager, RegisterShadersCallback.ShaderRegistry registry) throws IOException {
+    registry.registerShader(
+      new ShaderInstance(resourceManager, Mantle.getResource("block_fullbright").toString(), DefaultVertexFormat.BLOCK),
       shader -> blockFullBrightShader = shader
     );
   }

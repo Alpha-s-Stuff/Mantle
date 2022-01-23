@@ -4,14 +4,13 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Matrix4f;
 import com.mojang.math.Vector3f;
+import net.fabricmc.fabric.api.transfer.v1.client.fluid.FluidVariantRendering;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.InventoryMenu;
-import net.minecraftforge.fluids.FluidAttributes;
-import net.minecraftforge.fluids.FluidStack;
 import slimeknights.mantle.client.model.fluid.FluidCuboid;
 import slimeknights.mantle.client.model.fluid.FluidCuboid.FluidFace;
 import slimeknights.mantle.lib.transfer.fluid.FluidStack;
@@ -309,10 +308,9 @@ public class FluidRenderer {
     }
 
     // fluid attributes
-    FluidAttributes attributes = fluid.getFluid().getAttributes();
     TextureAtlasSprite still = getBlockSprite(attributes.getStillTexture(fluid));
-    TextureAtlasSprite flowing = getBlockSprite(attributes.getFlowingTexture(fluid));
-    boolean isGas = attributes.isGaseous(fluid);
+    TextureAtlasSprite flowing = getBlockSprite(FluidVariantRendering.getSprites().getFlowingTexture(fluid));
+    boolean isGas = FluidVariantRendering.fillsFromTop(fluid.getType());
     light = withBlockLight(light,attributes.getLuminosity(fluid));
 
     // determine height based on fluid amount

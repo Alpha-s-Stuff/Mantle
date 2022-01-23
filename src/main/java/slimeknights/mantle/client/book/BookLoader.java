@@ -2,6 +2,8 @@ package slimeknights.mantle.client.book;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
+import net.fabricmc.fabric.api.resource.conditions.v1.ConditionJsonProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -9,7 +11,6 @@ import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.crafting.conditions.ICondition;
 import slimeknights.mantle.Mantle;
 import slimeknights.mantle.client.book.action.StringActionProcessor;
 import slimeknights.mantle.client.book.action.protocol.ProtocolGoToPage;
@@ -45,7 +46,7 @@ import javax.annotation.Nullable;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 
-public class BookLoader implements ResourceManagerReloadListener {
+public class BookLoader implements ResourceManagerReloadListener, IdentifiableResourceReloadListener {
 
   /**
    * GSON object to be used for book loading purposes
@@ -90,7 +91,7 @@ public class BookLoader implements ResourceManagerReloadListener {
     // Register GSON type adapters
     registerGsonTypeAdapter(ResourceLocation.class, ResourceLocationSerializer.resourceLocation("mantle"));
     registerGsonTypeAdapter(int.class, new HexStringDeserializer());
-    registerGsonTypeAdapter(ICondition.class, new ConditionDeserializer());
+    registerGsonTypeAdapter(ConditionJsonProvider.class, new ConditionDeserializer());
     registerGsonTypeAdapter(IngredientData.class, new IngredientData.Deserializer());
 
     // Register page types that are implicitly hidden from indexes
@@ -223,5 +224,10 @@ public class BookLoader implements ResourceManagerReloadListener {
   @Override
   public void onResourceManagerReload(ResourceManager resourceManager) {
     books.forEach((s, bookData) -> bookData.reset());
+  }
+
+  @Override
+  public ResourceLocation getFabricId() {
+    return Mantle.getResource("book_loader");
   }
 }

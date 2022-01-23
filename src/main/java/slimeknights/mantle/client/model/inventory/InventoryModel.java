@@ -5,6 +5,8 @@ import com.google.gson.JsonObject;
 import com.mojang.datafixers.util.Pair;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import net.fabricmc.fabric.api.renderer.v1.model.ForwardingBakedModel;
+import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
@@ -14,11 +16,8 @@ import net.minecraft.client.resources.model.ModelState;
 import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraftforge.client.model.BakedModelWrapper;
-import net.minecraftforge.client.model.IModelConfiguration;
-import net.minecraftforge.client.model.IModelLoader;
-import net.minecraftforge.client.model.geometry.IModelGeometry;
 import slimeknights.mantle.client.model.util.SimpleBlockModel;
+import slimeknights.mantle.lib.model.IModelLoader;
 
 import java.util.Collection;
 import java.util.List;
@@ -29,34 +28,35 @@ import java.util.function.Function;
  * This model contains a list of multiple items to display in a TESR
  */
 @AllArgsConstructor
-public class InventoryModel implements IModelGeometry<InventoryModel> {
+public class InventoryModel implements UnbakedModel<InventoryModel> {
   protected final SimpleBlockModel model;
   protected final List<ModelItem> items;
+  protected final BlockModel owner;
 
   @Override
-  public Collection<Material> getTextures(IModelConfiguration owner, Function<ResourceLocation,UnbakedModel> modelGetter, Set<Pair<String,String>> missingTextureErrors) {
+  public Collection<Material> getTextures(BlockModel owner, Function<ResourceLocation,UnbakedModel> modelGetter, Set<Pair<String,String>> missingTextureErrors) {
     return model.getTextures(owner, modelGetter, missingTextureErrors);
   }
 
   @Override
-  public BakedModel bake(IModelConfiguration owner, ModelBakery bakery, Function<Material,TextureAtlasSprite> spriteGetter, ModelState transform, ItemOverrides overrides, ResourceLocation location) {
-    BakedModel baked = model.bakeModel(owner, transform, overrides, spriteGetter, location);
+  public BakedModel bake(ModelBakery bakery, Function<Material,TextureAtlasSprite> spriteGetter, ModelState transform, ResourceLocation location) {
+    BakedModel baked = model.bakeModel(owner, transform, ItemOverrides.EMPTY, spriteGetter, location);
     return new Baked(baked, items);
   }
 
   /** Baked model, mostly a data wrapper around a normal model */
   @SuppressWarnings("WeakerAccess")
-  public static class Baked extends BakedModelWrapper<BakedModel> {
+  public static class Baked extends ForwardingBakedModel {
     @Getter
     private final List<ModelItem> items;
     public Baked(BakedModel originalModel, List<ModelItem> items) {
-      super(originalModel);
+      this.wrapped = originalModel;
       this.items = items;
     }
   }
 
   /** Loader for this model */
-  public static class Loader implements IModelLoader<InventoryModel> {
+  public static class Loader extends IModelLoader<InventoryModel> {
     /**
      * Shared loader instance
      */

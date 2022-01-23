@@ -5,7 +5,10 @@ import com.google.gson.JsonObject;
 import net.fabricmc.fabric.api.client.model.ModelProviderContext;
 import net.fabricmc.fabric.api.client.model.ModelResourceProvider;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import slimeknights.mantle.Mantle;
+import slimeknights.mantle.client.model.fluid.FluidTextureModel;
 import slimeknights.mantle.lib.mixin.accessor.BlockModelAccessor;
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
@@ -17,7 +20,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.profiling.ProfilerFiller;
 
-public abstract class IModelLoader implements ModelResourceProvider {
+public abstract class IModelLoader<T extends UnbakedModel> implements ModelResourceProvider, ResourceManagerReloadListener {
 
   public String type;
 
@@ -50,7 +53,7 @@ public abstract class IModelLoader implements ModelResourceProvider {
     return BlockModelAccessor.getGSON()::fromJson;
   }
 
-  abstract public UnbakedModel loadJsonModelResource(ResourceLocation resourceId, JsonObject jsonObject, ModelProviderContext context);
+  public abstract T read(JsonDeserializationContext deserializationContext, JsonObject modelContents, ModelProviderContext context);
 
   static JsonObject getModelJson(ResourceLocation location) throws IOException {
     return BlockModelAccessor.getGSON().fromJson(HBMABFIB.getModelJson(location), JsonObject.class);

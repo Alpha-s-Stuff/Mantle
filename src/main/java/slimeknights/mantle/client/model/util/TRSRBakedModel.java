@@ -7,6 +7,7 @@ import com.mojang.math.Matrix4f;
 import com.mojang.math.Transformation;
 import com.mojang.math.Vector3f;
 import com.mojang.math.Vector4f;
+import net.fabricmc.fabric.api.renderer.v1.model.FabricBakedModel;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
@@ -16,10 +17,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.client.model.data.IModelData;
-import net.minecraftforge.client.model.pipeline.BakedQuadBuilder;
-import net.minecraftforge.client.model.pipeline.VertexTransformer;
-import net.minecraftforge.common.model.TransformationHelper;
+import slimeknights.mantle.lib.util.TransformationHelper;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -30,7 +28,7 @@ import java.util.Random;
  * Model that Translates, Rotates, Scales, then Rotates a child model
  * TODO: is this still needed?
  */
-public class TRSRBakedModel extends DynamicBakedWrapper<BakedModel> {
+public class TRSRBakedModel extends DynamicBakedWrapper<BakedModel> implements FabricBakedModel {
 
   private final Transformation transformation;
   private final TRSROverride override;
@@ -75,7 +73,7 @@ public class TRSRBakedModel extends DynamicBakedWrapper<BakedModel> {
     // transform quads obtained from parent
 
     ImmutableList.Builder<BakedQuad> builder = ImmutableList.builder();
-    if (!this.originalModel.isCustomRenderer()) {
+    if (!this.wrapped.isCustomRenderer()) {
       try {
         // adjust side to facing-rotation
         if (side != null && side.get2DDataValue() > -1) {

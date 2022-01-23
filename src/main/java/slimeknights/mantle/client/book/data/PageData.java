@@ -1,16 +1,16 @@
 package slimeknights.mantle.client.book.data;
 
 import com.google.gson.JsonElement;
+import net.fabricmc.fabric.api.resource.conditions.v1.ConditionJsonProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
-import net.minecraftforge.common.crafting.conditions.ICondition;
-import net.minecraftforge.common.crafting.conditions.TrueCondition;
 import slimeknights.mantle.Mantle;
 import slimeknights.mantle.client.book.BookLoader;
 import slimeknights.mantle.client.book.data.content.ContentError;
 import slimeknights.mantle.client.book.data.content.PageContent;
 import slimeknights.mantle.client.book.data.element.IDataElement;
 import slimeknights.mantle.client.book.repository.BookRepository;
+import slimeknights.mantle.lib.condition.TrueCondition;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Array;
@@ -26,7 +26,7 @@ public class PageData implements IDataItem, IConditional {
   public ResourceLocation type = Mantle.getResource("blank");
   public String data = "";
   public float scale = 1.0F;
-  public ICondition condition = TrueCondition.INSTANCE;
+  public ConditionJsonProvider condition = TrueCondition.INSTANCE;
 
   /** Contains arbitrary data to be used by custom transformers and other things */
   public Map<ResourceLocation, JsonElement> extraData = Collections.emptyMap();

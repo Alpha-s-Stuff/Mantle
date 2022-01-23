@@ -2,6 +2,12 @@ accessWidener v2 named
 
 transitive-accessible class net/minecraft/world/item/crafting/Ingredient$Value
 transitive-accessible method net/minecraft/world/item/crafting/Ingredient$ItemValue <init> (Lnet/minecraft/world/item/ItemStack;)V
+transitive-accessible method net/minecraft/world/level/block/state/properties/WoodType register (Lnet/minecraft/world/level/block/state/properties/WoodType;)Lnet/minecraft/world/level/block/state/properties/WoodType;
+transitive-accessible method net/minecraft/client/renderer/blockentity/BlockEntityRenderers register (Lnet/minecraft/world/level/block/entity/BlockEntityType;Lnet/minecraft/client/renderer/blockentity/BlockEntityRendererProvider;)V
+transitive-accessible method net/minecraft/client/renderer/block/model/FaceBakery applyElementRotation (Lcom/mojang/math/Vector3f;Lnet/minecraft/client/renderer/block/model/BlockElementRotation;)V
+transitive-accessible method net/minecraft/client/renderer/block/model/FaceBakery recalculateWinding ([ILnet/minecraft/core/Direction;)V
+transitive-accessible method net/minecraft/client/renderer/block/model/FaceBakery setupShape (Lcom/mojang/math/Vector3f;Lcom/mojang/math/Vector3f;)[F
 transitive-extendable class net/minecraft/world/item/crafting/Ingredient
 transitive-accessible field net/minecraft/client/renderer/block/model/BlockModel parentLocation Lnet/minecraft/resources/ResourceLocation;
 transitive-accessible field net/minecraft/client/renderer/block/model/BlockModel parent Lnet/minecraft/client/renderer/block/model/BlockModel;
+transitive-accessible field net/minecraft/client/renderer/block/model/BlockModel FACE_BAKERY Lnet/minecraft/client/renderer/block/model/FaceBakery;

@@ -17,6 +17,7 @@ import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockElement;
 import net.minecraft.client.renderer.block.model.BlockElementFace;
 import net.minecraft.client.renderer.block.model.BlockFaceUV;
+import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
@@ -36,17 +37,14 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 
 import net.fabricmc.fabric.api.renderer.v1.model.FabricBakedModel;
-import net.minecraftforge.client.model.IModelConfiguration;
-import net.minecraftforge.client.model.IModelLoader;
-import net.minecraftforge.client.model.data.IModelData;
-import net.minecraftforge.client.model.data.ModelProperty;
-import net.minecraftforge.client.model.geometry.IModelGeometry;
 import slimeknights.mantle.block.IMultipartConnectedBlock;
 import slimeknights.mantle.client.model.data.SinglePropertyData;
 import slimeknights.mantle.client.model.util.DynamicBakedWrapper;
 import slimeknights.mantle.client.model.util.ExtraTextureConfiguration;
 import slimeknights.mantle.client.model.util.ModelTextureIteratable;
 import slimeknights.mantle.client.model.util.SimpleBlockModel;
+import slimeknights.mantle.lib.model.IModelData;
+import slimeknights.mantle.lib.model.IModelLoader;
 import slimeknights.mantle.lib.model.ModelProperty;
 
 import javax.annotation.Nonnull;
@@ -70,7 +68,7 @@ import java.util.function.Predicate;
  * Model that handles generating variants for connected textures
  */
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public class ConnectedModel implements BakedModel, FabricBakedModel {
+public class ConnectedModel implements UnbakedModel, BakedModel, FabricBakedModel {
 
   /** Property of the connections cache key. Contains a 6 bit number with each bit representing a direction */
   private static final ModelProperty<Byte> CONNECTIONS = new ModelProperty<>();
@@ -84,11 +82,13 @@ public class ConnectedModel implements BakedModel, FabricBakedModel {
   /** List of sides to check when getting block directions */
   private final Set<Direction> sides;
 
-  /** Map of full texture name to the resulting material, filled during {@link #getTextures(IModelConfiguration, Function, Set)} */
+  private final BlockModel owner;
+
+  /** Map of full texture name to the resulting material, filled during {@link #getMaterials(Function, Set)} */
   private Map<String,Material> extraTextures;
 
   @Override
-  public Collection<Material> getTextures(IModelConfiguration owner, Function<ResourceLocation,UnbakedModel> modelGetter, Set<Pair<String,String>> missingTextureErrors) {
+  public Collection<Material> getMaterials(Function<ResourceLocation,UnbakedModel> modelGetter, Set<Pair<String,String>> missingTextureErrors) {
     Collection<Material> textures = model.getTextures(owner, modelGetter, missingTextureErrors);
     // for all connected textures, add suffix textures
     Map<String, Material> extraTextures = new HashMap<>();
@@ -116,8 +116,8 @@ public class ConnectedModel implements BakedModel, FabricBakedModel {
         if (!extraTextures.containsKey(suffixedName)) {
           Material mat;
           // allow overriding a specific texture
-          if (owner.isTexturePresent(suffixedName)) {
-            mat = owner.resolveTexture(suffixedName);
+          if (owner.hasTexture(suffixedName)) {
+            mat = owner.getMaterial(suffixedName);
           } else {
             mat = new Material(atlas, new ResourceLocation(namespace, path + "/" + suffix));
           }
@@ -135,20 +135,20 @@ public class ConnectedModel implements BakedModel, FabricBakedModel {
   }
 
   @Override
-  public BakedModel bake(IModelConfiguration owner, ModelBakery bakery, Function<Material,TextureAtlasSprite> spriteGetter, ModelState transform, ItemOverrides overrides, ResourceLocation location) {
-    BakedModel baked = model.bakeModel(owner, transform, overrides, spriteGetter, location);
+  public BakedModel bake(ModelBakery bakery, Function<Material,TextureAtlasSprite> spriteGetter, ModelState transform, ResourceLocation location) {
+    BakedModel baked = model.bakeModel(owner, transform, ItemOverrides.EMPTY, spriteGetter, location);
     return new Baked(this, new ExtraTextureConfiguration(owner, extraTextures), transform, baked);
   }
 
   @SuppressWarnings("WeakerAccess")
   protected static class Baked extends DynamicBakedWrapper<BakedModel> {
     private final ConnectedModel parent;
-    private final IModelConfiguration owner;
+    private final BlockModel owner;
     private final ModelState transforms;
     private final BakedModel[] cache = new BakedModel[64];
     private final Map<String,String> nameMappingCache = new ConcurrentHashMap<>();
     private final ModelTextureIteratable modelTextures;
-    public Baked(ConnectedModel parent, IModelConfiguration owner, ModelState transforms, BakedModel baked) {
+    public Baked(ConnectedModel parent, BlockModel owner, ModelState transforms, BakedModel baked) {
       super(baked);
       this.parent = parent;
       this.owner = owner;
@@ -417,7 +417,7 @@ public class ConnectedModel implements BakedModel, FabricBakedModel {
   }
 
   /** Loader class containing singleton instance */
-  public static class Loader implements IModelLoader<ConnectedModel> {
+  public static class Loader extends IModelLoader<ConnectedModel> {
     /** Shared loader instance */
     public static final ConnectedModel.Loader INSTANCE = new ConnectedModel.Loader();
 

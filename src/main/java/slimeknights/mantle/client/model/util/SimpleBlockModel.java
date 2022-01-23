@@ -30,11 +30,10 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.world.inventory.InventoryMenu;
 
 import net.fabricmc.fabric.api.renderer.v1.model.FabricBakedModel;
-import net.minecraftforge.client.model.ForgeModelBakery;
-import net.minecraftforge.client.model.IModelConfiguration;
-import net.minecraftforge.client.model.IModelLoader;
-import net.minecraftforge.client.model.geometry.IModelGeometry;
 import slimeknights.mantle.Mantle;
+import slimeknights.mantle.lib.mixin.accessor.BlockModelAccessor;
+import slimeknights.mantle.lib.mixin.accessor.DeserializerAccessor;
+import slimeknights.mantle.lib.model.IModelLoader;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -49,7 +48,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * Simplier version of {@link BlockModel} for use in an {@link net.minecraftforge.client.model.IModelLoader}, as the owner handles most block model properties
+ * Simplier version of {@link BlockModel} for use in an {@link slimeknights.mantle.lib.model.IModelLoader}, as the owner handles most block model properties
  */
 @SuppressWarnings("WeakerAccess")
 public class SimpleBlockModel implements UnbakedModel, BakedModel, FabricBakedModel {
@@ -234,7 +233,7 @@ public class SimpleBlockModel implements UnbakedModel, BakedModel, FabricBakedMo
       }
       // bake the face
       TextureAtlasSprite sprite = spriteGetter.apply(owner.getMaterial(texture));
-      BakedQuad bakedQuad = BlockModel.bakeFace(part, face, sprite, direction, transform, location);
+      BakedQuad bakedQuad = BlockModelAccessor.callBakeFace(part, face, sprite, direction, transform, location);
       // apply cull face
       if (face.cullForDirection == null) {
         builder.addUnculledFace(bakedQuad);
@@ -257,7 +256,7 @@ public class SimpleBlockModel implements UnbakedModel, BakedModel, FabricBakedMo
   public static BakedModel bakeModel(BlockModel owner, List<BlockElement> elements, ModelState transform, ItemOverrides overrides, Function<Material,TextureAtlasSprite> spriteGetter, ResourceLocation location) {
     // iterate parts, adding to the builder
     TextureAtlasSprite particle = spriteGetter.apply(owner.getMaterial("particle"));
-    SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(owner, overrides).particle(particle);
+    SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(owner, overrides, true).particle(particle);
     for(BlockElement part : elements) {
       bakePart(builder, owner, part, transform, spriteGetter, location);
     }
@@ -324,7 +323,7 @@ public class SimpleBlockModel implements UnbakedModel, BakedModel, FabricBakedMo
       ResourceLocation atlas = InventoryMenu.BLOCK_ATLAS;
       JsonObject textures = GsonHelper.getAsJsonObject(json, "textures");
       for(Entry<String, JsonElement> entry : textures.entrySet()) {
-        builder.put(entry.getKey(), BlockModel.Deserializer.parseTextureLocationOrReference(atlas, entry.getValue().getAsString()));
+        builder.put(entry.getKey(), DeserializerAccessor.callParseTextureLocationOrReference(atlas, entry.getValue().getAsString()));
       }
       textureMap = builder.build();
     } else {
@@ -365,7 +364,7 @@ public class SimpleBlockModel implements UnbakedModel, BakedModel, FabricBakedMo
   }
 
   /** Logic to implement a vanilla block model */
-  private static class Loader implements IModelLoader<SimpleBlockModel> {
+  private static class Loader extends IModelLoader<SimpleBlockModel> {
     @Override
     public void onResourceManagerReload(ResourceManager resourceManager) {}
 

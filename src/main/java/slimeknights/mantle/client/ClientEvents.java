@@ -3,12 +3,23 @@ package slimeknights.mantle.client;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import jdk.jfr.consumer.RecordedClassLoader;
+import net.fabricmc.fabric.api.client.rendering.v1.BlockEntityRendererRegistry;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.client.AttackIndicatorStatus;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.renderer.Sheets;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.blockentity.SignRenderer;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.ServerResources;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.resources.ReloadableResourceManager;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.level.GameType;
 
@@ -42,6 +53,9 @@ import slimeknights.mantle.client.model.inventory.InventoryModel;
 import slimeknights.mantle.client.model.util.ColoredBlockModel;
 import slimeknights.mantle.client.model.util.MantleItemLayerModel;
 import slimeknights.mantle.client.model.util.ModelHelper;
+import slimeknights.mantle.client.render.MantleShaders;
+import slimeknights.mantle.lib.event.RegisterShadersCallback;
+import slimeknights.mantle.lib.mixin.accessor.SheetsAccessor;
 import slimeknights.mantle.registration.MantleRegistrations;
 import slimeknights.mantle.registration.RegistrationHelper;
 import slimeknights.mantle.util.OffhandCooldownTracker;
@@ -52,22 +66,23 @@ import java.util.function.Function;
 public class ClientEvents implements ClientModInitializer {
   private static final Function<OffhandCooldownTracker,Float> COOLDOWN_TRACKER = OffhandCooldownTracker::getCooldown;
 
-  @SubscribeEvent
-  static void registerEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
-    event.registerBlockEntityRenderer(MantleRegistrations.SIGN, SignRenderer::new);
+  static void registerEntityRenderers() {
+    BlockEntityRenderers.register(MantleRegistrations.SIGN, SignRenderer::new);
   }
 
-  @SubscribeEvent
-  static void registerListeners(RegisterClientReloadListenersEvent event) {
-    event.registerReloadListener(ModelHelper.LISTENER);
-    event.registerReloadListener(new BookLoader());
+  static void registerListeners(MinecraftServer server, ServerResources serverResourceManager) {
+    ((ReloadableResourceManager)serverResourceManager.getResourceManager()).registerReloadListener(ModelHelper.LISTENER);
+    ((ReloadableResourceManager)serverResourceManager.getResourceManager()).registerReloadListener(new BookLoader());
   }
 
-  @SubscribeEvent
-  static void clientSetup(FMLClientSetupEvent event) {
-    event.enqueueWork(() -> RegistrationHelper.forEachWoodType(Sheets::addWoodType));
+  public void onInitializeClient() {
+    RegistrationHelper.forEachWoodType(woodType -> Sheets.SIGN_MATERIALS.put(woodType, SheetsAccessor.callCreateSignMaterial(woodType)));
 
     BookLoader.registerBook(Mantle.getResource("test"), new FileRepository(Mantle.getResource("books/test")));
+
+    registerEntityRenderers();
+    ServerLifecycleEvents.START_DATA_PACK_RELOAD.register(ClientEvents::registerListeners);
+    RegisterShadersCallback.EVENT.register(MantleShaders::registerShaders);
   }
 
   // PAINNNNNN
@@ -88,8 +103,7 @@ public class ClientEvents implements ClientModInitializer {
 //    ModelLoaderRegistry.registerLoader(Mantle.getResource("fluids"), FluidsModel.Loader.INSTANCE);
 //  }
 
-  @SubscribeEvent
-  static void commonSetup(FMLCommonSetupEvent event) {
+  static void commonSetup() {
     MinecraftForge.EVENT_BUS.register(new ExtraHeartRenderHandler());
     MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, RenderGameOverlayEvent.PostLayer.class, ClientEvents::renderOffhandAttackIndicator);
   }

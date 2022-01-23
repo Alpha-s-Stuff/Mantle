@@ -6,11 +6,14 @@
   "mixins": [
     "BlockEntityTypeAccessor",
     "accessor.BlockModelAccessor",
+    "accessor.DeserializerAccessor",
     "accessor.ItemAccessor",
     "accessor.ModelBakeryAccessor",
     "accessor.RecipeManagerAccessor",
+    "accessor.SheetsAccessor",
     "accessor.TagContainerAccessor",
     "accessor.Vector3fAccessor",
+    "client.GameRendererMixin",
     "common.TagContainerMixin"
   ],
   "injectors": {

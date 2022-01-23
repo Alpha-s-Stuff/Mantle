@@ -2,16 +2,17 @@ package slimeknights.mantle.client.book.data;
 
 import com.google.common.collect.Sets;
 import com.google.gson.JsonElement;
+import net.fabricmc.fabric.api.resource.conditions.v1.ConditionJsonProvider;
+import net.fabricmc.fabric.api.resource.conditions.v1.ResourceConditions;
 import net.minecraft.advancements.AdvancementProgress;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
-import net.minecraftforge.common.crafting.conditions.ICondition;
-import net.minecraftforge.common.crafting.conditions.TrueCondition;
 import slimeknights.mantle.client.book.BookLoader;
 import slimeknights.mantle.client.book.data.content.ContentError;
 import slimeknights.mantle.client.book.data.element.ImageData;
 import slimeknights.mantle.client.book.repository.BookRepository;
 import slimeknights.mantle.client.screen.book.BookScreen;
+import slimeknights.mantle.lib.condition.TrueCondition;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -29,7 +30,7 @@ public class SectionData implements IDataItem, IConditional {
   public Set<String> requirements = Sets.newHashSet();
   public boolean hideWhenLocked = false;
   public String data = "";
-  public ICondition condition = TrueCondition.INSTANCE;
+  public ConditionJsonProvider condition = TrueCondition.INSTANCE;
 
   /** Contains arbitrary data to be used by custom transformers and other things */
   public Map<ResourceLocation, JsonElement> extraData = Collections.emptyMap();
@@ -141,6 +142,6 @@ public class SectionData implements IDataItem, IConditional {
 
   @Override
   public boolean isConditionMet() {
-    return condition.test();
+    return ResourceConditions.get(condition.getConditionId()).test();
   }
 }
