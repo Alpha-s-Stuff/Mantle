@@ -23,8 +23,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
-import net.minecraftforge.registries.ForgeRegistries;
 import slimeknights.mantle.Mantle;
 import slimeknights.mantle.client.model.fluid.FluidCuboid;
 import slimeknights.mantle.client.render.FluidRenderer;
@@ -60,16 +58,16 @@ public class FaucetFluidLoader extends SimpleJsonResourceReloadListener {
   /** Used to prevent being initialized multiple times */
   private static boolean initialized = false;
 
-  /**
-   * Call during the event to register the reload listener
-   */
-  public static void initialize(RegisterClientReloadListenersEvent event) {
-    if (initialized) {
-      return;
-    }
-    initialized = true;
-    event.registerReloadListener(INSTANCE);
-  }
+//  /**
+//   * Call during the event to register the reload listener
+//   */
+//  public static void initialize(RegisterClientReloadListenersEvent event) {
+//    if (initialized) {
+//      return;
+//    }
+//    initialized = true;
+//    event.registerReloadListener(INSTANCE);
+//  }
 
   /** Default fluid model for blocks with no model */
   private FaucetFluid defaultFluid;

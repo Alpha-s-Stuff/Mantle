@@ -57,6 +57,6 @@ public abstract class BoatMixin {
 			)
 	)
 	public float create$setSlipperiness(float f) {
-		return ((BlockStateExtensions) create$state).create$getSlipperiness(create$world, create$pos, create$entity);
+		return ((BlockStateExtensions) create$state).getSlipperiness(create$world, create$pos, create$entity);
 	}
 }

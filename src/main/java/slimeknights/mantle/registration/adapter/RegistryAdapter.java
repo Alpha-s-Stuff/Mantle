@@ -4,6 +4,12 @@ import lombok.RequiredArgsConstructor;
 
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.material.Fluid;
+
+import java.util.Objects;
 
 /**
  * A convenience wrapper for forge registries, to be used in combination with the {@link net.minecraftforge.event.RegistryEvent.Register} event.
@@ -51,16 +57,28 @@ public class RegistryAdapter<T> {
     return this.register(entry, this.getResource(name));
   }
 
-//  /**
-//   * Registers an entry using the name from another entry
-//   * @param entry  Entry to register
-//   * @param name   Entry name to copy
-//   * @param <I>    Value type
-//   * @return  Registered entry
-//   */
-//  public <I extends T> I register(I entry, T name) {
-//    return this.register(entry, Objects.requireNonNull(name.getRegistryName()));
-//  }
+  /**
+   * Registers an entry using the name from another entry
+   * @param entry  Entry to register
+   * @param name   Entry name to copy
+   * @param <I>    Value type
+   * @return  Registered entry
+   */
+  public <I extends T> I register(I entry, Object name) {
+    return this.register(entry, Objects.requireNonNull(getRegistryName(name)));
+  }
+
+  public static ResourceLocation getRegistryName(Object obj) {
+    if(obj instanceof Block block)
+      return Registry.BLOCK.getKey(block);
+    if(obj instanceof Item item)
+      return Registry.ITEM.getKey(item);
+    if(obj instanceof Fluid fluid)
+      return Registry.FLUID.getKey(fluid);
+    if(obj instanceof EntityType<?> entityType)
+      return Registry.ENTITY_TYPE.getKey(entityType);
+    return null;
+  }
 
   /**
    * General purpose backup registration method. In case you want to set a very specific resource location.

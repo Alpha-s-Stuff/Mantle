@@ -1,6 +1,6 @@
 package slimeknights.mantle.lib.util;
 
-import com.simibubi.create.Create;
+import slimeknights.mantle.Mantle;
 import slimeknights.mantle.lib.transfer.TransferUtil;
 import slimeknights.mantle.lib.transfer.fluid.FluidStack;
 import slimeknights.mantle.lib.transfer.fluid.FluidTransferable;
@@ -22,7 +22,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.material.Fluid;
 
 public class FluidTileDataHandler {
-	public static final ResourceLocation PACKET_ID = Create.asResource("fluid_tile_handler_data");
+	public static final ResourceLocation PACKET_ID = Mantle.getResource("fluid_tile_handler_data");
 
 	@Environment(EnvType.CLIENT)
 	private static final Map<BlockPos, FluidTankData[]> CACHED_DATA = new HashMap<>();

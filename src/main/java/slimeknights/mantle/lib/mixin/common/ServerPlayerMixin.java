@@ -2,7 +2,6 @@ package slimeknights.mantle.lib.mixin.common;
 
 import com.jamieswhiteshirt.reachentityattributes.ReachEntityAttributes;
 import com.mojang.authlib.GameProfile;
-import com.simibubi.create.AllItems;
 import slimeknights.mantle.lib.event.PlayerTickEndCallback;
 import slimeknights.mantle.lib.event.ServerPlayerCreationCallback;
 import slimeknights.mantle.lib.transfer.TransferUtil;
@@ -39,26 +38,6 @@ public abstract class ServerPlayerMixin extends Player {
 	@Inject(method = "<init>", at = @At("RETURN"))
 	private void create$init(MinecraftServer minecraftServer, ServerLevel serverLevel, GameProfile gameProfile, CallbackInfo ci) {
 		ServerPlayerCreationCallback.EVENT.invoker().onCreate((ServerPlayer) (Object) this);
-	}
-
-	@Inject(method = "tick", at = @At("TAIL"))
-	public void create$clientEndOfTickEvent(CallbackInfo ci) {
-		if (!getLevel().isClientSide()) {
-			if (getItemBySlot(EquipmentSlot.HEAD).is(AllItems.GOGGLES.get())) {
-				double reach = ReachEntityAttributes.getReachDistance(this, 4);
-				HitResult hit = pick(reach, 0, false);
-				if (hit instanceof BlockHitResult blockHit) {
-					LazyOptional<IFluidHandler> optional = TransferUtil.getFluidHandler(level, blockHit.getBlockPos(), blockHit.getDirection());
-					if (optional.isPresent()) {
-						IFluidHandler handler = optional.orElse(null);
-						if (!create$checkSameAndUpdate(handler)) {
-							FluidHandlerData.sendToClient((ServerPlayer) (Object) this, handler);
-						}
-					}
-				}
-			}
-		}
-		PlayerTickEndCallback.EVENT.invoker().onEndOfPlayerTick((ServerPlayer) (Object) this);
 	}
 
 	/**

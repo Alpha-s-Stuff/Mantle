@@ -17,9 +17,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.SerializationTags;
 import net.minecraft.tags.TagCollection;
-import net.minecraftforge.registries.ForgeRegistry;
-import net.minecraftforge.registries.IForgeRegistryEntry;
-import net.minecraftforge.registries.RegistryManager;
+import slimeknights.mantle.registration.adapter.RegistryAdapter;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
@@ -47,7 +45,7 @@ public class TagCollectionArgument implements ArgumentType<TagCollectionArgument
    * @return  Tag folder
    */
   public static String getTagFolder(ResourceLocation name) {
-    return getTagFolder(RegistryManager.ACTIVE.getRegistry(name), name);
+    return getTagFolder(/*RegistryManager.ACTIVE.getRegistry(name)*/null, name);
   }
 
   /**
@@ -56,9 +54,9 @@ public class TagCollectionArgument implements ArgumentType<TagCollectionArgument
    * @param name      Name for fallback if the registry has no tag folder
    * @return  Tag folder name
    */
-  public static String getTagFolder(@Nullable ForgeRegistry<?> registry, ResourceLocation name) {
+  public static String getTagFolder(@Nullable Registry<?> registry, ResourceLocation name) {
     if (registry != null) {
-      String tagFolder = registry.getTagFolder();
+      String tagFolder = "items";/*registry.getTagFolder();*/
       if (tagFolder != null) {
         return tagFolder;
       }
@@ -72,7 +70,7 @@ public class TagCollectionArgument implements ArgumentType<TagCollectionArgument
     ResourceLocation name = ResourceLocation.read(reader);
     TagCollection<?> collection = SerializationTags.getInstance().get(ResourceKey.createRegistryKey(name));
     if (collection != null) {
-      ForgeRegistry<?> forgeRegistry = RegistryManager.ACTIVE.getRegistry(name);
+      Registry<?> forgeRegistry = /*RegistryManager.ACTIVE.getRegistry(name)*/Registry.ITEM;
       String tagFolder = getTagFolder(forgeRegistry, name);
       if (forgeRegistry != null) {
         return new ForgeResult(name, tagFolder, collection, forgeRegistry);
@@ -118,28 +116,28 @@ public class TagCollectionArgument implements ArgumentType<TagCollectionArgument
   }
 
   /** Result for a forge registry */
-  private static class ForgeResult<T extends IForgeRegistryEntry<T>> extends Result<T> {
-    private final ForgeRegistry<T> registry;
-    public ForgeResult(ResourceLocation name, String tagFolder, TagCollection<T> collection, ForgeRegistry<T> registry) {
+  private static class ForgeResult<T> extends Result<T> {
+    private final Registry<T> registry;
+    public ForgeResult(ResourceLocation name, String tagFolder, TagCollection<T> collection, Registry<T> registry) {
       super(name, tagFolder, collection);
       this.registry = registry;
     }
 
     @Override
     public Collection<ResourceLocation> getKeys() {
-      return registry.getKeys();
+      return registry.keySet();
     }
 
     @Override
     public ResourceLocation getKey(T object) {
-      return object.getRegistryName();
+      return RegistryAdapter.getRegistryName(object);
     }
 
     @Nullable
     @Override
     public T getValue(ResourceLocation key) {
       if (registry.containsKey(key)) {
-        return registry.getValue(key);
+        return registry.get(key);
       }
       return null;
     }

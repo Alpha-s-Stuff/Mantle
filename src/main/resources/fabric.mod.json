@@ -1,20 +1,19 @@
 {
   "schemaVersion": 1,
-  "id": "create",
+  "id": "mantle",
   "version": "${version}",
 
-  "name": "Create: Refabricated",
-  "description": "A Fabric port of Create.",
+  "name": "Mantle",
+  "description": "Shared code for Slime Knights mods and others.",
   "authors": [
-    "Create: Refabricated Team",
-    "Create Team"
+    "Slime Knights"
   ],
   "contact": {
     "sources": "https://github.com/Create-Fabric/Create-Refabricated"
   },
 
   "license": "MIT",
-  "icon": "Mantle.png",
+  "icon": "icon.png",
 
   "environment": "*",
   "entrypoints": {
@@ -22,18 +21,30 @@
       "slimeknights.mantle.Mantle"
     ],
     "client": [
+      "slimeknights.mantle.client.ClientEvents"
+    ],
+    "cardinal-components": [
+      "slimeknights.mantle.util.OffhandCooldownTracker"
     ]
   },
-
-  "accessWidener": "src/main/resources/mantle.accesswidener",
+  "accessWidener": "mantle.accesswidener",
   "mixins": [
-    "create.mixins.json",
-    "create_lib.mixins.json"
+    "mantle.mixin.json"
   ],
 
   "depends": {
     "fabricloader": ">=0.12.12",
     "fabric": ">=0.44.0",
     "minecraft": ">=1.18.1"
+  },
+  "custom": {
+    "loom:injected_interfaces": {
+      "net.minecraft.resources.ResourceLocation": ["slimeknights/mantle/lib/extensions/ResourceLocationEx"],
+      "net.minecraft.world.item.crafting.Ingredient": ["slimeknights/mantle/lib/extensions/IngredientEx"]
+    },
+    "cardinal-components": [
+      "mantle:offhand_cooldown"
+    ],
+    "banner": "Mantle.png"
   }
 }

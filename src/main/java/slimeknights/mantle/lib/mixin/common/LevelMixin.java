@@ -47,6 +47,6 @@ public abstract class LevelMixin {
 	)
 	public void create$updateComparatorOutputLevel(BlockPos blockPos, Block block, CallbackInfo ci,
 												   Iterator<?> var3, Direction direction, BlockPos blockPos2) {
-		((BlockStateExtensions) getBlockState(blockPos2)).create$onNeighborChange(MixinHelper.cast(this), blockPos2, blockPos);
+		((BlockStateExtensions) getBlockState(blockPos2)).onNeighborChange(MixinHelper.cast(this), blockPos2, blockPos);
 	}
 }

@@ -5,16 +5,17 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import slimeknights.mantle.lib.extensions.SlotExtensions;
 
 /**
  * Used to wrap the slots inside Modules/Subcontainers
  */
-public class WrapperSlot extends Slot {
+public class WrapperSlot extends Slot implements SlotExtensions {
 
   public final Slot parent;
 
   public WrapperSlot(Slot slot) {
-    super(slot.container, slot.getSlotIndex(), slot.x, slot.y);
+    super(slot.container, slot.getContainerSlot(), slot.x, slot.y);
     this.parent = slot;
   }
 
@@ -75,7 +76,7 @@ public class WrapperSlot extends Slot {
 
   @Override
   public Slot setBackground(ResourceLocation atlas, ResourceLocation sprite) {
-    return this.parent.setBackground(atlas, sprite);
+    return ((SlotExtensions)this.parent).setBackground(atlas, sprite);
   }
 
   @Override

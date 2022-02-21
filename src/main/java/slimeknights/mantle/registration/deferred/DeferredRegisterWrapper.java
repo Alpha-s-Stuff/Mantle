@@ -1,11 +1,9 @@
 package slimeknights.mantle.registration.deferred;
 
+import net.minecraft.core.Registry;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.IForgeRegistry;
-import net.minecraftforge.registries.IForgeRegistryEntry;
+import slimeknights.mantle.lib.util.MantleRegistry;
 import slimeknights.mantle.registration.object.EnumObject;
 
 import java.util.function.BiFunction;
@@ -16,22 +14,22 @@ import java.util.function.Supplier;
  * @param <T>  Registry type
  */
 @SuppressWarnings("WeakerAccess")
-public abstract class DeferredRegisterWrapper<T extends IForgeRegistryEntry<T>> {
+public abstract class DeferredRegisterWrapper<T> {
   /** Registry instance, use this to provide register methods */
-  protected final DeferredRegister<T> register;
+  protected final MantleRegistry<T> register;
   /** Mod ID for registration */
   private final String modID;
 
-  protected DeferredRegisterWrapper(IForgeRegistry<T> reg, String modID) {
-    register = DeferredRegister.create(reg, modID);
+  protected DeferredRegisterWrapper(Registry<T> reg, String modID) {
+    register = MantleRegistry.create(reg, modID);
     this.modID = modID;
   }
 
   /**
    * Initializes this registry wrapper. Needs to be called during mod construction
    */
-  public void register(IEventBus bus) {
-    register.register(bus);
+  public void register() {
+    register.register();
   }
 
   /* Utilities */
@@ -64,7 +62,7 @@ public abstract class DeferredRegisterWrapper<T extends IForgeRegistryEntry<T>> 
    * @param register  Function to register an entry
    * @return  EnumObject mapping between different block types
    */
-  protected static <E extends Enum<E> & StringRepresentable, V extends T, T extends IForgeRegistryEntry<T>> EnumObject<E,V> registerEnum(E[] values, String name, BiFunction<String,E,Supplier<? extends V>> register) {
+  protected static <E extends Enum<E> & StringRepresentable, V extends T, T> EnumObject<E,V> registerEnum(E[] values, String name, BiFunction<String,E,Supplier<? extends V>> register) {
     if (values.length == 0) {
       throw new IllegalArgumentException("Must have at least one value");
     }
@@ -83,7 +81,7 @@ public abstract class DeferredRegisterWrapper<T extends IForgeRegistryEntry<T>> 
    * @param register  Function to register an entry
    * @return  EnumObject mapping between different block types
    */
-  protected static <E extends Enum<E> & StringRepresentable, V extends T, T extends IForgeRegistryEntry<T>> EnumObject<E,V> registerEnum(String name, E[] values, BiFunction<String,E,Supplier<? extends V>> register) {
+  protected static <E extends Enum<E> & StringRepresentable, V extends T, T> EnumObject<E,V> registerEnum(String name, E[] values, BiFunction<String,E,Supplier<? extends V>> register) {
     if (values.length == 0) {
       throw new IllegalArgumentException("Must have at least one value");
     }

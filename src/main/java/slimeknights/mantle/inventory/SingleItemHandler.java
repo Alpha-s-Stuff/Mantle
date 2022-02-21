@@ -4,9 +4,9 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.items.IItemHandlerModifiable;
-import net.minecraftforge.items.ItemHandlerHelper;
 import slimeknights.mantle.block.entity.MantleBlockEntity;
+import slimeknights.mantle.lib.transfer.item.IItemHandlerModifiable;
+import slimeknights.mantle.lib.transfer.item.ItemHandlerHelper;
 
 import javax.annotation.Nonnull;
 

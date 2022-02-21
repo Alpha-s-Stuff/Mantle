@@ -12,9 +12,8 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.entity.player.StackedContents;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.common.crafting.CraftingHelper;
-import net.minecraftforge.common.crafting.IIngredientSerializer;
 import slimeknights.mantle.Mantle;
+import slimeknights.mantle.lib.crafting.CraftingHelper;
 import slimeknights.mantle.lib.crafting.IIngredientSerializer;
 import slimeknights.mantle.util.JsonHelper;
 
@@ -104,7 +103,7 @@ public class IngredientIntersection extends Ingredient {
   }
 
   @Override
-  protected void invalidate() {
+  public void invalidate() {
     super.invalidate();
     this.intersectedMatchingStacks = null;
     this.packedMatchingStacks = null;

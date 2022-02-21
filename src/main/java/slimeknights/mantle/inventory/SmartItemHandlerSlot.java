@@ -1,8 +1,8 @@
 package slimeknights.mantle.inventory;
 
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.SlotItemHandler;
+import slimeknights.mantle.lib.transfer.item.IItemHandler;
+import slimeknights.mantle.lib.transfer.item.SlotItemHandler;
 
 /** Forge still uses dumb vanilla logic for determining slot limits instead of their own method */
 public class SmartItemHandlerSlot extends SlotItemHandler {
@@ -12,6 +12,6 @@ public class SmartItemHandlerSlot extends SlotItemHandler {
 
 	@Override
 	public int getMaxStackSize(ItemStack stack) {
-		return getItemHandler().getSlotLimit(getSlotIndex());
+		return getItemHandler().getSlotLimit(getContainerSlot());
 	}
 }

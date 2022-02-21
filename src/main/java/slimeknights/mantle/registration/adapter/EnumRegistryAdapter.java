@@ -1,8 +1,8 @@
 package slimeknights.mantle.registration.adapter;
 
+import net.minecraft.core.Registry;
 import net.minecraft.util.StringRepresentable;
-import net.minecraftforge.registries.ForgeRegistryEntry;
-import net.minecraftforge.registries.IForgeRegistry;
+import slimeknights.mantle.Mantle;
 import slimeknights.mantle.registration.object.EnumObject;
 
 import java.util.function.Function;
@@ -12,15 +12,15 @@ import java.util.function.Function;
  * @param <T>  Registry type
  */
 @SuppressWarnings({"unused", "WeakerAccess"})
-public class EnumRegistryAdapter<T extends ForgeRegistryEntry<T>> extends RegistryAdapter<T> {
+public class EnumRegistryAdapter<T> extends RegistryAdapter<T> {
 
   /** @inheritDoc */
-  public EnumRegistryAdapter(IForgeRegistry<T> registry) {
-    super(registry);
+  public EnumRegistryAdapter(Registry<T> registry) {
+    super(registry, Mantle.modId);
   }
 
   /** @inheritDoc */
-  public EnumRegistryAdapter(IForgeRegistry<T> registry, String modId) {
+  public EnumRegistryAdapter(Registry<T> registry, String modId) {
     super(registry, modId);
   }
 
@@ -39,7 +39,7 @@ public class EnumRegistryAdapter<T extends ForgeRegistryEntry<T>> extends Regist
     EnumObject.Builder<E,I> builder = new EnumObject.Builder<>(values[0].getDeclaringClass());
     for (E value : values) {
       // assuming the type will not sub for a different class
-      builder.putDelegate(value, register(mapper.apply(value), value.getSerializedName() + "_" + name).delegate);
+      builder.putDelegate(value, register(mapper.apply(value), value.getSerializedName() + "_" + name));
     }
     return builder.build();
   }
@@ -58,7 +58,7 @@ public class EnumRegistryAdapter<T extends ForgeRegistryEntry<T>> extends Regist
     // note this cast only works because you cannot extend an enum
     EnumObject.Builder<E,I> builder = new EnumObject.Builder<>(values[0].getDeclaringClass());
     for (E value : values) {
-      builder.putDelegate(value, register(mapper.apply(value), name + "_" + value.getSerializedName()).delegate);
+      builder.putDelegate(value, register(mapper.apply(value), name + "_" + value.getSerializedName()));
     }
     return builder.build();
   }

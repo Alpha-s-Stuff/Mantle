@@ -1,6 +1,6 @@
 package slimeknights.mantle.lib.util;
 
-import com.simibubi.create.Create;
+import slimeknights.mantle.Mantle;
 import slimeknights.mantle.lib.transfer.fluid.FluidStack;
 import slimeknights.mantle.lib.transfer.fluid.IFluidHandler;
 import net.fabricmc.api.EnvType;
@@ -14,7 +14,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 
 public class FluidHandlerData {
-	public static final ResourceLocation PACKET_ID = Create.asResource("fluid_handler_data");
+	public static final ResourceLocation PACKET_ID = Mantle.getResource("fluid_handler_data");
 	public static FluidHandlerData CURRENT = null;
 
 	public FluidTankData[] data;

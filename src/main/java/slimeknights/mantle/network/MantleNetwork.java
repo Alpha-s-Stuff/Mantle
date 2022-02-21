@@ -1,6 +1,6 @@
 package slimeknights.mantle.network;
 
-import net.minecraftforge.network.NetworkDirection;
+import me.pepperbell.simplenetworking.NetworkDirection;
 import slimeknights.mantle.Mantle;
 import slimeknights.mantle.network.packet.DropLecternBookPacket;
 import slimeknights.mantle.network.packet.OpenLecternBookPacket;

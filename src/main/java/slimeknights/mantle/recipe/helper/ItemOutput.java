@@ -15,7 +15,7 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
-import net.minecraftforge.common.crafting.CraftingHelper;
+import slimeknights.mantle.lib.crafting.CraftingHelper;
 
 import java.util.Objects;
 import java.util.function.Supplier;
@@ -134,7 +134,7 @@ public abstract class ItemOutput implements Supplier<ItemStack> {
 
     @Override
     public JsonElement serialize() {
-      String itemName = Objects.requireNonNull(item.getRegistryName()).toString();
+      String itemName = Objects.requireNonNull(Registry.ITEM.getKey(item)).toString();
       if (count > 1) {
         JsonObject json = new JsonObject();
         json.addProperty("item", itemName);
@@ -158,7 +158,7 @@ public abstract class ItemOutput implements Supplier<ItemStack> {
 
     @Override
     public JsonElement serialize() {
-      String itemName = Objects.requireNonNull(stack.getItem().getRegistryName()).toString();
+      String itemName = Objects.requireNonNull(Registry.ITEM.getKey(stack.getItem())).toString();
       int count = stack.getCount();
       // if the item has NBT or a count, write as object
       if (stack.hasTag() || count > 1) {

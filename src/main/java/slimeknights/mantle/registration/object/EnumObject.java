@@ -2,8 +2,6 @@ package slimeknights.mantle.registration.object;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import net.minecraftforge.registries.IForgeRegistryEntry;
-import net.minecraftforge.registries.IRegistryDelegate;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
@@ -80,7 +78,7 @@ public class EnumObject<T extends Enum<T>, I> {
    * @param value  Value to check for
    * @return  True if the value is contained, false otherwise
    */
-  public boolean contains(IForgeRegistryEntry<? super I> value) {
+  public boolean contains(Object value) {
     return this.map.values().stream().map(Supplier::get).anyMatch(value::equals);
   }
 
@@ -138,7 +136,7 @@ public class EnumObject<T extends Enum<T>, I> {
    * @param <I>  Entry type
    */
   @SuppressWarnings({"UnusedReturnValue", "unused"})
-  public static class Builder<T extends Enum<T>, I extends IForgeRegistryEntry<? super I>> {
+  public static class Builder<T extends Enum<T>, I> {
     private final Map<T, Supplier<? extends I>> map;
     public Builder(Class<T> clazz) {
       this.map = new EnumMap<>(clazz);
@@ -163,8 +161,8 @@ public class EnumObject<T extends Enum<T>, I> {
      * @return  Builder instance
      */
     @SuppressWarnings("unchecked")
-    public Builder<T,I> putDelegate(T key, IRegistryDelegate<? super I> value) {
-      this.map.put(key, () -> (I) value.get());
+    public Builder<T,I> putDelegate(T key, I value) {
+      this.map.put(key, () -> (I) value);
       return this;
     }
 

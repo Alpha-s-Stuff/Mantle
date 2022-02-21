@@ -100,7 +100,7 @@ public class ItemElement extends SizedBookElement {
 
       ItemStack stack = this.itemCycle.get(this.currentItem);
       this.mc.getItemRenderer().renderAndDecorateItem(stack, 0, 0);
-      Font font = net.minecraftforge.client.RenderProperties.get(stack).getFont(stack);
+      Font font = fontRenderer;//net.minecraftforge.client.RenderProperties.get(stack).getFont(stack);
       if (font == null) font = mc.font;
       this.mc.getItemRenderer().renderGuiItemDecorations(font, stack, 0, 0, null);
 

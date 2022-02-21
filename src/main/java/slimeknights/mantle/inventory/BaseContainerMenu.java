@@ -14,7 +14,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.fabricmc.api.EnvType;
-import net.minecraftforge.fml.DistExecutor;
+import slimeknights.mantle.lib.util.EnvExecutor;
 import slimeknights.mantle.util.BlockEntityHelper;
 
 import javax.annotation.Nullable;
@@ -322,6 +322,6 @@ public class BaseContainerMenu<TILE extends BlockEntity> extends AbstractContain
     if (buf == null) {
       return null;
     }
-    return DistExecutor.unsafeCallWhenOn(EnvType.CLIENT, () -> () -> BlockEntityHelper.get(type, Minecraft.getInstance().level, buf.readBlockPos()).orElse(null));
+    return EnvExecutor.callWhenOn(EnvType.CLIENT, () -> () -> BlockEntityHelper.get(type, Minecraft.getInstance().level, buf.readBlockPos()).orElse(null));
   }
 }

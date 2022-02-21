@@ -2,7 +2,6 @@ package slimeknights.mantle.lib.crafting;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import twilightforest.lib.extensions.IIngredientEx;
 import java.util.stream.Stream;
 
 import javax.annotation.Nullable;
@@ -11,8 +10,9 @@ import net.minecraft.core.Registry;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
+import slimeknights.mantle.lib.extensions.IngredientEx;
 
-public class NBTIngredient extends Ingredient implements IIngredientEx {
+public class NBTIngredient extends Ingredient implements IngredientEx {
 
     private final ItemStack stack;
 

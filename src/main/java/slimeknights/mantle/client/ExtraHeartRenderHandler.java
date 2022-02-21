@@ -1,10 +1,13 @@
 package slimeknights.mantle.client;
 
+import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -13,13 +16,9 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.client.event.RenderGameOverlayEvent;
-import net.minecraftforge.client.gui.ForgeIngameGui;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import slimeknights.mantle.Mantle;
 import slimeknights.mantle.config.Config;
+import slimeknights.mantle.lib.event.OverlayRenderCallback.Types;
 
 import java.util.Random;
 
@@ -56,27 +55,33 @@ public class ExtraHeartRenderHandler {
 
   /**
    * Event listener
-   * @param event  Event instance
+   * @param matrixStack  Event instance
    */
-  @SubscribeEvent(priority = EventPriority.LOW)
-  public void renderHealthbar(RenderGameOverlayEvent.PreLayer event) {
-    if (event.isCanceled() || !Config.EXTRA_HEART_RENDERER.get() || event.getOverlay() != ForgeIngameGui.PLAYER_HEALTH_ELEMENT) {
-      return;
+  public boolean renderHealthbar(PoseStack matrixStack, float partialTicks, Window window, Types type) {
+    if (!Config.EXTRA_HEART_RENDERER.get() || type != Types.PLAYER_HEALTH) {
+      return false;
     }
     // ensure its visible
-    if (!(mc.gui instanceof ForgeIngameGui gui) || mc.options.hideGui || !gui.shouldDrawSurvivalElements()) {
-      return;
+    if (mc.options.hideGui || !(mc.gameMode.canHurtPlayer() && mc.getCameraEntity() instanceof Player)) {
+      return false;
     }
     Entity renderViewEnity = this.mc.getCameraEntity();
     if (!(renderViewEnity instanceof Player player)) {
-      return;
+      return false;
     }
-    gui.setupOverlayRenderState(true, false);
+    RenderSystem.enableBlend();
+    RenderSystem.defaultBlendFunc();
+    RenderSystem.disableDepthTest();
+    RenderSystem.enableTexture();
+    RenderSystem.setShaderTexture(0, Gui.GUI_ICONS_LOCATION);
+
+    RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+    RenderSystem.setShader(GameRenderer::getPositionTexShader);
 
     this.mc.getProfiler().push("health");
 
     // extra setup stuff from us
-    int left_height = gui.left_height;
+    int left_height = 39;
     int width = this.mc.getWindow().getGuiScaledWidth();
     int height = this.mc.getWindow().getGuiScaledHeight();
     int updateCounter = this.mc.gui.getGuiTicks();
@@ -138,7 +143,6 @@ public class ExtraHeartRenderHandler {
     else if (player.hasEffect(MobEffects.WITHER)) MARGIN += 72;
     float absorbRemaining = absorb;
 
-    PoseStack matrixStack = event.getMatrixStack();
     for (int i = Mth.ceil((healthMax + absorb) / 2.0F) - 1; i >= 0; --i) {
       int row = Mth.ceil((float) (i + 1) / 10.0F) - 1;
       int x = left + i % 10 * 8;
@@ -182,15 +186,14 @@ public class ExtraHeartRenderHandler {
     this.renderExtraAbsorption(matrixStack, left, top - rowHeight, player);
 
     RenderSystem.setShaderTexture(0, ICON_VANILLA);
-    gui.left_height += 10;
+    left_height += 10;
     if (absorb > 0) {
-      gui.left_height += 10;
+      left_height += 10;
     }
 
-    event.setCanceled(true);
     RenderSystem.disableBlend();
     this.mc.getProfiler().pop();
-    MinecraftForge.EVENT_BUS.post(new RenderGameOverlayEvent.PostLayer(matrixStack, event, ForgeIngameGui.PLAYER_HEALTH_ELEMENT));
+    return true;
   }
 
   /**

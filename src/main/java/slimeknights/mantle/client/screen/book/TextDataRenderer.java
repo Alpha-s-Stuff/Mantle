@@ -7,10 +7,10 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
-import net.minecraftforge.client.gui.GuiUtils;
 import org.apache.commons.lang3.StringUtils;
 import slimeknights.mantle.Mantle;
 import slimeknights.mantle.client.book.data.element.TextData;
+import slimeknights.mantle.lib.util.GuiUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,7 +28,7 @@ public class TextDataRenderer {
     String action = drawText(matrixStack, x, y, boxWidth, boxHeight, data, mouseX, mouseY, fr, tooltip);
 
     if (tooltip.size() > 0) {
-      parent.renderTooltip(matrixStack, tooltip, Optional.empty(), mouseX, mouseY, fr);
+      parent.renderTooltip(matrixStack, tooltip, Optional.empty(), mouseX, mouseY/*, fr*/);
     }
 
     return action;

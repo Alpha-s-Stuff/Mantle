@@ -10,11 +10,13 @@ import com.google.gson.JsonSyntaxException;
 import com.mojang.datafixers.util.Either;
 import com.mojang.datafixers.util.Pair;
 import lombok.Getter;
+import net.fabricmc.fabric.api.client.model.ModelProviderContext;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockElement;
 import net.minecraft.client.renderer.block.model.BlockElementFace;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
+import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
@@ -51,7 +53,7 @@ import java.util.stream.Collectors;
  * Simplier version of {@link BlockModel} for use in an {@link slimeknights.mantle.lib.model.IModelLoader}, as the owner handles most block model properties
  */
 @SuppressWarnings("WeakerAccess")
-public class SimpleBlockModel implements UnbakedModel, BakedModel, FabricBakedModel {
+public class SimpleBlockModel extends BlockModel {
   /** Model loader for vanilla block model, mainly intended for use in fallback registration */
   public static final Loader LOADER = new Loader();
   /** Location used for baking dynamic models, name does not matter so just using a constant */
@@ -78,6 +80,7 @@ public class SimpleBlockModel implements UnbakedModel, BakedModel, FabricBakedMo
    * @param parts           List of parts in the model
    */
   public SimpleBlockModel(@Nullable ResourceLocation parentLocation, Map<String,Either<Material,String>> textures, List<BlockElement> parts, BlockModel owner) {
+    super(parentLocation, parts, textures, false, GuiLight.SIDE, ItemTransforms.NO_TRANSFORMS, Collections.emptyList());
     this.parts = parts;
     this.textures = textures;
     this.parentLocation = parentLocation;
@@ -288,8 +291,8 @@ public class SimpleBlockModel implements UnbakedModel, BakedModel, FabricBakedMo
   }
 
   @Override
-  public BakedModel bake(BlockModel owner, ModelBakery bakery, Function<Material,TextureAtlasSprite> spriteGetter, ModelState transform, ItemOverrides overrides, ResourceLocation location) {
-    return bakeModel(owner, transform, overrides, spriteGetter, location);
+  public BakedModel bake(ModelBakery bakery, Function<Material,TextureAtlasSprite> spriteGetter, ModelState transform, ResourceLocation location) {
+    return bakeModel(this, transform, ItemOverrides.EMPTY, spriteGetter, location);
   }
 
   /**
@@ -311,7 +314,7 @@ public class SimpleBlockModel implements UnbakedModel, BakedModel, FabricBakedMo
    * @param json     Json element containing the model
    * @return  Serialized JSON
    */
-  public static SimpleBlockModel deserialize(JsonDeserializationContext context, JsonObject json, BlockModel owner) {
+  public static SimpleBlockModel deserialize(JsonDeserializationContext context, JsonObject json) {
     // parent, null if missing
     String parentName = GsonHelper.getAsString(json, "parent", "");
     ResourceLocation parent = parentName.isEmpty() ? null : new ResourceLocation(parentName);
@@ -337,7 +340,7 @@ public class SimpleBlockModel implements UnbakedModel, BakedModel, FabricBakedMo
     } else {
       parts = Collections.emptyList();
     }
-    return new SimpleBlockModel(parent, textureMap, parts, owner);
+    return new SimpleBlockModel(parent, textureMap, parts, context.deserialize(json, BlockModel.class));
   }
 
   /**
@@ -364,12 +367,13 @@ public class SimpleBlockModel implements UnbakedModel, BakedModel, FabricBakedMo
   }
 
   /** Logic to implement a vanilla block model */
-  private static class Loader extends IModelLoader<SimpleBlockModel> {
+  private static class Loader implements IModelLoader<SimpleBlockModel> {
+
     @Override
     public void onResourceManagerReload(ResourceManager resourceManager) {}
 
     @Override
-    public SimpleBlockModel read(JsonDeserializationContext context, JsonObject json, BlockModel owner) {
+    public SimpleBlockModel read(JsonDeserializationContext context, JsonObject json) {
       return deserialize(context, json);
     }
   }

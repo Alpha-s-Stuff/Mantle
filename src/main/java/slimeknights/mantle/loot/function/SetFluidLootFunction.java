@@ -9,9 +9,6 @@ import net.minecraft.world.level.storage.loot.functions.LootItemConditionalFunct
 import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.minecraft.util.GsonHelper;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
-import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
 import slimeknights.mantle.lib.transfer.TransferUtil;
 import slimeknights.mantle.lib.transfer.fluid.FluidStack;
 import slimeknights.mantle.loot.MantleLoot;

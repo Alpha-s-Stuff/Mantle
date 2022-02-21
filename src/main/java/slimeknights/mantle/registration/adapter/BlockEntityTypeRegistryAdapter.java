@@ -4,12 +4,13 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSet.Builder;
 import com.mojang.datafixers.types.Type;
 import net.minecraft.Util;
+import net.minecraft.core.Registry;
 import net.minecraft.util.datafix.fixes.References;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.entity.BlockEntityType.BlockEntitySupplier;
-import net.minecraftforge.registries.IForgeRegistry;
+import slimeknights.mantle.Mantle;
 import slimeknights.mantle.registration.object.EnumObject;
 
 import javax.annotation.Nullable;
@@ -21,13 +22,13 @@ import java.util.function.Consumer;
 @SuppressWarnings("unused")
 public class BlockEntityTypeRegistryAdapter extends RegistryAdapter<BlockEntityType<?>> {
   /** @inheritDoc */
-  public BlockEntityTypeRegistryAdapter(IForgeRegistry<BlockEntityType<?>> registry, String modId) {
-    super(registry, modId);
+  public BlockEntityTypeRegistryAdapter(String modId) {
+    super(Registry.BLOCK_ENTITY_TYPE, modId);
   }
 
   /** @inheritDoc */
-  public BlockEntityTypeRegistryAdapter(IForgeRegistry<BlockEntityType<?>> registry) {
-    super(registry);
+  public BlockEntityTypeRegistryAdapter() {
+    super(Registry.BLOCK_ENTITY_TYPE, Mantle.modId);
   }
 
   /**

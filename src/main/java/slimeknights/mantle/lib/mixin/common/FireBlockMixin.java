@@ -37,12 +37,12 @@ public abstract class FireBlockMixin extends BaseFireBlock implements FireBlockE
 	}
 
 	@Override
-	public boolean create$canCatchFire(BlockGetter world, BlockPos pos, Direction face) {
-		return ((BlockStateExtensions) world.getBlockState(pos)).create$isFlammable(world, pos, face);
+	public boolean canCatchFire(BlockGetter world, BlockPos pos, Direction face) {
+		return ((BlockStateExtensions) world.getBlockState(pos)).isFlammable(world, pos, face);
 	}
 
 	@Override
-	public int create$invokeGetBurnOdd(BlockState state) {
+	public int invokeGetBurnOdd(BlockState state) {
 		return getBurnOdd(state);
 	}
 
@@ -64,7 +64,7 @@ public abstract class FireBlockMixin extends BaseFireBlock implements FireBlockE
 				Direction direction = var6[var8];
 				BooleanProperty booleanProperty = PROPERTY_BY_DIRECTION.get(direction);
 				if (booleanProperty != null) {
-					blockState2 = blockState2.setValue(booleanProperty, this.canBurn(blockState2) || create$canCatchFire(iBlockReader, blockPos, direction));
+					blockState2 = blockState2.setValue(booleanProperty, this.canBurn(blockState2) || canCatchFire(iBlockReader, blockPos, direction));
 				}
 			}
 
@@ -84,8 +84,8 @@ public abstract class FireBlockMixin extends BaseFireBlock implements FireBlockE
 			),
 			cancellable = true
 	)
-	public void create$scheduledTick(BlockState blockState, ServerLevel serverWorld, BlockPos blockPos, Random random, CallbackInfo ci) {
-		if (blockState.getValue(FireBlock.AGE) == 15 && random.nextInt(4) == 0 && !create$canCatchFire(serverWorld, blockPos.below(), Direction.UP)) {
+	public void scheduledTick(BlockState blockState, ServerLevel serverWorld, BlockPos blockPos, Random random, CallbackInfo ci) {
+		if (blockState.getValue(FireBlock.AGE) == 15 && random.nextInt(4) == 0 && !canCatchFire(serverWorld, blockPos.below(), Direction.UP)) {
 			serverWorld.removeBlock(blockPos, false);
 			ci.cancel();
 		}
@@ -101,9 +101,9 @@ public abstract class FireBlockMixin extends BaseFireBlock implements FireBlockE
 			locals = LocalCapture.CAPTURE_FAILHARD,
 			cancellable = true
 	)
-	private void create$areNeighborsFlammable(BlockGetter iBlockReader, BlockPos blockPos, CallbackInfoReturnable<Boolean> cir,
+	private void areNeighborsFlammable(BlockGetter iBlockReader, BlockPos blockPos, CallbackInfoReturnable<Boolean> cir,
 											  Direction[] var3, int var4, int var5, Direction direction) {
-		if (this.create$canCatchFire(iBlockReader, blockPos.relative(direction), direction.getOpposite())) {
+		if (this.canCatchFire(iBlockReader, blockPos.relative(direction), direction.getOpposite())) {
 			cir.setReturnValue(true);
 		}
 	}

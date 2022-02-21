@@ -1,61 +1,32 @@
 package slimeknights.mantle.client;
 
 import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import jdk.jfr.consumer.RecordedClassLoader;
-import net.fabricmc.fabric.api.client.rendering.v1.BlockEntityRendererRegistry;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
+import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.client.AttackIndicatorStatus;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.renderer.Sheets;
-import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.blockentity.SignRenderer;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.ServerResources;
 import net.minecraft.server.packs.PackType;
-import net.minecraft.server.packs.resources.ReloadableResourceManager;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.level.GameType;
-
-import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.api.EnvType;
-import net.minecraftforge.client.event.EntityRenderersEvent;
-import net.minecraftforge.client.event.ModelRegistryEvent;
-import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
-import net.minecraftforge.client.event.RenderGameOverlayEvent;
-import net.minecraftforge.client.gui.ForgeIngameGui;
-import net.minecraftforge.client.gui.IIngameOverlay;
-import net.minecraftforge.client.model.ModelLoaderRegistry;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import slimeknights.mantle.Mantle;
 import slimeknights.mantle.client.book.BookLoader;
-import slimeknights.mantle.client.book.data.BookData;
 import slimeknights.mantle.client.book.repository.FileRepository;
-import slimeknights.mantle.client.model.FallbackModelLoader;
-import slimeknights.mantle.client.model.NBTKeyModel;
-import slimeknights.mantle.client.model.RetexturedModel;
-import slimeknights.mantle.client.model.connected.ConnectedModel;
-import slimeknights.mantle.client.model.fluid.FluidTextureModel;
-import slimeknights.mantle.client.model.fluid.FluidsModel;
-import slimeknights.mantle.client.model.inventory.InventoryModel;
-import slimeknights.mantle.client.model.util.ColoredBlockModel;
-import slimeknights.mantle.client.model.util.MantleItemLayerModel;
 import slimeknights.mantle.client.model.util.ModelHelper;
 import slimeknights.mantle.client.render.MantleShaders;
+import slimeknights.mantle.lib.event.OverlayRenderCallback;
+import slimeknights.mantle.lib.event.OverlayRenderCallback.Types;
 import slimeknights.mantle.lib.event.RegisterShadersCallback;
 import slimeknights.mantle.lib.mixin.accessor.SheetsAccessor;
+import slimeknights.mantle.lib.util.MantleSpawnEggItem;
 import slimeknights.mantle.registration.MantleRegistrations;
 import slimeknights.mantle.registration.RegistrationHelper;
 import slimeknights.mantle.util.OffhandCooldownTracker;
@@ -67,12 +38,12 @@ public class ClientEvents implements ClientModInitializer {
   private static final Function<OffhandCooldownTracker,Float> COOLDOWN_TRACKER = OffhandCooldownTracker::getCooldown;
 
   static void registerEntityRenderers() {
-    BlockEntityRenderers.register(MantleRegistrations.SIGN, SignRenderer::new);
+//    BlockEntityRenderers.register(MantleRegistrations.SIGN, SignRenderer::new);
   }
 
-  static void registerListeners(MinecraftServer server, ServerResources serverResourceManager) {
-    ((ReloadableResourceManager)serverResourceManager.getResourceManager()).registerReloadListener(ModelHelper.LISTENER);
-    ((ReloadableResourceManager)serverResourceManager.getResourceManager()).registerReloadListener(new BookLoader());
+  static void registerListeners() {
+    ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(ModelHelper.LISTENER);
+    ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new BookLoader());
   }
 
   public void onInitializeClient() {
@@ -81,8 +52,10 @@ public class ClientEvents implements ClientModInitializer {
     BookLoader.registerBook(Mantle.getResource("test"), new FileRepository(Mantle.getResource("books/test")));
 
     registerEntityRenderers();
-    ServerLifecycleEvents.START_DATA_PACK_RELOAD.register(ClientEvents::registerListeners);
+    registerListeners();
     RegisterShadersCallback.EVENT.register(MantleShaders::registerShaders);
+    MantleSpawnEggItem.MOD_EGGS.forEach(egg -> ColorProviderRegistry.ITEM.register((stack, layer) -> egg.getColor(layer), egg));
+    commonSetup();
   }
 
   // PAINNNNNN
@@ -104,34 +77,33 @@ public class ClientEvents implements ClientModInitializer {
 //  }
 
   static void commonSetup() {
-    MinecraftForge.EVENT_BUS.register(new ExtraHeartRenderHandler());
-    MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, RenderGameOverlayEvent.PostLayer.class, ClientEvents::renderOffhandAttackIndicator);
+    OverlayRenderCallback.EVENT.register(new ExtraHeartRenderHandler()::renderHealthbar);
+    OverlayRenderCallback.EVENT.register(ClientEvents::renderOffhandAttackIndicator);
   }
 
   // registered with FORGE bus
-  private static void renderOffhandAttackIndicator(RenderGameOverlayEvent.PostLayer event) {
+  private static boolean renderOffhandAttackIndicator(PoseStack matrixStack, float partialTicks, Window window, OverlayRenderCallback.Types overlay) {
     // must have a player, not be in spectator, and have the indicator enabled
     Minecraft minecraft = Minecraft.getInstance();
     Options settings = minecraft.options;
     if (minecraft.player == null || minecraft.gameMode == null || minecraft.gameMode.getPlayerMode() == GameType.SPECTATOR || settings.attackIndicator == AttackIndicatorStatus.OFF) {
-      return;
+      return false;
     }
-    IIngameOverlay overlay = event.getOverlay();
-    if (overlay != ForgeIngameGui.CROSSHAIR_ELEMENT && overlay != ForgeIngameGui.HOTBAR_ELEMENT) {
-      return;
+
+    if (overlay != Types.CROSSHAIRS /*&& overlay != Types.HOTBAR_ELEMENT*/) {
+      return false;
     }
 
     // enabled if either in the tag, or if force enabled
-    float cooldown = minecraft.player.getCapability(OffhandCooldownTracker.CAPABILITY).filter(OffhandCooldownTracker::isEnabled).map(COOLDOWN_TRACKER).orElse(1.0f);
+    float cooldown = OffhandCooldownTracker.CAPABILITY.maybeGet(minecraft.player).filter(OffhandCooldownTracker::isEnabled).map(COOLDOWN_TRACKER).orElse(1.0f);
     if (cooldown >= 1.0f) {
-      return;
+      return false;
     }
 
     // show attack indicator
-    PoseStack matrixStack = event.getMatrixStack();
     switch (settings.attackIndicator) {
       case CROSSHAIR:
-        if (overlay == ForgeIngameGui.CROSSHAIR_ELEMENT && minecraft.options.getCameraType().isFirstPerson()) {
+        if (overlay == Types.CROSSHAIRS && minecraft.options.getCameraType().isFirstPerson()) {
           if (!settings.renderDebug || settings.hideGui || minecraft.player.isReducedDebugInfo() || settings.reducedDebugInfo) {
             // mostly cloned from vanilla attack indicator
             RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.ONE_MINUS_DST_COLOR, GlStateManager.DestFactor.ONE_MINUS_SRC_COLOR, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
@@ -147,7 +119,7 @@ public class ClientEvents implements ClientModInitializer {
         }
         break;
       case HOTBAR:
-        if (overlay == ForgeIngameGui.HOTBAR_ELEMENT && minecraft.cameraEntity == minecraft.player) {
+        if (/*overlay == ForgeIngameGui.HOTBAR_ELEMENT && */minecraft.cameraEntity == minecraft.player) {
           int centerWidth = minecraft.getWindow().getGuiScaledWidth() / 2;
           int y = minecraft.getWindow().getGuiScaledHeight() - 20;
           int x;
@@ -165,5 +137,6 @@ public class ClientEvents implements ClientModInitializer {
         }
         break;
     }
+    return false;
   }
 }

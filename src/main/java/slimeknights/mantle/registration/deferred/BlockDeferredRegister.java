@@ -1,5 +1,6 @@
 package slimeknights.mantle.registration.deferred;
 
+import net.minecraft.core.Registry;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
@@ -24,10 +25,6 @@ import net.minecraft.world.level.block.WoodButtonBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
 import net.minecraft.world.level.block.state.properties.WoodType;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
 import slimeknights.mantle.block.MantleStandingSignBlock;
 import slimeknights.mantle.block.MantleWallSignBlock;
 import slimeknights.mantle.block.StrippableLogBlock;
@@ -36,6 +33,8 @@ import slimeknights.mantle.block.entity.MantleSignBlockEntity;
 import slimeknights.mantle.item.BurnableBlockItem;
 import slimeknights.mantle.item.BurnableSignItem;
 import slimeknights.mantle.item.BurnableTallBlockItem;
+import slimeknights.mantle.lib.util.MantleRegistry;
+import slimeknights.mantle.lib.util.RegistryObject;
 import slimeknights.mantle.registration.RegistrationHelper;
 import slimeknights.mantle.registration.object.BuildingBlockObject;
 import slimeknights.mantle.registration.object.EnumObject;
@@ -56,16 +55,16 @@ import java.util.function.Supplier;
 @SuppressWarnings({"WeakerAccess", "unused"})
 public class BlockDeferredRegister extends DeferredRegisterWrapper<Block> {
 
-  protected final DeferredRegister<Item> itemRegister;
+  protected final MantleRegistry<Item> itemRegister;
   public BlockDeferredRegister(String modID) {
-    super(ForgeRegistries.BLOCKS, modID);
-    this.itemRegister = DeferredRegister.create(ForgeRegistries.ITEMS, modID);
+    super(Registry.BLOCK, modID);
+    this.itemRegister = MantleRegistry.create(Registry.ITEM, modID);
   }
 
   @Override
-  public void register(IEventBus bus) {
-    super.register(bus);
-    itemRegister.register(bus);
+  public void register() {
+    super.register();
+    itemRegister.register();
   }
 
 
@@ -79,7 +78,7 @@ public class BlockDeferredRegister extends DeferredRegisterWrapper<Block> {
    * @return  Block registry object
    */
   public <B extends Block> RegistryObject<B> registerNoItem(String name, Supplier<? extends B> block) {
-    return register.register(name, block);
+    return register.register(name, block.get());
   }
 
   /**
@@ -135,7 +134,7 @@ public class BlockDeferredRegister extends DeferredRegisterWrapper<Block> {
     return new BuildingBlockObject(
         blockObj,
         this.register(name + "_slab", () -> new SlabBlock(BlockBehaviour.Properties.copy(blockObj.get())), item),
-        this.register(name + "_stairs", () -> new StairBlock(() -> blockObj.get().defaultBlockState(), BlockBehaviour.Properties.copy(blockObj.get())), item));
+        this.register(name + "_stairs", () -> new StairBlock(blockObj.get().defaultBlockState(), BlockBehaviour.Properties.copy(blockObj.get())), item));
   }
 
   /**
@@ -149,7 +148,7 @@ public class BlockDeferredRegister extends DeferredRegisterWrapper<Block> {
     ItemObject<Block> blockObj = register(name, props, item);
     return new BuildingBlockObject(blockObj,
       register(name + "_slab", () -> new SlabBlock(props), item),
-      register(name + "_stairs", () -> new StairBlock(() -> blockObj.get().defaultBlockState(), props), item)
+      register(name + "_stairs", () -> new StairBlock(blockObj.get().defaultBlockState(), props), item)
     );
   }
 
@@ -214,7 +213,7 @@ public class BlockDeferredRegister extends DeferredRegisterWrapper<Block> {
    * @return Wood object
    */
   public WoodBlockObject registerWood(String name, Function<WoodVariant,BlockBehaviour.Properties> behaviorCreator, boolean flammable, CreativeModeTab group) {
-    WoodType woodType = WoodType.create(resourceName(name));
+    WoodType woodType = WoodType.register(new WoodType(resourceName(name)));
     RegistrationHelper.registerWoodType(woodType);
     Item.Properties itemProps = new Item.Properties().tab(group);
 
@@ -256,7 +255,7 @@ public class BlockDeferredRegister extends DeferredRegisterWrapper<Block> {
     ItemObject<WoodButtonBlock> button = register(name + "_button", () -> new WoodButtonBlock(redstoneProps), burnableItem.apply(100));
     // signs
     RegistryObject<StandingSignBlock> standingSign = registerNoItem(name + "_sign", () -> new MantleStandingSignBlock(behaviorCreator.apply(WoodBlockObject.WoodVariant.PLANKS).noCollission().strength(1.0F), woodType));
-    RegistryObject<WallSignBlock> wallSign = registerNoItem(name + "_wall_sign", () -> new MantleWallSignBlock(behaviorCreator.apply(WoodBlockObject.WoodVariant.PLANKS).noCollission().strength(1.0F).lootFrom(standingSign), woodType));
+    RegistryObject<WallSignBlock> wallSign = registerNoItem(name + "_wall_sign", () -> new MantleWallSignBlock(behaviorCreator.apply(WoodBlockObject.WoodVariant.PLANKS).noCollission().strength(1.0F)/*.lootFrom(standingSign)*/, woodType));
     // tell mantle to inject these into the TE
     MantleSignBlockEntity.registerSignBlock(standingSign);
     MantleSignBlockEntity.registerSignBlock(wallSign);

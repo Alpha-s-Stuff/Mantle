@@ -12,9 +12,8 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.ShapedRecipe;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.common.crafting.CraftingHelper;
-import net.minecraftforge.registries.ForgeRegistryEntry;
 import slimeknights.mantle.item.RetexturedBlockItem;
+import slimeknights.mantle.lib.crafting.CraftingHelper;
 import slimeknights.mantle.recipe.MantleRecipeSerializers;
 import slimeknights.mantle.util.JsonHelper;
 
@@ -95,7 +94,7 @@ public class ShapedRetexturedRecipe extends ShapedRecipe {
     return MantleRecipeSerializers.CRAFTING_SHAPED_RETEXTURED;
   }
 
-  public static class Serializer extends ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<ShapedRetexturedRecipe> {
+  public static class Serializer implements RecipeSerializer<ShapedRetexturedRecipe> {
     @Override
     public ShapedRetexturedRecipe fromJson(ResourceLocation recipeId, JsonObject json) {
       ShapedRecipe recipe = SHAPED_RECIPE.fromJson(recipeId, json);

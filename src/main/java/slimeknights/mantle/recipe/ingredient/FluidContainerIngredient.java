@@ -9,13 +9,11 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.material.Fluid;
 
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
-import net.minecraftforge.common.crafting.IIngredientSerializer;
-import net.minecraftforge.fluids.FluidAttributes;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
-import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
-import net.minecraftforge.items.ItemHandlerHelper;
 import slimeknights.mantle.Mantle;
+import slimeknights.mantle.lib.crafting.IIngredientSerializer;
+import slimeknights.mantle.lib.transfer.TransferUtil;
+import slimeknights.mantle.lib.transfer.fluid.FluidStack;
+import slimeknights.mantle.lib.transfer.item.ItemHandlerHelper;
 import slimeknights.mantle.registration.object.FluidObject;
 import slimeknights.mantle.util.JsonHelper;
 
@@ -58,24 +56,24 @@ public class FluidContainerIngredient extends Ingredient {
   @Override
   public boolean test(@Nullable ItemStack stack) {
     // first, must have a fluid capability
-    return stack != null && !stack.isEmpty() && stack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).resolve().flatMap(cap -> {
+    return stack != null && !stack.isEmpty() && TransferUtil.getFluidHandlerItem(stack).resolve().flatMap(cap -> {
       // second, must contain enough fluid
       if (cap.getTanks() == 1) {
         FluidStack contained = cap.getFluidInTank(0);
         if (!contained.isEmpty() && fluidIngredient.getAmount(contained.getFluid()) == contained.getAmount() && fluidIngredient.test(contained.getFluid())) {
           // so far so good, from this point on we are forced to make copies as we need to try draining, so copy and fetch the copy's cap
           ItemStack copy = ItemHandlerHelper.copyStackWithSize(stack, 1);
-          return copy.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).resolve();
+          return TransferUtil.getFluidHandlerItem(copy).resolve();
         }
       }
       return Optional.empty();
     }).filter(cap -> {
       // alright, we know it has the fluid, the question is just whether draining the fluid will give us the desired result
       Fluid fluid = cap.getFluidInTank(0).getFluid();
-      int amount = fluidIngredient.getAmount(fluid);
-      FluidStack drained = cap.drain(amount, FluidAction.EXECUTE);
+      long amount = fluidIngredient.getAmount(fluid);
+      FluidStack drained = cap.drain(amount, false);
       // we need an exact match, and we need the resulting container item to be the same as the item stack's container item
-      return drained.getFluid() == fluid && drained.getAmount() == amount && ItemStack.matches(stack.getContainerItem(), cap.getContainer());
+      return drained.getFluid() == fluid && drained.getAmount() == amount && ItemStack.matches(stack.getItem().getCraftingRemainingItem().getDefaultInstance(), cap.getContainer());
     }).isPresent();
   }
 
@@ -110,7 +108,7 @@ public class FluidContainerIngredient extends Ingredient {
   }
 
   @Override
-  protected void invalidate() {
+  public void invalidate() {
     super.invalidate();
     this.displayStacks = null;
   }

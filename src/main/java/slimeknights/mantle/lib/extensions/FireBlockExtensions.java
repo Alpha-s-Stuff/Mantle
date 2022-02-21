@@ -6,7 +6,7 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.state.BlockState;
 
 public interface FireBlockExtensions {
-	boolean create$canCatchFire(BlockGetter world, BlockPos pos, Direction face);
+	boolean canCatchFire(BlockGetter world, BlockPos pos, Direction face);
 
-	int create$invokeGetBurnOdd(BlockState state);
+	int invokeGetBurnOdd(BlockState state);
 }

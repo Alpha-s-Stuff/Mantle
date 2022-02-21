@@ -118,7 +118,7 @@ public abstract class LivingEntityMixin extends Entity {
 	)
 	protected void create$updateFallState(double d, boolean bl, BlockState blockState, BlockPos blockPos,
 										  CallbackInfo ci, float f, double e, int i) {
-		if (((BlockStateExtensions) blockState).create$addLandingEffects((ServerLevel) level, blockPos, blockState, MixinHelper.cast(this), i)) {
+		if (((BlockStateExtensions) blockState).addLandingEffects((ServerLevel) level, blockPos, blockState, MixinHelper.cast(this), i)) {
 			super.checkFallDamage(d, bl, blockState, blockPos);
 			ci.cancel();
 		}
@@ -128,7 +128,7 @@ public abstract class LivingEntityMixin extends Entity {
 	@ModifyVariable(method = "travel", at = @At(value = "INVOKE_ASSIGN", target = "Lnet/minecraft/world/level/block/Block;getFriction()F"), index = 7)
 	public float create$setSlipperiness(float t) {
 		return ((BlockStateExtensions) MixinHelper.<LivingEntity>cast(this).level.getBlockState(getBlockPosBelowThatAffectsMyMovement()))
-				.create$getSlipperiness(MixinHelper.<LivingEntity>cast(this).level, getBlockPosBelowThatAffectsMyMovement(), MixinHelper.<LivingEntity>cast(this));
+				.getSlipperiness(MixinHelper.<LivingEntity>cast(this).level, getBlockPosBelowThatAffectsMyMovement(), MixinHelper.<LivingEntity>cast(this));
 	}
 
 	//Moved from MobMixin

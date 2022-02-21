@@ -1,9 +1,10 @@
 package slimeknights.mantle.recipe.data;
 
+import net.fabricmc.fabric.api.resource.conditions.v1.ConditionJsonProvider;
+import net.minecraft.core.Registry;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.common.crafting.conditions.ICondition;
 
 import javax.annotation.Nullable;
 import java.util.Objects;
@@ -30,7 +31,7 @@ public interface IRecipeBuilderUtils {
    * Gets the base condition for the condition utility
    */
   @Nullable
-  default ICondition baseCondition() {
+  default ConditionJsonProvider baseCondition() {
     return null;
   }
 
@@ -59,7 +60,7 @@ public interface IRecipeBuilderUtils {
    * @return Prefixed resource location
    */
   default ResourceLocation prefix(ItemLike item, String prefix) {
-    return resource(prefix + Objects.requireNonNull(item.asItem().getRegistryName()).getPath());
+    return resource(prefix + Objects.requireNonNull(Registry.ITEM.getKey(item.asItem())).getPath());
   }
 
   /**
@@ -70,7 +71,7 @@ public interface IRecipeBuilderUtils {
    * @return Prefixed resource location
    */
   default ResourceLocation wrap(ItemLike item, String prefix, String suffix) {
-    return resource(prefix + Objects.requireNonNull(item.asItem().getRegistryName()).getPath() + suffix);
+    return resource(prefix + Objects.requireNonNull(Registry.ITEM.getKey(item.asItem())).getPath() + suffix);
   }
 
   /**
@@ -78,13 +79,13 @@ public interface IRecipeBuilderUtils {
    * @param conditions Conditions to add
    * @return Consumer with condition
    */
-  default Consumer<FinishedRecipe> withCondition(ICondition... conditions) {
+  default Consumer<FinishedRecipe> withCondition(ConditionJsonProvider... conditions) {
     ConsumerWrapperBuilder builder = ConsumerWrapperBuilder.wrap();
-    ICondition base = baseCondition();
+    ConditionJsonProvider base = baseCondition();
     if (base != null) {
       builder.addCondition(base);
     }
-    for (ICondition condition : conditions) {
+    for (ConditionJsonProvider condition : conditions) {
       builder.addCondition(condition);
     }
     return builder.build(Objects.requireNonNull(getConsumer()));

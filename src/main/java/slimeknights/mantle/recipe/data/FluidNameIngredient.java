@@ -5,7 +5,7 @@ import com.google.gson.JsonObject;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraftforge.fluids.FluidStack;
+import slimeknights.mantle.lib.transfer.fluid.FluidStack;
 import slimeknights.mantle.recipe.ingredient.FluidIngredient;
 
 import java.util.List;
@@ -22,7 +22,7 @@ public class FluidNameIngredient extends FluidIngredient {
   }
 
   @Override
-  public int getAmount(Fluid fluid) {
+  public long getAmount(Fluid fluid) {
     return amount;
   }
 

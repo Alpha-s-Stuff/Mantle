@@ -6,6 +6,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Quaternion;
 import com.mojang.math.Transformation;
 import com.mojang.math.Vector3f;
+import net.fabricmc.fabric.api.rendering.data.v1.RenderAttachmentBlockEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -15,12 +16,12 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
-import net.minecraftforge.client.model.data.EmptyModelData;
-import net.minecraftforge.client.model.data.IModelData;
 import slimeknights.mantle.client.book.structure.StructureInfo;
 import slimeknights.mantle.client.book.structure.level.TemplateLevel;
 import slimeknights.mantle.client.render.MantleRenderTypes;
 import slimeknights.mantle.client.screen.book.BookScreen;
+import slimeknights.mantle.lib.model.EmptyModelData;
+import slimeknights.mantle.lib.model.IModelData;
 
 import java.util.List;
 import java.util.stream.IntStream;
@@ -90,7 +91,7 @@ public class StructureElement extends SizedBookElement {
 
       transform.translate(this.transX, this.transY, Math.max(structureHeight, Math.max(structureWidth, structureLength)));
       transform.scale(this.scale, -this.scale, 1);
-      this.additionalTransform.push(transform);
+//      this.additionalTransform.push(transform); todo: port
       transform.mulPose(new Quaternion(0, 0, 0, true));
 
       transform.translate(structureLength / -2f, structureHeight / -2f, structureWidth / -2f);
@@ -116,12 +117,12 @@ public class StructureElement extends SizedBookElement {
               BlockEntity te = structureWorld.getBlockEntity(pos);
 
               if (te != null)
-                modelData = te.getModelData();
+                modelData = (IModelData) ((RenderAttachmentBlockEntity)te).getRenderAttachmentData();
 
               blockRender.getModelRenderer().tesselateBlock(
                 structureWorld, blockRender.getBlockModel(state), state, pos, transform,
                 buffer.getBuffer(MantleRenderTypes.TRANSLUCENT_FULLBRIGHT), false, structureWorld.random, state.getSeed(pos),
-                overlay, modelData
+                overlay
               );
 
               transform.popPose();

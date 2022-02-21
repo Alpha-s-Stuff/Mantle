@@ -18,7 +18,7 @@ public class SupplierCreativeTab extends CreativeModeTab {
    * @param supplier  Item stack supplier
    */
   public SupplierCreativeTab(String modId, String name, Supplier<ItemStack> supplier) {
-    super(String.format("%s.%s", modId, name));
+    super(/*String.format("%s.%s", modId*/100, name);
     this.setRecipeFolderName(String.format("%s/%s", modId, name));
     this.supplier = supplier;
   }

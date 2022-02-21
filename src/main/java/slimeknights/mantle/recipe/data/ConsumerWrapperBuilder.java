@@ -3,11 +3,12 @@ package slimeknights.mantle.recipe.data;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import net.fabricmc.fabric.api.resource.conditions.v1.ConditionJsonProvider;
+import net.minecraft.core.Registry;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.common.crafting.CraftingHelper;
-import net.minecraftforge.common.crafting.conditions.ICondition;
+import slimeknights.mantle.lib.crafting.CraftingHelper;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -20,7 +21,7 @@ import java.util.function.Consumer;
  */
 @SuppressWarnings("UnusedReturnValue")
 public class ConsumerWrapperBuilder {
-  private final List<ICondition> conditions = new ArrayList<>();
+  private final List<ConditionJsonProvider> conditions = new ArrayList<>();
   @Nullable
   private final RecipeSerializer<?> override;
   @Nullable
@@ -62,7 +63,7 @@ public class ConsumerWrapperBuilder {
    * @param condition Condition to add
    * @return Added condition
    */
-  public ConsumerWrapperBuilder addCondition(ICondition condition) {
+  public ConsumerWrapperBuilder addCondition(ConditionJsonProvider condition) {
     conditions.add(condition);
     return this;
   }
@@ -78,18 +79,18 @@ public class ConsumerWrapperBuilder {
 
   private static class Wrapped implements FinishedRecipe {
     private final FinishedRecipe original;
-    private final List<ICondition> conditions;
+    private final List<ConditionJsonProvider> conditions;
     @Nullable
     private final RecipeSerializer<?> override;
     @Nullable
     private final ResourceLocation overrideName;
 
-    private Wrapped(FinishedRecipe original, List<ICondition> conditions, @Nullable RecipeSerializer<?> override, @Nullable ResourceLocation overrideName) {
+    private Wrapped(FinishedRecipe original, List<ConditionJsonProvider> conditions, @Nullable RecipeSerializer<?> override, @Nullable ResourceLocation overrideName) {
       // if wrapping another wrapper result, merge the two together
       if (original instanceof Wrapped) {
         Wrapped toMerge = (Wrapped) original;
         this.original = toMerge.original;
-        this.conditions = ImmutableList.<ICondition>builder().addAll(toMerge.conditions).addAll(conditions).build();
+        this.conditions = ImmutableList.<ConditionJsonProvider>builder().addAll(toMerge.conditions).addAll(conditions).build();
         // consumer wrappers are processed inside out, so the innermost wrapped recipe is the one with the most recent serializer override
         if (toMerge.override != null || toMerge.overrideName != null) {
           this.override = toMerge.override;
@@ -112,7 +113,7 @@ public class ConsumerWrapperBuilder {
       if (overrideName != null) {
         json.addProperty("type", overrideName.toString());
       } else {
-        json.addProperty("type", Objects.requireNonNull(getType().getRegistryName()).toString());
+        json.addProperty("type", Objects.requireNonNull(Registry.RECIPE_SERIALIZER.getKey(getType())).toString());
       }
       this.serializeRecipeData(json);
       return json;
@@ -123,8 +124,8 @@ public class ConsumerWrapperBuilder {
       // add conditions on top
       if (!conditions.isEmpty()) {
         JsonArray conditionsArray = new JsonArray();
-        for (ICondition condition : conditions) {
-          conditionsArray.add(CraftingHelper.serialize(condition));
+        for (ConditionJsonProvider condition : conditions) {
+          conditionsArray.add(condition.toJson());
         }
         json.add("conditions", conditionsArray);
       }

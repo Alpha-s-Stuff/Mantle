@@ -6,10 +6,11 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder;
+import net.minecraft.core.MappedRegistry;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import twilightforest.TwilightForestMod;
+import slimeknights.mantle.Mantle;
 import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.IOException;
@@ -32,7 +33,7 @@ import net.minecraft.world.level.storage.loot.Deserializers;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 
 public class LootModifierManager extends SimpleJsonResourceReloadListener {
-    public static Registry<GlobalLootModifierSerializer> SERIALIZER = FabricRegistryBuilder.createSimple(GlobalLootModifierSerializer.class, TwilightForestMod.prefix("loot_modifier")).buildAndRegister();
+    public static MappedRegistry<GlobalLootModifierSerializer> SERIALIZER = FabricRegistryBuilder.createSimple(GlobalLootModifierSerializer.class, Mantle.getResource("loot_modifier")).buildAndRegister();
     public static final Logger LOGGER = LogManager.getLogger();
     private static final Gson GSON_INSTANCE = Deserializers.createFunctionSerializer().create();
 

@@ -43,9 +43,14 @@ public class RetexturedBlockEntity extends MantleBlockEntity implements IRetextu
     // if the texture name changed, mark the position for rerender
     if (!oldName.equals(newName) && level != null && level.isClientSide) {
       data.get().setData(RetexturedHelper.BLOCK_PROPERTY, getTexture());
-      requestModelDataUpdate();
+//      requestModelDataUpdate();
       BlockState state = getBlockState();
       level.sendBlockUpdated(worldPosition, state, state, 0);
     }
+  }
+
+  @Override
+  public CompoundTag getTileData() {
+    return null;
   }
 }

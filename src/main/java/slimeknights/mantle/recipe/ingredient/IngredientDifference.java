@@ -10,9 +10,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.StackedContents;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraftforge.common.crafting.CraftingHelper;
-import net.minecraftforge.common.crafting.IIngredientSerializer;
 import slimeknights.mantle.Mantle;
+import slimeknights.mantle.lib.crafting.CraftingHelper;
 import slimeknights.mantle.lib.crafting.IIngredientSerializer;
 import slimeknights.mantle.util.JsonHelper;
 
@@ -77,7 +76,7 @@ public class IngredientDifference extends Ingredient {
   }
 
   @Override
-  protected void invalidate() {
+  public void invalidate() {
     super.invalidate();
     this.filteredMatchingStacks = null;
     this.packedMatchingStacks = null;

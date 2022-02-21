@@ -10,11 +10,9 @@ import net.minecraft.world.level.storage.loot.functions.LootItemFunction;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.minecraft.world.level.storage.loot.predicates.LootItemConditionType;
-import net.minecraftforge.common.loot.GlobalLootModifierSerializer;
-import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.registries.ObjectHolder;
 import slimeknights.mantle.Mantle;
 import slimeknights.mantle.lib.loot.GlobalLootModifierSerializer;
+import slimeknights.mantle.lib.loot.LootModifierManager;
 import slimeknights.mantle.loot.condition.BlockTagLootCondition;
 import slimeknights.mantle.loot.condition.ContainsItemModifierLootCondition;
 import slimeknights.mantle.loot.condition.EmptyModifierLootCondition;
@@ -27,7 +25,7 @@ import slimeknights.mantle.registration.adapter.RegistryAdapter;
 import static slimeknights.mantle.registration.RegistrationHelper.injected;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-@ObjectHolder(value = Mantle.modId)
+//@ObjectHolder(value = Mantle.modId)
 public class MantleLoot {
   /** Condition to match a block tag and property predicate */
   public static LootItemConditionType BLOCK_TAG_CONDITION;
@@ -44,8 +42,8 @@ public class MantleLoot {
   /**
    * Called during serializer registration to register any relevant loot logic
    */
-  public static void registerGlobalLootModifiers(final RegistryEvent.Register<GlobalLootModifierSerializer<?>> event) {
-    RegistryAdapter<GlobalLootModifierSerializer<?>> adapter = new RegistryAdapter<>(event.getRegistry());
+  public static void registerGlobalLootModifiers() {
+    RegistryAdapter<GlobalLootModifierSerializer> adapter = new RegistryAdapter<>(LootModifierManager.SERIALIZER, Mantle.modId);
     adapter.register(new AddEntryLootModifier.Serializer(), "add_entry");
     adapter.register(new ReplaceItemLootModifier.Serializer(), "replace_item");
 

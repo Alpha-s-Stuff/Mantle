@@ -1,6 +1,7 @@
 package slimeknights.mantle.lib.util;
 
-import com.simibubi.create.Create;
+import slimeknights.mantle.Mantle;
+
 import java.lang.reflect.Method;
 
 public class MethodGetter {
@@ -18,7 +19,7 @@ public class MethodGetter {
 			try {
 				method = clas.getMethod(methodName, parameterTypes);
 			} catch (NoSuchMethodException ex) {
-				Create.LOGGER.fatal("No method with the provided name or obfuscated name found!");
+				Mantle.logger.fatal("No method with the provided name or obfuscated name found!");
 				throw new RuntimeException(ex);
 			}
 		}

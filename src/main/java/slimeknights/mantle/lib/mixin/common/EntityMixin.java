@@ -1,12 +1,11 @@
 package slimeknights.mantle.lib.mixin.common;
 
-import com.simibubi.create.Create;
 import slimeknights.mantle.lib.event.EntityEyeHeightCallback;
 import slimeknights.mantle.lib.event.StartRidingCallback;
 import slimeknights.mantle.lib.extensions.BlockStateExtensions;
 import slimeknights.mantle.lib.extensions.EntityExtensions;
 import slimeknights.mantle.lib.util.EntityHelper;
-import slimeknights.mantle.lib.util.ListenerProvider;
+import slimeknights.mantle.lib.util.LazyOptional;
 import slimeknights.mantle.lib.util.MixinHelper;
 import slimeknights.mantle.lib.util.NBTSerializable;
 import org.spongepowered.asm.mixin.Mixin;
@@ -85,7 +84,6 @@ public abstract class EntityMixin implements EntityExtensions, NBTSerializable {
 	@Inject(method = "saveWithoutId", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;addAdditionalSaveData(Lnet/minecraft/nbt/CompoundTag;)V"))
 	public void create$beforeWriteCustomData(CompoundTag tag, CallbackInfoReturnable<CompoundTag> cir) {
 		if (create$extraCustomData != null && !create$extraCustomData.isEmpty()) {
-			Create.LOGGER.debug("writing custom data to entity [{}]", MixinHelper.<Entity>cast(this).toString());
 			tag.put(EntityHelper.EXTRA_DATA_KEY, create$extraCustomData);
 		}
 	}
@@ -110,19 +108,13 @@ public abstract class EntityMixin implements EntityExtensions, NBTSerializable {
 			cancellable = true
 	)
 	public void create$spawnSprintParticle(CallbackInfo ci, int i, int j, int k, BlockPos blockPos) {
-		if (((BlockStateExtensions) level.getBlockState(blockPos)).create$addRunningEffects(level, blockPos, MixinHelper.cast(this))) {
+		if (((BlockStateExtensions) level.getBlockState(blockPos)).addRunningEffects(level, blockPos, MixinHelper.cast(this))) {
 			ci.cancel();
 		}
 	}
 
 	// (did someone intend to write something here?)
 
-	@Inject(method = "discard", at = @At("HEAD"))
-	public void create$discard(CallbackInfo ci) {
-		if (this instanceof ListenerProvider) {
-			((ListenerProvider) this).invalidate();
-		}
-	}
 
 	@Inject(
 			method = "startRiding(Lnet/minecraft/world/entity/Entity;Z)Z",

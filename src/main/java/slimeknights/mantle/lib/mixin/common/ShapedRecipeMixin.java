@@ -1,7 +1,6 @@
 package slimeknights.mantle.lib.mixin.common;
 
 import com.google.gson.JsonArray;
-import com.simibubi.create.Create;
 import slimeknights.mantle.lib.util.Constants;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -28,17 +27,5 @@ public abstract class ShapedRecipeMixin {
 	)
 	private static int create$modifyMaxWidth(int original) {
 		return Constants.Crafting.WIDTH;
-	}
-
-	@Inject(method = "patternFromJson(Lcom/google/gson/JsonArray;)[Ljava/lang/String;",
-			at = @At(
-					value = "INVOKE",
-					target = "Lcom/google/gson/JsonSyntaxException;<init>(Ljava/lang/String;)V",
-					shift = At.Shift.BEFORE,
-					remap = false
-			)
-	)
-	private static void create$changeWidthAndHeightWarning(JsonArray jsonArray, CallbackInfoReturnable<String[]> cir) {
-		Create.LOGGER.warn("The following error may be inaccurate, there is no check for the actual maximum size of a recipe.");
 	}
 }

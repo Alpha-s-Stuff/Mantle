@@ -38,7 +38,7 @@ public abstract class ParticleEngineMixin {
 	@Unique
 	private static boolean create$replacedRenderOrderList = false;
 
-	private static void create$addRenderType(ParticleRenderType type) {
+	private static void addRenderType(ParticleRenderType type) {
 		if (!create$replacedRenderOrderList) {
 			List<ParticleRenderType> old = RENDER_ORDER;
 			RENDER_ORDER = new ArrayList<>(old);
@@ -48,9 +48,9 @@ public abstract class ParticleEngineMixin {
 	}
 
 	@Inject(method = "method_18125", at = @At("RETURN"))
-	private static void create$addCustomRenderTypes(ParticleRenderType particleRenderType, CallbackInfoReturnable<Queue<Particle>> cir) {
+	private static void addCustomRenderTypes(ParticleRenderType particleRenderType, CallbackInfoReturnable<Queue<Particle>> cir) {
 		if (!RENDER_ORDER.contains(particleRenderType)) {
-			create$addRenderType(particleRenderType);
+			addRenderType(particleRenderType);
 		}
 	}
 
@@ -64,7 +64,7 @@ public abstract class ParticleEngineMixin {
 			cancellable = true
 	)
 	public void create$addBlockDestroyEffects(BlockPos blockPos, BlockState blockState, CallbackInfo ci) {
-		if (((BlockStateExtensions) blockState).create$addDestroyEffects(level, blockPos, MixinHelper.cast(this))) {
+		if (((BlockStateExtensions) blockState).addDestroyEffects(level, blockPos, MixinHelper.cast(this))) {
 			ci.cancel();
 		}
 	}

@@ -112,7 +112,7 @@ public class TransferUtil {
 	@Nullable
 	public static Storage<FluidVariant> getFluidStorageForBE(BlockEntity be, Direction side) {
 		if (be instanceof FluidTransferable transferable) {
-			IFluidHandler handler = transferable.getFluidHandler(side);
+			IFluidHandler handler = transferable.getFluidHandler(side).getValueUnsafer();
 			return handler == null ? null : new StorageFluidHandler(handler);
 		}
 		return null;
@@ -121,7 +121,7 @@ public class TransferUtil {
 	@Nullable
 	public static Storage<ItemVariant> getItemStorageForBE(BlockEntity be, Direction side) {
 		if (be instanceof ItemTransferable transferable) {
-			IItemHandler handler = transferable.getItemHandler(side);
+			IItemHandler handler = transferable.getItemHandler(side).getValueUnsafer();
 			return handler == null ? null : new StorageItemHandler(handler);
 		}
 		return null;

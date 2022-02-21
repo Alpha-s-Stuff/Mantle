@@ -14,6 +14,7 @@ import net.minecraft.world.level.storage.loot.functions.LootItemFunctions;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.resources.ResourceLocation;
 import slimeknights.mantle.Mantle;
+import slimeknights.mantle.data.GlobalLootModifierProvider;
 import slimeknights.mantle.lib.loot.GlobalLootModifierSerializer;
 import slimeknights.mantle.lib.loot.LootModifier;
 import slimeknights.mantle.loot.builder.AbstractLootModifierBuilder;

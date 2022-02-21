@@ -26,32 +26,36 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.pathfinder.BlockPathTypes;
 
 public interface BlockExtensions {
-	default boolean create$addRunningEffects(BlockState state, Level world, BlockPos pos, Entity entity) {
+	default boolean addRunningEffects(BlockState state, Level world, BlockPos pos, Entity entity) {
 		return false;
 	}
 
-	default boolean create$addLandingEffects(BlockState state1, ServerLevel worldserver, BlockPos pos, BlockState state2, LivingEntity entity, int numberOfParticles) {
+	default boolean addLandingEffects(BlockState state1, ServerLevel worldserver, BlockPos pos, BlockState state2, LivingEntity entity, int numberOfParticles) {
 		return false;
 	}
 
 	@Environment(EnvType.CLIENT)
-	default boolean create$addDestroyEffects(BlockState state, Level world, BlockPos pos, ParticleEngine manager) {
+	default boolean addDestroyEffects(BlockState state, Level world, BlockPos pos, ParticleEngine manager) {
 		return false;
 	}
 
-	default boolean create$isFlammable(BlockState state, BlockGetter world, BlockPos pos, Direction face) {
-		return ((BlockStateExtensions) state).create$getFlammability(world, pos, face) > 0;
+	default boolean isFlammable(BlockState state, BlockGetter world, BlockPos pos, Direction face) {
+		return ((BlockStateExtensions) state).getFlammability(world, pos, face) > 0;
 	}
 
-	default int create$getFlammability(BlockState state, BlockGetter world, BlockPos pos, Direction face) {
-		return ((FireBlockExtensions) Blocks.FIRE).create$invokeGetBurnOdd(state);
+	default int getFlammability(BlockState state, BlockGetter world, BlockPos pos, Direction face) {
+		return ((FireBlockExtensions) Blocks.FIRE).invokeGetBurnOdd(state);
 	}
 
-	default SoundType create$getSoundType(BlockState state, LevelReader world, BlockPos pos, @Nullable Entity entity) {
+  default boolean isBurning(BlockState state, BlockGetter world, BlockPos pos) {
+    return this == Blocks.FIRE || this == Blocks.LAVA;
+  }
+
+	default SoundType getSoundType(BlockState state, LevelReader world, BlockPos pos, @Nullable Entity entity) {
 		return ((Block) this).getSoundType(state);
 	}
 
-	default int create$getLightEmission(BlockState state, BlockGetter world, BlockPos pos) {
+	default int getLightEmission(BlockState state, BlockGetter world, BlockPos pos) {
 		return state.getLightEmission();
 	}
 
@@ -59,11 +63,14 @@ public interface BlockExtensions {
 		return state.getBlock() instanceof HalfTransparentBlock || state.getBlock() instanceof LeavesBlock;
 	}
 
-	default void create$onNeighborChange(BlockState state, LevelReader world, BlockPos pos, BlockPos neighbor) {}
+	default void onNeighborChange(BlockState state, LevelReader world, BlockPos pos, BlockPos neighbor) {}
 
-	default float create$getSlipperiness(BlockState state, LevelReader world, BlockPos pos, Entity entity) {
+	default float getSlipperiness(BlockState state, LevelReader world, BlockPos pos, Entity entity) {
 		return ((Block) this).getFriction();
 	}
 
-  BlockPathTypes getAiPathNodeType(BlockState state, BlockGetter world, BlockPos pos, @Nullable Mob entity);
+  @Nullable
+  default BlockPathTypes getAiPathNodeType(BlockState state, BlockGetter world, BlockPos pos, @Nullable Mob entity) {
+    return state.getBlock() == Blocks.LAVA ? BlockPathTypes.LAVA : ((BlockStateExtensions)state).isBurning(world, pos) ? BlockPathTypes.DAMAGE_FIRE : null;
+  }
 }

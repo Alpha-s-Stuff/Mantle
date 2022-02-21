@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.network.NetworkEvent.Context;
 import slimeknights.mantle.item.ILecternBookItem;
 
 /**

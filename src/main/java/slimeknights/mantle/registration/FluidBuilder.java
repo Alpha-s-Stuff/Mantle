@@ -6,8 +6,8 @@ import lombok.experimental.Accessors;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.item.Item;
-import net.minecraftforge.fluids.FluidAttributes;
-import net.minecraftforge.fluids.ForgeFlowingFluid;
+import slimeknights.mantle.lib.fluid.SimpleFlowableFluid;
+import slimeknights.mantle.lib.transfer.fluid.FluidAttributes;
 
 import java.util.function.Supplier;
 
@@ -18,7 +18,7 @@ import java.util.function.Supplier;
 @Setter
 @RequiredArgsConstructor
 public class FluidBuilder {
-//  private final FluidAttributes.Builder attributes;
+  private final FluidAttributes.Builder attributes;
   private boolean canMultiply = false;
   private Supplier<? extends Item> bucket;
   private Supplier<? extends LiquidBlock> block;
@@ -39,11 +39,11 @@ public class FluidBuilder {
    * @param flowing  Flowing supplier
    * @return  Forge fluid properties
    */
-  public ForgeFlowingFluid.Properties build(Supplier<? extends Fluid> still, Supplier<? extends Fluid> flowing) {
-    ForgeFlowingFluid.Properties properties = new ForgeFlowingFluid.Properties(still, flowing, this.attributes)
-        .slopeFindDistance(this.slopeFindDistance)
+  public SimpleFlowableFluid.Properties build(Supplier<? extends Fluid> still, Supplier<? extends Fluid> flowing) {
+    SimpleFlowableFluid.Properties properties = new SimpleFlowableFluid.Properties(still, flowing/*, this.attributes*/)
+        .flowSpeed(this.slopeFindDistance)
         .levelDecreasePerBlock(this.levelDecreasePerBlock)
-        .explosionResistance(this.explosionResistance)
+        .blastResistance(this.explosionResistance)
         .tickRate(this.tickRate)
         .block(this.block)
         .bucket(this.bucket);

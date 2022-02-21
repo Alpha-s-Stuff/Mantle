@@ -1,14 +1,13 @@
 package slimeknights.mantle.registration.deferred;
 
+import net.minecraft.core.Registry;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.Item;
-import net.minecraftforge.common.ForgeSpawnEggItem;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
+import slimeknights.mantle.lib.util.MantleRegistry;
+import slimeknights.mantle.lib.util.MantleSpawnEggItem;
+import slimeknights.mantle.lib.util.RegistryObject;
 import slimeknights.mantle.registration.ItemProperties;
 
 import java.util.function.Supplier;
@@ -19,16 +18,16 @@ import java.util.function.Supplier;
 @SuppressWarnings("unused")
 public class EntityTypeDeferredRegister extends DeferredRegisterWrapper<EntityType<?>> {
 
-  private final DeferredRegister<Item> itemRegistry;
+  private final MantleRegistry<Item> itemRegistry;
   public EntityTypeDeferredRegister(String modID) {
-    super(ForgeRegistries.ENTITIES, modID);
-    itemRegistry = DeferredRegister.create(ForgeRegistries.ITEMS, modID);
+    super(Registry.ENTITY_TYPE, modID);
+    itemRegistry = MantleRegistry.create(Registry.ITEM, modID);
   }
 
   @Override
-  public void register(IEventBus bus) {
-    super.register(bus);
-    itemRegistry.register(bus);
+  public void register() {
+    super.register();
+    itemRegistry.register();
   }
 
   /**
@@ -53,7 +52,7 @@ public class EntityTypeDeferredRegister extends DeferredRegisterWrapper<EntityTy
    */
   public <T extends Mob> RegistryObject<EntityType<T>> registerWithEgg(String name, Supplier<EntityType.Builder<T>> sup, int primary, int secondary) {
     RegistryObject<EntityType<T>> object = register(name, sup);
-    itemRegistry.register(name + "_spawn_egg", () -> new ForgeSpawnEggItem(object, primary, secondary, ItemProperties.EGG_PROPS));
+    itemRegistry.register(name + "_spawn_egg", () -> new MantleSpawnEggItem(object, primary, secondary, ItemProperties.EGG_PROPS));
     return object;
   }
 }

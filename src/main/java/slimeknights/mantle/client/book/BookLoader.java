@@ -38,6 +38,7 @@ import slimeknights.mantle.client.book.repository.BookRepository;
 import slimeknights.mantle.client.book.transformer.BookTransformer;
 import slimeknights.mantle.client.book.transformer.IndexTransformer;
 import slimeknights.mantle.data.ResourceLocationSerializer;
+import slimeknights.mantle.lib.util.IdentifiableResourceManagerReloadListener;
 import slimeknights.mantle.network.MantleNetwork;
 import slimeknights.mantle.network.packet.UpdateHeldPagePacket;
 import slimeknights.mantle.network.packet.UpdateLecternPagePacket;
@@ -46,7 +47,7 @@ import javax.annotation.Nullable;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 
-public class BookLoader implements ResourceManagerReloadListener, IdentifiableResourceReloadListener {
+public class BookLoader implements IdentifiableResourceManagerReloadListener {
 
   /**
    * GSON object to be used for book loading purposes

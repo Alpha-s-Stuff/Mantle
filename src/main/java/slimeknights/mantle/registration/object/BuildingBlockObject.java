@@ -9,8 +9,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
 
-import static slimeknights.mantle.registration.RegistrationHelper.castDelegate;
-
 /**
  * Object containing a block with slab and stairs variants
  */
@@ -27,8 +25,8 @@ public class BuildingBlockObject extends ItemObject<Block> {
    */
   public BuildingBlockObject(Block block, Block slab, Block stairs) {
     super(block);
-    this.slab = castDelegate(slab.delegate);
-    this.stairs = castDelegate(stairs.delegate);
+    this.slab = () -> (SlabBlock) slab;
+    this.stairs = () -> (StairBlock) stairs;
   }
 
   /**

@@ -1,12 +1,11 @@
 package slimeknights.mantle.registration.object;
 
 import lombok.Getter;
+import net.fabricmc.fabric.api.tag.TagFactory;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.BlockTags;
-import net.minecraft.tags.ItemTags;
+import net.minecraft.tags.Tag;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.common.Tags.IOptionalNamedTag;
 
 import java.util.function.Supplier;
 
@@ -15,19 +14,19 @@ public class MetalItemObject extends ItemObject<Block> {
   private final Supplier<? extends Item> ingot;
   private final Supplier<? extends Item> nugget;
   @Getter
-  private final IOptionalNamedTag<Block> blockTag;
+  private final Tag.Named<Block> blockTag;
   @Getter
-  private final IOptionalNamedTag<Item> blockItemTag;
+  private final Tag.Named<Item> blockItemTag;
   @Getter
-  private final IOptionalNamedTag<Item> ingotTag;
+  private final Tag.Named<Item> ingotTag;
   @Getter
-  private final IOptionalNamedTag<Item> nuggetTag;
+  private final Tag.Named<Item> nuggetTag;
 
   public MetalItemObject(String tagName, ItemObject<? extends Block> block, Supplier<? extends Item> ingot, Supplier<? extends Item> nugget) {
     super(block);
     this.ingot = ingot;
     this.nugget = nugget;
-    this.blockTag = BlockTags.createOptional(new ResourceLocation("forge", "storage_blocks/" + tagName));
+    this.blockTag = TagFactory.BLOCK.create(new ResourceLocation("c", "storage_blocks/" + tagName));
     this.blockItemTag = getTag("storage_blocks/" + tagName);
     this.ingotTag = getTag("ingots/" + tagName);
     this.nuggetTag = getTag("nuggets/" + tagName);
@@ -48,7 +47,7 @@ public class MetalItemObject extends ItemObject<Block> {
    * @param name  Tag name
    * @return  Tag
    */
-  private static IOptionalNamedTag<Item> getTag(String name) {
-    return ItemTags.createOptional(new ResourceLocation("forge", name));
+  private static Tag.Named<Item> getTag(String name) {
+    return TagFactory.ITEM.create(new ResourceLocation("c", name));
   }
 }

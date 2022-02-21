@@ -38,13 +38,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.ForgeMod;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.fluids.capability.IFluidHandlerItem;
-import net.minecraftforge.fluids.capability.templates.EmptyFluidHandler;
+import slimeknights.mantle.lib.extensions.ResourceLocationEx;
 import slimeknights.mantle.lib.mixin.accessor.ItemAccessor;
 import slimeknights.mantle.lib.transfer.TransferUtil;
 import slimeknights.mantle.lib.transfer.fluid.EmptyFluidHandler;
@@ -118,7 +112,7 @@ public class TagsForCommand {
       output.append("\n* ").append(NO_TAGS);
     } else {
       tags.stream()
-          .sorted(ResourceLocation::compareNamespaced)
+          .sorted(ResourceLocationEx::compareNamespaced)
           .forEach(tag -> output.append("\n* " + tag));
     }
     context.getSource().sendSuccess(output, true);

@@ -142,6 +142,7 @@ public class SectionData implements IDataItem, IConditional {
 
   @Override
   public boolean isConditionMet() {
-    return ResourceConditions.get(condition.getConditionId()).test();
+    return false;
+    /*return ResourceConditions.get(condition.getConditionId()).test();*/
   }
 }

@@ -8,13 +8,10 @@ import net.minecraft.tags.Tag;
 import net.minecraft.tags.TagContainer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.Tags.Tag.Named;
-import net.minecraftforge.event.TagsUpdatedEvent;
-import net.minecraftforge.registries.IForgeRegistryEntry;
 import slimeknights.mantle.Mantle;
 import slimeknights.mantle.config.Config;
 import slimeknights.mantle.lib.event.TagsUpdatedCallback;
+import slimeknights.mantle.lib.extensions.ResourceLocationEx;
 import slimeknights.mantle.lib.util.RegistryHelper;
 import slimeknights.mantle.util.LogicHelper;
 
@@ -50,7 +47,7 @@ public class TagPreference<T> {
       return Integer.compare(indexA, indexB);
     }
     // for stability, fallback to registry name compare
-    return idA.compareNamespaced(idB);
+    return ((ResourceLocationEx)idA).compareNamespaced(idB);
   };
 
   /**
@@ -103,10 +100,10 @@ public class TagPreference<T> {
   /** Gets the preference from a tag without going through the cache, internal logic behind {@link #getPreference(Tag)} */
   private Optional<T> getUncachedPreference(Tag<T> tag) {
     // if no items, empty optional
-    if (tag instanceof Tag.Named && ((Tag.Named<?>) tag).isDefaulted()) {
+    if (tag instanceof Tag.Named/* && ((Tag.Named<?>) tag).isDefaulted()*/) {
       return Optional.empty();
     }
-    List<? extends T> elements = tag.getValues();
+    List<T> elements = tag.getValues();
     if (elements.isEmpty()) {
       return Optional.empty();
     }
@@ -117,7 +114,7 @@ public class TagPreference<T> {
     }
     // streams have a lovely function to get the minimum element based on a comparator
     return elements.stream()
-                   .min(ENTRY_COMPARATOR)
+                   .min((Comparator<? super T>) ENTRY_COMPARATOR)
                    .map(t -> (T) t); // required for generics to be happy
   }
 

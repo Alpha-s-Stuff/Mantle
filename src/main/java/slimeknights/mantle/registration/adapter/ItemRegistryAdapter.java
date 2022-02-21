@@ -1,5 +1,6 @@
 package slimeknights.mantle.registration.adapter;
 
+import net.minecraft.core.Registry;
 import net.minecraft.data.models.blockstates.PropertyDispatch.TriFunction;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
@@ -12,13 +13,12 @@ import net.minecraft.world.item.SignItem;
 import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraftforge.common.ForgeSpawnEggItem;
-import net.minecraftforge.registries.IForgeRegistry;
 import slimeknights.mantle.item.BlockTooltipItem;
 import slimeknights.mantle.item.BurnableBlockItem;
 import slimeknights.mantle.item.BurnableSignItem;
 import slimeknights.mantle.item.BurnableTallBlockItem;
 import slimeknights.mantle.item.TooltipItem;
+import slimeknights.mantle.lib.util.MantleSpawnEggItem;
 import slimeknights.mantle.registration.ItemProperties;
 import slimeknights.mantle.registration.object.BuildingBlockObject;
 import slimeknights.mantle.registration.object.EnumObject;
@@ -43,8 +43,8 @@ public class ItemRegistryAdapter extends EnumRegistryAdapter<Item> {
    * Registers a new item registry adapter with default mod ID and item properties
    * @param registry  Item registry instance
    */
-  public ItemRegistryAdapter(IForgeRegistry<Item> registry) {
-    this(registry, null);
+  public ItemRegistryAdapter() {
+    this(null);
   }
 
   /**
@@ -52,8 +52,8 @@ public class ItemRegistryAdapter extends EnumRegistryAdapter<Item> {
    * @param registry      Item registry instance
    * @param defaultProps  Default item properties
    */
-  public ItemRegistryAdapter(IForgeRegistry<Item> registry, @Nullable Item.Properties defaultProps) {
-    super(registry);
+  public ItemRegistryAdapter(@Nullable Item.Properties defaultProps) {
+    super(Registry.ITEM);
     this.defaultProps = Objects.requireNonNullElseGet(defaultProps, Properties::new);
   }
 
@@ -63,8 +63,8 @@ public class ItemRegistryAdapter extends EnumRegistryAdapter<Item> {
    * @param modid         Mod ID override
    * @param defaultProps  Default item properties
    */
-  public ItemRegistryAdapter(IForgeRegistry<Item> registry, String modid, @Nullable Item.Properties defaultProps) {
-    super(registry, modid);
+  public ItemRegistryAdapter(String modid, @Nullable Item.Properties defaultProps) {
+    super(Registry.ITEM, modid);
     this.defaultProps = Objects.requireNonNullElseGet(defaultProps, Properties::new);
   }
 
@@ -253,7 +253,7 @@ public class ItemRegistryAdapter extends EnumRegistryAdapter<Item> {
    * @return  Bucket instance
    */
   public BucketItem registerBucket(Supplier<? extends Fluid> fluid, String baseName) {
-    return register(new BucketItem(fluid, ItemProperties.BUCKET_PROPS), baseName + "_bucket");
+    return register(new BucketItem(fluid.get(), ItemProperties.BUCKET_PROPS), baseName + "_bucket");
   }
 
   /**
@@ -265,6 +265,6 @@ public class ItemRegistryAdapter extends EnumRegistryAdapter<Item> {
    * @return  Spawn egg item instance
    */
   public SpawnEggItem registerSpawnEgg(Supplier<? extends EntityType<? extends Mob>> type, int primary, int secondary, String baseName) {
-    return register(new ForgeSpawnEggItem(type, primary, secondary, ItemProperties.EGG_PROPS), baseName + "_spawn_egg");
+    return register(new MantleSpawnEggItem(type, primary, secondary, ItemProperties.EGG_PROPS), baseName + "_spawn_egg");
   }
 }

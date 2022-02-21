@@ -9,6 +9,8 @@ import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.server.level.ServerChunkCache;
+import net.minecraft.world.level.chunk.LevelChunk;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import java.lang.reflect.Constructor;
@@ -157,6 +159,10 @@ public class SimpleChannel {
 		sendToClients(packet, PlayerLookup.around(world, pos, radius));
 	}
 
+  public void sendToClientsAround(S2CPacket packet, final LevelChunk chunk) {
+    ((ServerChunkCache)chunk.getLevel().getChunkSource()).chunkMap.getPlayers(chunk.getPos(), false).forEach(e -> sendToClient(packet, e));
+  }
+
 	@Environment(EnvType.CLIENT)
 	public void sendResponseToServer(ResponseTarget target, C2SPacket packet) {
 		FriendlyByteBuf buf = createBuf(packet);
@@ -212,7 +218,7 @@ public class SimpleChannel {
 				LOGGER.error("Could not create S2C packet in channel '" + channelName + "' with id " + id, e);
 			}
 			if (packet != null) {
-				packet.execute(client, handler, new ResponseTarget(responseSender));
+				packet.handle(client, handler, new ResponseTarget(responseSender));
 			}
 		}
 	}

@@ -6,7 +6,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.StateDefinition.Builder;
 import net.minecraft.core.Direction;
-import slimeknights.mantle.client.model.connected.ConnectedModel;
 
 import java.util.Arrays;
 import java.util.EnumMap;

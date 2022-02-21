@@ -1,8 +1,10 @@
 package slimeknights.mantle.registration.adapter;
 
+import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
+import net.minecraft.core.Registry;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraftforge.registries.IForgeRegistry;
+import slimeknights.mantle.Mantle;
 
 /**
  * Registry adapter for registering entity types
@@ -10,13 +12,13 @@ import net.minecraftforge.registries.IForgeRegistry;
 @SuppressWarnings("unused")
 public class EntityTypeRegistryAdapter extends RegistryAdapter<EntityType<?>> {
   /** @inheritDoc */
-  public EntityTypeRegistryAdapter(IForgeRegistry<EntityType<?>> registry, String modId) {
-    super(registry, modId);
+  public EntityTypeRegistryAdapter(String modId) {
+    super(Registry.ENTITY_TYPE, modId);
   }
 
   /** @inheritDoc */
-  public EntityTypeRegistryAdapter(IForgeRegistry<EntityType<?>> registry) {
-    super(registry);
+  public EntityTypeRegistryAdapter() {
+    super(Registry.ENTITY_TYPE, Mantle.modId);
   }
 
   /**
@@ -26,7 +28,7 @@ public class EntityTypeRegistryAdapter extends RegistryAdapter<EntityType<?>> {
    * @param <T>      Entity type
    * @return  Registered entity type
    */
-  public <T extends Entity> EntityType<T> register(EntityType.Builder<T> builder, String name) {
-    return register(builder.build(resourceName(name)), name);
+  public <T extends Entity> EntityType<T> register(FabricEntityTypeBuilder<T> builder, String name) {
+    return register(builder.build(), name);
   }
 }

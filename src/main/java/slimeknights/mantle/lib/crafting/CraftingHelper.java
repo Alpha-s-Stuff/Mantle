@@ -13,8 +13,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
-import twilightforest.lib.extensions.IIngredientEx;
-import twilightforest.lib.mixin.IngredientAccessor;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -30,6 +28,8 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
+import slimeknights.mantle.lib.extensions.IngredientEx;
+import slimeknights.mantle.lib.mixin.IngredientAccessor;
 
 public class CraftingHelper
 {
@@ -57,7 +57,7 @@ public class CraftingHelper
     public static <T extends Ingredient> void write(FriendlyByteBuf buffer, T ingredient)
     {
         @SuppressWarnings("unchecked") //I wonder if there is a better way generic wise...
-        IIngredientSerializer<T> serializer = (IIngredientSerializer<T>)((IIngredientEx)ingredient).getSerializer();
+        IIngredientSerializer<T> serializer = (IIngredientSerializer<T>) ingredient.getSerializer();
         ResourceLocation key = ingredients.inverse().get(serializer);
         if (key == null)
             throw new IllegalArgumentException("Tried to serialize unregistered Ingredient: " + ingredient + " " + serializer);

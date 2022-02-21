@@ -3,42 +3,37 @@ package slimeknights.mantle.util;
 import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentRegistry;
-import dev.onyxstudios.cca.api.v3.component.ComponentRegistryV3;
 import dev.onyxstudios.cca.api.v3.entity.EntityComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.entity.EntityComponentInitializer;
+import dev.onyxstudios.cca.api.v3.entity.PlayerComponent;
 import lombok.RequiredArgsConstructor;
-import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityManager;
-import net.minecraftforge.common.capabilities.CapabilityToken;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.common.util.NonNullFunction;
-import net.minecraftforge.event.AttachCapabilitiesEvent;
 import slimeknights.mantle.Mantle;
-import slimeknights.mantle.lib.util.NonNullFunction;
+import slimeknights.mantle.lib.util.LazyOptional;
 import slimeknights.mantle.network.MantleNetwork;
 import slimeknights.mantle.network.packet.SwingArmPacket;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.function.Function;
 
 /**
  * Logic to handle offhand having its own cooldown
  */
 @RequiredArgsConstructor
-public class OffhandCooldownTracker implements Component, EntityComponentInitializer {
+public class OffhandCooldownTracker implements PlayerComponent<OffhandCooldownTracker>, EntityComponentInitializer {
   public static final ResourceLocation KEY = Mantle.getResource("offhand_cooldown");
-  public static final NonNullFunction<OffhandCooldownTracker,Float> COOLDOWN_TRACKER = OffhandCooldownTracker::getCooldown;
-  private static final NonNullFunction<OffhandCooldownTracker,Boolean> ATTACK_READY = OffhandCooldownTracker::isAttackReady;
+  public static final Function<OffhandCooldownTracker,Float> COOLDOWN_TRACKER = OffhandCooldownTracker::getCooldown;
+  private static final Function<OffhandCooldownTracker,Boolean> ATTACK_READY = OffhandCooldownTracker::isAttackReady;
+
+  public OffhandCooldownTracker() {
+    this.player = null;
+  }
 
   /**
    * Capability instance for offhand cooldown
@@ -48,24 +43,20 @@ public class OffhandCooldownTracker implements Component, EntityComponentInitial
   /** Registers the capability and subscribes to event listeners */
   @Override
   public void registerEntityComponentFactories(EntityComponentFactoryRegistry registry) {
-    registry.registerForPlayers(CAPABILITY, (player1 -> new OffhandCooldownTracker(player1)));
-    MinecraftForge.EVENT_BUS.addGenericListener(Entity.class, OffhandCooldownTracker::attachCapability);
+    registry.registerForPlayers(CAPABILITY, OffhandCooldownTracker::attachCapability);
   }
 
   /** Registers the capability with the event bus */
-  public static void register(RegisterCapabilitiesEvent event) {
-    event.register(OffhandCooldownTracker.class);
+  public static void register() {
+
   }
 
   /**
    * Called to add the capability handler to all players
-   * @param event  Event
+   * @param player  Player
    */
-  private static void attachCapability(AttachCapabilitiesEvent<Entity> event) {
-    Entity entity = event.getObject();
-    if (entity instanceof Player player) {
-      event.addCapability(KEY, new OffhandCooldownTracker(player));
-    }
+  private static OffhandCooldownTracker attachCapability(Player player) {
+      return new OffhandCooldownTracker(player);
   }
 
   /** Lazy optional of self for capability requirements */
@@ -80,12 +71,6 @@ public class OffhandCooldownTracker implements Component, EntityComponentInitial
 
   /** Enables the cooldown tracker if above 0. Intended to be set in equipment change events, not serialized */
   private int enabled = 0;
-
-  @Nonnull
-  @Override
-  public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
-    return cap == CAPABILITY ? this.capabilityInstance.cast() : LazyOptional.empty();
-  }
 
   /** Null safe way to get the player's ticks existed */
   private int getTicksExisted() {
@@ -150,7 +135,7 @@ public class OffhandCooldownTracker implements Component, EntityComponentInitial
    * @return  Offhand cooldown
    */
   public static float getCooldown(Player player) {
-    return player.getCapability(CAPABILITY).map(COOLDOWN_TRACKER).orElse(1.0f);
+    return CAPABILITY.maybeGet(player).map(COOLDOWN_TRACKER).orElse(1.0f);
   }
 
   /**
@@ -159,7 +144,7 @@ public class OffhandCooldownTracker implements Component, EntityComponentInitial
    * @param cooldown  Cooldown to apply
    */
   public static void applyCooldown(Player player, int cooldown) {
-    player.getCapability(CAPABILITY).ifPresent(cap -> cap.applyCooldown(cooldown));
+    CAPABILITY.maybeGet(player).ifPresent(cap -> cap.applyCooldown(cooldown));
   }
 
   /**
@@ -167,7 +152,7 @@ public class OffhandCooldownTracker implements Component, EntityComponentInitial
    * @param player  Player
    */
   public static boolean isAttackReady(Player player) {
-    return player.getCapability(CAPABILITY).map(ATTACK_READY).orElse(true);
+    return CAPABILITY.maybeGet(player).map(ATTACK_READY).orElse(true);
   }
 
   /**
@@ -194,5 +179,19 @@ public class OffhandCooldownTracker implements Component, EntityComponentInitial
         }
       }
     }
+  }
+
+  @Override
+  public void readFromNbt(CompoundTag tag) {
+    tag.putInt("attackReady", this.attackReady);
+    tag.putInt("lastCooldown", this.lastCooldown);
+    tag.putInt("enabled", this.enabled);
+  }
+
+  @Override
+  public void writeToNbt(CompoundTag tag) {
+    this.attackReady = tag.getInt("attackReady");
+    this.lastCooldown = tag.getInt("lastCooldown");
+    this.enabled = tag.getInt("enabled");
   }
 }

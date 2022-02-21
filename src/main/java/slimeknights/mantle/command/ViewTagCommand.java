@@ -12,6 +12,7 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.Tag;
+import slimeknights.mantle.lib.extensions.ResourceLocationEx;
 
 import java.util.Collection;
 import java.util.Objects;
@@ -54,7 +55,7 @@ public class ViewTagCommand {
       } else {
         values.stream()
               .map(result::getKey)
-              .sorted((a, b) -> Objects.requireNonNull(a).compareNamespaced(Objects.requireNonNull(b)))
+              .sorted((a, b) -> ((ResourceLocationEx)Objects.requireNonNull(a)).compareNamespaced(Objects.requireNonNull(b)))
               .forEach(value -> output.append("\n* " + Objects.requireNonNull(value)));
       }
       context.getSource().sendSuccess(output, true);

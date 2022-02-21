@@ -35,7 +35,7 @@ public class LazyOptional<T> {
 	// non-null and contains non-null value -> resolved
 	// non-null and contains null -> resolved, but supplier returned null (contract violation)
 	private Mutable<T> resolved;
-	private final Set<Consumer<LazyOptional<T>>> listeners = new HashSet<>();
+	private final Set<NonNullConsumer<LazyOptional<T>>> listeners = new HashSet<>();
 	private boolean isValid = true;
 
 	private LazyOptional(@Nullable Supplier<T> instanceSupplier) {
@@ -132,13 +132,22 @@ public class LazyOptional<T> {
 		throw exceptionSupplier.get();
 	}
 
-	public void addListener(Consumer<LazyOptional<T>> listener) {
-		if (isPresent()) {
-			this.listeners.add(listener);
-		} else {
-			listener.accept(this);
-		}
-	}
+  /**
+   * Register a {@link NonNullConsumer listener} that will be called when this {@link LazyOptional} becomes invalid (via {@link #invalidate()}).
+   * <p>
+   * If this {@link LazyOptional} is empty, the listener will be called immediately.
+   */
+  public void addListener(NonNullConsumer<LazyOptional<T>> listener)
+  {
+    if (isPresent())
+    {
+      this.listeners.add(listener);
+    }
+    else
+    {
+      listener.accept(this);
+    }
+  }
 
 	public void invalidate() {
 		if (this.isValid) {

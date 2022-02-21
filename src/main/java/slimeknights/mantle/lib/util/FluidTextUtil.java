@@ -1,8 +1,6 @@
 package slimeknights.mantle.lib.util;
 
 import com.google.common.math.LongMath;
-import com.simibubi.create.content.contraptions.goggles.IHaveGoggleInformation;
-import com.simibubi.create.foundation.config.AllConfigs;
 
 /**
  * A few helpers to display fluids.
@@ -52,12 +50,12 @@ public class FluidTextUtil {
 	 * .
 	 */
 	public static String getUnicodeMillibuckets(long droplets) {
-		FluidUnit fluidUnit = AllConfigs.CLIENT.fluidUnitType.get();
+		FluidUnit fluidUnit = FluidUnit.MILIBUCKETS;
 		if(fluidUnit == FluidUnit.DROPLETS)
-			return IHaveGoggleInformation.format(droplets);
-		String result = IHaveGoggleInformation.format(droplets / fluidUnit.getOneBucketAmount());
+			return String.valueOf(droplets);
+		String result = String.valueOf(droplets / fluidUnit.getOneBucketAmount());
 
-		if (droplets % 81 != 0 && !AllConfigs.CLIENT.simplifyFluidUnit.get()) {
+		if (droplets % 81 != 0) {
 			result += " " + getUnicodeFraction(droplets % fluidUnit.getOneBucketAmount(), fluidUnit.getOneBucketAmount(), true);
 		}
 

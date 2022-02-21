@@ -1,5 +1,6 @@
 package slimeknights.mantle.lib.mixin.common;
 
+import org.spongepowered.asm.mixin.Unique;
 import slimeknights.mantle.lib.extensions.BlockExtensions;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
@@ -24,13 +25,15 @@ public abstract class BlockMixin extends BlockBehaviour implements BlockExtensio
 	@Shadow
 	public abstract SoundType getSoundType(BlockState blockState);
 
+  @Unique
 	@Override
-	public SoundType create$getSoundType(BlockState state, LevelReader world, BlockPos pos, @Nullable Entity entity) {
+	public SoundType getSoundType(BlockState state, LevelReader world, BlockPos pos, @Nullable Entity entity) {
 		return getSoundType(state);
 	}
 
+  @Unique
 	@Override
-	public int create$getLightEmission(BlockState state, BlockGetter world, BlockPos pos) {
+	public int getLightEmission(BlockState state, BlockGetter world, BlockPos pos) {
 		return state.getLightEmission();
 	}
 }

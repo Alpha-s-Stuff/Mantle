@@ -8,8 +8,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraftforge.client.model.data.ModelProperty;
-import net.minecraftforge.registries.ForgeRegistries;
+import slimeknights.mantle.lib.model.ModelProperty;
 
 import javax.annotation.Nullable;
 

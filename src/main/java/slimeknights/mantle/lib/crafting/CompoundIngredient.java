@@ -8,21 +8,20 @@ import com.google.gson.JsonSyntaxException;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntComparators;
 import it.unimi.dsi.fastutil.ints.IntList;
-import twilightforest.lib.extensions.IIngredientEx;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
+import slimeknights.mantle.lib.extensions.IngredientEx;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Ingredient;
-
-public class CompoundIngredient extends Ingredient implements IIngredientEx {
+public class CompoundIngredient extends Ingredient implements IngredientEx {
     private List<Ingredient> children;
     private ItemStack[] stacks;
     private IntList itemIds;
@@ -32,7 +31,7 @@ public class CompoundIngredient extends Ingredient implements IIngredientEx {
     {
         super(Stream.of());
         this.children = Collections.unmodifiableList(children);
-        this.isSimple = children.stream().allMatch(ingredient -> ((IIngredientEx)ingredient).isSimple());
+        this.isSimple = children.stream().allMatch(ingredient -> ingredient.isSimple());
     }
 
     @Override

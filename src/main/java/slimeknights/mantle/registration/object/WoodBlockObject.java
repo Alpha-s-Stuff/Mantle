@@ -1,9 +1,11 @@
 package slimeknights.mantle.registration.object;
 
 import lombok.Getter;
+import net.fabricmc.fabric.api.tag.TagFactory;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
+import net.minecraft.tags.Tag;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.DoorBlock;
@@ -15,7 +17,6 @@ import net.minecraft.world.level.block.TrapDoorBlock;
 import net.minecraft.world.level.block.WallSignBlock;
 import net.minecraft.world.level.block.WoodButtonBlock;
 import net.minecraft.world.level.block.state.properties.WoodType;
-import net.minecraftforge.common.Tags.IOptionalNamedTag;
 
 import java.util.Arrays;
 import java.util.List;
@@ -75,22 +76,22 @@ public class WoodBlockObject extends FenceBuildingBlockObject {
                          Block log, Block strippedLog, Block wood, Block strippedWood,
                          Block fence, Block fenceGate, Block door, Block trapdoor,
                          Block pressurePlate, Block button, Block sign, Block wallSign) {
-    super(planks, fence);
+    super(planks, () -> (FenceBlock) fence);
     this.woodType = woodType;
     this.log = castDelegate(log);
-    this.strippedLog = castDelegate(strippedLog.delegate);
-    this.wood = castDelegate(wood.delegate);
-    this.strippedWood = castDelegate(strippedWood.delegate);
-    this.fenceGate = castDelegate(fenceGate.delegate);
-    this.door = castDelegate(door.delegate);
-    this.trapdoor = castDelegate(trapdoor.delegate);
-    this.pressurePlate = castDelegate(pressurePlate.delegate);
-    this.button = castDelegate(button.delegate);
-    this.sign = castDelegate(sign.delegate);
-    this.wallSign = castDelegate(wallSign.delegate);
+    this.strippedLog = castDelegate(strippedLog);
+    this.wood = castDelegate(wood);
+    this.strippedWood = castDelegate(strippedWood);
+    this.fenceGate = castDelegate((FenceGateBlock) fenceGate);
+    this.door = castDelegate((DoorBlock) door);
+    this.trapdoor = castDelegate((TrapDoorBlock) trapdoor);
+    this.pressurePlate = castDelegate((PressurePlateBlock) pressurePlate);
+    this.button = castDelegate((WoodButtonBlock) button);
+    this.sign = castDelegate((StandingSignBlock) sign);
+    this.wallSign = castDelegate((WallSignBlock) wallSign);
     ResourceLocation tagName = new ResourceLocation(name.getNamespace(), name.getPath() + "_logs");
-    this.logBlockTag = BlockTags.createOptional(tagName);
-    this.logItemTag = ItemTags.createOptional(tagName);
+    this.logBlockTag = TagFactory.BLOCK.create(tagName);
+    this.logItemTag = TagFactory.ITEM.create(tagName);
   }
 
   /** Gets the log for this wood type */
