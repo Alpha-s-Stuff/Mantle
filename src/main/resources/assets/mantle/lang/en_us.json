@@ -18,6 +18,7 @@
 
   "command.mantle.dump_tag.success": "Printed combined %s tag '%s' to console log",
   "command.mantle.dump_tag.read_error": "Error reading %s tag '%s':",
+  "command.mantle.dump_tag.success_log": "Dumped combined %s tag '%s' to '%s'",
   "command.mantle.dump_all_tags.success": "Dumped all tags to '%s'",
   "command.mantle.dump_all_tags.type_success": "Dumped all %s tags to '%s'",
 
@@ -25,6 +26,11 @@
   "command.mantle.dump_loot_modifiers.success_save": "Dumped combined global loot modifiers to '%s'",
   "command.mantle.dump_loot_modifiers.read_error": "Error reading global loot modifiers",
 
+  "command.mantle.harvest_tiers.success_log": "Printed sorted tiers to console log",
+  "command.mantle.harvest_tiers.success_save": "Dumped sorted tiers to '%s'",
+  "command.mantle.harvest_tiers.success_list": "Harvest tiers:",
+  "command.mantle.harvest_tiers.tag": "%s: Block tag %s",
+  "command.mantle.harvest_tiers.no_tag": "%s: No tag",
 
   "command.mantle.tag.empty": "Empty",
   "command.mantle.tag_collection.not_found": "Unknown tag collection '%s'",
