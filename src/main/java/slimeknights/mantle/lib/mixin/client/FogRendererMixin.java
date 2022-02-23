@@ -30,7 +30,7 @@ public abstract class FogRendererMixin {
 	private static float fogBlue;
 
 	@ModifyArgs(method = "setupColor", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;clearColor(FFFF)V", remap = false))
-	private static void create$modifyFogColors(Args args, Camera camera, float partialTicks, ClientLevel level, int renderDistanceChunks, float bossColorModifier) {
+	private static void mantle$modifyFogColors(Args args, Camera camera, float partialTicks, ClientLevel level, int renderDistanceChunks, float bossColorModifier) {
 		ColorData data = new ColorData(camera, fogRed, fogGreen, fogBlue);
 		FogEvents.SET_COLOR.invoker().setColor(data);
 		fogRed = data.getRed();
@@ -39,7 +39,7 @@ public abstract class FogRendererMixin {
 	}
 
 	@Inject(method = "setupFog", at = @At("HEAD"), cancellable = true)
-	private static void create$setupFog(Camera activeRenderInfo, FogRenderer.FogMode fogType, float f, boolean bl, CallbackInfo ci) {
+	private static void mantle$setupFog(Camera activeRenderInfo, FogRenderer.FogMode fogType, float f, boolean bl, CallbackInfo ci) {
 		float density = FogEvents.SET_DENSITY.invoker().setDensity(activeRenderInfo, 0.1f);
 		if (density != 0.1f) {
 			RenderSystem.setShaderFogStart(-8.0F);

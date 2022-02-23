@@ -23,7 +23,7 @@ public abstract class BufferBuilderMixin {
 			),
 			locals = LocalCapture.CAPTURE_FAILHARD
 	)
-	public void create$bufferOrder(CallbackInfoReturnable<Pair<BufferBuilder.DrawState, ByteBuffer>> cir, BufferBuilder.DrawState bufferbuilder$drawstate, ByteBuffer byteBuffer) {
+	public void mantle$bufferOrder(CallbackInfoReturnable<Pair<BufferBuilder.DrawState, ByteBuffer>> cir, BufferBuilder.DrawState bufferbuilder$drawstate, ByteBuffer byteBuffer) {
 		byteBuffer.order(this.buffer.order()); // Fix incorrect byte order
 	}
 }

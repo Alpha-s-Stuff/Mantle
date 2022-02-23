@@ -5,17 +5,17 @@ import slimeknights.mantle.lib.mixin.accessor.DamageSourceAccessor;
 import net.minecraft.world.damagesource.DamageSource;
 
 public final class DamageSourceHelper {
-	public static DamageSource create$createDamageSource(String string) {
-		return DamageSourceAccessor.create$init(string);
+	public static DamageSource mantle$createDamageSource(String string) {
+		return DamageSourceAccessor.mantle$init(string);
 	}
 
 	// this is probably going to crash and burn.
-	public static DamageSource create$createArmorBypassingDamageSource(String string) {
-		return MixinHelper.<DamageSourceAccessor>cast(create$createDamageSource(string)).create$setDamageBypassesArmor();
+	public static DamageSource mantle$createArmorBypassingDamageSource(String string) {
+		return MixinHelper.<DamageSourceAccessor>cast(mantle$createDamageSource(string)).mantle$setDamageBypassesArmor();
 	}
 
-	public static DamageSource create$createFireDamageSource(String string) {
-		return MixinHelper.<DamageSourceAccessor>cast(create$createDamageSource(string)).create$setFireDamage();
+	public static DamageSource mantle$createFireDamageSource(String string) {
+		return MixinHelper.<DamageSourceAccessor>cast(mantle$createDamageSource(string)).mantle$setFireDamage();
 	}
 
 	private DamageSourceHelper() {}

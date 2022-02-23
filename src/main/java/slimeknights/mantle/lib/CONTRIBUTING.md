@@ -4,7 +4,7 @@
 	- **Class Names**
 	All mixin classes should be named after the class that they mixin to followed by either `Mixin` if the class is a regular mixin, or `Accessor` if it is an accessor mixin. When mixing into inner classes, use a `$` symbol to separate the outer and inner class names. For example, when making a regular mixin for the class `ClassA.ClassB`, the mixin class name would be `ClassA$ClassBMixin`.
 	- **Field and Method Names**
-	All non-shadowed fields and methods, including those in extension interfaces, should be prefixed with `create$`. Accessor and invoker methods' base name should be the same as the method that is being accessed or invoked. For example, the invoker method name for `renderBakedItemModel` would be `create$renderBakedItemModel`.
+	All non-shadowed fields and methods, including those in extension interfaces, should be prefixed with `mantle$`. Accessor and invoker methods' base name should be the same as the method that is being accessed or invoked. For example, the invoker method name for `renderBakedItemModel` would be `mantle$renderBakedItemModel`.
 
 2. **Mixin Misc**
 	- Mixins that mixin to a class that only exists in a certain environment type should have an `@Environment(EnvType.{type})` annotation. This annotation should go above the `@Mixin` annotation.

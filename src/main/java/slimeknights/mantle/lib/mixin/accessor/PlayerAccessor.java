@@ -8,5 +8,5 @@ import net.minecraft.world.entity.player.Player;
 @Mixin(Player.class)
 public interface PlayerAccessor {
 	@Invoker("closeContainer")
-	void create$closeScreen();
+	void mantle$closeScreen();
 }

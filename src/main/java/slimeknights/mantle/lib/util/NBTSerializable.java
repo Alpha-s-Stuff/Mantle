@@ -3,7 +3,7 @@ package slimeknights.mantle.lib.util;
 import net.minecraft.nbt.CompoundTag;
 
 public interface NBTSerializable {
-	CompoundTag create$serializeNBT();
+	CompoundTag mantle$serializeNBT();
 
-	void create$deserializeNBT(CompoundTag nbt);
+	void mantle$deserializeNBT(CompoundTag nbt);
 }

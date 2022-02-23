@@ -22,7 +22,7 @@ import net.minecraft.world.level.block.state.BlockState;
 @Mixin(TerrainParticle.class)
 public abstract class TerrainParticleMixin extends TextureSheetParticle implements TerrainParticleExtensions {
 	@Unique
-	private BlockState create$state;
+	private BlockState mantle$state;
 
 	private TerrainParticleMixin(ClientLevel clientWorld, double d, double e, double f) {
 		super(clientWorld, d, e, f);
@@ -33,16 +33,16 @@ public abstract class TerrainParticleMixin extends TextureSheetParticle implemen
 			method = "<init>(Lnet/minecraft/client/multiplayer/ClientLevel;DDDDDDLnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;)V",
 			at = @At("RETURN")
 	)
-	private void create$init(ClientLevel clientLevel, double d, double e, double f, double g, double h, double i,
+	private void mantle$init(ClientLevel clientLevel, double d, double e, double f, double g, double h, double i,
 							 BlockState blockState, BlockPos blockPos, CallbackInfo ci) {
-		this.create$state = blockState;
+		this.mantle$state = blockState;
 	}
 
 	@Unique
 	@Override
-	public Particle create$updateSprite(BlockPos pos) {
+	public Particle mantle$updateSprite(BlockPos pos) {
 		if (pos != null)
-			this.setSprite(Minecraft.getInstance().getBlockRenderer().getBlockModelShaper().getParticleIcon(create$state));
+			this.setSprite(Minecraft.getInstance().getBlockRenderer().getBlockModelShaper().getParticleIcon(mantle$state));
 		return MixinHelper.cast(this);
 	}
 }

@@ -12,6 +12,6 @@ public final class ScreenHelper {
 	public static RenderTooltipBorderColorCallback.BorderColorEntry CURRENT_COLOR;
 
 	public static Minecraft getClient(Screen screen) {
-		return ((ScreenAccessor) screen).create$getMinecraft();
+		return ((ScreenAccessor) screen).mantle$getMinecraft();
 	}
 }

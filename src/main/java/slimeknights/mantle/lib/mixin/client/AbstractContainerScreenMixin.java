@@ -17,15 +17,15 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 @Mixin(AbstractContainerScreen.class)
 public abstract class AbstractContainerScreenMixin implements AbstractContainerScreenExtensions {
 
-	private Inventory create$inventory;
+	private Inventory mantle$inventory;
 
 	@Override
-	public Inventory create$getInventory() {
-		return create$inventory;
+	public Inventory mantle$getInventory() {
+		return mantle$inventory;
 	}
 
 	@Inject(at = @At("RETURN"), method = "<init>")
-	private void create$init(AbstractContainerMenu abstractContainerMenu, Inventory inventory, Component component, CallbackInfo ci) {
-		create$inventory = inventory;
+	private void mantle$init(AbstractContainerMenu abstractContainerMenu, Inventory inventory, Component component, CallbackInfo ci) {
+		mantle$inventory = inventory;
 	}
 }

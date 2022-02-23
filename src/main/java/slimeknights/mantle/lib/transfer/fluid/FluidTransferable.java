@@ -1,9 +1,9 @@
 package slimeknights.mantle.lib.transfer.fluid;
 
-import javax.annotation.Nullable;
-
 import net.minecraft.core.Direction;
 import slimeknights.mantle.lib.util.LazyOptional;
+
+import javax.annotation.Nullable;
 
 public interface FluidTransferable {
 	@Nullable

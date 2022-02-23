@@ -56,7 +56,7 @@ public abstract class LevelRendererMixin {
 					target = "Ljava/util/Iterator;next()Ljava/lang/Object;"
 			)
 	)
-	private <E> E create$redirectBlockEntityIterator(Iterator<E> instance) {
+	private <E> E mantle$redirectBlockEntityIterator(Iterator<E> instance) {
 		E obj = instance.next();
 		BlockEntity next = (BlockEntity) obj;
 		if (next instanceof CustomRenderBoundingBoxBlockEntity custom) {
@@ -67,7 +67,7 @@ public abstract class LevelRendererMixin {
 				if (!instance.hasNext()) {
 					return obj;
 				}
-				return create$redirectBlockEntityIterator(instance);
+				return mantle$redirectBlockEntityIterator(instance);
 			}
 		}
 		return obj;
@@ -80,8 +80,8 @@ public abstract class LevelRendererMixin {
 					ordinal = 0
 			)
 	)
-	public void create$setBlur(PoseStack poseStack, float partialTick, long finishNanoTime, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightTexture lightTexture, Matrix4f projectionMatrix, CallbackInfo ci) {
-		((AbstractTextureExtension)this.minecraft.getModelManager().getAtlas(TextureAtlas.LOCATION_BLOCKS)).create$setBlurMipmap(false, this.minecraft.options.mipmapLevels > 0);
+	public void mantle$setBlur(PoseStack poseStack, float partialTick, long finishNanoTime, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightTexture lightTexture, Matrix4f projectionMatrix, CallbackInfo ci) {
+		((AbstractTextureExtension)this.minecraft.getModelManager().getAtlas(TextureAtlas.LOCATION_BLOCKS)).mantle$setBlurMipmap(false, this.minecraft.options.mipmapLevels > 0);
 	}
 
 	@Inject(
@@ -92,7 +92,7 @@ public abstract class LevelRendererMixin {
 					ordinal = 1
 			)
 	)
-	public void create$lastBlur(PoseStack poseStack, float partialTick, long finishNanoTime, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightTexture lightTexture, Matrix4f projectionMatrix, CallbackInfo ci) {
-		((AbstractTextureExtension)this.minecraft.getModelManager().getAtlas(TextureAtlas.LOCATION_BLOCKS)).create$restoreLastBlurMipmap();
+	public void mantle$lastBlur(PoseStack poseStack, float partialTick, long finishNanoTime, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightTexture lightTexture, Matrix4f projectionMatrix, CallbackInfo ci) {
+		((AbstractTextureExtension)this.minecraft.getModelManager().getAtlas(TextureAtlas.LOCATION_BLOCKS)).mantle$restoreLastBlurMipmap();
 	}
 }

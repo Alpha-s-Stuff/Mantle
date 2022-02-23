@@ -14,6 +14,7 @@ import slimeknights.mantle.command.MantleCommand;
 import slimeknights.mantle.config.Config;
 import slimeknights.mantle.item.LecternBookItem;
 import slimeknights.mantle.lib.crafting.CraftingHelper;
+import slimeknights.mantle.lib.tiers.TierSortingRegistry;
 import slimeknights.mantle.loot.MantleLoot;
 import slimeknights.mantle.network.MantleNetwork;
 import slimeknights.mantle.recipe.crafting.ShapedFallbackRecipe;
@@ -46,6 +47,7 @@ public class Mantle implements ModInitializer {
     ModLoadingContext.registerConfig(modId, Type.SERVER, Config.SERVER_SPEC);
 
     instance = this;
+    TierSortingRegistry.init();
     commonSetup();
     this.registerCapabilities();
     this.registerRecipeSerializers();

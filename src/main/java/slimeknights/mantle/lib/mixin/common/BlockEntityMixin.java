@@ -17,42 +17,42 @@ import net.minecraft.world.level.block.state.BlockState;
 @Mixin(BlockEntity.class)
 public abstract class BlockEntityMixin implements BlockEntityExtensions, NBTSerializable {
 	@Unique
-	private CompoundTag create$extraCustomData;
+	private CompoundTag mantle$extraCustomData;
 
 	@Override
-	public CompoundTag create$getExtraCustomData() {
-		if (create$extraCustomData == null) {
-			create$extraCustomData = new CompoundTag();
+	public CompoundTag mantle$getExtraCustomData() {
+		if (mantle$extraCustomData == null) {
+			mantle$extraCustomData = new CompoundTag();
 		}
-		return create$extraCustomData;
+		return mantle$extraCustomData;
 	}
 
 	@Inject(method = "load", at = @At("TAIL"))
-	public void create$load(CompoundTag compoundNBT, CallbackInfo ci) {
+	public void mantle$load(CompoundTag compoundNBT, CallbackInfo ci) {
 		if (compoundNBT.contains(TileEntityHelper.EXTRA_DATA_KEY))
-			this.create$extraCustomData = compoundNBT.getCompound(TileEntityHelper.EXTRA_DATA_KEY);
+			this.mantle$extraCustomData = compoundNBT.getCompound(TileEntityHelper.EXTRA_DATA_KEY);
 	}
 
 	@Inject(method = "saveMetadata", at = @At(value = "INVOKE", target = "Lnet/minecraft/nbt/CompoundTag;putInt(Ljava/lang/String;I)V", ordinal = 2))
-	private void create$saveMetadata(CompoundTag compoundNBT, CallbackInfo ci) {
-		if (this.create$extraCustomData != null) {
-			compoundNBT.put(TileEntityHelper.EXTRA_DATA_KEY, this.create$extraCustomData.copy());
+	private void mantle$saveMetadata(CompoundTag compoundNBT, CallbackInfo ci) {
+		if (this.mantle$extraCustomData != null) {
+			compoundNBT.put(TileEntityHelper.EXTRA_DATA_KEY, this.mantle$extraCustomData.copy());
 		}
 	}
 
 	@Override
-	public CompoundTag create$serializeNBT() {
+	public CompoundTag mantle$serializeNBT() {
 		CompoundTag nbt = new CompoundTag();
 		MixinHelper.<BlockEntity>cast(this).load(nbt);
 		return nbt;
 	}
 
 	@Override
-	public void create$deserializeNBT(CompoundTag nbt) {
-		create$deserializeNBT(null, nbt);
+	public void mantle$deserializeNBT(CompoundTag nbt) {
+		mantle$deserializeNBT(null, nbt);
 	}
 
-	public void create$deserializeNBT(BlockState state, CompoundTag nbt) {
+	public void mantle$deserializeNBT(BlockState state, CompoundTag nbt) {
 		MixinHelper.<BlockEntity>cast(this).load(nbt);
 	}
 }

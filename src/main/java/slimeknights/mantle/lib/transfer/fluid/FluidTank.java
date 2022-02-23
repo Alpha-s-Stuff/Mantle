@@ -1,11 +1,11 @@
 package slimeknights.mantle.lib.transfer.fluid;
 
-import java.util.function.Predicate;
-
 import net.minecraft.nbt.CompoundTag;
 
+import java.util.function.Predicate;
+
 public class FluidTank implements IFluidHandler {
-	protected FluidStack fluid = FluidStack.empty();
+	protected FluidStack fluid = FluidStack.EMPTY;
 	protected long capacity;
 	protected Predicate<FluidStack> validator;
 
@@ -55,12 +55,12 @@ public class FluidTank implements IFluidHandler {
 
 	public FluidTank readFromNBT(CompoundTag tag) {
 		this.fluid = FluidStack.loadFluidStackFromNBT(tag);
-		this.capacity = tag.getLong("Capacity");
+		if (tag.contains("Capacity")) this.capacity = tag.getLong("Capacity");
 		return this;
 	}
 
 	public boolean isEmpty() {
-		return getFluid() == null || getFluid().getAmount() == 0;
+		return getFluid() == null || getFluid().isEmpty();
 	}
 
 	public long getFluidAmount() {
@@ -83,7 +83,7 @@ public class FluidTank implements IFluidHandler {
 
 	@Override
 	public long getTankCapacity(int tank) {
-		return capacity;
+		return getCapacity();
 	}
 
 	@Override
@@ -101,7 +101,7 @@ public class FluidTank implements IFluidHandler {
 			return Math.min(capacity - fluid.getAmount(), resource.getAmount());
 		}
 		if (fluid.isEmpty()) {
-			fluid = new FluidStack(resource, Math.min(capacity, resource.getAmount()));
+			fluid = resource.copy().setAmount(Math.min(capacity, resource.getAmount()));
 			onContentsChanged();
 			return fluid.getAmount();
 		}
@@ -124,6 +124,7 @@ public class FluidTank implements IFluidHandler {
 
 	@Override
 	public FluidStack drain(FluidStack stack, boolean sim) {
+		if (stack.isEmpty() || !stack.isFluidEqual(fluid)) return FluidStack.EMPTY;
 		return drain(stack.getAmount(), sim);
 	}
 
@@ -134,7 +135,7 @@ public class FluidTank implements IFluidHandler {
 		FluidStack out = fluid.copy().setAmount(amount);
 		if (!sim) {
 			fluid.shrink(amount);
-			if (fluid.isEmpty()) fluid = FluidStack.empty();
+			if (fluid.isEmpty()) fluid = FluidStack.EMPTY;
 			onContentsChanged();
 		}
 
@@ -147,6 +148,5 @@ public class FluidTank implements IFluidHandler {
 	}
 
 	protected void onContentsChanged() {
-
 	}
 }

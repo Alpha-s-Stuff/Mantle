@@ -1,23 +1,24 @@
 package slimeknights.mantle.lib.transfer.item;
 
-import com.google.common.collect.Iterators;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
+import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
+
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import net.minecraft.world.item.ItemStack;
-
 /**
  * Wraps an IItemHandler in a Storage, for use outside Create
  */
-@SuppressWarnings({"UnstableApiUsage"})
+@SuppressWarnings("UnstableApiUsage")
 public class StorageItemHandler implements Storage<ItemVariant> {
-	protected final IItemHandler handler;
+	@Nonnull
+	protected IItemHandler handler;
 
 	public StorageItemHandler(@Nullable IItemHandler handler) {
 		if (handler == null) {
@@ -27,6 +28,7 @@ public class StorageItemHandler implements Storage<ItemVariant> {
 		}
 	}
 
+	@Nonnull
 	public IItemHandler getHandler() {
 		return handler;
 	}
@@ -40,7 +42,7 @@ public class StorageItemHandler implements Storage<ItemVariant> {
 				ItemHandlerHelper.insertItemStacked(handler, toInsert, false);
 			}
 		});
-		return remainder.getCount();
+		return maxAmount - remainder.getCount();
 	}
 
 	@Override
@@ -56,16 +58,6 @@ public class StorageItemHandler implements Storage<ItemVariant> {
 	}
 
 	@Override
-	public Iterator<StorageView<ItemVariant>> iterator(TransactionContext transaction) {
-		int slots = handler.getSlots();
-		List<StorageView<ItemVariant>> views = new ArrayList<>();
-		for (int i = 0; i < slots; i++) {
-			views.add(new SlotStorageView(i, handler));
-		}
-		return Iterators.forArray((StorageView<ItemVariant>[]) views.toArray());
-	}
-
-	@Override
 	public Iterable<StorageView<ItemVariant>> iterable(TransactionContext transaction) {
 		int slots = handler.getSlots();
 		List<StorageView<ItemVariant>> views = new ArrayList<>();
@@ -76,7 +68,13 @@ public class StorageItemHandler implements Storage<ItemVariant> {
 	}
 
 	@Override
-	public @Nullable StorageView<ItemVariant> exactView(TransactionContext transaction, ItemVariant resource) {
+	public Iterator<StorageView<ItemVariant>> iterator(TransactionContext transaction) {
+		return iterable(transaction).iterator();
+	}
+
+	@Override
+	@Nullable
+	public StorageView<ItemVariant> exactView(TransactionContext transaction, ItemVariant resource) {
 		for (StorageView<ItemVariant> view : iterable(transaction)) {
 			if (view.getResource().equals(resource)) {
 				return view;
@@ -96,13 +94,17 @@ public class StorageItemHandler implements Storage<ItemVariant> {
 
 		@Override
 		public long extract(ItemVariant resource, long maxAmount, TransactionContext transaction) {
+			long actual = 0;
 			ItemStack extracted = owner.extractItem(slotIndex, (int) maxAmount, true);
-			transaction.addOuterCloseCallback(result -> {
-				if (result.wasCommitted()) {
-					owner.extractItem(slotIndex, (int) maxAmount, false);
-				}
-			});
-			return extracted.getCount();
+			if (extracted.is(resource.getItem())) {
+				actual = extracted.getCount();
+				transaction.addOuterCloseCallback(result -> {
+					if (result.wasCommitted()) {
+						owner.extractItem(slotIndex, (int) maxAmount, false);
+					}
+				});
+			}
+			return actual;
 		}
 
 		@Override

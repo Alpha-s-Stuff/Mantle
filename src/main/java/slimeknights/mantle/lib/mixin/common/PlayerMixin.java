@@ -30,14 +30,14 @@ public abstract class PlayerMixin extends LivingEntity {
 	}
 
 	@Inject(method = "hasCorrectToolForDrops", at = @At("HEAD"), cancellable = true)
-	public void create$isUsingEffectiveTool(BlockState blockState, CallbackInfoReturnable<Boolean> cir) {
+	public void mantle$isUsingEffectiveTool(BlockState blockState, CallbackInfoReturnable<Boolean> cir) {
 		if (blockState.getBlock() instanceof HarvestableBlock harvestable && inventory.getSelected().getItem() instanceof DiggerItem digger) {
 			cir.setReturnValue(harvestable.isToolEffective(blockState, digger));
 		}
 	}
 
 	@Inject(method = "tick", at = @At("TAIL"))
-	public void create$clientEndOfTickEvent(CallbackInfo ci) {
+	public void mantle$clientEndOfTickEvent(CallbackInfo ci) {
 		PlayerTickEndCallback.EVENT.invoker().onEndOfPlayerTick(MixinHelper.cast(this));
 	}
 }

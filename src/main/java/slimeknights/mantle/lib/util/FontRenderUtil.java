@@ -12,7 +12,7 @@ import net.minecraft.resources.ResourceLocation;
 public final class FontRenderUtil {
 
 	public static FontSet getFontStorage(Font renderer, ResourceLocation location) {
-		return get(renderer).create$getFontSet(location);
+		return get(renderer).mantle$getFontSet(location);
 	}
 
 	private static FontAccessor get(Font renderer) {

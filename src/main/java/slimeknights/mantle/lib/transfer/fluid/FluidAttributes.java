@@ -1,9 +1,5 @@
 package slimeknights.mantle.lib.transfer.fluid;
 
-import java.util.function.BiFunction;
-
-import javax.annotation.Nullable;
-
 import net.minecraft.Util;
 import net.minecraft.core.Registry;
 import net.minecraft.network.chat.Component;
@@ -12,6 +8,9 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.material.Fluid;
+
+import javax.annotation.Nullable;
+import java.util.function.BiFunction;
 
 public class FluidAttributes {
 

@@ -17,7 +17,7 @@ public abstract class ShapedRecipeMixin {
 			method = "patternFromJson(Lcom/google/gson/JsonArray;)[Ljava/lang/String;",
 			constant = @Constant(intValue = 3, ordinal = 0)
 	)
-	private static int create$modifyMaxHeight(int original) {
+	private static int mantle$modifyMaxHeight(int original) {
 		return Constants.Crafting.HEIGHT;
 	}
 
@@ -25,7 +25,7 @@ public abstract class ShapedRecipeMixin {
 			method = "patternFromJson(Lcom/google/gson/JsonArray;)[Ljava/lang/String;",
 			constant = @Constant(intValue = 3, ordinal = 1)
 	)
-	private static int create$modifyMaxWidth(int original) {
+	private static int mantle$modifyMaxWidth(int original) {
 		return Constants.Crafting.WIDTH;
 	}
 }

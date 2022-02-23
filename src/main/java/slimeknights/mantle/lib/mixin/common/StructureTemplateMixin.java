@@ -37,7 +37,7 @@ public abstract class StructureTemplateMixin implements StructureTemplateExtensi
 
 	@Unique
 	@Override
-	public List<StructureTemplate.StructureEntityInfo> create$getEntities() {
+	public List<StructureTemplate.StructureEntityInfo> mantle$getEntities() {
 		return entityInfoList;
 	}
 
@@ -50,25 +50,25 @@ public abstract class StructureTemplateMixin implements StructureTemplateExtensi
 			),
 			cancellable = true
 	)
-	public void create$place(ServerLevelAccessor iServerWorld, BlockPos blockPos, BlockPos blockPos2, StructurePlaceSettings placementSettings, Random random, int i, CallbackInfoReturnable<Boolean> cir) {
-		create$addEntitiesToWorld(iServerWorld, blockPos, placementSettings);
+	public void mantle$place(ServerLevelAccessor iServerWorld, BlockPos blockPos, BlockPos blockPos2, StructurePlaceSettings placementSettings, Random random, int i, CallbackInfoReturnable<Boolean> cir) {
+		mantle$addEntitiesToWorld(iServerWorld, blockPos, placementSettings);
 		cir.setReturnValue(true);
 	}
 
 	@Override
-	public Vec3 create$transformedVec3d(StructurePlaceSettings placementIn, Vec3 pos) {
+	public Vec3 mantle$transformedVec3d(StructurePlaceSettings placementIn, Vec3 pos) {
 		return StructureTemplate.transform(pos, placementIn.getMirror(), placementIn.getRotation(), placementIn.getRotationPivot());
 	}
 
 	@Override
-	public List<StructureTemplate.StructureEntityInfo> create$processEntityInfos(@Nullable StructureTemplate template, LevelAccessor world, BlockPos blockPos, StructurePlaceSettings settings, List<StructureTemplate.StructureEntityInfo> infos) {
+	public List<StructureTemplate.StructureEntityInfo> mantle$processEntityInfos(@Nullable StructureTemplate template, LevelAccessor world, BlockPos blockPos, StructurePlaceSettings settings, List<StructureTemplate.StructureEntityInfo> infos) {
 		List<StructureTemplate.StructureEntityInfo> list = Lists.newArrayList();
 		for(StructureTemplate.StructureEntityInfo entityInfo : infos) {
-			Vec3 pos = create$transformedVec3d(settings, entityInfo.pos).add(Vec3.atLowerCornerOf(blockPos));
+			Vec3 pos = mantle$transformedVec3d(settings, entityInfo.pos).add(Vec3.atLowerCornerOf(blockPos));
 			BlockPos blockpos = StructureTemplate.calculateRelativePosition(settings, entityInfo.blockPos).offset(blockPos);
 			StructureTemplate.StructureEntityInfo info = new StructureTemplate.StructureEntityInfo(pos, blockpos, entityInfo.nbt);
 			for (StructureProcessor proc : settings.getProcessors()) {
-				info = ((StructureProcessorExtensions) proc).create$processEntity(world, blockPos, entityInfo, info, settings, template);
+				info = ((StructureProcessorExtensions) proc).mantle$processEntity(world, blockPos, entityInfo, info, settings, template);
 				if (info == null)
 					break;
 			}
@@ -79,8 +79,8 @@ public abstract class StructureTemplateMixin implements StructureTemplateExtensi
 	}
 
 	@Override
-	public void create$addEntitiesToWorld(ServerLevelAccessor world, BlockPos blockPos, StructurePlaceSettings settings) {
-		for(StructureTemplate.StructureEntityInfo template$entityinfo : create$processEntityInfos((StructureTemplate) (Object) this, world, blockPos, settings, this.create$getEntities())) {
+	public void mantle$addEntitiesToWorld(ServerLevelAccessor world, BlockPos blockPos, StructurePlaceSettings settings) {
+		for(StructureTemplate.StructureEntityInfo template$entityinfo : mantle$processEntityInfos((StructureTemplate) (Object) this, world, blockPos, settings, this.mantle$getEntities())) {
 			BlockPos blockpos = StructureTemplate.transform(template$entityinfo.blockPos, settings.getMirror(), settings.getRotation(), settings.getRotationPivot()).offset(blockPos);
 			blockpos = template$entityinfo.blockPos;
 			if (settings.getBoundingBox() == null || settings.getBoundingBox().isInside(blockpos)) {
@@ -92,7 +92,7 @@ public abstract class StructureTemplateMixin implements StructureTemplateExtensi
 				listnbt.add(DoubleTag.valueOf(vector3d1.z));
 				compoundnbt.put("Pos", listnbt);
 				compoundnbt.remove("UUID");
-				StructureTemplateAccessor.create$createEntityIgnoreException(world, compoundnbt).ifPresent((entity) -> {
+				StructureTemplateAccessor.mantle$createEntityIgnoreException(world, compoundnbt).ifPresent((entity) -> {
 					float f = entity.mirror(settings.getMirror());
 					f = f + (entity.getYRot() - entity.rotate(settings.getRotation()));
 					entity.moveTo(vector3d1.x, vector3d1.y, vector3d1.z, f, entity.getXRot());

@@ -45,7 +45,7 @@ public abstract class Matrix4fMixin implements Matrix4fExtensions {
 	protected float m33;
 
 	@Override
-	public void create$set(@Nonnull Matrix4f other) {
+	public void mantle$set(@Nonnull Matrix4f other) {
 		Matrix4fMixin o = MixinHelper.cast(other); // This will look weird in the merged class
 
 		m00 = o.m00;
@@ -71,7 +71,7 @@ public abstract class Matrix4fMixin implements Matrix4fExtensions {
 
 	@Override
 	@Contract(mutates = "this")
-	public void create$fromFloatArray(float[] floats) {
+	public void mantle$fromFloatArray(float[] floats) {
 		m00 = floats[0];
 		m01 = floats[1];
 		m02 = floats[2];
@@ -94,7 +94,7 @@ public abstract class Matrix4fMixin implements Matrix4fExtensions {
 	}
 
 	@Override
-	public float[] create$writeMatrix() {
+	public float[] mantle$writeMatrix() {
 		return new float[]{
 				m00,
 				m10,
@@ -116,7 +116,7 @@ public abstract class Matrix4fMixin implements Matrix4fExtensions {
 	}
 
 	@Override
-	public void create$setTranslation(float x, float y, float z) {
+	public void mantle$setTranslation(float x, float y, float z) {
 		m00 = 1.0F;
 		m11 = 1.0F;
 		m22 = 1.0F;

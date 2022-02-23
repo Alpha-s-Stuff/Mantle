@@ -6,7 +6,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
 public interface ItemExtensions {
-	default Supplier<Item> create$getSupplier() {
+	default Supplier<Item> mantle$getSupplier() {
 		return () -> new Item(new Item.Properties());
 	}
 

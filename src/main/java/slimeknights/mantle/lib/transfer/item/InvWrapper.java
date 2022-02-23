@@ -1,9 +1,9 @@
 package slimeknights.mantle.lib.transfer.item;
 
-import javax.annotation.Nonnull;
-
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
+
+import javax.annotation.Nonnull;
 
 public class InvWrapper implements IItemHandlerModifiable {
 	private final Container inv;

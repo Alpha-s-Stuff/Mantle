@@ -13,13 +13,13 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 @Mixin(Entity.class)
 public interface EntityAccessor {
 	@Accessor("removalReason")
-	void create$setRemovalReason(Entity.RemovalReason removalReason);
+	void mantle$setRemovalReason(Entity.RemovalReason removalReason);
 
 	@Invoker("getEncodeId")
-	String create$getEntityString();
+	String mantle$getEntityString();
 
 	@Invoker("collideWithShapes")
-	static Vec3 create$collideWithShapes(Vec3 vec3, AABB aABB, List<VoxelShape> list) {
+	static Vec3 mantle$collideWithShapes(Vec3 vec3, AABB aABB, List<VoxelShape> list) {
 		throw new AssertionError("Mixin application failed!");
 	}
 }

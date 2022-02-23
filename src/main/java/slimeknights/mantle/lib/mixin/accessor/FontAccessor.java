@@ -13,5 +13,5 @@ import net.minecraft.resources.ResourceLocation;
 @Mixin(Font.class)
 public interface FontAccessor {
 	@Invoker("getFontSet")
-	FontSet create$getFontSet(ResourceLocation resourceLocation);
+	FontSet mantle$getFontSet(ResourceLocation resourceLocation);
 }

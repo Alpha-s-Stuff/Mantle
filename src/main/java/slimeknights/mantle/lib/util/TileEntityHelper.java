@@ -9,6 +9,6 @@ public class TileEntityHelper {
 	public static final String EXTRA_DATA_KEY = "ForgeData";
 
 	public static CompoundTag getExtraCustomData(BlockEntity tileEntity) {
-		return ((BlockEntityExtensions) tileEntity).create$getExtraCustomData();
+		return ((BlockEntityExtensions) tileEntity).mantle$getExtraCustomData();
 	}
 }

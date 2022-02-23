@@ -20,8 +20,9 @@ import net.minecraft.tags.Tag;
 import net.minecraft.tags.TagCollection;
 import net.minecraft.world.item.Tier;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.common.TierSortingRegistry;
 import slimeknights.mantle.Mantle;
+import slimeknights.mantle.lib.tiers.TierSortingRegistry;
+import slimeknights.mantle.lib.util.TagUtil;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -34,7 +35,7 @@ import java.util.Objects;
 /** Command to dump global loot modifiers */
 public class HarvestTiersCommand {
   /** Resource location of the global loot manager "tag" */
-  protected static final ResourceLocation HARVEST_TIERS = new ResourceLocation("forge", "item_tier_ordering.json");
+  protected static final ResourceLocation HARVEST_TIERS = new ResourceLocation("mantle", "item_tier_ordering.json");
   /** Path for saving the loot modifiers */
   private static final String HARVEST_TIER_PATH = HARVEST_TIERS.getNamespace() + "/" + HARVEST_TIERS.getPath();
 
@@ -59,7 +60,7 @@ public class HarvestTiersCommand {
     if (id == null) {
       return "";
     }
-    return new TextComponent(id.toString()).withStyle(style -> style.setUnderlined(true).withClickEvent(new ClickEvent(Action.SUGGEST_COMMAND, "/mantle dump_tag " + Registry.BLOCK_REGISTRY.location() + " " + id + " save")));
+    return new TextComponent(id.toString()).withStyle(style -> style.withUnderlined(true).withClickEvent(new ClickEvent(Action.SUGGEST_COMMAND, "/mantle dump_tag " + Registry.BLOCK_REGISTRY.location() + " " + id + " save")));
   }
 
   /** Runs the command, dumping the tag */
@@ -75,7 +76,7 @@ public class HarvestTiersCommand {
       TagCollection<Block> blockTags = SerializationTags.getInstance().getOrEmpty(Registry.BLOCK_REGISTRY);
       for (Tier tier : sortedTiers) {
         output.append("\n* ");
-        Tag<Block> tag = tier.getTag();
+        Tag<Block> tag = TagUtil.getTagFromTier(tier);
         ResourceLocation id = TierSortingRegistry.getName(tier);
         if (tag != null) {
           output.append(new TranslatableComponent("command.mantle.harvest_tiers.tag", id, getTagComponent(blockTags, tag)));

@@ -29,7 +29,7 @@ public abstract class GuiMixin {
 	public float partialTicks;
 
 	@Inject(method = "render", at = @At("HEAD"))
-	public void create$render(PoseStack matrixStack, float f, CallbackInfo ci) {
+	public void mantle$render(PoseStack matrixStack, float f, CallbackInfo ci) {
 		partialTicks = f;
 	}
 

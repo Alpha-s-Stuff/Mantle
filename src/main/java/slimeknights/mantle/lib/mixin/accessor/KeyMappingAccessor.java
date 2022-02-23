@@ -12,5 +12,5 @@ import net.minecraft.client.KeyMapping;
 @Mixin(KeyMapping.class)
 public interface KeyMappingAccessor {
 	@Accessor("key")
-	Key create$getKey();
+	Key mantle$getKey();
 }

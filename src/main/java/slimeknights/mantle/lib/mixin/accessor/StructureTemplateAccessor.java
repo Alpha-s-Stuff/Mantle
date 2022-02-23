@@ -12,7 +12,7 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemp
 @Mixin(StructureTemplate.class)
 public interface StructureTemplateAccessor {
 	@Invoker("createEntityIgnoreException")
-	static Optional<Entity> create$createEntityIgnoreException(ServerLevelAccessor iServerWorld, CompoundTag compoundNBT) {
+	static Optional<Entity> mantle$createEntityIgnoreException(ServerLevelAccessor iServerWorld, CompoundTag compoundNBT) {
 		throw new AssertionError("Mixin application failed!");
 	}
 }

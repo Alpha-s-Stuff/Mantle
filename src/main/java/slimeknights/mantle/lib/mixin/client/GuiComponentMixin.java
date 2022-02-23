@@ -18,8 +18,8 @@ public abstract class GuiComponentMixin {
 			ordinal = 5,
 			argsOnly = true
 	)
-	private static int create$replaceA(int a) {
-		return create$getColor(a);
+	private static int mantle$replaceA(int a) {
+		return mantle$getColor(a);
 	}
 
 	@ModifyVariable(
@@ -28,11 +28,11 @@ public abstract class GuiComponentMixin {
 			ordinal = 6,
 			argsOnly = true
 	)
-	private static int create$replaceB(int b) {
-		return create$getColor(b);
+	private static int mantle$replaceB(int b) {
+		return mantle$getColor(b);
 	}
 
-	private static int create$getColor(int original) {
+	private static int mantle$getColor(int original) {
 		if (ScreenHelper.CURRENT_COLOR != null) {
 			if (original == ScreenHelper.DEFAULT_BORDER_COLOR_START) {
 				return ScreenHelper.CURRENT_COLOR.getBorderColorStart();

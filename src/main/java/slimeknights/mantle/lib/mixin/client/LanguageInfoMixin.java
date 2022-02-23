@@ -21,20 +21,20 @@ public abstract class LanguageInfoMixin implements LanguageInfoExtensions {
 	@Final
 	private String code;
 	@Unique
-	private Locale create$javaLocale;
+	private Locale mantle$javaLocale;
 
 	@Inject(method = "<init>", at = @At("TAIL"))
-	private void create$addLocale(String string, String string2, String string3, boolean bl, CallbackInfo ci) {
+	private void mantle$addLocale(String string, String string2, String string3, boolean bl, CallbackInfo ci) {
 		String[] splitLangCode = code.split("_", 2);
 		if (splitLangCode.length == 1) { // Vanilla has some languages without underscores
-			this.create$javaLocale = new Locale(code);
+			this.mantle$javaLocale = new Locale(code);
 		} else {
-			this.create$javaLocale = new Locale(splitLangCode[0], splitLangCode[1]);
+			this.mantle$javaLocale = new Locale(splitLangCode[0], splitLangCode[1]);
 		}
 	}
 
 	@Override
-	public Locale create$getJavaLocale() {
-		return create$javaLocale;
+	public Locale mantle$getJavaLocale() {
+		return mantle$javaLocale;
 	}
 }

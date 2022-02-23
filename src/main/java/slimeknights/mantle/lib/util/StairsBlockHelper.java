@@ -8,6 +8,6 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class StairsBlockHelper {
 	public static StairBlock init(BlockState blockState, Properties properties) {
-		return StairBlockAccessor.create$init(blockState, properties);
+		return StairBlockAccessor.mantle$init(blockState, properties);
 	}
 }

@@ -15,16 +15,16 @@ import net.minecraft.world.item.Item;
 @Mixin(Item.class)
 public abstract class ItemMixin implements ItemExtensions {
 	@Unique
-	private Supplier<Item> create$supplier;
+	private Supplier<Item> mantle$supplier;
 
 	@Unique
 	@Override
-	public Supplier<Item> create$getSupplier() {
-		return create$supplier;
+	public Supplier<Item> mantle$getSupplier() {
+		return mantle$supplier;
 	}
 
 	@Inject(method = "<init>", at = @At("TAIL"))
-	public void create$item(Item.Properties properties, CallbackInfo ci) {
-		create$supplier = new ItemSupplier(MixinHelper.cast(this));
+	public void mantle$item(Item.Properties properties, CallbackInfo ci) {
+		mantle$supplier = new ItemSupplier(MixinHelper.cast(this));
 	}
 }

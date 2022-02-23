@@ -9,5 +9,5 @@ import net.minecraft.world.level.material.FlowingFluid;
 @Mixin(LiquidBlock.class)
 public interface LiquidBlockAccessor {
 	@Accessor("fluid")
-	FlowingFluid create$getFluid();
+	FlowingFluid mantle$getFluid();
 }

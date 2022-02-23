@@ -15,7 +15,7 @@ import net.minecraft.world.item.ItemStack;
 public final class ItemRendererHelper {
 
 	public static void renderQuadList(ItemRenderer renderer, PoseStack matrices, VertexConsumer vertices, List<BakedQuad> quads, ItemStack stack, int light, int overlay) {
-		get(renderer).create$renderQuadList(matrices, vertices, quads, stack, light, overlay);
+		get(renderer).mantle$renderQuadList(matrices, vertices, quads, stack, light, overlay);
 	}
 
 	private static ItemRendererAccessor get(ItemRenderer renderer) {

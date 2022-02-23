@@ -7,7 +7,7 @@ import net.minecraft.client.renderer.GameRenderer;
 
 public final class GameRendererHelper {
 	public static double getFOVModifier(GameRenderer renderer, Camera camera, float tickDelta, boolean changingFov) {
-		return get(renderer).create$getFOVModifier(camera, tickDelta, changingFov);
+		return get(renderer).mantle$getFOVModifier(camera, tickDelta, changingFov);
 	}
 
 	private static GameRendererAccessor get(GameRenderer renderer) {

@@ -10,11 +10,11 @@ public final class EntityHelper {
 	public static final String EXTRA_DATA_KEY = "create_ExtraEntityData";
 
 	public static CompoundTag getExtraCustomData(Entity entity) {
-		return ((EntityExtensions) entity).create$getExtraCustomData();
+		return ((EntityExtensions) entity).mantle$getExtraCustomData();
 	}
 
 	public static String getEntityString(Entity entity) {
-		return ((EntityAccessor) entity).create$getEntityString();
+		return ((EntityAccessor) entity).mantle$getEntityString();
 	}
 
 	private EntityHelper() {}

@@ -34,15 +34,15 @@ public abstract class EntityMixin implements EntityExtensions, NBTSerializable {
 	@Shadow
 	private float eyeHeight;
 	@Unique
-	private CompoundTag create$extraCustomData;
+	private CompoundTag mantle$extraCustomData;
 	@Unique
-	private Collection<ItemEntity> create$captureDrops = null;
+	private Collection<ItemEntity> mantle$captureDrops = null;
 
 	@Shadow
 	protected abstract void readAdditionalSaveData(CompoundTag compoundTag);
 
 	@Inject(at = @At("TAIL"), method = "<init>")
-	public void create$entityInit(EntityType<?> entityType, Level world, CallbackInfo ci) {
+	public void mantle$entityInit(EntityType<?> entityType, Level world, CallbackInfo ci) {
 		int newEyeHeight = EntityEyeHeightCallback.EVENT.invoker().onEntitySize((Entity) (Object) this);
 		if (newEyeHeight != -1)
 			eyeHeight = newEyeHeight;
@@ -60,38 +60,38 @@ public abstract class EntityMixin implements EntityExtensions, NBTSerializable {
 			),
 			cancellable = true
 	)
-	public void create$spawnAtLocation(ItemStack stack, float f, CallbackInfoReturnable<ItemEntity> cir, ItemEntity itemEntity) {
-		if (create$captureDrops != null) create$captureDrops.add(itemEntity);
+	public void mantle$spawnAtLocation(ItemStack stack, float f, CallbackInfoReturnable<ItemEntity> cir, ItemEntity itemEntity) {
+		if (mantle$captureDrops != null) mantle$captureDrops.add(itemEntity);
 		else cir.cancel();
 	}
 
 	@Unique
 	@Override
-	public Collection<ItemEntity> create$captureDrops() {
-		return create$captureDrops;
+	public Collection<ItemEntity> mantle$captureDrops() {
+		return mantle$captureDrops;
 	}
 
 	@Unique
 	@Override
-	public Collection<ItemEntity> create$captureDrops(Collection<ItemEntity> value) {
-		Collection<ItemEntity> ret = create$captureDrops;
-		create$captureDrops = value;
+	public Collection<ItemEntity> mantle$captureDrops(Collection<ItemEntity> value) {
+		Collection<ItemEntity> ret = mantle$captureDrops;
+		mantle$captureDrops = value;
 		return ret;
 	}
 
 	// EXTRA CUSTOM DATA
 
 	@Inject(method = "saveWithoutId", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;addAdditionalSaveData(Lnet/minecraft/nbt/CompoundTag;)V"))
-	public void create$beforeWriteCustomData(CompoundTag tag, CallbackInfoReturnable<CompoundTag> cir) {
-		if (create$extraCustomData != null && !create$extraCustomData.isEmpty()) {
-			tag.put(EntityHelper.EXTRA_DATA_KEY, create$extraCustomData);
+	public void mantle$beforeWriteCustomData(CompoundTag tag, CallbackInfoReturnable<CompoundTag> cir) {
+		if (mantle$extraCustomData != null && !mantle$extraCustomData.isEmpty()) {
+			tag.put(EntityHelper.EXTRA_DATA_KEY, mantle$extraCustomData);
 		}
 	}
 
 	@Inject(method = "load", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;readAdditionalSaveData(Lnet/minecraft/nbt/CompoundTag;)V"))
-	public void create$beforeReadCustomData(CompoundTag tag, CallbackInfo ci) {
+	public void mantle$beforeReadCustomData(CompoundTag tag, CallbackInfo ci) {
 		if (tag.contains(EntityHelper.EXTRA_DATA_KEY)) {
-			create$extraCustomData = tag.getCompound(EntityHelper.EXTRA_DATA_KEY);
+			mantle$extraCustomData = tag.getCompound(EntityHelper.EXTRA_DATA_KEY);
 		}
 	}
 
@@ -107,7 +107,7 @@ public abstract class EntityMixin implements EntityExtensions, NBTSerializable {
 			locals = LocalCapture.CAPTURE_FAILHARD,
 			cancellable = true
 	)
-	public void create$spawnSprintParticle(CallbackInfo ci, int i, int j, int k, BlockPos blockPos) {
+	public void mantle$spawnSprintParticle(CallbackInfo ci, int i, int j, int k, BlockPos blockPos) {
 		if (((BlockStateExtensions) level.getBlockState(blockPos)).addRunningEffects(level, blockPos, MixinHelper.cast(this))) {
 			ci.cancel();
 		}
@@ -125,7 +125,7 @@ public abstract class EntityMixin implements EntityExtensions, NBTSerializable {
 			),
 			cancellable = true
 	)
-	public void create$startRiding(Entity entity, boolean bl, CallbackInfoReturnable<Boolean> cir) {
+	public void mantle$startRiding(Entity entity, boolean bl, CallbackInfoReturnable<Boolean> cir) {
 		if (StartRidingCallback.EVENT.invoker().onStartRiding(MixinHelper.cast(this), entity) == InteractionResult.FAIL) {
 			cir.setReturnValue(false);
 		}
@@ -133,16 +133,16 @@ public abstract class EntityMixin implements EntityExtensions, NBTSerializable {
 
 	@Unique
 	@Override
-	public CompoundTag create$getExtraCustomData() {
-		if (create$extraCustomData == null) {
-			create$extraCustomData = new CompoundTag();
+	public CompoundTag mantle$getExtraCustomData() {
+		if (mantle$extraCustomData == null) {
+			mantle$extraCustomData = new CompoundTag();
 		}
-		return create$extraCustomData;
+		return mantle$extraCustomData;
 	}
 
 	@Unique
 	@Override
-	public CompoundTag create$serializeNBT() {
+	public CompoundTag mantle$serializeNBT() {
 		CompoundTag nbt = new CompoundTag();
 		String id = EntityHelper.getEntityString(MixinHelper.cast(this));
 
@@ -155,7 +155,7 @@ public abstract class EntityMixin implements EntityExtensions, NBTSerializable {
 
 	@Unique
 	@Override
-	public void create$deserializeNBT(CompoundTag nbt) {
+	public void mantle$deserializeNBT(CompoundTag nbt) {
 		readAdditionalSaveData(nbt);
 	}
 }

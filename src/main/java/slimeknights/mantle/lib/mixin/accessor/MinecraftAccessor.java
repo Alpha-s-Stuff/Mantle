@@ -11,5 +11,5 @@ import net.minecraft.client.Minecraft;
 @Mixin(Minecraft.class)
 public interface MinecraftAccessor {
 	@Accessor("pausePartialTick")
-	float create$pausePartialTick();
+	float mantle$pausePartialTick();
 }

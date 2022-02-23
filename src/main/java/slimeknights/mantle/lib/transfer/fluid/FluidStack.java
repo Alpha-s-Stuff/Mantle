@@ -3,18 +3,17 @@ package slimeknights.mantle.lib.transfer.fluid;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
-import org.jetbrains.annotations.Nullable;
-import java.util.Optional;
-
-import net.minecraft.Util;
-import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraft.world.level.material.Fluids;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Objects;
+import java.util.Optional;
 
 @SuppressWarnings({"UnstableApiUsage"})
 public class FluidStack {
@@ -22,15 +21,16 @@ public class FluidStack {
 			instance -> instance.group(
 					Registry.FLUID.byNameCodec().fieldOf("FluidName").forGetter(FluidStack::getFluid),
 					Codec.LONG.fieldOf("Amount").forGetter(FluidStack::getAmount),
+					CompoundTag.CODEC.optionalFieldOf("VariantTag", null).forGetter(fluidStack -> fluidStack.getType().copyNbt()),
 					CompoundTag.CODEC.optionalFieldOf("Tag").forGetter(stack -> Optional.ofNullable(stack.getTag()))
-			).apply(instance, (fluid, amount, tag) -> {
-				FluidStack stack = new FluidStack(fluid, amount);
+			).apply(instance, (fluid, amount, variantTag, tag) -> {
+				FluidStack stack = new FluidStack(fluid, amount, variantTag);
 				tag.ifPresent(stack::setTag);
 				return stack;
 			})
 	);
 
-	private static final FluidStack EMPTY = new FluidStack(FluidVariant.blank(), 0) {
+	public static final FluidStack EMPTY = new FluidStack(FluidVariant.blank(), 0) {
 		@Override
 		public FluidStack setAmount(long amount) {
 			return this;
@@ -54,12 +54,11 @@ public class FluidStack {
 	@Nullable
 	private CompoundTag tag;
 	private long amount;
-	private String translationKey;
-	private boolean virtual = false;
 
 	public FluidStack(FluidVariant type, long amount) {
 		this.type = type;
 		this.amount = amount;
+		this.tag = type.copyNbt();
 	}
 
 	public FluidStack(FluidVariant type, long amount, @Nullable CompoundTag tag) {
@@ -67,34 +66,26 @@ public class FluidStack {
 		this.tag = tag;
 	}
 
+	/**
+	 * Avoid this constructor when possible, may result in NBT loss
+	 */
 	public FluidStack(Fluid type, long amount) {
-		// todo: support virtual fluids
-		if(!type.isSource(type.defaultFluidState())) {
-			this.type = FluidVariant.blank();
-			this.amount = amount;
-			this.virtual = true;
-			return;
-		}
-		this.type = FluidVariant.of(type);
-		this.amount = amount;
+		this(FluidVariant.of(type instanceof FlowingFluid flowing ? flowing.getSource() : type), amount);
 	}
 
-	public FluidStack(Fluid type, long amount, CompoundTag nbt) {
-		this.type = FluidVariant.of(type, nbt);
-		this.amount = amount;
+	public FluidStack(Fluid type, long amount, @Nullable CompoundTag nbt) {
+		this(FluidVariant.of(type instanceof FlowingFluid flowing ? flowing.getSource() : type, nbt), amount);
+		this.tag = nbt;
 	}
 
 	public FluidStack(FluidStack copy, long amount) {
 		this(copy.getType(), amount);
+		if (copy.hasTag()) tag = copy.getTag().copy();
 	}
 
 	public FluidStack setAmount(long amount) {
 		this.amount = amount;
 		return this;
-	}
-
-	public boolean isVirtual() {
-		return virtual;
 	}
 
 	public void grow(long amount) {
@@ -114,7 +105,7 @@ public class FluidStack {
 	}
 
 	public boolean isEmpty() {
-		return amount == 0;
+		return amount <= 0 || getType().isBlank();
 	}
 
 	public void shrink(int amount) {
@@ -133,19 +124,15 @@ public class FluidStack {
 		FluidVariant theirs = other.getType();
 		boolean fluidsEqual = mine.isOf(theirs.getFluid());
 
-
 		CompoundTag myTag = mine.getNbt();
 		CompoundTag theirTag = theirs.getNbt();
-
-		if (myTag == null) {
-			return theirTag == null && fluidsEqual;
-		} else if (theirTag == null) {
-			return false;
-		}
-
-		boolean tagsEqual = myTag.equals(theirTag);
+		boolean tagsEqual = Objects.equals(myTag, theirTag);
 
 		return fluidsEqual && tagsEqual;
+	}
+
+	public boolean canFill(FluidVariant var) {
+		return isEmpty() || var.isOf(getFluid()) && Objects.equals(var.getNbt(), getType().getNbt());
 	}
 
 	public CompoundTag writeToNBT(CompoundTag nbt) {
@@ -157,20 +144,24 @@ public class FluidStack {
 	}
 
 	public static FluidStack loadFluidStackFromNBT(CompoundTag tag) {
-		Tag fluidTag = tag.get("Variant");
-		FluidVariant fluid = FluidVariant.fromNbt((CompoundTag) fluidTag);
-		FluidStack stack = new FluidStack(fluid, tag.getLong("Amount"));
-		if(tag.contains("Tag", Tag.TAG_COMPOUND))
-			stack.tag = tag.getCompound("Tag");
+		FluidStack stack;
+		if (tag.contains("FluidName")) {
+			Fluid fluid = Registry.FLUID.get(new ResourceLocation(tag.getString("FluidName")));
+			int amount = tag.getInt("Amount");
+			if (tag.contains("Tag")) {
+				stack = new FluidStack(fluid, amount, tag.getCompound("Tag"));
+			} else {
+				stack = new FluidStack(fluid, amount);
+			}
+		} else {
+			CompoundTag fluidTag = tag.getCompound("Variant");
+			FluidVariant fluid = FluidVariant.fromNbt(fluidTag);
+			stack = new FluidStack(fluid, tag.getLong("Amount"));
+			if(tag.contains("Tag", Tag.TAG_COMPOUND))
+				stack.tag = tag.getCompound("Tag");
+		}
+
 		return stack;
-	}
-
-	public CompoundTag toTag() {
-		return writeToNBT(new CompoundTag());
-	}
-
-	public CompoundTag toTag(CompoundTag tag) {
-		return writeToNBT(tag);
 	}
 
 	public void setTag(CompoundTag tag) {
@@ -183,7 +174,7 @@ public class FluidStack {
 	}
 
 	public CompoundTag getOrCreateTag() {
-		if (getTag() == null) tag = new CompoundTag();
+		if (tag == null) tag = new CompoundTag();
         return tag;
 	}
 
@@ -200,7 +191,7 @@ public class FluidStack {
 		FluidVariant fluid = FluidVariant.fromPacket(buffer);
 		long amount = buffer.readVarLong();
 		CompoundTag tag = buffer.readNbt();
-		if (fluid.isBlank()) return empty();
+		if (fluid.isBlank()) return EMPTY;
 		return new FluidStack(fluid, amount, tag);
 	}
 
@@ -215,29 +206,7 @@ public class FluidStack {
 		return buffer;
 	}
 
-	public static FluidStack empty() {
-		return EMPTY.copy();
-	}
-
-	public String getTranslationKey() {
-		if (translationKey != null) return translationKey;
-
-		if (getFluid() == Fluids.EMPTY) {
-			translationKey = "";
-		} else if (getFluid() == Fluids.WATER) {
-			translationKey = "block.minecraft.water";
-		} else if (getFluid() == Fluids.LAVA) {
-			translationKey = "block.minecraft.lava";
-		} else {
-			ResourceLocation id = Registry.FLUID.getKey(getFluid());
-			String key = Util.makeDescriptionId("block", id);
-			String translated = I18n.get(key);
-			translationKey = translated.equals(key) ? Util.makeDescriptionId("fluid", id) : key;
-		}
-		return translationKey;
-	}
-
 	public FluidStack copy() {
-		return new FluidStack(FluidVariant.of(getFluid(), getType().copyNbt()), getAmount());
+		return new FluidStack(FluidVariant.of(getFluid(), getType().copyNbt()), getAmount(), getTag());
 	}
 }

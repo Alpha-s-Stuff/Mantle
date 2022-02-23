@@ -15,7 +15,7 @@ import net.minecraft.world.item.ItemStack;
 @Mixin(ItemStack.class)
 public abstract class ItemStackMixin implements NBTSerializable {
 	@Inject(method = "getMaxStackSize", at = @At("HEAD"), cancellable = true)
-	public void create$onGetMaxCount(CallbackInfoReturnable<Integer> cir) {
+	public void mantle$onGetMaxCount(CallbackInfoReturnable<Integer> cir) {
 		ItemStack self = (ItemStack) (Object) this;
 		Item item = self.getItem();
 		if (item instanceof CustomMaxCountItem) {
@@ -24,14 +24,14 @@ public abstract class ItemStackMixin implements NBTSerializable {
 	}
 
 	@Override
-	public CompoundTag create$serializeNBT() {
+	public CompoundTag mantle$serializeNBT() {
 		CompoundTag nbt = new CompoundTag();
 		MixinHelper.<ItemStack>cast(this).save(nbt);
 		return nbt;
 	}
 
 	@Override
-	public void create$deserializeNBT(CompoundTag nbt) {
+	public void mantle$deserializeNBT(CompoundTag nbt) {
 		MixinHelper.<ItemStack>cast(this).setTag(ItemStack.of(nbt).getTag());
 	}
 }

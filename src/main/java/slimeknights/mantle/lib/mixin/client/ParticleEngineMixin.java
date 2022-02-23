@@ -36,13 +36,13 @@ public abstract class ParticleEngineMixin {
 	private static List<ParticleRenderType> RENDER_ORDER;
 
 	@Unique
-	private static boolean create$replacedRenderOrderList = false;
+	private static boolean mantle$replacedRenderOrderList = false;
 
 	private static void addRenderType(ParticleRenderType type) {
-		if (!create$replacedRenderOrderList) {
+		if (!mantle$replacedRenderOrderList) {
 			List<ParticleRenderType> old = RENDER_ORDER;
 			RENDER_ORDER = new ArrayList<>(old);
-			create$replacedRenderOrderList = true;
+			mantle$replacedRenderOrderList = true;
 		}
 		RENDER_ORDER.add(type);
 	}
@@ -63,7 +63,7 @@ public abstract class ParticleEngineMixin {
 			),
 			cancellable = true
 	)
-	public void create$addBlockDestroyEffects(BlockPos blockPos, BlockState blockState, CallbackInfo ci) {
+	public void mantle$addBlockDestroyEffects(BlockPos blockPos, BlockState blockState, CallbackInfo ci) {
 		if (((BlockStateExtensions) blockState).addDestroyEffects(level, blockPos, MixinHelper.cast(this))) {
 			ci.cancel();
 		}

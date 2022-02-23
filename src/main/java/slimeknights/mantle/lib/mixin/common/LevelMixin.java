@@ -24,15 +24,15 @@ public abstract class LevelMixin {
 	public abstract BlockState getBlockState(BlockPos blockPos);
 
 	@Inject(method = "getSignal", at = @At("RETURN"), cancellable = true)
-	public void create$getRedstoneSignal(BlockPos blockPos, Direction direction, CallbackInfoReturnable<Integer> cir) {
-		BlockState create$blockstate = MixinHelper.<Level>cast(this).getBlockState(blockPos);
-		int create$i = create$blockstate.getSignal(MixinHelper.<Level>cast(this), blockPos, direction);
+	public void mantle$getRedstoneSignal(BlockPos blockPos, Direction direction, CallbackInfoReturnable<Integer> cir) {
+		BlockState mantle$blockstate = MixinHelper.<Level>cast(this).getBlockState(blockPos);
+		int mantle$i = mantle$blockstate.getSignal(MixinHelper.<Level>cast(this), blockPos, direction);
 
-		if (create$blockstate.getBlock() instanceof WeakPowerCheckingBlock) {
+		if (mantle$blockstate.getBlock() instanceof WeakPowerCheckingBlock) {
 			cir.setReturnValue(
-					((WeakPowerCheckingBlock) create$blockstate.getBlock()).shouldCheckWeakPower(create$blockstate, MixinHelper.<Level>cast(this), blockPos, direction)
-							? Math.max(create$i, MixinHelper.<Level>cast(this).getDirectSignalTo(blockPos))
-							: create$i);
+					((WeakPowerCheckingBlock) mantle$blockstate.getBlock()).shouldCheckWeakPower(mantle$blockstate, MixinHelper.<Level>cast(this), blockPos, direction)
+							? Math.max(mantle$i, MixinHelper.<Level>cast(this).getDirectSignalTo(blockPos))
+							: mantle$i);
 		}
 	}
 
@@ -45,7 +45,7 @@ public abstract class LevelMixin {
 			),
 			locals = LocalCapture.CAPTURE_FAILHARD
 	)
-	public void create$updateComparatorOutputLevel(BlockPos blockPos, Block block, CallbackInfo ci,
+	public void mantle$updateComparatorOutputLevel(BlockPos blockPos, Block block, CallbackInfo ci,
 												   Iterator<?> var3, Direction direction, BlockPos blockPos2) {
 		((BlockStateExtensions) getBlockState(blockPos2)).onNeighborChange(MixinHelper.cast(this), blockPos2, blockPos);
 	}

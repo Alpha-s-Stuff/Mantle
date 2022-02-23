@@ -1,12 +1,12 @@
 package slimeknights.mantle.lib.transfer.item;
 
-import slimeknights.mantle.lib.util.NBTSerializable;
-import java.util.Arrays;
-
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.item.ItemStack;
+import slimeknights.mantle.lib.util.NBTSerializable;
+
+import java.util.Arrays;
 
 public class ItemStackHandler implements IItemHandlerModifiable, NBTSerializable {
 	protected ItemStack[] stacks;
@@ -114,7 +114,7 @@ public class ItemStackHandler implements IItemHandlerModifiable, NBTSerializable
 	// NBTSerializable
 
 	@Override
-	public CompoundTag create$serializeNBT() {
+	public CompoundTag mantle$serializeNBT() {
 		return serializeNBT();
 	}
 
@@ -135,7 +135,7 @@ public class ItemStackHandler implements IItemHandlerModifiable, NBTSerializable
 	}
 
 	@Override
-	public void create$deserializeNBT(CompoundTag nbt) {
+	public void mantle$deserializeNBT(CompoundTag nbt) {
 		deserializeNBT(nbt);
 	}
 

@@ -5,12 +5,12 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 public interface Matrix4fExtensions {
-	void create$set(@NotNull Matrix4f other);
+	void mantle$set(@NotNull Matrix4f other);
 
 	@Contract(mutates = "this")
-	void create$fromFloatArray(float[] floats);
+	void mantle$fromFloatArray(float[] floats);
 
-	float[] create$writeMatrix();
+	float[] mantle$writeMatrix();
 
-	void create$setTranslation(float x, float y, float z);
+	void mantle$setTranslation(float x, float y, float z);
 }

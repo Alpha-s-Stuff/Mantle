@@ -4,7 +4,6 @@ import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
-
 import net.minecraft.world.item.ItemStack;
 
 // this class is awful, but we don't have many options
@@ -73,7 +72,7 @@ public class ItemStorageHandler implements IItemHandlerModifiable {
 			for (StorageView<ItemVariant> view : storage.iterable(t)) {
 				if (index == slot) {
 					ItemVariant variant = view.getResource();
-					long extracted = view.isResourceBlank() ? 0 : storage.extract(variant, amount, t);
+					long extracted = view.isResourceBlank() ? 0 : view.extract(variant, amount, t);
 					if (extracted != 0) {
 						finalVal = variant.toStack((int) extracted);
 					}

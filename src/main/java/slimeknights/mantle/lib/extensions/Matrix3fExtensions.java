@@ -4,7 +4,7 @@ import com.mojang.math.Matrix3f;
 import org.jetbrains.annotations.NotNull;
 
 public interface Matrix3fExtensions {
-	float[] create$writeMatrix();
+	float[] mantle$writeMatrix();
 
-	void create$set(@NotNull Matrix3f other);
+	void mantle$set(@NotNull Matrix3f other);
 }

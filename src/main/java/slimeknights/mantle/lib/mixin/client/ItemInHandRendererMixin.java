@@ -28,22 +28,22 @@ public abstract class ItemInHandRendererMixin {
 	private ItemStack mainHandItem;
 	@Shadow
 	private ItemStack offHandItem;
-	private static int create$mainHandSlot = 0;
+	private static int mantle$mainHandSlot = 0;
 
-	private static boolean create$shouldCauseReequipAnimation(@Nonnull ItemStack from, @Nonnull ItemStack to, int slot) {
+	private static boolean mantle$shouldCauseReequipAnimation(@Nonnull ItemStack from, @Nonnull ItemStack to, int slot) {
 		if (from.isEmpty() && to.isEmpty()) return false;
 		if (from.isEmpty() || to.isEmpty()) return true;
 
 		boolean changed = false;
 		if (slot != -1) {
-			changed = slot != create$mainHandSlot;
-			create$mainHandSlot = slot;
+			changed = slot != mantle$mainHandSlot;
+			mantle$mainHandSlot = slot;
 		}
 		return ((ItemExtensions) from.getItem()).shouldCauseReequipAnimation(from, to, changed);
 	}
 
 	@Inject(method = "renderArmWithItem", at = @At("HEAD"), cancellable = true)
-	private void create$renderArmWithItem(AbstractClientPlayer player, float tickDelta, float pitch, InteractionHand hand, float swingProgress, ItemStack stack, float equipProgress, PoseStack matrices, MultiBufferSource vertexConsumers, int light, CallbackInfo ci) {
+	private void mantle$renderArmWithItem(AbstractClientPlayer player, float tickDelta, float pitch, InteractionHand hand, float swingProgress, ItemStack stack, float equipProgress, PoseStack matrices, MultiBufferSource vertexConsumers, int light, CallbackInfo ci) {
 		RenderHandCallback.RenderHandEvent event = new RenderHandCallback.RenderHandEvent(player, hand, stack, matrices, vertexConsumers, tickDelta, pitch, swingProgress, equipProgress, light);
 		RenderHandCallback.EVENT.invoker().onRenderHand(event);
 		if (event.isCanceled()) {
@@ -60,13 +60,13 @@ public abstract class ItemInHandRendererMixin {
 			),
 			locals = LocalCapture.CAPTURE_FAILHARD
 	)
-	public void create$tick(CallbackInfo ci,
+	public void mantle$tick(CallbackInfo ci,
 							LocalPlayer clientPlayerEntity, ItemStack itemStack, ItemStack itemStack2) {
-		if (create$shouldCauseReequipAnimation(mainHandItem, itemStack, clientPlayerEntity.getInventory().selected)) {
+		if (mantle$shouldCauseReequipAnimation(mainHandItem, itemStack, clientPlayerEntity.getInventory().selected)) {
 			mainHandItem = itemStack;
 		}
 
-		if (create$shouldCauseReequipAnimation(offHandItem, itemStack2, -1)) {
+		if (mantle$shouldCauseReequipAnimation(offHandItem, itemStack2, -1)) {
 			offHandItem = itemStack2;
 		}
 	}

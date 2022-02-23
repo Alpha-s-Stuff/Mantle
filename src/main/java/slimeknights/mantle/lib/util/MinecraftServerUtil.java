@@ -7,7 +7,7 @@ import net.minecraft.world.level.storage.LevelStorageSource;
 
 public final class MinecraftServerUtil {
 	public static LevelStorageSource.LevelStorageAccess getAnvilConverterForAnvilFile(MinecraftServer minecraftServer) {
-		return get(minecraftServer).create$getStorageSource();
+		return get(minecraftServer).mantle$getStorageSource();
 	}
 
 	private static MinecraftServerAccessor get(MinecraftServer minecraftServer) {

@@ -11,7 +11,7 @@ import net.minecraft.world.level.block.state.BlockState;
 @Mixin(RedStoneWireBlock.class)
 public interface RedStoneWireBlockAccessor {
 	@Invoker("shouldConnectTo")
-	static boolean create$shouldConnectTo(BlockState blockState, @Nullable Direction side) {
+	static boolean mantle$shouldConnectTo(BlockState blockState, @Nullable Direction side) {
 		throw new AssertionError("Mixin application failed!");
 	}
 }

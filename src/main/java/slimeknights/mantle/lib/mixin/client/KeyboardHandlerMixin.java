@@ -27,7 +27,7 @@ public abstract class KeyboardHandlerMixin {
 			),
 			at = @At(value = "RETURN")
 	)
-	public void create$onHandleKeyInput(long window, int key, int scancode, int action, int mods, CallbackInfo ci) {
+	public void mantle$onHandleKeyInput(long window, int key, int scancode, int action, int mods, CallbackInfo ci) {
 		KeyInputCallback.EVENT.invoker().onKeyInput(key, scancode, action, mods);
 	}
 }

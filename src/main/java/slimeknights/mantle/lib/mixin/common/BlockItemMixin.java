@@ -14,7 +14,7 @@ import net.minecraft.world.item.context.UseOnContext;
 @Mixin(BlockItem.class)
 public abstract class BlockItemMixin {
 	@Inject(method = "useOn", at = @At("HEAD"), cancellable = true)
-	private void create$useOn(UseOnContext context, CallbackInfoReturnable<InteractionResult> cir) {
+	private void mantle$useOn(UseOnContext context, CallbackInfoReturnable<InteractionResult> cir) {
 		InteractionResult result = BlockPlaceCallback.EVENT.invoker().onBlockPlace(new BlockPlaceContext(context));
 		if (result != InteractionResult.PASS) {
 			cir.setReturnValue(result);

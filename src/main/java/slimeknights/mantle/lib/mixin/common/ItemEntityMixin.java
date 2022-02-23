@@ -12,7 +12,7 @@ import net.minecraft.world.item.ItemStack;
 @Mixin(ItemEntity.class)
 public abstract class ItemEntityMixin {
 	@Inject(method = "tick", at = @At("HEAD"), cancellable = true)
-	public void create$onHeadTick(CallbackInfo ci) {
+	public void mantle$onHeadTick(CallbackInfo ci) {
 		ItemEntity self = (ItemEntity) (Object) this;
 		ItemStack stack = self.getItem();
 		if (stack.getItem() instanceof EntityTickListenerItem && ((EntityTickListenerItem) stack.getItem()).onEntityItemUpdate(stack, self)) {

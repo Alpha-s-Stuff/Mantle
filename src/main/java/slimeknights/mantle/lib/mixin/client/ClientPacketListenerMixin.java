@@ -39,9 +39,9 @@ public abstract class ClientPacketListenerMixin {
 			),
 			locals = LocalCapture.CAPTURE_FAILHARD
 	)
-	public void create$afterAddEntity(ClientboundAddEntityPacket packet, CallbackInfo ci, EntityType<?> entityType, Entity entity) {
+	public void mantle$afterAddEntity(ClientboundAddEntityPacket packet, CallbackInfo ci, EntityType<?> entityType, Entity entity) {
 		if (entity instanceof ExtraSpawnDataEntity extra) {
-			FriendlyByteBuf extraData = ((ClientboundAddEntityPacketExtensions) packet).create$getExtraDataBuf();
+			FriendlyByteBuf extraData = ((ClientboundAddEntityPacketExtensions) packet).mantle$getExtraDataBuf();
 			if (extraData != null) {
 				extra.readSpawnData(extraData);
 			}
@@ -49,7 +49,7 @@ public abstract class ClientPacketListenerMixin {
 	}
 
 	@Inject(method = "method_38542", at = @At("HEAD"), cancellable = true)
-	public void create$handleCustomBlockEntity(ClientboundBlockEntityDataPacket packet, BlockEntity blockEntity, CallbackInfo ci) {
+	public void mantle$handleCustomBlockEntity(ClientboundBlockEntityDataPacket packet, BlockEntity blockEntity, CallbackInfo ci) {
 		if (blockEntity instanceof CustomDataPacketHandlingBlockEntity handler) {
 			handler.onDataPacket(connection, packet);
 			ci.cancel();

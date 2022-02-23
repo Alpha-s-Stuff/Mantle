@@ -30,7 +30,7 @@ public abstract class MouseHandlerMixin {
 			at = @At(value = "RETURN"
 			)
 	)
-	private void create$onHandleMouseButton(long window, int button, int action, int mods, CallbackInfo ci) {
+	private void mantle$onHandleMouseButton(long window, int button, int action, int mods, CallbackInfo ci) {
 		MouseButtonCallback.EVENT.invoker().onMouseButton(button, action, mods);
 	}
 
@@ -43,7 +43,7 @@ public abstract class MouseHandlerMixin {
 			locals = LocalCapture.CAPTURE_FAILHARD,
 			cancellable = true
 	)
-	private void create$onHandleMouseScroll(long window, double horizontal, double vertical, CallbackInfo ci, double delta) {
+	private void mantle$onHandleMouseScroll(long window, double horizontal, double vertical, CallbackInfo ci, double delta) {
 		boolean cancelled = MouseScrolledCallback.EVENT.invoker().onMouseScrolled(delta);
 		if (cancelled) {
 			ci.cancel();

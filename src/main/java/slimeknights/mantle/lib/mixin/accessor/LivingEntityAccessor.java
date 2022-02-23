@@ -8,5 +8,5 @@ import net.minecraft.world.entity.LivingEntity;
 @Mixin(LivingEntity.class)
 public interface LivingEntityAccessor {
 	@Accessor("jumping")
-	boolean create$isJumping();
+	boolean mantle$isJumping();
 }

@@ -28,7 +28,7 @@ public abstract class ServerPlayerGameModeMixin {
 					target = "Lnet/minecraft/world/level/block/state/BlockState;use(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/InteractionHand;Lnet/minecraft/world/phys/BlockHitResult;)Lnet/minecraft/world/InteractionResult;"
 			)
 	)
-	public InteractionResult create$bypassBlockUse(BlockState instance, Level level, Player player, InteractionHand interactionHand, BlockHitResult blockHitResult) {
+	public InteractionResult mantle$bypassBlockUse(BlockState instance, Level level, Player player, InteractionHand interactionHand, BlockHitResult blockHitResult) {
 		if (player.getItemInHand(interactionHand).getItem() instanceof BlockUseBypassingItem bypassing) {
 			if (bypassing.shouldBypass(instance, blockHitResult.getBlockPos(), level, player, interactionHand)) return InteractionResult.PASS;
 		}
@@ -45,7 +45,7 @@ public abstract class ServerPlayerGameModeMixin {
 			),
 			cancellable = true
 	)
-	public void create$onItemFirstUse(ServerPlayer serverPlayer, Level level, ItemStack itemStack, InteractionHand interactionHand, BlockHitResult blockHitResult, CallbackInfoReturnable<InteractionResult> cir) {
+	public void mantle$onItemFirstUse(ServerPlayer serverPlayer, Level level, ItemStack itemStack, InteractionHand interactionHand, BlockHitResult blockHitResult, CallbackInfoReturnable<InteractionResult> cir) {
 		if (itemStack.getItem() instanceof UseFirstBehaviorItem first) {
 			UseOnContext useoncontext = new UseOnContext(serverPlayer, interactionHand, blockHitResult);
 			InteractionResult result = first.onItemUseFirst(itemStack, useoncontext);

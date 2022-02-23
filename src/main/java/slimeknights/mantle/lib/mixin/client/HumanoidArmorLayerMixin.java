@@ -15,12 +15,12 @@ import net.minecraft.world.item.ArmorItem;
 @Mixin(HumanoidArmorLayer.class)
 public abstract class HumanoidArmorLayerMixin {
 
-	private static final ResourceLocation create$copperArmorLocation = new ResourceLocation("create", "textures/models/armor/copper.png");
+	private static final ResourceLocation mantle$copperArmorLocation = new ResourceLocation("create", "textures/models/armor/copper.png");
 
 	@Inject(method = "getArmorLocation", at = @At("HEAD"), cancellable = true)
-	private void create$getArmorLocation(ArmorItem armorItem, boolean bl, String string, CallbackInfoReturnable<ResourceLocation> cir) {
+	private void mantle$getArmorLocation(ArmorItem armorItem, boolean bl, String string, CallbackInfoReturnable<ResourceLocation> cir) {
 		if (armorItem.getMaterial().getName().equals("copper")) {
-			cir.setReturnValue(create$copperArmorLocation);
+			cir.setReturnValue(mantle$copperArmorLocation);
 		}
 	}
 }

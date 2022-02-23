@@ -12,5 +12,5 @@ import net.minecraft.client.renderer.entity.layers.RenderLayer;
 @Mixin(LivingEntityRenderer.class)
 public interface LivingEntityRendererAccessor {
 	@Invoker("addLayer")
-	boolean create$addLayer(RenderLayer<?, ?> layerRenderer);
+	boolean mantle$addLayer(RenderLayer<?, ?> layerRenderer);
 }

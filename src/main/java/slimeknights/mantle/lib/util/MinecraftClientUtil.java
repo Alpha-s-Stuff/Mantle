@@ -11,11 +11,11 @@ import net.minecraft.client.Minecraft;
 @Environment(EnvType.CLIENT)
 public final class MinecraftClientUtil {
 	public static float getRenderPartialTicksPaused(Minecraft minecraft) {
-		return get(minecraft).create$pausePartialTick();
+		return get(minecraft).mantle$pausePartialTick();
 	}
 
 	public static Locale getLocale() {
-		return ((LanguageInfoExtensions) Minecraft.getInstance().getLanguageManager().getSelected()).create$getJavaLocale();
+		return ((LanguageInfoExtensions) Minecraft.getInstance().getLanguageManager().getSelected()).mantle$getJavaLocale();
 	}
 
 	private static MinecraftAccessor get(Minecraft minecraft) {

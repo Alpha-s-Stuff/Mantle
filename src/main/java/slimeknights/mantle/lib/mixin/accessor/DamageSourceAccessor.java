@@ -8,13 +8,13 @@ import net.minecraft.world.damagesource.DamageSource;
 @Mixin(DamageSource.class)
 public interface DamageSourceAccessor {
 	@Invoker("<init>")
-	static DamageSource create$init(String string) {
+	static DamageSource mantle$init(String string) {
 		throw new AssertionError();
 	}
 
 	@Invoker("setIsFire")
-	DamageSource create$setFireDamage();
+	DamageSource mantle$setFireDamage();
 
 	@Invoker("bypassArmor")
-	DamageSource create$setDamageBypassesArmor();
+	DamageSource mantle$setDamageBypassesArmor();
 }

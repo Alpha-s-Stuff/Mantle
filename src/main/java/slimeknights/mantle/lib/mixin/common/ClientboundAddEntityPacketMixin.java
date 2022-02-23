@@ -19,51 +19,51 @@ import net.minecraft.world.entity.EntityType;
 @Mixin(ClientboundAddEntityPacket.class)
 public abstract class ClientboundAddEntityPacketMixin implements ClientboundAddEntityPacketExtensions {
 	@Unique
-	private FriendlyByteBuf create$extraDataBuf;
+	private FriendlyByteBuf mantle$extraDataBuf;
 
 	@Inject(method = "<init>(Lnet/minecraft/world/entity/Entity;I)V", at = @At("TAIL"))
-	public void create$onEntityInit(Entity entity, int entityData, CallbackInfo ci) {
-		create$setExtraData(entity);
+	public void mantle$onEntityInit(Entity entity, int entityData, CallbackInfo ci) {
+		mantle$setExtraData(entity);
 	}
 
 	@Inject(method = "<init>(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/entity/EntityType;ILnet/minecraft/core/BlockPos;)V", at = @At("TAIL"))
-	public void create$onEntityInit(Entity entity, EntityType<?> entityType, int data, BlockPos pos, CallbackInfo ci) {
-		create$setExtraData(entity);
+	public void mantle$onEntityInit(Entity entity, EntityType<?> entityType, int data, BlockPos pos, CallbackInfo ci) {
+		mantle$setExtraData(entity);
 	}
 
 	@Unique
-	private void create$setExtraData(Entity entity) {
+	private void mantle$setExtraData(Entity entity) {
 		if (entity instanceof ExtraSpawnDataEntity) {
-			create$extraDataBuf = new FriendlyByteBuf(Unpooled.buffer());
-			((ExtraSpawnDataEntity) entity).writeSpawnData(create$extraDataBuf);
+			mantle$extraDataBuf = new FriendlyByteBuf(Unpooled.buffer());
+			((ExtraSpawnDataEntity) entity).writeSpawnData(mantle$extraDataBuf);
 		}
 	}
 
 	@Inject(method = "write", at = @At("TAIL"))
-	public void create$onTailWrite(FriendlyByteBuf buf, CallbackInfo ci) {
-		if (create$extraDataBuf != null) {
-			buf.writeBytes(create$extraDataBuf);
+	public void mantle$onTailWrite(FriendlyByteBuf buf, CallbackInfo ci) {
+		if (mantle$extraDataBuf != null) {
+			buf.writeBytes(mantle$extraDataBuf);
 		}
 	}
 
 	@Inject(method = "<init>(Lnet/minecraft/network/FriendlyByteBuf;)V", at = @At("TAIL"))
-	public void create$onTailRead(FriendlyByteBuf buf, CallbackInfo ci) {
+	public void mantle$onTailRead(FriendlyByteBuf buf, CallbackInfo ci) {
 		int readable = buf.readableBytes();
 		if (readable != 0) {
-			this.create$extraDataBuf = new FriendlyByteBuf(buf.readBytes(readable));
+			this.mantle$extraDataBuf = new FriendlyByteBuf(buf.readBytes(readable));
 		}
 	}
 
 	@Inject(method = "handle(Lnet/minecraft/network/protocol/game/ClientGamePacketListener;)V", at = @At("TAIL"))
-	public void create$onTailApply(ClientGamePacketListener listener, CallbackInfo ci) {
-		if (create$extraDataBuf != null) {
-			create$extraDataBuf.release();
+	public void mantle$onTailApply(ClientGamePacketListener listener, CallbackInfo ci) {
+		if (mantle$extraDataBuf != null) {
+			mantle$extraDataBuf.release();
 		}
 	}
 
 	@Unique
 	@Override
-	public FriendlyByteBuf create$getExtraDataBuf() {
-		return create$extraDataBuf;
+	public FriendlyByteBuf mantle$getExtraDataBuf() {
+		return mantle$extraDataBuf;
 	}
 }

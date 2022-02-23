@@ -9,7 +9,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.RailShape;
 
 public interface BaseRailBlockExtensions {
-	RailShape create$getRailDirection(BlockState state, BlockGetter world, BlockPos pos, @Nullable BaseRailBlock cart);
+	RailShape mantle$getRailDirection(BlockState state, BlockGetter world, BlockPos pos, @Nullable BaseRailBlock cart);
 
-	RailShape create$getRailDirection(BlockState state);
+	RailShape mantle$getRailDirection(BlockState state);
 }

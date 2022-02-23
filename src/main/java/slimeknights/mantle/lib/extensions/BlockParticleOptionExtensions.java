@@ -4,7 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.BlockParticleOption;
 
 public interface BlockParticleOptionExtensions {
-	BlockParticleOption create$setPos(BlockPos pos);
+	BlockParticleOption mantle$setPos(BlockPos pos);
 
-	BlockPos create$getPos();
+	BlockPos mantle$getPos();
 }

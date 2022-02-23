@@ -22,13 +22,13 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 public abstract class BoatMixin {
 	// you can't capture locals in a @ModifyVariable, so we have this
 	@Unique
-	BlockState create$state;
+	BlockState mantle$state;
 	@Unique
-	Level create$world;
+	Level mantle$world;
 	@Unique
-	BlockPos.MutableBlockPos create$pos;
+	BlockPos.MutableBlockPos mantle$pos;
 	@Unique
-	Entity create$entity;
+	Entity mantle$entity;
 
 	@Inject(
 			method = "getGroundFriction()F",
@@ -38,14 +38,14 @@ public abstract class BoatMixin {
 			),
 			locals = LocalCapture.CAPTURE_FAILHARD
 	)
-	public void create$getBoatGlide(CallbackInfoReturnable<Float> cir,
+	public void mantle$getBoatGlide(CallbackInfoReturnable<Float> cir,
 									AABB AABB, AABB AABB2, int i, int j, int k,
 									int l, int m, int n, VoxelShape shape, float f, int o, BlockPos.MutableBlockPos mutable,
 									int p, int q, int r, int s, BlockState blockState) {
-		create$state = blockState;
-		create$world = MixinHelper.<Boat>cast(this).level;
-		create$pos = mutable;
-		create$entity = MixinHelper.<Boat>cast(this);
+		mantle$state = blockState;
+		mantle$world = MixinHelper.<Boat>cast(this).level;
+		mantle$pos = mutable;
+		mantle$entity = MixinHelper.<Boat>cast(this);
 	}
 
 	@ModifyVariable(
@@ -56,7 +56,7 @@ public abstract class BoatMixin {
 					shift = At.Shift.AFTER
 			)
 	)
-	public float create$setSlipperiness(float f) {
-		return ((BlockStateExtensions) create$state).getSlipperiness(create$world, create$pos, create$entity);
+	public float mantle$setSlipperiness(float f) {
+		return ((BlockStateExtensions) mantle$state).getSlipperiness(mantle$world, mantle$pos, mantle$entity);
 	}
 }

@@ -15,11 +15,11 @@ import net.minecraft.client.gui.screens.Screen;
 @Mixin(Screen.class)
 public interface ScreenAccessor {
 	@Accessor("children")
-	List<GuiEventListener> create$getChildren();
+	List<GuiEventListener> mantle$getChildren();
 
 	@Accessor("minecraft")
-	Minecraft create$getMinecraft();
+	Minecraft mantle$getMinecraft();
 
 	@Accessor("renderables")
-	List<Widget> create$getRenderables();
+	List<Widget> mantle$getRenderables();
 }

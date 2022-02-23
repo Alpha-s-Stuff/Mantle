@@ -10,10 +10,10 @@ import net.minecraft.world.item.crafting.Ingredient;
 @Mixin(Ingredient.class)
 public interface IngredientAccessor {
 	@Accessor("values")
-	Ingredient.Value[] create$getAcceptedItems();
+	Ingredient.Value[] mantle$getAcceptedItems();
 
 	@Invoker("fromValues")
-	static Ingredient create$fromValues(Stream<? extends Ingredient.Value> stream) {
+	static Ingredient mantle$fromValues(Stream<? extends Ingredient.Value> stream) {
 		throw new AssertionError("Mixin application failed!");
 	}
 }

@@ -17,24 +17,24 @@ public abstract class AbstractTextureMixin implements AbstractTextureExtension {
 	@Shadow
 	protected boolean mipmap;
 	@Unique
-	private boolean create$lastBlur;
+	private boolean mantle$lastBlur;
 	@Unique
-	private boolean create$lastMipmap;
+	private boolean mantle$lastMipmap;
 
 	@Shadow
 	public abstract void setFilter(boolean blur, boolean mipmap);
 
 	@Unique
 	@Override
-	public void create$setBlurMipmap(boolean blur, boolean mipmap) {
-		this.create$lastBlur = this.blur;
-		this.create$lastMipmap = this.mipmap;
+	public void mantle$setBlurMipmap(boolean blur, boolean mipmap) {
+		this.mantle$lastBlur = this.blur;
+		this.mantle$lastMipmap = this.mipmap;
 		setFilter(blur, mipmap);
 	}
 
 	@Unique
 	@Override
-	public void create$restoreLastBlurMipmap() {
-		setFilter(this.create$lastBlur, this.create$lastMipmap);
+	public void mantle$restoreLastBlurMipmap() {
+		setFilter(this.mantle$lastBlur, this.mantle$lastMipmap);
 	}
 }

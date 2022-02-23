@@ -16,5 +16,5 @@ import net.minecraft.world.item.ItemStack;
 @Mixin(ItemRenderer.class)
 public interface ItemRendererAccessor {
 	@Invoker("renderQuadList")
-	void create$renderQuadList(PoseStack matrices, VertexConsumer vertices, List<BakedQuad> quads, ItemStack stack, int light, int overlay);
+	void mantle$renderQuadList(PoseStack matrices, VertexConsumer vertices, List<BakedQuad> quads, ItemStack stack, int light, int overlay);
 }

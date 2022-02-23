@@ -6,10 +6,11 @@
   "name": "Mantle",
   "description": "Shared code for Slime Knights mods and others.",
   "authors": [
-    "Slime Knights"
+    "Slime Knights",
+    "AlphaMode"
   ],
   "contact": {
-    "sources": "https://github.com/Create-Fabric/Create-Refabricated"
+    "sources": "https://github.com/Alpha-s-Stuff/Mantle"
   },
 
   "license": "MIT",

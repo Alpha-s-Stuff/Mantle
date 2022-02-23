@@ -8,5 +8,5 @@ import net.minecraft.network.protocol.game.ClientboundPlayerAbilitiesPacket;
 @Mixin(ClientboundPlayerAbilitiesPacket.class)
 public interface ClientboundPlayerAbilitiesPacketAccessor {
 	@Accessor("flyingSpeed")
-	void create$setFlyingSpeed(float speed);
+	void mantle$setFlyingSpeed(float speed);
 }

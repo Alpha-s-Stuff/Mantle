@@ -39,7 +39,7 @@ public abstract class MinecraftMixin {
 					shift = Shift.AFTER
 			)
 	)
-	public void create$registerParticleManagers(GameConfig gameConfiguration, CallbackInfo ci) {
+	public void mantle$registerParticleManagers(GameConfig gameConfiguration, CallbackInfo ci) {
 		ParticleManagerRegistrationCallback.EVENT.invoker().onParticleManagerRegistration();
 	}
 
@@ -51,12 +51,12 @@ public abstract class MinecraftMixin {
 					target = "Lnet/minecraft/server/packs/resources/SimpleReloadableResourceManager;<init>(Lnet/minecraft/server/packs/PackType;)V"
 			)
 	)
-	public void create$instanceRegistration(GameConfig args, CallbackInfo ci) {
+	public void mantle$instanceRegistration(GameConfig args, CallbackInfo ci) {
 		InstanceRegistrationCallback.EVENT.invoker().registerInstance();
 	}
 
 	@Inject(method = "setLevel", at = @At("HEAD"))
-	public void create$onHeadJoinWorld(ClientLevel world, CallbackInfo ci) {
+	public void mantle$onHeadJoinWorld(ClientLevel world, CallbackInfo ci) {
 		if (this.level != null) {
 			ClientWorldEvents.UNLOAD.invoker().onWorldUnload((Minecraft) (Object) this, this.level);
 		}
@@ -71,17 +71,17 @@ public abstract class MinecraftMixin {
 					shift = Shift.AFTER
 			)
 	)
-	public void create$onDisconnect(Screen screen, CallbackInfo ci) {
+	public void mantle$onDisconnect(Screen screen, CallbackInfo ci) {
 		ClientWorldEvents.UNLOAD.invoker().onWorldUnload((Minecraft) (Object) this, this.level);
 	}
 
 	@Inject(method = "startAttack", at = @At(value = "FIELD", ordinal = 2, target = "Lnet/minecraft/client/Minecraft;player:Lnet/minecraft/client/player/LocalPlayer;"))
-	private void create$onClickMouse(CallbackInfo ci) {
+	private void mantle$onClickMouse(CallbackInfo ci) {
 		LeftClickAirCallback.EVENT.invoker().onLeftClickAir(player);
 	}
 
 	@Inject(method = "runTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/toasts/ToastComponent;render(Lcom/mojang/blaze3d/vertex/PoseStack;)V", shift = Shift.BEFORE))
-	private void create$renderTickStart(CallbackInfo ci) {
+	private void mantle$renderTickStart(CallbackInfo ci) {
 		RenderTickStartCallback.EVENT.invoker().tick();
 	}
 }

@@ -22,7 +22,7 @@ public abstract class ServerResourcesMixin {
 	private ReloadableResourceManager resources;
 
 	@Inject(method = "<init>",at = @At("TAIL"))
-	public void create$DataPackRegistries(RegistryAccess registryAccess, Commands.CommandSelection commandSelection, int i, CallbackInfo ci) {
+	public void mantle$DataPackRegistries(RegistryAccess registryAccess, Commands.CommandSelection commandSelection, int i, CallbackInfo ci) {
 		for (PreparableReloadListener listener : DataPackReloadCallback.EVENT.invoker().onDataPackReload(MixinHelper.cast(this))) {
 			resources.registerReloadListener(listener);
 		}

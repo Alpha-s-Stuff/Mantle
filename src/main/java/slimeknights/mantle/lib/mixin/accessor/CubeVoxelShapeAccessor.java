@@ -9,7 +9,7 @@ import net.minecraft.world.phys.shapes.DiscreteVoxelShape;
 @Mixin(CubeVoxelShape.class)
 public interface CubeVoxelShapeAccessor {
 	@Invoker("<init>")
-	static CubeVoxelShape create$init(DiscreteVoxelShape discreteVoxelShape) {
+	static CubeVoxelShape mantle$init(DiscreteVoxelShape discreteVoxelShape) {
 		throw new AssertionError("Mixin application failed!");
 	}
 }
