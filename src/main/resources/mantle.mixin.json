@@ -45,6 +45,7 @@
     "common.ClientboundAddEntityPacketMixin",
     "common.EntityMixin",
     "common.FireBlockMixin",
+    "common.FluidMixin",
     "common.ItemEntityMixin",
     "common.ItemMixin",
     "common.ItemStackMixin",
