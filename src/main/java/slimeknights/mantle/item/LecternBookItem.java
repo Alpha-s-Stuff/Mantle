@@ -59,7 +59,7 @@ public abstract class LecternBookItem extends TooltipItem implements ILecternBoo
                         }
                       });
     }
-    return isCancelled.get() ? InteractionResult.FAIL : InteractionResult.SUCCESS;
+    return isCancelled.get() ? InteractionResult.FAIL : InteractionResult.PASS;
   }
 
 }

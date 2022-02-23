@@ -50,6 +50,7 @@
     "common.ItemStackMixin",
     "common.LevelMixin",
     "common.PlayerMixin",
+    "common.ServerLevelMixin",
     "common.ShapedRecipeMixin",
     "common.TagContainerMixin",
     "common.TierMixin",
