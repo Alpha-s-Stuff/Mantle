@@ -17,7 +17,9 @@ public class BlockBehaviourMixin {
   @Inject(method = "getDestroyProgress", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;getDestroySpeed(Lnet/minecraft/world/level/block/state/BlockState;)F", shift = At.Shift.AFTER), locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true)
   public void getDestroySpeed(BlockState state, Player player, BlockGetter level, BlockPos pos, CallbackInfoReturnable<Float> cir, float f) {
     float original = player.getDestroySpeed(state);
-    float newSpeed = PlayerBreakSpeedCallback.EVENT.invoker().setBreakSpeed(player, state, original, pos);
+    PlayerBreakSpeedCallback.BreakSpeed speed = new PlayerBreakSpeedCallback.BreakSpeed(player, state, original, pos);
+    PlayerBreakSpeedCallback.EVENT.invoker().setBreakSpeed(speed);
+    float newSpeed = speed.getNewSpeed();
     if(newSpeed != original) {
       if (f == -1.0F) {
         cir.setReturnValue(0.0F);

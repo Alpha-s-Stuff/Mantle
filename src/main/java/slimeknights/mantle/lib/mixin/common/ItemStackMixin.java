@@ -1,5 +1,6 @@
 package slimeknights.mantle.lib.mixin.common;
 
+import slimeknights.mantle.lib.extensions.ItemStackExtensions;
 import slimeknights.mantle.lib.item.CustomMaxCountItem;
 import slimeknights.mantle.lib.util.MixinHelper;
 import slimeknights.mantle.lib.util.NBTSerializable;
@@ -13,7 +14,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
 @Mixin(ItemStack.class)
-public abstract class ItemStackMixin implements NBTSerializable {
+public abstract class ItemStackMixin implements NBTSerializable, ItemStackExtensions {
 	@Inject(method = "getMaxStackSize", at = @At("HEAD"), cancellable = true)
 	public void mantle$onGetMaxCount(CallbackInfoReturnable<Integer> cir) {
 		ItemStack self = (ItemStack) (Object) this;
