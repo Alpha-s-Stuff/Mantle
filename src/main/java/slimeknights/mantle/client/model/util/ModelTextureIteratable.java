@@ -2,11 +2,11 @@ package slimeknights.mantle.client.model.util;
 
 import com.mojang.datafixers.util.Either;
 import lombok.AllArgsConstructor;
-import slimeknights.mantle.lib.mixin.accessor.BlockModelAccessor;
-
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.client.resources.model.Material;
+import slimeknights.mantle.lib.mixin.accessor.BlockModelAccessor;
+import slimeknights.mantle.lib.model.IModelConfiguration;
 
 import javax.annotation.Nullable;
 import java.util.Iterator;
@@ -30,19 +30,19 @@ public class ModelTextureIteratable implements Iterable<Map<String,Either<Materi
     this(null, model);
   }
 
-//  /**
-//   *
-//   * @param owner     Model configuration owner
-//   * @param fallback  Fallback in case the owner does not contain a block model
-//   * @return  Iteratable over block model texture maps
-//   */
-//  public static ModelTextureIteratable of(BlockModel owner, SimpleBlockModel fallback) {
-//    UnbakedModel unbaked = owner.getRootModel();
-//    if (unbaked instanceof BlockModel) {
-//      return new ModelTextureIteratable(null, (BlockModel)unbaked);
-//    }
-//    return new ModelTextureIteratable(fallback.getTextures(), fallback.getParent());
-//  }
+  /**
+   *
+   * @param owner     Model configuration owner
+   * @param fallback  Fallback in case the owner does not contain a block model
+   * @return  Iteratable over block model texture maps
+   */
+  public static ModelTextureIteratable of(IModelConfiguration owner, SimpleBlockModel fallback) {
+    UnbakedModel unbaked = owner.getOwnerModel();
+    if (unbaked instanceof BlockModel) {
+      return new ModelTextureIteratable(null, (BlockModel)unbaked);
+    }
+    return new ModelTextureIteratable(fallback.getTextures(), fallback.getParent());
+  }
 
   @Override
   public MapIterator iterator() {

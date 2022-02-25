@@ -13,13 +13,11 @@ import com.mojang.math.Transformation;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.block.model.BlockElement;
 import net.minecraft.client.renderer.block.model.BlockModel;
-import net.minecraft.client.renderer.block.model.ItemOverride;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
-import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.block.model.ItemTransforms.TransformType;
 import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.Material;
@@ -34,6 +32,8 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import slimeknights.mantle.client.model.util.BakedItemModel;
 import slimeknights.mantle.client.model.util.ModelTextureIteratable;
+import slimeknights.mantle.lib.model.IModelConfiguration;
+import slimeknights.mantle.lib.model.IModelGeometry;
 import slimeknights.mantle.lib.model.IModelLoader;
 import slimeknights.mantle.util.JsonHelper;
 
@@ -41,26 +41,19 @@ import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 
-//@RequiredArgsConstructor
-public class NBTKeyModel extends BlockModel {
+@RequiredArgsConstructor
+public class NBTKeyModel implements IModelGeometry<NBTKeyModel> {
   /** Model loader instance */
   public static final Loader LOADER = new Loader();
 
   /** Map of statically registered extra textures, used for addon mods */
   private static final Multimap<ResourceLocation,Pair<String,ResourceLocation>> EXTRA_TEXTURES = HashMultimap.create();
-
-  public NBTKeyModel(@org.jetbrains.annotations.Nullable ResourceLocation resourceLocation, List<BlockElement> list, Map<String, Either<Material, String>> map, boolean bl, @Nullable BlockModel.GuiLight guiLight, ItemTransforms itemTransforms, List<ItemOverride> list2, String nbtKey, ResourceLocation extraTexturesKey) {
-    super(resourceLocation, list, map, bl, guiLight, itemTransforms, list2);
-    this.nbtKey = nbtKey;
-    this.extraTexturesKey = extraTexturesKey;
-  }
 
   /**
    * Registers an extra variant texture for the model with the given key. Note that resource packs can override the extra texture
@@ -82,22 +75,22 @@ public class NBTKeyModel extends BlockModel {
   private Map<String,Material> textures = Collections.emptyMap();
 
   @Override
-  public Collection<Material> getMaterials(Function<ResourceLocation,UnbakedModel> modelGetter, Set<Pair<String,String>> missingTextureErrors) {
+  public Collection<Material> getTextures(IModelConfiguration owner, Function<ResourceLocation,UnbakedModel> modelGetter, Set<Pair<String,String>> missingTextureErrors) {
     textures = new HashMap<>();
     // must have a default
-    Material defaultTexture = getMaterial("default");
+    Material defaultTexture = owner.resolveTexture("default");
     textures.put("default", defaultTexture);
     if (Objects.equals(defaultTexture.texture(), MissingTextureAtlasSprite.getLocation())) {
-      missingTextureErrors.add(Pair.of("default", name));
+      missingTextureErrors.add(Pair.of("default", owner.getModelName()));
     }
     // fetch others
-    UnbakedModel model = getRootModel();
+    UnbakedModel model = owner.getOwnerModel();
     if (model instanceof BlockModel) {
       ModelTextureIteratable iterable = new ModelTextureIteratable(null, (BlockModel) model);
       for (Map<String,Either<Material,String>> map : iterable) {
         for (String key : map.keySet()) {
-          if (!textures.containsKey(key) && hasTexture(key)) {
-            textures.put(key, getMaterial(key));
+          if (!textures.containsKey(key) && owner.isTexturePresent(key)) {
+            textures.put(key, owner.resolveTexture(key));
           }
         }
       }
@@ -107,7 +100,7 @@ public class NBTKeyModel extends BlockModel {
       for (Pair<String,ResourceLocation> extra : EXTRA_TEXTURES.get(extraTexturesKey)) {
         String key = extra.getFirst();
         if (!textures.containsKey(key)) {
-//          textures.put(key, ModelLoaderRegistry.blockMaterial(extra.getSecond()));
+          textures.put(key, new Material(TextureAtlas.LOCATION_BLOCKS, extra.getSecond()));
         }
       }
     }
@@ -116,24 +109,23 @@ public class NBTKeyModel extends BlockModel {
   }
 
   /** Bakes a model for the given texture */
-  private static BakedModel bakeModel(BlockModel owner, Material texture, Function<Material,TextureAtlasSprite> spriteGetter, ImmutableMap<TransformType,Transformation> transformMap, ItemOverrides overrides) {
+  private static BakedModel bakeModel(IModelConfiguration owner, Material texture, Function<Material,TextureAtlasSprite> spriteGetter, ImmutableMap<TransformType,Transformation> transformMap, ItemOverrides overrides) {
     TextureAtlasSprite sprite = spriteGetter.apply(texture);
-
-    ImmutableList<BakedQuad> quads = ImmutableList.<BakedQuad>builder().build();//ItemLayerModel.getQuadsForSprite(-1, sprite, Transformation.identity());
-    return new BakedItemModel(quads, sprite, transformMap, overrides, true, owner.getGuiLight().lightLikeBlock());
+    ImmutableList<BakedQuad> quads = ImmutableList.<BakedQuad>builder().build();//ItemLayerUtil.getQuadsForSprite(-1, sprite, Transformation.identity());
+    return new BakedItemModel(quads, sprite, transformMap, overrides, true, owner.isSideLit());
   }
 
   @Override
-  public BakedModel bake(ModelBakery bakery, Function<Material,TextureAtlasSprite> spriteGetter, ModelState modelTransform, ResourceLocation modelLocation) {
+  public BakedModel bake(IModelConfiguration owner, ModelBakery bakery, Function<Material,TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides, ResourceLocation modelLocation) {
     ImmutableMap.Builder<String, BakedModel> variants = ImmutableMap.builder();
     ImmutableMap<TransformType,Transformation> transformMap = Maps.immutableEnumMap(Maps.newEnumMap(TransformType.class));
     for (Entry<String,Material> entry : textures.entrySet()) {
       String key = entry.getKey();
       if (!key.equals("default")) {
-        variants.put(key, bakeModel(this, entry.getValue(), spriteGetter, transformMap, ItemOverrides.EMPTY));
+        variants.put(key, bakeModel(owner, entry.getValue(), spriteGetter, transformMap, ItemOverrides.EMPTY));
       }
     }
-    return bakeModel(this, textures.get("default"), spriteGetter, transformMap, new Overrides(nbtKey, textures, variants.build()));
+    return bakeModel(owner, textures.get("default"), spriteGetter, transformMap, new Overrides(nbtKey, textures, variants.build()));
   }
 
   /** Overrides list for a tool slot item model */
@@ -171,7 +163,7 @@ public class NBTKeyModel extends BlockModel {
       if (modelContents.has("extra_textures_key")) {
         extraTexturesKey = JsonHelper.getResourceLocation(modelContents, "extra_textures_key");
       }
-      return null;//new NBTKeyModel(key, extraTexturesKey);
+      return new NBTKeyModel(key, extraTexturesKey);
     }
   }
 }

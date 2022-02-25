@@ -1,6 +1,7 @@
 accessWidener v2 named
 
 transitive-accessible class net/minecraft/world/item/crafting/Ingredient$Value
+transitive-accessible class net/minecraft/client/renderer/texture/TextureAtlasSprite$AnimatedTexture
 transitive-accessible method net/minecraft/world/item/crafting/Ingredient$ItemValue <init> (Lnet/minecraft/world/item/ItemStack;)V
 transitive-accessible method net/minecraft/world/item/crafting/Ingredient <init> (Ljava/util/stream/Stream;)V
 transitive-accessible method net/minecraft/world/level/block/state/properties/WoodType register (Lnet/minecraft/world/level/block/state/properties/WoodType;)Lnet/minecraft/world/level/block/state/properties/WoodType;
@@ -21,6 +22,10 @@ transitive-accessible method net/minecraft/tags/TagContainer get (Lnet/minecraft
 transitive-accessible method net/minecraft/client/renderer/RenderType create (Ljava/lang/String;Lcom/mojang/blaze3d/vertex/VertexFormat;Lcom/mojang/blaze3d/vertex/VertexFormat$Mode;IZZLnet/minecraft/client/renderer/RenderType$CompositeState;)Lnet/minecraft/client/renderer/RenderType$CompositeRenderType;
 transitive-accessible method net/minecraft/client/gui/GuiComponent innerBlit (Lcom/mojang/math/Matrix4f;IIIIIFFFF)V
 transitive-accessible method net/minecraft/client/renderer/block/model/ItemOverrides <init> ()V
+transitive-accessible method net/minecraft/client/resources/model/SimpleBakedModel$Builder <init> (ZZZLnet/minecraft/client/renderer/block/model/ItemTransforms;Lnet/minecraft/client/renderer/block/model/ItemOverrides;)V
+transitive-accessible method net/minecraft/client/renderer/texture/TextureAtlasSprite getFrameCount ()I
+transitive-accessible method net/minecraft/client/renderer/texture/TextureAtlasSprite$AnimatedTexture getFrameX (I)I
+transitive-accessible method net/minecraft/client/renderer/texture/TextureAtlasSprite$AnimatedTexture getFrameY (I)I
 transitive-extendable method net/minecraft/client/gui/screens/inventory/AbstractContainerScreen renderSlot (Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/world/inventory/Slot;)V
 transitive-extendable method net/minecraft/client/gui/screens/inventory/AbstractContainerScreen isHovering (Lnet/minecraft/world/inventory/Slot;DD)Z
 transitive-extendable class net/minecraft/world/item/crafting/Ingredient
@@ -42,5 +47,6 @@ transitive-accessible field net/minecraft/world/level/dimension/DimensionType DE
 transitive-accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen leftPos I
 transitive-accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen topPos I
 transitive-accessible field net/minecraft/world/inventory/DataSlot prevValue I
+transitive-accessible field com/mojang/blaze3d/vertex/VertexFormatElement count I
 transitive-mutable field net/minecraft/world/inventory/Slot x I
 transitive-mutable field net/minecraft/world/inventory/Slot y I

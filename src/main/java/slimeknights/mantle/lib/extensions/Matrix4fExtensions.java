@@ -13,4 +13,6 @@ public interface Matrix4fExtensions {
 	float[] mantle$writeMatrix();
 
 	void mantle$setTranslation(float x, float y, float z);
+
+  void mantle$multiplyBackward(Matrix4f other);
 }

@@ -7,10 +7,12 @@ import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.level.material.Fluid;
 import org.jetbrains.annotations.Nullable;
+import slimeknights.mantle.lib.extensions.FluidExtensions;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -181,7 +183,11 @@ public class FluidStack {
 	public void removeChildTag(String key) {
         if (getTag() == null) return;
         getTag().remove(key);
-    }
+  }
+
+  public Component getDisplayName() {
+    return ((FluidExtensions)this.getFluid()).getAttributes().getDisplayName(this);
+  }
 
 	public boolean hasTag() {
 		return tag != null;

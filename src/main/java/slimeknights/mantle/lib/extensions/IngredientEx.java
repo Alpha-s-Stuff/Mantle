@@ -4,9 +4,13 @@ import net.minecraft.world.item.crafting.Ingredient;
 import slimeknights.mantle.lib.crafting.IIngredientSerializer;
 
 public interface IngredientEx {
-  IIngredientSerializer<? extends Ingredient> getSerializer();
+  default IIngredientSerializer<? extends Ingredient> getSerializer() {
+    return null;
+  }
 
-  boolean isSimple();
+  default boolean isSimple() {
+    return true;
+  }
 
   default void invalidate() {}
 }

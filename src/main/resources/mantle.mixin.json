@@ -15,13 +15,16 @@
     "accessor.SheetsAccessor",
     "accessor.TagContainerAccessor",
     "accessor.Vector3fAccessor",
+    "client.AbstractFurnaceMenuMixin",
     "client.AbstractTextureMixin",
+    "client.BlockColorsMixin",
     "client.ClientPacketListenerMixin",
     "client.FogRendererMixin",
     "client.GameRendererMixin",
     "client.GuiComponentMixin",
     "client.GuiMixin",
     "client.HumanoidArmorLayerMixin",
+    "client.ItemColorsMixin",
     "client.ItemInHandRendererMixin",
     "client.ItemRendererMixin",
     "client.KeyboardHandlerMixin",
@@ -35,7 +38,11 @@
     "client.ScreenMixin",
     "client.TerrainParticle$ProviderMixin",
     "client.TerrainParticleMixin",
+    "client.TextureAtlasSpriteMixin",
     "client.TextureManagerMixin",
+    "client.VertexFormatMixin",
+    "common.AbstractFurnaceBlockEntityMixin",
+    "common.BlockBehaviourMixin",
     "common.BlockEntityMixin",
     "common.BlockItemMixin",
     "common.BlockMixin",
@@ -55,7 +62,8 @@
     "common.ShapedRecipeMixin",
     "common.TagContainerMixin",
     "common.TierMixin",
-    "common.TiersMixin"
+    "common.TiersMixin",
+    "common.TransformationMixin"
   ],
   "injectors": {
     "defaultRequire": 1

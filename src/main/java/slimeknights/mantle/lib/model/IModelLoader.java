@@ -19,7 +19,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.profiling.ProfilerFiller;
 
-public interface IModelLoader<T extends BlockModel> extends ResourceManagerReloadListener
+public interface IModelLoader<T extends IModelGeometry<T>> extends ResourceManagerReloadListener
 {
   T read(JsonDeserializationContext deserializationContext, JsonObject modelContents);
 }

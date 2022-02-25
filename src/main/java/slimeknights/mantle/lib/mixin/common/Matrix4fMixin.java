@@ -1,6 +1,7 @@
 package slimeknights.mantle.lib.mixin.common;
 
 import com.mojang.math.Matrix4f;
+import org.spongepowered.asm.mixin.Unique;
 import slimeknights.mantle.lib.extensions.Matrix4fExtensions;
 import slimeknights.mantle.lib.util.MixinHelper;
 import org.jetbrains.annotations.Contract;
@@ -44,6 +45,10 @@ public abstract class Matrix4fMixin implements Matrix4fExtensions {
 	@Shadow
 	protected float m33;
 
+  @Shadow
+  public abstract void load(Matrix4f other);
+
+  @Unique
 	@Override
 	public void mantle$set(@Nonnull Matrix4f other) {
 		Matrix4fMixin o = MixinHelper.cast(other); // This will look weird in the merged class
@@ -69,6 +74,7 @@ public abstract class Matrix4fMixin implements Matrix4fExtensions {
 		m33 = o.m33;
 	}
 
+  @Unique
 	@Override
 	@Contract(mutates = "this")
 	public void mantle$fromFloatArray(float[] floats) {
@@ -93,6 +99,7 @@ public abstract class Matrix4fMixin implements Matrix4fExtensions {
 		m33 = floats[15];
 	}
 
+  @Unique
 	@Override
 	public float[] mantle$writeMatrix() {
 		return new float[]{
@@ -115,6 +122,7 @@ public abstract class Matrix4fMixin implements Matrix4fExtensions {
 		};
 	}
 
+  @Unique
 	@Override
 	public void mantle$setTranslation(float x, float y, float z) {
 		m00 = 1.0F;
@@ -125,4 +133,12 @@ public abstract class Matrix4fMixin implements Matrix4fExtensions {
 		m13 = y;
 		m23 = z;
 	}
+
+  @Unique
+  @Override
+  public void mantle$multiplyBackward(Matrix4f other) {
+    Matrix4f copy = other.copy();
+    copy.multiply((Matrix4f) (Object) this);
+    this.load(copy);
+  }
 }
