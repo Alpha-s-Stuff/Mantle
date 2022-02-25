@@ -1,7 +1,10 @@
 package slimeknights.mantle.lib.mixin.client;
 
+import net.minecraft.network.protocol.game.ClientboundUpdateRecipesPacket;
+import net.minecraft.world.item.crafting.RecipeManager;
 import slimeknights.mantle.lib.block.CustomDataPacketHandlingBlockEntity;
 import slimeknights.mantle.lib.entity.ExtraSpawnDataEntity;
+import slimeknights.mantle.lib.event.RecipesUpdatedCallback;
 import slimeknights.mantle.lib.extensions.ClientboundAddEntityPacketExtensions;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -30,7 +33,11 @@ public abstract class ClientPacketListenerMixin {
 	@Final
 	private Connection connection;
 
-	@Inject(
+  @Shadow
+  @Final
+  private RecipeManager recipeManager;
+
+  @Inject(
 			method = "handleAddEntity",
 			at = @At(
 					value = "INVOKE",
@@ -55,4 +62,9 @@ public abstract class ClientPacketListenerMixin {
 			ci.cancel();
 		}
 	}
+
+  @Inject(method = "handleUpdateRecipes", at = @At("TAIL"))
+  public void mantle$updateRecipes(ClientboundUpdateRecipesPacket packet, CallbackInfo ci) {
+    RecipesUpdatedCallback.EVENT.invoker().onRecipesUpdated(this.recipeManager);
+  }
 }
