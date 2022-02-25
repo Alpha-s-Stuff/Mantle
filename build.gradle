@@ -220,10 +220,14 @@ publishing {
         }
     }
 
-
     repositories {
-        if (project.hasProperty('DEPLOY_DIR')) {
-            maven { url DEPLOY_DIR }
+        maven {
+            url = "https://maven.devos.community/${System.getenv().PUBLISH_SUFFIX}/"
+            credentials {
+                username = System.getenv().MAVEN_USER
+                password = System.getenv().MAVEN_PASS
+            }
+            authentication { basic(BasicAuthentication) }
         }
     }
 }
