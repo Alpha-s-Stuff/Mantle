@@ -6,11 +6,12 @@
  * Help from AbrarSyed
 */
 
+//file:noinspection GroovyAssignabilityCheck
 plugins {
     id 'fabric-loom' version '0.11-SNAPSHOT'
     id 'maven-publish'
-    id 'io.github.juuxel.loom-quiltflower' version '1.6.0'
-    id 'org.quiltmc.quilt-mappings-on-loom' version '3.1.1'
+    id 'io.github.juuxel.loom-quiltflower' version '1.+'
+    id 'org.quiltmc.quilt-mappings-on-loom' version '4.+'
 }
 
 repositories {
@@ -21,16 +22,8 @@ repositories {
     maven { url = "https://cursemaven.com" }
     maven { url = "https://maven.devos.community/releases/" }
     maven { url = "https://maven.terraformersmc.com/releases/" }
-    maven {
-        name = 'Ladysnake Mods'
-        url = 'https://ladysnake.jfrog.io/artifactory/mods'
-    }
-    maven {
-        url = "https://maven.jamieswhiteshirt.com/libs-release"
-        content {
-            includeGroup("com.jamieswhiteshirt")
-        }
-    }
+    maven { url = "https://ladysnake.jfrog.io/artifactory/mods" }
+    maven { url = "https://maven.jamieswhiteshirt.com/libs-release" }
 }
 
 group = 'slimeknights.mantle'
@@ -111,18 +104,20 @@ configurations {
 }
                
 dependencies {
-    minecraft "com.mojang:minecraft:${minecraft_version}"
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
 
     mappings loom.layered {
         it.addLayer(quiltMappings.mappings("org.quiltmc:quilt-mappings:1.18.1+build.4:v2")) // https://maven.quiltmc.org/#browse/browse:release
         it.parchment("org.parchmentmc.data:parchment-1.18.1:BLEEDING-20211212.174449-1@zip") // https://ldtteam.jfrog.io/ui/native/parchmentmc-public/org/parchmentmc/data/parchment-1.18.1/BLEEDING-SNAPSHOT
-        it.officialMojangMappings()
+        it.officialMojangMappings() {
+            setNameSyntheticMembers(false)
+        }
     }
 
     modImplementation("net.fabricmc:fabric-loader:${project.loader_version}")
     modImplementation("net.fabricmc.fabric-api:fabric-api:${project.fabric_version}")
 
-    modImplementation(include("io.github.ladysnake:satin:${satin_version}"))
+    modImplementation(include("io.github.ladysnake:satin:${project.satin_version}"))
 
     modImplementation(include("me.alphamode:ForgeTags:2.0"))
 
@@ -158,7 +153,19 @@ dependencies {
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.22'
 }
 
-def modsTomlSpec = copySpec{
+task buildOrPublish {
+    group = "build"
+    String mavenUser = System.getenv().MAVEN_USER
+    if (mavenUser != null && !mavenUser.isEmpty()) {
+        dependsOn(tasks.getByName("publish"))
+        println "prepared for publish"
+    } else {
+        dependsOn(tasks.getByName("build"))
+        println "prepared for build"
+    }
+}
+
+def modsTomlSpec = copySpec {
     from(sourceSets.main.resources) {
         include 'META-INF/mods.toml'
         expand 'version': artifact_version,
