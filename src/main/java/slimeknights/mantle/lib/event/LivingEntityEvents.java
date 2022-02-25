@@ -59,6 +59,12 @@ public class LivingEntityEvents {
 		return amount;
 	});
 
+  public static final Event<Jump> JUMP = EventFactory.createArrayBacked(Jump.class, callbacks -> (entity) -> {
+    for (Jump callback : callbacks) {
+      callback.onLivingEntityJump(entity);
+    }
+  });
+
 	@FunctionalInterface
 	public interface Hurt {
 		float onHurt(DamageSource source, float amount);
@@ -88,4 +94,9 @@ public class LivingEntityEvents {
 	public interface Tick {
 		void onLivingEntityTick(LivingEntity entity);
 	}
+
+  @FunctionalInterface
+  public interface Jump {
+    void onLivingEntityJump(LivingEntity entity);
+  }
 }

@@ -106,6 +106,11 @@ public abstract class LivingEntityMixin extends Entity {
 		return LivingEntityEvents.HURT.invoker().onHurt(source, amount);
 	}
 
+  @Inject(method = "jumpFromGround", at = @At("TAIL"))
+  public void mantle$onJump(CallbackInfo ci) {
+    LivingEntityEvents.JUMP.invoker().onLivingEntityJump((LivingEntity) (Object) this);
+  }
+
 	@Inject(
 			method = "checkFallDamage",
 			at = @At(

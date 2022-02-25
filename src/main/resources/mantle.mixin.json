@@ -15,6 +15,7 @@
     "accessor.SheetsAccessor",
     "accessor.TagContainerAccessor",
     "accessor.Vector3fAccessor",
+    "common.AbstractHorseMixin",
     "common.BlockBehaviourMixin",
     "common.BlockEntityMixin",
     "common.BlockItemMixin",
@@ -30,7 +31,10 @@
     "common.ItemMixin",
     "common.ItemStackMixin",
     "common.LevelMixin",
+    "common.LivingEntityMixin",
+    "common.MagmaCubeMixin",
     "common.PlayerMixin",
+    "common.ResultSlotMixin",
     "common.ServerLevelMixin",
     "common.ShapedRecipeMixin",
     "common.TagContainerMixin",
@@ -63,7 +67,7 @@
     "client.TerrainParticleMixin",
     "client.TextureAtlasSpriteMixin",
     "client.TextureManagerMixin",
-    "client.VertexFormatMixin",
+    "client.VertexFormatMixin"
   ],
   "injectors": {
     "defaultRequire": 1

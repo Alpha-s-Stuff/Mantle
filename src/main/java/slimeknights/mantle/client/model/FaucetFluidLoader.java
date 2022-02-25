@@ -14,6 +14,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.ReloadableResourceManager;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.GsonHelper;
@@ -58,16 +59,16 @@ public class FaucetFluidLoader extends SimpleJsonResourceReloadListener {
   /** Used to prevent being initialized multiple times */
   private static boolean initialized = false;
 
-//  /**
-//   * Call during the event to register the reload listener
-//   */
-//  public static void initialize(RegisterClientReloadListenersEvent event) {
-//    if (initialized) {
-//      return;
-//    }
-//    initialized = true;
-//    event.registerReloadListener(INSTANCE);
-//  }
+  /**
+   * Call during the event to register the reload listener
+   */
+  public static void initialize(ReloadableResourceManager reloadable) {
+    if (initialized) {
+      return;
+    }
+    initialized = true;
+    reloadable.registerReloadListener(INSTANCE);
+  }
 
   /** Default fluid model for blocks with no model */
   private FaucetFluid defaultFluid;
