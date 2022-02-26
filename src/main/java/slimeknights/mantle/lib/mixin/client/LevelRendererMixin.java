@@ -2,7 +2,10 @@ package slimeknights.mantle.lib.mixin.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Matrix4f;
+import net.minecraft.client.renderer.RenderBuffers;
+import net.minecraft.world.phys.HitResult;
 import slimeknights.mantle.lib.block.CustomRenderBoundingBoxBlockEntity;
+import slimeknights.mantle.lib.event.DrawSelectionEvents;
 import slimeknights.mantle.lib.extensions.AbstractTextureExtension;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -39,7 +42,11 @@ public abstract class LevelRendererMixin {
 	@Shadow
 	private Frustum cullingFrustum;
 
-	@Redirect(
+  @Shadow
+  @Final
+  private RenderBuffers renderBuffers;
+
+  @Redirect(
 			method = "renderLevel",
 			slice = @Slice(
 					from = @At(
@@ -95,4 +102,12 @@ public abstract class LevelRendererMixin {
 	public void mantle$lastBlur(PoseStack poseStack, float partialTick, long finishNanoTime, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightTexture lightTexture, Matrix4f projectionMatrix, CallbackInfo ci) {
 		((AbstractTextureExtension)this.minecraft.getModelManager().getAtlas(TextureAtlas.LOCATION_BLOCKS)).mantle$restoreLastBlurMipmap();
 	}
+
+  @Inject(method = "renderLevel", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;getModelViewStack()Lcom/mojang/blaze3d/vertex/PoseStack;", shift = At.Shift.BEFORE))
+  public void renderOutline(PoseStack poseStack, float partialTick, long finishNanoTime, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightTexture lightTexture, Matrix4f projectionMatrix, CallbackInfo ci) {
+    HitResult hitresult = Minecraft.getInstance().hitResult;
+    if (hitresult != null && hitresult.getType() == HitResult.Type.ENTITY) {
+      DrawSelectionEvents.ENTITY.invoker().onHighlightEntity((LevelRenderer) (Object) this, camera, hitresult, partialTick, poseStack, this.renderBuffers.bufferSource());
+    }
+  }
 }
