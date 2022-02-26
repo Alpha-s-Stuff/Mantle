@@ -48,5 +48,6 @@ transitive-accessible field net/minecraft/client/gui/screens/inventory/AbstractC
 transitive-accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen topPos I
 transitive-accessible field net/minecraft/world/inventory/DataSlot prevValue I
 transitive-accessible field com/mojang/blaze3d/vertex/VertexFormatElement count I
+transitive-accessible field net/minecraft/util/datafix/DataFixers SAME_NAMESPACED Ljava/util/function/BiFunction;
 transitive-mutable field net/minecraft/world/inventory/Slot x I
 transitive-mutable field net/minecraft/world/inventory/Slot y I

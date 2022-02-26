@@ -53,7 +53,7 @@ public abstract class LivingEntityMixin extends Entity {
 	@Inject(method = "dropAllDeathLoot", at = @At("HEAD"))
 	private void mantle$spawnDropsHEAD(DamageSource source, CallbackInfo ci) {
 		mantle$currentDamageSource = source;
-		((EntityExtensions) this).mantle$captureDrops(new ArrayList<>());
+    ((EntityExtensions)this).captureDrops(new ArrayList<>());
 	}
 
 	@ModifyVariable(method = "dropAllDeathLoot",
@@ -67,6 +67,18 @@ public abstract class LivingEntityMixin extends Entity {
 		}
 	}
 
+  @Inject(method = "causeFallDamage", at = @At("HEAD"), cancellable = true)
+  public void onFall(float fallDistance, float multiplier, DamageSource source, CallbackInfoReturnable<Boolean> cir) {
+    LivingEntityEvents.LivingFallEvent event = new LivingEntityEvents.LivingFallEvent((LivingEntity) (Object) this, fallDistance, multiplier);
+    event.sendEvent();
+    if(event.isCanceled())
+      cir.setReturnValue(false);
+    if(fallDistance != event.getDistance())
+      fallDistance = event.getDistance();
+    if(multiplier != event.getDamageMultiplier())
+      multiplier = event.getDamageMultiplier();
+  }
+
 	@ModifyVariable(method = "dropAllDeathLoot",
 			at = @At(value = "STORE", ordinal = 1))
 	private int mantle$spawnDropsBODY2(int j) {
@@ -75,7 +87,7 @@ public abstract class LivingEntityMixin extends Entity {
 
 	@Inject(method = "dropAllDeathLoot", at = @At("TAIL"))
 	private void mantle$spawnDropsTAIL(DamageSource source, CallbackInfo ci) {
-		Collection<ItemEntity> drops = ((EntityExtensions) this).mantle$captureDrops(null);
+		Collection<ItemEntity> drops = ((EntityExtensions) this).captureDrops(null);
 		if (!LivingEntityEvents.DROPS.invoker().onLivingEntityDrops(source, drops))
 			drops.forEach(e -> level.addFreshEntity(e));
 	}

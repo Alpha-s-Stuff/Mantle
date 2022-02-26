@@ -1,14 +1,21 @@
 package slimeknights.mantle.lib.extensions;
 
 import java.util.Collection;
+import java.util.Collections;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.item.ItemEntity;
 
 public interface EntityExtensions {
-	CompoundTag mantle$getExtraCustomData();
+	default CompoundTag getExtraCustomData() {
+    return null;
+  }
 
-	Collection<ItemEntity> mantle$captureDrops();
+	default Collection<ItemEntity> captureDrops() {
+    return Collections.emptyList();
+  }
 
-	Collection<ItemEntity> mantle$captureDrops(Collection<ItemEntity> value);
+	default Collection<ItemEntity> captureDrops(Collection<ItemEntity> value) {
+    return Collections.emptyList();
+  }
 }

@@ -186,7 +186,7 @@ public class FluidStack {
   }
 
   public Component getDisplayName() {
-    return ((FluidExtensions)this.getFluid()).getAttributes().getDisplayName(this);
+    return this.getFluid().getAttributes().getDisplayName(this);
   }
 
 	public boolean hasTag() {

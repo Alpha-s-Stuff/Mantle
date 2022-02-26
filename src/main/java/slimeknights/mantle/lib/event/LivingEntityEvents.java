@@ -1,5 +1,7 @@
 package slimeknights.mantle.lib.event;
 
+import lombok.Getter;
+import lombok.Setter;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 import java.util.Collection;
@@ -8,6 +10,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
+import slimeknights.mantle.lib.util.MantleEvent;
 
 public class LivingEntityEvents {
 	public static final Event<ExperienceDrop> EXPERIENCE_DROP = EventFactory.createArrayBacked(ExperienceDrop.class, callbacks -> (i, player) -> {
@@ -33,6 +36,11 @@ public class LivingEntityEvents {
 
 		return false;
 	});
+
+  public static final Event<Fall> FALL = EventFactory.createArrayBacked(Fall.class, callbacks -> fallEvent -> {
+    for(Fall e : callbacks)
+      e.onFall(fallEvent);
+  });
 
 	public static final Event<LootingLevel> LOOTING_LEVEL = EventFactory.createArrayBacked(LootingLevel.class, callbacks -> (source) -> {
 		for (LootingLevel callback : callbacks) {
@@ -69,6 +77,27 @@ public class LivingEntityEvents {
 	public interface Hurt {
 		float onHurt(DamageSource source, float amount);
 	}
+
+  @FunctionalInterface
+  public interface Fall {
+    void onFall(LivingFallEvent event);
+  }
+
+  @Getter @Setter
+  public static class LivingFallEvent extends MantleEvent.EntityEvent {
+    private float distance, damageMultiplier;
+
+    public LivingFallEvent(LivingEntity entity, float distance, float damageMultiplier) {
+      super(entity);
+      this.distance = distance;
+      this.damageMultiplier = damageMultiplier;
+    }
+
+    @Override
+    public void sendEvent() {
+      FALL.invoker().onFall(this);
+    }
+  }
 
 	@FunctionalInterface
 	public interface ExperienceDrop {

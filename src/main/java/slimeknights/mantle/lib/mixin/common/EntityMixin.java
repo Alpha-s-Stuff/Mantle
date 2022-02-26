@@ -67,13 +67,13 @@ public abstract class EntityMixin implements EntityExtensions, NBTSerializable {
 
 	@Unique
 	@Override
-	public Collection<ItemEntity> mantle$captureDrops() {
+	public Collection<ItemEntity> captureDrops() {
 		return mantle$captureDrops;
 	}
 
 	@Unique
 	@Override
-	public Collection<ItemEntity> mantle$captureDrops(Collection<ItemEntity> value) {
+	public Collection<ItemEntity> captureDrops(Collection<ItemEntity> value) {
 		Collection<ItemEntity> ret = mantle$captureDrops;
 		mantle$captureDrops = value;
 		return ret;
@@ -133,7 +133,7 @@ public abstract class EntityMixin implements EntityExtensions, NBTSerializable {
 
 	@Unique
 	@Override
-	public CompoundTag mantle$getExtraCustomData() {
+	public CompoundTag getExtraCustomData() {
 		if (mantle$extraCustomData == null) {
 			mantle$extraCustomData = new CompoundTag();
 		}

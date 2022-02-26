@@ -6,7 +6,7 @@ import net.minecraft.tags.Tag;
 import net.minecraft.world.item.Tier;
 import net.minecraft.world.item.Tiers;
 import net.minecraft.world.level.block.Block;
-import slimeknights.mantle.lib.extensions.TierExtension;
+import slimeknights.mantle.lib.extensions.TierExtensions;
 
 public class TagUtil {
   public static Tag<Block> getTagFromVanillaTier(Tiers tier)
@@ -23,6 +23,6 @@ public class TagUtil {
   }
 
   public static Tag<Block> getTagFromTier(Tier tier) {
-    return ((TierExtension)tier).getTag();
+    return ((TierExtensions)tier).getTag();
   }
 }

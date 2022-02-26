@@ -1,12 +1,17 @@
 package slimeknights.mantle.registration;
 
+import com.mojang.datafixers.DataFixerBuilder;
+import com.mojang.datafixers.schemas.Schema;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import net.minecraft.util.datafix.DataFixers;
+import net.minecraft.util.datafix.fixes.BlockRenameFix;
 import net.minecraft.world.level.block.state.properties.WoodType;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -36,13 +41,15 @@ public class RegistrationHelper {
     return () -> delegate;
   }
 
-//  /**
-//   * Handles missing mappings for the given registry
-//   * @param event    Mappings event
-//   * @param handler  Mapping handler
-//   * @param <T>      Event type
-//   */
-//  public static <T extends IForgeRegistryEntry<T>> void handleMissingMappings(MissingMappings<T> event, String modID, Function<String, T> handler) {
+  /**
+   * Handles missing mappings for the given registry
+   * @param event    Mappings event
+   * @param handler  Mapping handler
+   * @param <T>      Event type
+   */
+  public static void handleMissingMappingsBlock(DataFixerBuilder builder, Function<String, String> handler) {
+    Schema schema = builder.addSchema(0, DataFixers.SAME_NAMESPACED);
+    builder.addFixer(BlockRenameFix.create(schema, "Mantle Data Fixer", handler));
 //    for (Mapping<T> mapping : event.getAllMappings()) {
 //      if (modID.equals(mapping.key.getNamespace())) {
 //        @Nullable T value = handler.apply(mapping.key.getPath());
@@ -51,7 +58,7 @@ public class RegistrationHelper {
 //        }
 //      }
 //    }
-//  }
+  }
 
   /** Registers a wood type to be injected into the atlas, should be called before client setup */
   public static void registerWoodType(WoodType type) {

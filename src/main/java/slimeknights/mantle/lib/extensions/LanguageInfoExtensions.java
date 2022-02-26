@@ -3,5 +3,7 @@ package slimeknights.mantle.lib.extensions;
 import java.util.Locale;
 
 public interface LanguageInfoExtensions {
-	Locale mantle$getJavaLocale();
+	default Locale mantle$getJavaLocale() {
+    return null;
+  }
 }

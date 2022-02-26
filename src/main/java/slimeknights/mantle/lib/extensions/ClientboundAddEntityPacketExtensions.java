@@ -3,5 +3,7 @@ package slimeknights.mantle.lib.extensions;
 import net.minecraft.network.FriendlyByteBuf;
 
 public interface ClientboundAddEntityPacketExtensions {
-	FriendlyByteBuf mantle$getExtraDataBuf();
+	default FriendlyByteBuf mantle$getExtraDataBuf() {
+    return null;
+  }
 }

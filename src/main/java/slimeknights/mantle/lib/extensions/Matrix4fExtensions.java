@@ -10,9 +10,11 @@ public interface Matrix4fExtensions {
 	@Contract(mutates = "this")
 	void mantle$fromFloatArray(float[] floats);
 
-	float[] mantle$writeMatrix();
+	default float[] mantle$writeMatrix() {
+    return new float[0];
+  };
 
-	void mantle$setTranslation(float x, float y, float z);
+	default void mantle$setTranslation(float x, float y, float z) {}
 
-  void mantle$multiplyBackward(Matrix4f other);
+  default void mantle$multiplyBackward(Matrix4f other) {}
 }

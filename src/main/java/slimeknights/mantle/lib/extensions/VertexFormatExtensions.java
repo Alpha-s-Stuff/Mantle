@@ -1,5 +1,7 @@
 package slimeknights.mantle.lib.extensions;
 
 public interface VertexFormatExtensions {
-  int getOffset(int index);
+  default int getOffset(int index) {
+    return 0;
+  }
 }
