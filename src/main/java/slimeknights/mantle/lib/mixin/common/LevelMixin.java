@@ -6,7 +6,7 @@ import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.ExplosionDamageCalculator;
 import org.jetbrains.annotations.Nullable;
 import slimeknights.mantle.lib.block.WeakPowerCheckingBlock;
-import slimeknights.mantle.lib.event.ExplosionStartCallback;
+import slimeknights.mantle.lib.event.ExplosionEvents;
 import slimeknights.mantle.lib.extensions.BlockStateExtensions;
 import slimeknights.mantle.lib.util.MixinHelper;
 import org.spongepowered.asm.mixin.Mixin;
@@ -67,6 +67,6 @@ public abstract class LevelMixin {
   )
   @SuppressWarnings("ALL")
   public void mantle$onStartExplosion(@Nullable Entity exploder, @Nullable DamageSource damageSource, @Nullable ExplosionDamageCalculator context, double x, double y, double z, float size, boolean causesFire, Explosion.BlockInteraction mode, CallbackInfoReturnable<Explosion> cir, Explosion explosion) {
-    if(ExplosionStartCallback.EVENT.invoker().onExplosionStart((Level) (Object) this, explosion)) cir.setReturnValue(explosion);
+    if(ExplosionEvents.START.invoker().onExplosionStart((Level) (Object) this, explosion)) cir.setReturnValue(explosion);
   }
 }

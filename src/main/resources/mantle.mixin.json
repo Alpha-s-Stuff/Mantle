@@ -26,6 +26,7 @@
     "common.BoatMixin",
     "common.ClientboundAddEntityPacketMixin",
     "common.EntityMixin",
+    "common.ExplosionMixin",
     "common.FireBlockMixin",
     "common.FluidMixin",
     "common.ItemEntityMixin",
