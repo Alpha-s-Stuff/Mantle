@@ -28,8 +28,11 @@ public abstract class MantleEvent {
     @Getter @Setter
     private double targetX, targetY, targetZ;
 
-    public EntityTeleportEvent(Entity entity) {
+    public EntityTeleportEvent(Entity entity, double targetX, double targetY, double targetZ) {
       super(entity);
+      this.targetX = targetX;
+      this.targetY = targetY;
+      this.targetZ = targetZ;
     }
   }
 }
