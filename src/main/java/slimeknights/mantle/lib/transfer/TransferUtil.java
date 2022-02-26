@@ -139,11 +139,12 @@ public class TransferUtil {
 
 	// Helpers
 
-	public static LazyOptional<?> getHandler(BlockEntity be, @Nullable Direction direction, Class<?> handler) {
+	@SuppressWarnings("unchecked")
+  public static <T> LazyOptional<T> getHandler(BlockEntity be, @Nullable Direction direction, Class<T> handler) {
 		if (handler == IItemHandler.class) {
-			return getItemHandler(be, direction);
+			return (LazyOptional<T>) getItemHandler(be, direction);
 		} else if (handler == IFluidHandler.class) {
-			return getFluidHandler(be, direction);
+			return (LazyOptional<T>) getFluidHandler(be, direction);
 		} else throw new RuntimeException("Handler class must be IItemHandler or IFluidHandler");
 	}
 

@@ -9,6 +9,7 @@ import net.fabricmc.fabric.api.rendering.data.v1.RenderAttachmentBlockEntity;
 import slimeknights.mantle.block.RetexturedBlock;
 import slimeknights.mantle.lib.model.IModelData;
 import slimeknights.mantle.lib.util.Lazy;
+import slimeknights.mantle.lib.util.TileEntityHelper;
 import slimeknights.mantle.util.RetexturedHelper;
 
 import javax.annotation.Nonnull;
@@ -51,6 +52,6 @@ public class RetexturedBlockEntity extends MantleBlockEntity implements IRetextu
 
   @Override
   public CompoundTag getTileData() {
-    return null;
+    return TileEntityHelper.getExtraCustomData(this);
   }
 }

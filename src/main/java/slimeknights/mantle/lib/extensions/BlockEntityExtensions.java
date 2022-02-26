@@ -6,6 +6,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.state.BlockState;
 
 public interface BlockEntityExtensions {
+  // overridden by BlockEntityMixin
 	default CompoundTag mantle$getExtraCustomData() {
 		return null;
 	}
@@ -15,5 +16,5 @@ public interface BlockEntityExtensions {
 	default CompoundTag mantle$save(CompoundTag tag) {
 		((BlockEntityAccessor) this).mantle$saveMetadata(tag);
 		return tag;
-	};
+	}
 }

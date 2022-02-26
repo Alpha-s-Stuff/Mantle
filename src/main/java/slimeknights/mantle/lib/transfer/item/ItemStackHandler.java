@@ -150,5 +150,9 @@ public class ItemStackHandler implements IItemHandlerModifiable, NBTSerializable
 				stacks[slot] = ItemStack.of(itemTags);
 			}
 		}
+    onLoad();
 	}
+  
+  protected void onLoad() {
+  }
 }
