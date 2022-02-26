@@ -7,7 +7,6 @@ import net.minecraft.world.level.ExplosionDamageCalculator;
 import org.jetbrains.annotations.Nullable;
 import slimeknights.mantle.lib.block.WeakPowerCheckingBlock;
 import slimeknights.mantle.lib.event.ExplosionEvents;
-import slimeknights.mantle.lib.extensions.BlockStateExtensions;
 import slimeknights.mantle.lib.util.MixinHelper;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -53,7 +52,7 @@ public abstract class LevelMixin {
 	)
 	public void mantle$updateComparatorOutputLevel(BlockPos blockPos, Block block, CallbackInfo ci,
 												   Iterator<?> var3, Direction direction, BlockPos blockPos2) {
-		((BlockStateExtensions) getBlockState(blockPos2)).onNeighborChange(MixinHelper.cast(this), blockPos2, blockPos);
+		getBlockState(blockPos2).onNeighborChange(MixinHelper.cast(this), blockPos2, blockPos);
 	}
 
   @Inject(

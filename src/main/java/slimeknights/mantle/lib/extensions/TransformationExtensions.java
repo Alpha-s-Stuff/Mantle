@@ -80,9 +80,9 @@ public interface TransformationExtensions
 
     Matrix4f ret = transform.getMatrix();
     Matrix4f tmp = Matrix4f.createTranslateMatrix(origin.x(), origin.y(), origin.z());
-    ((Matrix4fExtensions)(Object)ret).mantle$multiplyBackward(tmp);
+    ret.mantle$multiplyBackward(tmp);
     tmp.setIdentity();
-    ((Matrix4fExtensions)(Object)tmp).mantle$setTranslation(-origin.x(), -origin.y(), -origin.z());
+    tmp.mantle$setTranslation(-origin.x(), -origin.y(), -origin.z());
     ret.multiply(tmp);
     return new Transformation(ret);
   }

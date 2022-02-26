@@ -53,7 +53,7 @@ public abstract class LivingEntityMixin extends Entity {
 	@Inject(method = "dropAllDeathLoot", at = @At("HEAD"))
 	private void mantle$spawnDropsHEAD(DamageSource source, CallbackInfo ci) {
 		mantle$currentDamageSource = source;
-    ((EntityExtensions)this).captureDrops(new ArrayList<>());
+    this.captureDrops(new ArrayList<>());
 	}
 
 	@ModifyVariable(method = "dropAllDeathLoot",
@@ -87,7 +87,7 @@ public abstract class LivingEntityMixin extends Entity {
 
 	@Inject(method = "dropAllDeathLoot", at = @At("TAIL"))
 	private void mantle$spawnDropsTAIL(DamageSource source, CallbackInfo ci) {
-		Collection<ItemEntity> drops = ((EntityExtensions) this).captureDrops(null);
+		Collection<ItemEntity> drops = this.captureDrops(null);
 		if (!LivingEntityEvents.DROPS.invoker().onLivingEntityDrops(source, drops))
 			drops.forEach(e -> level.addFreshEntity(e));
 	}
@@ -135,7 +135,7 @@ public abstract class LivingEntityMixin extends Entity {
 	)
 	protected void mantle$updateFallState(double d, boolean bl, BlockState blockState, BlockPos blockPos,
 										  CallbackInfo ci, float f, double e, int i) {
-		if (((BlockStateExtensions) blockState).addLandingEffects((ServerLevel) level, blockPos, blockState, MixinHelper.cast(this), i)) {
+		if (blockState.addLandingEffects((ServerLevel) level, blockPos, blockState, MixinHelper.cast(this), i)) {
 			super.checkFallDamage(d, bl, blockState, blockPos);
 			ci.cancel();
 		}
@@ -144,7 +144,7 @@ public abstract class LivingEntityMixin extends Entity {
 	// TODO Make this less :concern: when fabric's mixin fork updates
 	@ModifyVariable(method = "travel", at = @At(value = "INVOKE_ASSIGN", target = "Lnet/minecraft/world/level/block/Block;getFriction()F"), index = 7)
 	public float mantle$setSlipperiness(float t) {
-		return ((BlockStateExtensions) MixinHelper.<LivingEntity>cast(this).level.getBlockState(getBlockPosBelowThatAffectsMyMovement()))
+		return MixinHelper.<LivingEntity>cast(this).level.getBlockState(getBlockPosBelowThatAffectsMyMovement())
 				.getSlipperiness(MixinHelper.<LivingEntity>cast(this).level, getBlockPosBelowThatAffectsMyMovement(), MixinHelper.<LivingEntity>cast(this));
 	}
 

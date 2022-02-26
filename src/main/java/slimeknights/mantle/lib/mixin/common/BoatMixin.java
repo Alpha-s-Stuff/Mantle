@@ -1,15 +1,5 @@
 package slimeknights.mantle.lib.mixin.common;
 
-import slimeknights.mantle.lib.extensions.BlockStateExtensions;
-import slimeknights.mantle.lib.util.MixinHelper;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.vehicle.Boat;
@@ -17,6 +7,14 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
+import slimeknights.mantle.lib.util.MixinHelper;
 
 @Mixin(Boat.class)
 public abstract class BoatMixin {
@@ -57,6 +55,6 @@ public abstract class BoatMixin {
 			)
 	)
 	public float mantle$setSlipperiness(float f) {
-		return ((BlockStateExtensions) mantle$state).getSlipperiness(mantle$world, mantle$pos, mantle$entity);
+		return mantle$state.getSlipperiness(mantle$world, mantle$pos, mantle$entity);
 	}
 }

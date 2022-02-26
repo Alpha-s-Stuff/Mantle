@@ -47,7 +47,7 @@ public class TagPreference<T> {
       return Integer.compare(indexA, indexB);
     }
     // for stability, fallback to registry name compare
-    return ((ResourceLocationEx)idA).compareNamespaced(idB);
+    return idA.compareNamespaced(idB);
   };
 
   /**

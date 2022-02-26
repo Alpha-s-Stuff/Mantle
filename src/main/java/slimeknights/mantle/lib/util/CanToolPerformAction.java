@@ -40,7 +40,7 @@ public class CanToolPerformAction implements LootItemCondition {
 
   public boolean test(LootContext lootContext) {
     ItemStack itemstack = lootContext.getParamOrNull(LootContextParams.TOOL);
-    return itemstack != null && ItemStackExtensions.cast(itemstack).canPerformAction(this.action);
+    return itemstack != null && itemstack.canPerformAction(this.action);
   }
 
   public static LootItemCondition.Builder canToolPerformAction(ToolAction action) {

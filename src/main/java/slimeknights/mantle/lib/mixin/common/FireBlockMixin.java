@@ -1,7 +1,13 @@
 package slimeknights.mantle.lib.mixin.common;
 
-import slimeknights.mantle.lib.extensions.BlockStateExtensions;
-import slimeknights.mantle.lib.extensions.FireBlockExtensions;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.BaseFireBlock;
+import net.minecraft.world.level.block.FireBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
@@ -11,17 +17,10 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
+import slimeknights.mantle.lib.extensions.FireBlockExtensions;
+
 import java.util.Map;
 import java.util.Random;
-
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.block.BaseFireBlock;
-import net.minecraft.world.level.block.FireBlock;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.BooleanProperty;
 
 @Mixin(FireBlock.class)
 public abstract class FireBlockMixin extends BaseFireBlock implements FireBlockExtensions {
@@ -38,7 +37,7 @@ public abstract class FireBlockMixin extends BaseFireBlock implements FireBlockE
 
 	@Override
 	public boolean canCatchFire(BlockGetter world, BlockPos pos, Direction face) {
-		return ((BlockStateExtensions) world.getBlockState(pos)).isFlammable(world, pos, face);
+		return world.getBlockState(pos).isFlammable(world, pos, face);
 	}
 
 	@Override

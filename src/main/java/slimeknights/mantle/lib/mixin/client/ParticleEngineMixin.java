@@ -64,7 +64,7 @@ public abstract class ParticleEngineMixin {
 			cancellable = true
 	)
 	public void mantle$addBlockDestroyEffects(BlockPos blockPos, BlockState blockState, CallbackInfo ci) {
-		if (((BlockStateExtensions) blockState).addDestroyEffects(level, blockPos, MixinHelper.cast(this))) {
+		if (blockState.addDestroyEffects(level, blockPos, MixinHelper.cast(this))) {
 			ci.cancel();
 		}
 	}

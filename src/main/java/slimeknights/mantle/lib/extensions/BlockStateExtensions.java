@@ -19,37 +19,37 @@ import net.minecraft.world.level.block.state.BlockState;
 public interface BlockStateExtensions {
 
 	default boolean addRunningEffects(Level world, BlockPos pos, Entity entity) {
-		return ((BlockExtensions)((BlockState) this).getBlock()).addRunningEffects((BlockState) this, world, pos, entity);
+		return ((BlockState) this).getBlock().addRunningEffects((BlockState) this, world, pos, entity);
 	}
 
 	default boolean addLandingEffects(ServerLevel worldserver, BlockPos pos, BlockState state2, LivingEntity entity, int numberOfParticles) {
-		return ((BlockExtensions)((BlockState) this).getBlock()).addLandingEffects((BlockState) this, worldserver, pos, state2, entity, numberOfParticles);
+		return ((BlockState) this).getBlock().addLandingEffects((BlockState) this, worldserver, pos, state2, entity, numberOfParticles);
 	}
 
 	@Environment(EnvType.CLIENT)
 	default boolean addDestroyEffects(Level world, BlockPos pos, ParticleEngine manager) {
-		return ((BlockExtensions)((BlockState) this).getBlock()).addDestroyEffects((BlockState) this, world, pos, manager);
+		return ((BlockState) this).getBlock().addDestroyEffects((BlockState) this, world, pos, manager);
 	}
 
 	default boolean isFlammable(BlockGetter world, BlockPos pos, Direction face) {
-		return ((BlockExtensions)((BlockState) this).getBlock()).isFlammable((BlockState) this, world, pos, face);
+		return ((BlockState) this).getBlock().isFlammable((BlockState) this, world, pos, face);
 	}
 
 	default int getFlammability(BlockGetter world, BlockPos pos, Direction face) {
-		return ((BlockExtensions)((BlockState) this).getBlock()).getFlammability((BlockState) this, world, pos, face);
+		return ((BlockState) this).getBlock().getFlammability((BlockState) this, world, pos, face);
 	}
 
 	default void onNeighborChange(LevelReader world, BlockPos pos, BlockPos neighbor) {
-    ((BlockExtensions)((BlockState) this).getBlock()).onNeighborChange((BlockState) this, world, pos, neighbor);
+    ((BlockState) this).getBlock().onNeighborChange((BlockState) this, world, pos, neighbor);
 	}
 
 	default float getSlipperiness(LevelReader world, BlockPos pos, @Nullable Entity entity)
 	{
-		return ((BlockExtensions)((BlockState) this).getBlock()).getSlipperiness((BlockState) this, world, pos, entity);
+		return ((BlockState) this).getBlock().getSlipperiness((BlockState) this, world, pos, entity);
 	}
 
   default boolean isBurning(BlockGetter world, BlockPos pos)
   {
-    return ((BlockExtensions)((BlockState) this).getBlock()).isBurning((BlockState) this, world, pos);
+    return ((BlockState) this).getBlock().isBurning((BlockState) this, world, pos);
   }
 }

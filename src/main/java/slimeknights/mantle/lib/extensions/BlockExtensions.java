@@ -40,7 +40,7 @@ public interface BlockExtensions {
 	}
 
 	default boolean isFlammable(BlockState state, BlockGetter world, BlockPos pos, Direction face) {
-		return ((BlockStateExtensions) state).getFlammability(world, pos, face) > 0;
+		return state.getFlammability(world, pos, face) > 0;
 	}
 
 	default int getFlammability(BlockState state, BlockGetter world, BlockPos pos, Direction face) {
@@ -71,6 +71,6 @@ public interface BlockExtensions {
 
   @Nullable
   default BlockPathTypes getAiPathNodeType(BlockState state, BlockGetter world, BlockPos pos, @Nullable Mob entity) {
-    return state.getBlock() == Blocks.LAVA ? BlockPathTypes.LAVA : ((BlockStateExtensions)state).isBurning(world, pos) ? BlockPathTypes.DAMAGE_FIRE : null;
+    return state.getBlock() == Blocks.LAVA ? BlockPathTypes.LAVA : state.isBurning(world, pos) ? BlockPathTypes.DAMAGE_FIRE : null;
   }
 }

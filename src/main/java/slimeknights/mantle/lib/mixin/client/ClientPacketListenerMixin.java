@@ -48,7 +48,7 @@ public abstract class ClientPacketListenerMixin {
 	)
 	public void mantle$afterAddEntity(ClientboundAddEntityPacket packet, CallbackInfo ci, EntityType<?> entityType, Entity entity) {
 		if (entity instanceof ExtraSpawnDataEntity extra) {
-			FriendlyByteBuf extraData = ((ClientboundAddEntityPacketExtensions)packet).mantle$getExtraDataBuf();
+			FriendlyByteBuf extraData = packet.mantle$getExtraDataBuf();
 			if (extraData != null) {
 				extra.readSpawnData(extraData);
 			}

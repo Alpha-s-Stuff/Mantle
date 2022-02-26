@@ -108,7 +108,7 @@ public abstract class EntityMixin implements EntityExtensions, NBTSerializable {
 			cancellable = true
 	)
 	public void mantle$spawnSprintParticle(CallbackInfo ci, int i, int j, int k, BlockPos blockPos) {
-		if (((BlockStateExtensions) level.getBlockState(blockPos)).addRunningEffects(level, blockPos, MixinHelper.cast(this))) {
+		if (level.getBlockState(blockPos).addRunningEffects(level, blockPos, MixinHelper.cast(this))) {
 			ci.cancel();
 		}
 	}

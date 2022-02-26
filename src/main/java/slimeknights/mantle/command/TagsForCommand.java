@@ -112,7 +112,7 @@ public class TagsForCommand {
       output.append("\n* ").append(NO_TAGS);
     } else {
       tags.stream()
-          .sorted(ResourceLocationEx::compareNamespaced)
+          .sorted(ResourceLocation::compareNamespaced)
           .forEach(tag -> output.append("\n* " + tag));
     }
     context.getSource().sendSuccess(output, true);
