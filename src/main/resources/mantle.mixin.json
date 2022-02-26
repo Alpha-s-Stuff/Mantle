@@ -15,6 +15,7 @@
     "accessor.SheetsAccessor",
     "accessor.TagContainerAccessor",
     "accessor.Vector3fAccessor",
+    "client.TextureAtlasMixin",
     "common.AbstractHorseMixin",
     "common.BlockBehaviourMixin",
     "common.BlockEntityMixin",
