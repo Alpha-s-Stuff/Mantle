@@ -2,9 +2,10 @@ package slimeknights.mantle.lib.util;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 import net.minecraft.world.entity.Entity;
 
-public class MantleEvent {
+public abstract class MantleEvent {
   private boolean canceled = false;
 
   public boolean isCanceled() {
@@ -15,9 +16,20 @@ public class MantleEvent {
     this.canceled = canceled;
   }
 
+  public abstract void sendEvent();
+
   @AllArgsConstructor
-  public static class EntityEvent extends MantleEvent {
+  public abstract static class EntityEvent extends MantleEvent {
     @Getter
     private Entity entity;
+  }
+
+  public abstract static class EntityTeleportEvent extends EntityEvent {
+    @Getter @Setter
+    private double targetX, targetY, targetZ;
+
+    public EntityTeleportEvent(Entity entity) {
+      super(entity);
+    }
   }
 }
