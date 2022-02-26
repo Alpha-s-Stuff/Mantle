@@ -18,7 +18,7 @@ public class LivingEntityEvents {
 			return callback.onLivingEntityExperienceDrop(i, player);
 		}
 
-		return 0;
+		return i;
 	});
 
 	public static final Event<KnockBackStrength> KNOCKBACK_STRENGTH = EventFactory.createArrayBacked(KnockBackStrength.class, callbacks -> (strength, player) -> {
@@ -26,7 +26,7 @@ public class LivingEntityEvents {
 			return callback.onLivingEntityTakeKnockback(strength, player);
 		}
 
-		return 0;
+		return strength;
 	});
 
 	public static final Event<Drops> DROPS = EventFactory.createArrayBacked(Drops.class, callbacks -> (source, drops) -> {
@@ -42,15 +42,15 @@ public class LivingEntityEvents {
       e.onFall(fallEvent);
   });
 
-	public static final Event<LootingLevel> LOOTING_LEVEL = EventFactory.createArrayBacked(LootingLevel.class, callbacks -> (source) -> {
+	public static final Event<LootingLevel> LOOTING_LEVEL = EventFactory.createArrayBacked(LootingLevel.class, callbacks -> (source, original) -> {
 		for (LootingLevel callback : callbacks) {
-			int lootingLevel = callback.modifyLootingLevel(source);
+			int lootingLevel = callback.modifyLootingLevel(source, original);
 			if (lootingLevel != 0) {
 				return lootingLevel;
 			}
 		}
 
-		return 0;
+		return original;
 	});
 
 	public static final Event<Tick> TICK = EventFactory.createArrayBacked(Tick.class, callbacks -> (entity) -> {
@@ -116,7 +116,7 @@ public class LivingEntityEvents {
 
 	@FunctionalInterface
 	public interface LootingLevel {
-		int modifyLootingLevel(DamageSource source);
+		int modifyLootingLevel(DamageSource source, int original);
 	}
 
 	@FunctionalInterface

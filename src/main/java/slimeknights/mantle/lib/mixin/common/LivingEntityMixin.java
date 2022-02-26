@@ -59,7 +59,7 @@ public abstract class LivingEntityMixin extends Entity {
 	@ModifyVariable(method = "dropAllDeathLoot",
 			at = @At(value = "STORE", ordinal = 0))
 	private int mantle$spawnDropsBODY1(int j) {
-		int modifiedLevel = LivingEntityEvents.LOOTING_LEVEL.invoker().modifyLootingLevel(mantle$currentDamageSource);
+		int modifiedLevel = LivingEntityEvents.LOOTING_LEVEL.invoker().modifyLootingLevel(mantle$currentDamageSource, j);
 		if (modifiedLevel != 0) {
 			return modifiedLevel;
 		} else {
@@ -82,7 +82,7 @@ public abstract class LivingEntityMixin extends Entity {
 	@ModifyVariable(method = "dropAllDeathLoot",
 			at = @At(value = "STORE", ordinal = 1))
 	private int mantle$spawnDropsBODY2(int j) {
-		return LivingEntityEvents.LOOTING_LEVEL.invoker().modifyLootingLevel(mantle$currentDamageSource);
+		return LivingEntityEvents.LOOTING_LEVEL.invoker().modifyLootingLevel(mantle$currentDamageSource, j);
 	}
 
 	@Inject(method = "dropAllDeathLoot", at = @At("TAIL"))
