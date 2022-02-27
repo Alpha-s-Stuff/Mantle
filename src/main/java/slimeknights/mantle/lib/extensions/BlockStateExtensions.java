@@ -11,10 +11,12 @@ import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.FluidState;
 
 public interface BlockStateExtensions {
 
@@ -43,10 +45,19 @@ public interface BlockStateExtensions {
     ((BlockState) this).getBlock().onNeighborChange((BlockState) this, world, pos, neighbor);
 	}
 
+  default boolean onDestroyedByPlayer(Level world, BlockPos pos, Player player, boolean willHarvest, FluidState fluid) {
+    return ((BlockState) this).getBlock().onDestroyedByPlayer((BlockState) this, world, pos, player, willHarvest, fluid);
+  }
+
 	default float getSlipperiness(LevelReader world, BlockPos pos, @Nullable Entity entity)
 	{
 		return ((BlockState) this).getBlock().getSlipperiness((BlockState) this, world, pos, entity);
 	}
+
+  default boolean canHarvestBlock(BlockGetter world, BlockPos pos, Player player)
+  {
+    return ((BlockState) this).getBlock().canHarvestBlock(((BlockState) this), world, pos, player);
+  }
 
   default boolean isBurning(BlockGetter world, BlockPos pos)
   {

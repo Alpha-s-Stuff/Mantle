@@ -12,6 +12,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -68,6 +69,15 @@ public interface BlockExtensions {
 	default float getSlipperiness(BlockState state, LevelReader world, BlockPos pos, Entity entity) {
 		return ((Block) this).getFriction();
 	}
+
+  default boolean onDestroyedByPlayer(BlockState state, Level world, BlockPos pos, Player player, boolean willHarvest, FluidState fluid) {
+    ((Block) this).playerWillDestroy(world, pos, state, player);
+    return world.setBlock(pos, fluid.createLegacyBlock(), world.isClientSide ? 11 : 3);
+  }
+
+  default public boolean canHarvestBlock(BlockState state, BlockGetter world, BlockPos pos, Player player) {
+    return player.hasCorrectToolForDrops(state);
+  }
 
   @Nullable
   default BlockPathTypes getAiPathNodeType(BlockState state, BlockGetter world, BlockPos pos, @Nullable Mob entity) {

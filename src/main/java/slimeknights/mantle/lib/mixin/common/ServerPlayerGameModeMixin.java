@@ -52,4 +52,6 @@ public abstract class ServerPlayerGameModeMixin {
 			if (result != InteractionResult.PASS) cir.setReturnValue(result);
 		}
 	}
+
+//  @Redirect(method = "r")
 }

@@ -1,5 +1,7 @@
 package slimeknights.mantle.lib.mixin.client;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
 import slimeknights.mantle.lib.item.BlockUseBypassingItem;
 import slimeknights.mantle.lib.item.UseFirstBehaviorItem;
 import net.fabricmc.api.EnvType;
@@ -32,7 +34,11 @@ public abstract class MultiPlayerGameModeMixin {
 	@Shadow
 	private ClientPacketListener connection;
 
-	@Redirect(method = "useItemOn", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockState;use(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/InteractionHand;Lnet/minecraft/world/phys/BlockHitResult;)Lnet/minecraft/world/InteractionResult;"))
+  @Shadow
+  @Final
+  private Minecraft minecraft;
+
+  @Redirect(method = "useItemOn", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockState;use(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/InteractionHand;Lnet/minecraft/world/phys/BlockHitResult;)Lnet/minecraft/world/InteractionResult;"))
 	public InteractionResult mantle$bypassBlockUse(BlockState instance, Level level, Player player, InteractionHand interactionHand, BlockHitResult blockHitResult) {
 		if (player.getItemInHand(interactionHand).getItem() instanceof BlockUseBypassingItem bypassing) {
 			if (bypassing.shouldBypass(instance, blockHitResult.getBlockPos(), level, player, interactionHand)) return InteractionResult.PASS;
@@ -51,4 +57,9 @@ public abstract class MultiPlayerGameModeMixin {
 			}
 		}
 	}
+
+  @Redirect(method = "destroyBlock", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Z"))
+  public boolean onDestroy(Level level, BlockPos pos, BlockState newState, int flags) {
+    return level.getBlockState(pos).onDestroyedByPlayer(level, pos, minecraft.player, false, level.getFluidState(pos));
+  }
 }
