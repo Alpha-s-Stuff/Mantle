@@ -1,7 +1,7 @@
 package slimeknights.mantle.lib.mixin.common;
 
 import slimeknights.mantle.lib.block.HarvestableBlock;
-import slimeknights.mantle.lib.event.PlayerTickEndCallback;
+import slimeknights.mantle.lib.event.PlayerTickEvents;
 import slimeknights.mantle.lib.util.MixinHelper;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -36,8 +36,13 @@ public abstract class PlayerMixin extends LivingEntity {
 		}
 	}
 
+  @Inject(method = "tick", at = @At("HEAD"))
+  public void mantle$clientStartOfTickEvent(CallbackInfo ci) {
+    PlayerTickEvents.START.invoker().onStartOfPlayerTick(MixinHelper.cast(this));
+  }
+
 	@Inject(method = "tick", at = @At("TAIL"))
 	public void mantle$clientEndOfTickEvent(CallbackInfo ci) {
-		PlayerTickEndCallback.EVENT.invoker().onEndOfPlayerTick(MixinHelper.cast(this));
+		PlayerTickEvents.END.invoker().onEndOfPlayerTick(MixinHelper.cast(this));
 	}
 }
