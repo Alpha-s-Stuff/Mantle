@@ -29,9 +29,9 @@ public class LivingEntityEvents {
 		return strength;
 	});
 
-	public static final Event<Drops> DROPS = EventFactory.createArrayBacked(Drops.class, callbacks -> (source, drops) -> {
+	public static final Event<Drops> DROPS = EventFactory.createArrayBacked(Drops.class, callbacks -> (target, source, drops) -> {
 		for (Drops callback : callbacks) {
-			return callback.onLivingEntityDrops(source, drops);
+			return callback.onLivingEntityDrops(target, source, drops);
 		}
 
 		return false;
@@ -111,7 +111,7 @@ public class LivingEntityEvents {
 
 	@FunctionalInterface
 	public interface Drops {
-		boolean onLivingEntityDrops(DamageSource source, Collection<ItemEntity> drops);
+		boolean onLivingEntityDrops(LivingEntity target, DamageSource source, Collection<ItemEntity> drops);
 	}
 
 	@FunctionalInterface

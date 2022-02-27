@@ -88,7 +88,7 @@ public abstract class LivingEntityMixin extends Entity {
 	@Inject(method = "dropAllDeathLoot", at = @At("TAIL"))
 	private void mantle$spawnDropsTAIL(DamageSource source, CallbackInfo ci) {
 		Collection<ItemEntity> drops = this.captureDrops(null);
-		if (!LivingEntityEvents.DROPS.invoker().onLivingEntityDrops(source, drops))
+		if (!LivingEntityEvents.DROPS.invoker().onLivingEntityDrops((LivingEntity) (Object) this, source, drops))
 			drops.forEach(e -> level.addFreshEntity(e));
 	}
 
