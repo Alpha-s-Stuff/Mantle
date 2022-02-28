@@ -1,11 +1,9 @@
 package slimeknights.mantle.lib.mixin.common;
 
-import slimeknights.mantle.lib.event.EntityEyeHeightCallback;
+import slimeknights.mantle.lib.event.EntityEvents;
 import slimeknights.mantle.lib.event.StartRidingCallback;
-import slimeknights.mantle.lib.extensions.BlockStateExtensions;
 import slimeknights.mantle.lib.extensions.EntityExtensions;
 import slimeknights.mantle.lib.util.EntityHelper;
-import slimeknights.mantle.lib.util.LazyOptional;
 import slimeknights.mantle.lib.util.MixinHelper;
 import slimeknights.mantle.lib.util.NBTSerializable;
 import org.spongepowered.asm.mixin.Mixin;
@@ -43,7 +41,7 @@ public abstract class EntityMixin implements EntityExtensions, NBTSerializable {
 
 	@Inject(at = @At("TAIL"), method = "<init>")
 	public void mantle$entityInit(EntityType<?> entityType, Level world, CallbackInfo ci) {
-		int newEyeHeight = EntityEyeHeightCallback.EVENT.invoker().onEntitySize((Entity) (Object) this);
+		int newEyeHeight = EntityEvents.EYE_HEIGHT.invoker().onEntitySize((Entity) (Object) this);
 		if (newEyeHeight != -1)
 			eyeHeight = newEyeHeight;
 	}
@@ -130,6 +128,11 @@ public abstract class EntityMixin implements EntityExtensions, NBTSerializable {
 			cir.setReturnValue(false);
 		}
 	}
+
+  @Inject(method = "remove", at = @At("TAIL"))
+  public void mantle$onEntityRemove(Entity.RemovalReason reason, CallbackInfo ci) {
+    EntityEvents.ON_REMOVE.invoker().onRemove((Entity) (Object) this, reason);
+  }
 
 	@Unique
 	@Override
