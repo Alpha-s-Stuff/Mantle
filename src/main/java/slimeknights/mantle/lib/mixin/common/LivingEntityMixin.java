@@ -1,6 +1,10 @@
 package slimeknights.mantle.lib.mixin.common;
 
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.effect.MobEffectInstance;
+import org.objectweb.asm.Opcodes;
 import slimeknights.mantle.lib.event.LivingEntityEvents;
+import slimeknights.mantle.lib.event.PotionEvents;
 import slimeknights.mantle.lib.extensions.BlockStateExtensions;
 import slimeknights.mantle.lib.extensions.EntityExtensions;
 import slimeknights.mantle.lib.item.EntitySwingListenerItem;
@@ -155,4 +159,17 @@ public abstract class LivingEntityMixin extends Entity {
 			cir.setReturnValue(equipment.getEquipmentSlot(itemStack));
 		}
 	}
+
+  @Inject(method = "addEffect(Lnet/minecraft/world/effect/MobEffectInstance;Lnet/minecraft/world/entity/Entity;)Z", at = @At(value = "JUMP", opcode = Opcodes.IFNONNULL), locals = LocalCapture.CAPTURE_FAILHARD)
+  public void mantle$onPotionEffectAdded(MobEffectInstance oldEffectInstance, Entity source, CallbackInfoReturnable<Boolean> cir, MobEffectInstance newEffectInstance) {
+    PotionEvents.POTION_ADDED.invoker().onPotionAdded(new PotionEvents.PotionAddedEvent(MixinHelper.cast(this), oldEffectInstance, newEffectInstance, source));
+  }
+
+  @Inject(method = "canBeAffected", at = @At("HEAD"), cancellable = true)
+  public void mantle$potionApplicable(MobEffectInstance potioneffect, CallbackInfoReturnable<Boolean> cir) {
+    PotionEvents.PotionApplicableEvent event = new PotionEvents.PotionApplicableEvent(MixinHelper.cast(this), potioneffect);
+    event.sendEvent();
+    if(event.getResult() != InteractionResult.PASS)
+      cir.setReturnValue(event.getResult() == InteractionResult.SUCCESS);
+  }
 }

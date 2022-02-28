@@ -50,6 +50,7 @@
     "common.ShapedRecipeMixin",
     "common.SheepMixin",
     "common.SnowGolemMixin",
+    "common.SpiderMixin",
     "common.TagContainerMixin",
     "common.TallGrassBlockMixin",
     "common.TierMixin",
