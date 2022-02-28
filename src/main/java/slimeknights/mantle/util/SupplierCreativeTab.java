@@ -19,8 +19,7 @@ public class SupplierCreativeTab extends CreativeModeTab {
    * @param supplier  Item stack supplier
    */
   public SupplierCreativeTab(String modId, String name, Supplier<ItemStack> supplier) {
-    super(CreativeModeTab.TABS.length - 1, String.format("%s.%s", modId, name));
-    ((ItemGroupExtensions)CreativeModeTab.TAB_BUILDING_BLOCKS).fabric_expandArray();
+    super(createTabIndex(), String.format("%s.%s", modId, name));
     this.setRecipeFolderName(String.format("%s/%s", modId, name));
     this.supplier = supplier;
   }
@@ -29,4 +28,10 @@ public class SupplierCreativeTab extends CreativeModeTab {
   public ItemStack makeIcon() {
     return supplier.get();
   }
+
+  private static int createTabIndex() {
+    ((ItemGroupExtensions)CreativeModeTab.TAB_BUILDING_BLOCKS).fabric_expandArray();
+    return CreativeModeTab.TABS.length - 1;
+  }
+
 }
