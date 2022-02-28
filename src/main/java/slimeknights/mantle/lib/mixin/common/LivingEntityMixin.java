@@ -3,6 +3,8 @@ package slimeknights.mantle.lib.mixin.common;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffectInstance;
 import org.objectweb.asm.Opcodes;
+import org.spongepowered.asm.mixin.injection.ModifyArgs;
+import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 import slimeknights.mantle.lib.event.LivingEntityEvents;
 import slimeknights.mantle.lib.event.PotionEvents;
 import slimeknights.mantle.lib.extensions.BlockStateExtensions;
@@ -63,7 +65,7 @@ public abstract class LivingEntityMixin extends Entity {
 	@ModifyVariable(method = "dropAllDeathLoot",
 			at = @At(value = "STORE", ordinal = 0))
 	private int mantle$spawnDropsBODY1(int j) {
-		int modifiedLevel = LivingEntityEvents.LOOTING_LEVEL.invoker().modifyLootingLevel(mantle$currentDamageSource, j);
+		int modifiedLevel = LivingEntityEvents.LOOTING_LEVEL.invoker().modifyLootingLevel(mantle$currentDamageSource, (LivingEntity) (Object) this, j);
 		if (modifiedLevel != 0) {
 			return modifiedLevel;
 		} else {
@@ -86,8 +88,17 @@ public abstract class LivingEntityMixin extends Entity {
 	@ModifyVariable(method = "dropAllDeathLoot",
 			at = @At(value = "STORE", ordinal = 1))
 	private int mantle$spawnDropsBODY2(int j) {
-		return LivingEntityEvents.LOOTING_LEVEL.invoker().modifyLootingLevel(mantle$currentDamageSource, j);
+		return LivingEntityEvents.LOOTING_LEVEL.invoker().modifyLootingLevel(mantle$currentDamageSource, (LivingEntity) (Object) this, j);
 	}
+
+  @ModifyArgs(method = "actuallyHurt", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;getDamageAfterArmorAbsorb(Lnet/minecraft/world/damagesource/DamageSource;F)F"))
+  private void mantle$onHurt(Args args) {
+    DamageSource source = args.get(0);
+    float currentAmount = args.get(1);
+    float newAmount = LivingEntityEvents.ACTUALLY_HURT.invoker().onHurt(source, (LivingEntity) (Object) this, currentAmount);
+    if (newAmount != currentAmount)
+      args.set(1, newAmount);
+  }
 
 	@Inject(method = "dropAllDeathLoot", at = @At("TAIL"))
 	private void mantle$spawnDropsTAIL(DamageSource source, CallbackInfo ci) {

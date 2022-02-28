@@ -1,6 +1,10 @@
 package slimeknights.mantle.lib.mixin.common;
 
+import net.minecraft.world.damagesource.DamageSource;
+import org.spongepowered.asm.mixin.injection.ModifyArgs;
+import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 import slimeknights.mantle.lib.block.HarvestableBlock;
+import slimeknights.mantle.lib.event.LivingEntityEvents;
 import slimeknights.mantle.lib.event.PlayerTickEvents;
 import slimeknights.mantle.lib.util.MixinHelper;
 import org.spongepowered.asm.mixin.Final;
@@ -45,4 +49,13 @@ public abstract class PlayerMixin extends LivingEntity {
 	public void mantle$clientEndOfTickEvent(CallbackInfo ci) {
 		PlayerTickEvents.END.invoker().onEndOfPlayerTick(MixinHelper.cast(this));
 	}
+
+  @ModifyArgs(method = "actuallyHurt", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;getDamageAfterArmorAbsorb(Lnet/minecraft/world/damagesource/DamageSource;F)F"))
+  private void mantle$onHurt(Args args) {
+    DamageSource source = args.get(0);
+    float currentAmount = args.get(1);
+    float newAmount = LivingEntityEvents.ACTUALLY_HURT.invoker().onHurt(source, this, currentAmount);
+    if (newAmount != currentAmount)
+      args.set(1, newAmount);
+  }
 }

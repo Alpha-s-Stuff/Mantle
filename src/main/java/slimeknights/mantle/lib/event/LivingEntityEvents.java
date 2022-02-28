@@ -42,16 +42,16 @@ public class LivingEntityEvents {
       e.onFall(fallEvent);
   });
 
-	public static final Event<LootingLevel> LOOTING_LEVEL = EventFactory.createArrayBacked(LootingLevel.class, callbacks -> (source, original) -> {
-		for (LootingLevel callback : callbacks) {
-			int lootingLevel = callback.modifyLootingLevel(source, original);
-			if (lootingLevel != 0) {
-				return lootingLevel;
-			}
-		}
+	public static final Event<LootingLevel> LOOTING_LEVEL = EventFactory.createArrayBacked(LootingLevel.class, callbacks -> (source, target, level) -> {
+    for (LootingLevel callback : callbacks) {
+      int lootingLevel = callback.modifyLootingLevel(source, target, level);
+      if (lootingLevel != level) {
+        return lootingLevel;
+      }
+    }
 
-		return original;
-	});
+    return level;
+  });
 
 	public static final Event<Tick> TICK = EventFactory.createArrayBacked(Tick.class, callbacks -> (entity) -> {
 		for (Tick callback : callbacks) {
@@ -67,6 +67,14 @@ public class LivingEntityEvents {
 		return amount;
 	});
 
+  public static final Event<ActuallyHurt> ACTUALLY_HURT = EventFactory.createArrayBacked(ActuallyHurt.class, callbacks -> (source, damaged, amount) -> {
+    for (ActuallyHurt callback : callbacks) {
+      float newAmount = callback.onHurt(source, damaged, amount);
+      if (newAmount != amount) return newAmount;
+    }
+    return amount;
+  });
+
   public static final Event<Jump> JUMP = EventFactory.createArrayBacked(Jump.class, callbacks -> (entity) -> {
     for (Jump callback : callbacks) {
       callback.onLivingEntityJump(entity);
@@ -77,6 +85,11 @@ public class LivingEntityEvents {
 	public interface Hurt {
 		float onHurt(DamageSource source, float amount);
 	}
+
+  @FunctionalInterface
+  public interface ActuallyHurt {
+    float onHurt(DamageSource source, LivingEntity damaged, float amount);
+  }
 
   @FunctionalInterface
   public interface Fall {
@@ -116,7 +129,7 @@ public class LivingEntityEvents {
 
 	@FunctionalInterface
 	public interface LootingLevel {
-		int modifyLootingLevel(DamageSource source, int original);
+    int modifyLootingLevel(DamageSource source, LivingEntity target, int currentLevel);
 	}
 
 	@FunctionalInterface

@@ -10,6 +10,7 @@
     "accessor.DeserializerAccessor",
     "accessor.ItemAccessor",
     "accessor.KeyMappingAccessor",
+    "accessor.LivingEntityAccessor",
     "accessor.LivingEntityRendererAccessor",
     "accessor.MinecraftAccessor",
     "accessor.MinecraftServerAccessor",
