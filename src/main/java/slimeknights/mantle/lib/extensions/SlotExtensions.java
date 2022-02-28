@@ -7,4 +7,8 @@ public interface SlotExtensions {
   default Slot setBackground(ResourceLocation atlas, ResourceLocation sprite) {
     return null;
   }
+
+  default int getSlotIndex() {
+    return 0;
+  }
 }

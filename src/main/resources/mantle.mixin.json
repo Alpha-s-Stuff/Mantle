@@ -49,6 +49,7 @@
     "common.ServerPlayerGameModeMixin",
     "common.ShapedRecipeMixin",
     "common.SheepMixin",
+    "common.SlotMixin",
     "common.SnowGolemMixin",
     "common.SpiderMixin",
     "common.TagContainerMixin",
