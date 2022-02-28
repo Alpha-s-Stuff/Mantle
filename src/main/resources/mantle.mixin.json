@@ -17,7 +17,6 @@
     "accessor.PlayerAccessor",
     "accessor.RecipeManagerAccessor",
     "accessor.TagContainerAccessor",
-    "accessor.Vector3fAccessor",
     "common.AbstractHorseMixin",
     "common.BlockBehaviourMixin",
     "common.BlockEntityMixin",

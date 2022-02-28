@@ -28,7 +28,6 @@ import slimeknights.mantle.Mantle;
 import slimeknights.mantle.client.model.fluid.FluidCuboid;
 import slimeknights.mantle.client.render.FluidRenderer;
 import slimeknights.mantle.lib.mixin.accessor.ModelBakeryAccessor;
-import slimeknights.mantle.lib.mixin.accessor.Vector3fAccessor;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -249,7 +248,7 @@ public class FaucetFluidLoader extends SimpleJsonResourceReloadListener {
         int value = element.getAsInt();
         return def.stream().map(cuboid -> {
           Vector3f from = cuboid.getFrom().copy();
-          ((Vector3fAccessor)(Object)from).setY(value);
+         from.setY(value);
           return new FluidCuboid(from, cuboid.getTo(), cuboid.getFaces());
         }).collect(Collectors.toList());
       } else {
