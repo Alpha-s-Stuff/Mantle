@@ -1,6 +1,8 @@
 package slimeknights.mantle.registration.deferred;
 
+import net.fabricmc.fabric.api.screenhandler.v1.ScreenHandlerRegistry;
 import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import slimeknights.mantle.lib.util.RegistryObject;
@@ -22,7 +24,7 @@ public class ContainerTypeDeferredRegister extends DeferredRegisterWrapper<MenuT
    * @param <C>      Container type
    * @return  Registry object containing the container type
    */
-  public <C extends AbstractContainerMenu> RegistryObject<MenuType<C>> register(String name, MenuType.MenuSupplier<C> factory) {
-    return register.register(name, () -> new MenuType(factory));
+  public <C extends AbstractContainerMenu> RegistryObject<MenuType<C>> register(String name, ScreenHandlerRegistry.ExtendedClientHandlerFactory<C> factory) {
+    return register.register(name, () -> ScreenHandlerRegistry.registerExtended(new ResourceLocation(name), factory));
   }
 }
