@@ -39,6 +39,7 @@
     "accessor.StructureTemplateAccessor",
     "accessor.TagContainerAccessor",
     "accessor.TitleScreenAccessor",
+    "client.SheetsMixin",
     "common.AbstractHorseMixin",
     "common.BlockBehaviourMixin",
     "common.BlockEntityMixin",
