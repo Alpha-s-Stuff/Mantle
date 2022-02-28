@@ -36,6 +36,7 @@
     "common.ItemMixin",
     "common.ItemStackMixin",
     "common.LeavesBlockMixin",
+    "common.LevelChunkMixin",
     "common.LevelMixin",
     "common.LivingEntityMixin",
     "common.MagmaCubeMixin",
