@@ -12,8 +12,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.renderer.Sheets;
-import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
-import net.minecraft.client.renderer.blockentity.SignRenderer;
+import net.minecraft.client.resources.model.Material;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.level.GameType;
@@ -25,13 +25,13 @@ import slimeknights.mantle.client.render.MantleShaders;
 import slimeknights.mantle.lib.event.OverlayRenderCallback;
 import slimeknights.mantle.lib.event.OverlayRenderCallback.Types;
 import slimeknights.mantle.lib.event.RegisterShadersCallback;
-import slimeknights.mantle.lib.mixin.accessor.SheetsAccessor;
 import slimeknights.mantle.lib.util.MantleSpawnEggItem;
-import slimeknights.mantle.registration.MantleRegistrations;
 import slimeknights.mantle.registration.RegistrationHelper;
 import slimeknights.mantle.util.OffhandCooldownTracker;
 
 import java.util.function.Function;
+
+import static net.minecraft.client.renderer.Sheets.SIGN_SHEET;
 
 @SuppressWarnings("unused")
 public class ClientEvents implements ClientModInitializer {
@@ -47,7 +47,10 @@ public class ClientEvents implements ClientModInitializer {
   }
 
   public void onInitializeClient() {
-    RegistrationHelper.forEachWoodType(woodType -> Sheets.SIGN_MATERIALS.put(woodType, SheetsAccessor.callCreateSignMaterial(woodType)));
+    RegistrationHelper.forEachWoodType(woodType ->  {
+      ResourceLocation location = new ResourceLocation(woodType.name());
+      Sheets.SIGN_MATERIALS.put(woodType, new Material(SIGN_SHEET, new ResourceLocation(location.getNamespace(), "entity/signs/" + location.getPath())));
+    });
 
     BookLoader.registerBook(Mantle.getResource("test"), new FileRepository(Mantle.getResource("books/test")));
 
