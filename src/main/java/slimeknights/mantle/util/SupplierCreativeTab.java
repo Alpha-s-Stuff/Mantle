@@ -1,5 +1,6 @@
 package slimeknights.mantle.util;
 
+import net.fabricmc.fabric.impl.item.group.ItemGroupExtensions;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 
@@ -18,7 +19,8 @@ public class SupplierCreativeTab extends CreativeModeTab {
    * @param supplier  Item stack supplier
    */
   public SupplierCreativeTab(String modId, String name, Supplier<ItemStack> supplier) {
-    super(/*String.format("%s.%s", modId*/100, name);
+    super(CreativeModeTab.TABS.length - 1, String.format("%s.%s", modId, name));
+    ((ItemGroupExtensions)CreativeModeTab.TAB_BUILDING_BLOCKS).fabric_expandArray();
     this.setRecipeFolderName(String.format("%s/%s", modId, name));
     this.supplier = supplier;
   }
