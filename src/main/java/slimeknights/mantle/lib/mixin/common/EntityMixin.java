@@ -1,8 +1,11 @@
 package slimeknights.mantle.lib.mixin.common;
 
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceLocation;
 import slimeknights.mantle.lib.event.EntityEvents;
 import slimeknights.mantle.lib.event.StartRidingCallback;
 import slimeknights.mantle.lib.extensions.EntityExtensions;
+import slimeknights.mantle.lib.extensions.RegistryNameProvider;
 import slimeknights.mantle.lib.util.EntityHelper;
 import slimeknights.mantle.lib.util.MixinHelper;
 import slimeknights.mantle.lib.util.NBTSerializable;
@@ -26,7 +29,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
 @Mixin(Entity.class)
-public abstract class EntityMixin implements EntityExtensions, NBTSerializable {
+public abstract class EntityMixin implements EntityExtensions, NBTSerializable, RegistryNameProvider {
 	@Shadow
 	public Level level;
 	@Shadow
@@ -39,7 +42,10 @@ public abstract class EntityMixin implements EntityExtensions, NBTSerializable {
 	@Shadow
 	protected abstract void readAdditionalSaveData(CompoundTag compoundTag);
 
-	@Inject(at = @At("TAIL"), method = "<init>")
+  @Shadow
+  public abstract EntityType<?> getType();
+
+  @Inject(at = @At("TAIL"), method = "<init>")
 	public void mantle$entityInit(EntityType<?> entityType, Level world, CallbackInfo ci) {
 		int newEyeHeight = EntityEvents.EYE_HEIGHT.invoker().onEntitySize((Entity) (Object) this);
 		if (newEyeHeight != -1)
@@ -161,4 +167,10 @@ public abstract class EntityMixin implements EntityExtensions, NBTSerializable {
 	public void mantle$deserializeNBT(CompoundTag nbt) {
 		readAdditionalSaveData(nbt);
 	}
+
+  @Unique
+  @Override
+  public ResourceLocation getRegistryName() {
+    return Registry.ENTITY_TYPE.getKey(getType());
+  }
 }
