@@ -44,6 +44,7 @@
       "net/minecraft/class_276": ["slimeknights/mantle/lib/extensions/RenderTargetExtensions"],
       "net/minecraft/class_1077": ["slimeknights/mantle/lib/extensions/LanguageInfoExtensions"],
       "net/minecraft/class_1159": ["slimeknights/mantle/lib/extensions/Matrix4fExtensions"],
+      "net/minecraft/class_1160": ["slimeknights/mantle/lib/extensions/Vector3fExtensions"],
       "net/minecraft/class_1297": [
         "slimeknights/mantle/lib/extensions/EntityExtensions",
         "slimeknights/mantle/lib/extensions/RegistryNameProvider"

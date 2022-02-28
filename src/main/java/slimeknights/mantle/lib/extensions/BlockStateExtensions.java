@@ -12,13 +12,19 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
+import slimeknights.mantle.lib.util.ToolAction;
 
 public interface BlockStateExtensions {
+
+  private BlockState self() {
+    return (BlockState)this;
+  }
 
 	default boolean addRunningEffects(Level world, BlockPos pos, Entity entity) {
 		return ((BlockState) this).getBlock().addRunningEffects((BlockState) this, world, pos, entity);
@@ -62,5 +68,10 @@ public interface BlockStateExtensions {
   default boolean isBurning(BlockGetter world, BlockPos pos)
   {
     return ((BlockState) this).getBlock().isBurning((BlockState) this, world, pos);
+  }
+
+  @Nullable
+  default BlockState getToolModifiedState(Level world, BlockPos pos, Player player, ItemStack stack, ToolAction toolAction) {
+    return self().getBlock().getToolModifiedState(self(), world, pos, player, stack, toolAction);
   }
 }
