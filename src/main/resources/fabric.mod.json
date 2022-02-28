@@ -66,6 +66,7 @@
       ],
       "net/minecraft/class_2311": ["slimeknights/mantle/lib/extensions/IShearable"],
       "net/minecraft/class_2358": ["slimeknights/mantle/lib/extensions/FireBlockExtensions"],
+      "net/minecraft/class_2396": ["slimeknights/mantle/lib/extensions/RegistryNameProvider"],
       "net/minecraft/class_2397": ["slimeknights/mantle/lib/extensions/IShearable"],
       "net/minecraft/class_2476": ["slimeknights/mantle/lib/extensions/IShearable"],
       "net/minecraft/class_2526": ["slimeknights/mantle/lib/extensions/IShearable"],
