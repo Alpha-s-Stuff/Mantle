@@ -33,6 +33,6 @@ public class StrippableLogBlock extends RotatedPillarBlock {
         return InteractionResult.PASS;
       world.setBlock(hitResult.getBlockPos(), stripped.get().defaultBlockState().setValue(AXIS, world.getBlockState(hitResult.getBlockPos()).getValue(AXIS)) , Constants.BlockFlags.BLOCK_UPDATE);
     }
-    return null;
+    return InteractionResult.PASS;
   }
 }

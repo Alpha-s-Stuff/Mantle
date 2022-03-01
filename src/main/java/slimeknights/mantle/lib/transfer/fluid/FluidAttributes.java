@@ -2,6 +2,9 @@ package slimeknights.mantle.lib.transfer.fluid;
 
 import javax.annotation.Nullable;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandlerRegistry;
+import net.fabricmc.fabric.api.client.render.fluid.v1.SimpleFluidRenderHandler;
 import net.minecraft.core.Registry;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.level.block.state.BlockState;
@@ -29,6 +32,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.phys.BlockHitResult;
+import slimeknights.mantle.lib.util.EnvExecutor;
 
 /**
  * Minecraft Forge Fluid Implementation
@@ -135,6 +139,7 @@ public class FluidAttributes
     this.density = builder.density;
     this.isGaseous = builder.isGaseous;
     this.rarity = builder.rarity;
+    EnvExecutor.runWhenOn(EnvType.CLIENT, () -> () -> FluidRenderHandlerRegistry.INSTANCE.register(fluid, new SimpleFluidRenderHandler(stillTexture, flowingTexture, overlayTexture)));
   }
 
   public ItemStack getBucket(FluidStack stack)

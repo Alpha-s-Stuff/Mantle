@@ -95,9 +95,9 @@ public class NetworkWrapper {
    * @param msg     Packet
    * @param player  Player to send
    */
-  public void sendTo(Object msg, Player player) {
+  public void sendTo(S2CPacket msg, Player player) {
     if (player instanceof ServerPlayer) {
-      sendTo(msg, (ServerPlayer) player);
+      this.network.sendToClient(msg, (ServerPlayer) player);
     }
   }
 

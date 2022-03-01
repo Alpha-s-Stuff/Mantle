@@ -40,7 +40,7 @@ public class FluidBuilder {
    * @return  Forge fluid properties
    */
   public SimpleFlowableFluid.Properties build(Supplier<? extends Fluid> still, Supplier<? extends Fluid> flowing) {
-    SimpleFlowableFluid.Properties properties = new SimpleFlowableFluid.Properties(still, flowing/*, this.attributes*/)
+    SimpleFlowableFluid.Properties properties = new SimpleFlowableFluid.Properties(still, flowing, this.attributes)
         .flowSpeed(this.slopeFindDistance)
         .levelDecreasePerBlock(this.levelDecreasePerBlock)
         .blastResistance(this.explosionResistance)
