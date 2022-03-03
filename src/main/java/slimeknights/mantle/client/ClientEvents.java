@@ -17,11 +17,21 @@ import net.minecraft.world.level.GameType;
 import slimeknights.mantle.Mantle;
 import slimeknights.mantle.client.book.BookLoader;
 import slimeknights.mantle.client.book.repository.FileRepository;
+import slimeknights.mantle.client.model.FallbackModelLoader;
+import slimeknights.mantle.client.model.NBTKeyModel;
+import slimeknights.mantle.client.model.RetexturedModel;
+import slimeknights.mantle.client.model.fluid.FluidTextureModel;
+import slimeknights.mantle.client.model.fluid.FluidsModel;
+import slimeknights.mantle.client.model.inventory.InventoryModel;
+import slimeknights.mantle.client.model.util.ColoredBlockModel;
+import slimeknights.mantle.client.model.util.MantleItemLayerModel;
 import slimeknights.mantle.client.model.util.ModelHelper;
 import slimeknights.mantle.client.render.MantleShaders;
+import slimeknights.mantle.lib.event.ModelLoadCallback;
 import slimeknights.mantle.lib.event.OverlayRenderCallback;
 import slimeknights.mantle.lib.event.OverlayRenderCallback.Types;
 import slimeknights.mantle.lib.event.RegisterShadersCallback;
+import slimeknights.mantle.lib.model.ModelLoaderRegistry;
 import slimeknights.mantle.lib.util.MantleSpawnEggItem;
 import slimeknights.mantle.util.OffhandCooldownTracker;
 
@@ -52,26 +62,27 @@ public class ClientEvents implements ClientModInitializer {
     registerListeners();
     RegisterShadersCallback.EVENT.register(MantleShaders::registerShaders);
     MantleSpawnEggItem.MOD_EGGS.forEach(egg -> ColorProviderRegistry.ITEM.register((stack, layer) -> egg.getColor(layer), egg));
+    ModelLoadCallback.EVENT.register(ClientEvents::registerModelLoaders);
     commonSetup();
   }
 
   // PAINNNNNN
-//  static void registerModelLoaders(ModelRegistryEvent event) {
-//    // standard models - useful in resource packs for any model
-//    ModelLoaderRegistry.registerLoader(Mantle.getResource("connected"), ConnectedModel.Loader.INSTANCE);
-//    ModelLoaderRegistry.registerLoader(Mantle.getResource("item_layer"), MantleItemLayerModel.LOADER);
-//    ModelLoaderRegistry.registerLoader(Mantle.getResource("colored_block"), ColoredBlockModel.LOADER);
-//    ModelLoaderRegistry.registerLoader(Mantle.getResource("fallback"), FallbackModelLoader.INSTANCE);
-//
-//    // NBT dynamic models - require specific data defined in the block/item to use
-//    ModelLoaderRegistry.registerLoader(Mantle.getResource("nbt_key"), NBTKeyModel.LOADER);
-//    ModelLoaderRegistry.registerLoader(Mantle.getResource("retextured"), RetexturedModel.Loader.INSTANCE);
-//
-//    // data models - contain information for other parts in rendering rather than rendering directly
-//    ModelLoaderRegistry.registerLoader(Mantle.getResource("fluid_texture"), FluidTextureModel.LOADER);
-//    ModelLoaderRegistry.registerLoader(Mantle.getResource("inventory"), InventoryModel.Loader.INSTANCE);
-//    ModelLoaderRegistry.registerLoader(Mantle.getResource("fluids"), FluidsModel.Loader.INSTANCE);
-//  }
+  static void registerModelLoaders() {
+    // standard models - useful in resource packs for any model
+//    ModelLoaderRegistry.registerLoader(Mantle.getResource("connected"), ConnectedModel.Loader.INSTANCE); TODO: PORT
+    ModelLoaderRegistry.registerLoader(Mantle.getResource("item_layer"), MantleItemLayerModel.LOADER);
+    ModelLoaderRegistry.registerLoader(Mantle.getResource("colored_block"), ColoredBlockModel.LOADER);
+    ModelLoaderRegistry.registerLoader(Mantle.getResource("fallback"), FallbackModelLoader.INSTANCE);
+
+    // NBT dynamic models - require specific data defined in the block/item to use
+    ModelLoaderRegistry.registerLoader(Mantle.getResource("nbt_key"), NBTKeyModel.LOADER);
+    ModelLoaderRegistry.registerLoader(Mantle.getResource("retextured"), RetexturedModel.Loader.INSTANCE);
+
+    // data models - contain information for other parts in rendering rather than rendering directly
+    ModelLoaderRegistry.registerLoader(Mantle.getResource("fluid_texture"), FluidTextureModel.LOADER);
+    ModelLoaderRegistry.registerLoader(Mantle.getResource("inventory"), InventoryModel.Loader.INSTANCE);
+    ModelLoaderRegistry.registerLoader(Mantle.getResource("fluids"), FluidsModel.Loader.INSTANCE);
+  }
 
   static void commonSetup() {
     OverlayRenderCallback.EVENT.register(new ExtraHeartRenderHandler()::renderHealthbar);

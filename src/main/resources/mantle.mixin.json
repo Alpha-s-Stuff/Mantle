@@ -41,6 +41,7 @@
     "accessor.TitleScreenAccessor",
     "client.BlockModelDeserializerMixin",
     "client.BlockModelMixin",
+    "client.ModelBakeryMixin",
     "client.ModelLayersMixin",
     "client.SheetsMixin",
     "common.AbstractHorseMixin",
