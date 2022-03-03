@@ -51,6 +51,6 @@ public class RetexturedBlockEntity extends MantleBlockEntity implements IRetextu
 
   @Override
   public CompoundTag getTileData() {
-    return TileEntityHelper.getExtraCustomData(this);
+    return this.getExtraCustomData();
   }
 }
