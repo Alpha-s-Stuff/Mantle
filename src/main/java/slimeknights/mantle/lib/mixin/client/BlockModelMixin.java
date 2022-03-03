@@ -4,15 +4,22 @@ import com.google.common.collect.Sets;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.client.renderer.block.model.*;
 import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.client.resources.model.ModelBakery;
+import net.minecraft.client.resources.model.ModelState;
 import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.resources.ResourceLocation;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.*;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import slimeknights.mantle.lib.extensions.BlockModelExtensions;
 import slimeknights.mantle.lib.model.BlockModelConfiguration;
+import slimeknights.mantle.lib.model.IModelGeometry;
 
 import java.util.Collection;
 import java.util.List;
@@ -113,4 +120,13 @@ public abstract class BlockModelMixin implements BlockModelExtensions {
 
 		return set1;
 	}
+
+  @Inject(method = "bake(Lnet/minecraft/client/resources/model/ModelBakery;Lnet/minecraft/client/renderer/block/model/BlockModel;Ljava/util/function/Function;Lnet/minecraft/client/resources/model/ModelState;Lnet/minecraft/resources/ResourceLocation;Z)Lnet/minecraft/client/resources/model/BakedModel;", at = @At("HEAD"), cancellable = true)
+  public void handleCustomModels(ModelBakery modelBakery, BlockModel otherModel, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelTransform, ResourceLocation modelLocation, boolean guiLight3d, CallbackInfoReturnable<BakedModel> cir) {
+    BlockModel blockModel = (BlockModel) (Object) this;
+    IModelGeometry<?> customModel = blockModel.getGeometry().getCustomGeometry();
+
+    if (customModel != null)
+      cir.setReturnValue(customModel.bake(blockModel.getGeometry(), modelBakery, spriteGetter, modelTransform, blockModel.getOverrides(modelBakery, otherModel, spriteGetter), modelLocation));
+  }
 }
