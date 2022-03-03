@@ -1,5 +1,10 @@
 package slimeknights.mantle.registration;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandlerRegistry;
+import net.fabricmc.fabric.api.client.render.fluid.v1.SimpleFluidRenderHandler;
+import net.fabricmc.fabric.api.event.client.ClientSpriteRegistryCallback;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.material.Fluid;
 import slimeknights.mantle.client.model.fluid.FluidTextureModel;
@@ -22,6 +27,14 @@ public class ModelFluidAttributes extends FluidAttributes {
   protected ModelFluidAttributes(FluidAttributes.Builder builder, Fluid fluid) {
     super(builder, fluid);
     this.fluid = fluid;
+    EnvExecutor.runWhenOn(EnvType.CLIENT, () -> () -> {
+      FluidRenderHandlerRegistry.INSTANCE.register(fluid, new SimpleFluidRenderHandler(getStillTexture(), getFlowingTexture(), getOverlayTexture()));
+      ClientSpriteRegistryCallback.event(TextureAtlas.LOCATION_BLOCKS).register((atlasTexture, registry) -> {
+        registry.register(getStillTexture());
+        registry.register(getFlowingTexture());
+        registry.register(getStillTexture());
+      });
+    });
   }
 
   @Override

@@ -80,7 +80,9 @@
         "slimeknights/mantle/lib/extensions/FluidExtensions",
         "slimeknights/mantle/lib/extensions/RegistryNameProvider"
       ],
-      "net/minecraft/class_4581": ["slimeknights/mantle/lib/extensions/Matrix3fExtensions"]
+      "net/minecraft/class_3665": ["slimeknights/mantle/lib/extensions/ModelStateExtensions"],
+      "net/minecraft/class_4581": ["slimeknights/mantle/lib/extensions/Matrix3fExtensions"],
+      "net/minecraft/class_4590": ["slimeknights/mantle/lib/extensions/TransformationExtensions"]
     },
     "cardinal-components": [
       "mantle:offhand_cooldown"

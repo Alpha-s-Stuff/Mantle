@@ -50,7 +50,9 @@ public class ClientEvents implements ClientModInitializer {
     ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new BookLoader());
   }
 
+  @Override
   public void onInitializeClient() {
+    ModelLoadCallback.EVENT.register(ModelLoaderRegistry::init);
 //    RegistrationHelper.forEachWoodType(woodType ->  {
 //      ResourceLocation location = new ResourceLocation(woodType.name());
 //      Sheets.SIGN_MATERIALS.put(woodType, new Material(SIGN_SHEET, new ResourceLocation(location.getNamespace(), "entity/signs/" + location.getPath())));

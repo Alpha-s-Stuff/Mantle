@@ -257,8 +257,8 @@ public class FluidRenderer {
 
     // fluid attributes, fetch once for all fluids to save effort
     FluidVariantRenderHandler attributes = FluidVariantRendering.getHandler(fluid.getFluid());
-    TextureAtlasSprite still = getBlockSprite(attributes.getSprites(fluid.getType())[0].getName());
-    TextureAtlasSprite flowing = getBlockSprite(attributes.getSprites(fluid.getType())[1].getName());
+    TextureAtlasSprite still = /*getBlockSprite(*/attributes.getSprites(fluid.getType())[0]/*.getName())*/;
+    TextureAtlasSprite flowing = /*getBlockSprite(*/attributes.getSprites(fluid.getType())[1]/*.getName())*/;
     int color = attributes.getColor(fluid.getType(), null, null);
     light = withBlockLight(light,/*attributes.getLuminosity(fluid)*/0);
     boolean isGas = attributes.fillsFromTop(fluid.getType());
@@ -311,9 +311,9 @@ public class FluidRenderer {
 
     // fluid attributes
     TextureAtlasSprite still = FluidVariantRendering.getSprite(fluid.getType());
-    TextureAtlasSprite flowing = FluidVariantRendering.getSprites(fluid.getType())[0];
+    TextureAtlasSprite flowing = FluidVariantRendering.getSprites(fluid.getType())[1];
     boolean isGas = FluidVariantRendering.fillsFromTop(fluid.getType());
-    light = withBlockLight(light,/*attributes.getLuminosity(fluid)*/0);
+    light = withBlockLight(light, fluid.getFluid().getAttributes().getLuminosity(fluid));
 
     // determine height based on fluid amount
     Vector3f from = cube.getFromScaled();

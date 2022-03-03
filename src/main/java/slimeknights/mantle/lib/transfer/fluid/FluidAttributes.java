@@ -5,6 +5,8 @@ import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandlerRegistry;
 import net.fabricmc.fabric.api.client.render.fluid.v1.SimpleFluidRenderHandler;
+import net.fabricmc.fabric.api.event.client.ClientSpriteRegistryCallback;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.core.Registry;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.level.block.state.BlockState;
@@ -139,7 +141,6 @@ public class FluidAttributes
     this.density = builder.density;
     this.isGaseous = builder.isGaseous;
     this.rarity = builder.rarity;
-    EnvExecutor.runWhenOn(EnvType.CLIENT, () -> () -> FluidRenderHandlerRegistry.INSTANCE.register(fluid, new SimpleFluidRenderHandler(stillTexture, flowingTexture, overlayTexture)));
   }
 
   public ItemStack getBucket(FluidStack stack)

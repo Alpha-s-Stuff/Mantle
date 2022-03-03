@@ -2,6 +2,7 @@ accessWidener v2 named
 
 transitive-accessible class net/minecraft/world/item/crafting/Ingredient$Value
 transitive-accessible class net/minecraft/client/renderer/texture/TextureAtlasSprite$AnimatedTexture
+transitive-accessible class net/minecraft/client/renderer/block/model/ItemOverrides$BakedOverride
 transitive-accessible method net/minecraft/client/renderer/Sheets createSignMaterial (Lnet/minecraft/world/level/block/state/properties/WoodType;)Lnet/minecraft/client/resources/model/Material;
 transitive-accessible method net/minecraft/world/item/crafting/Ingredient$ItemValue <init> (Lnet/minecraft/world/item/ItemStack;)V
 transitive-accessible method net/minecraft/world/item/crafting/Ingredient <init> (Ljava/util/stream/Stream;)V
@@ -27,6 +28,7 @@ transitive-accessible method net/minecraft/client/resources/model/SimpleBakedMod
 transitive-accessible method net/minecraft/client/renderer/texture/TextureAtlasSprite getFrameCount ()I
 transitive-accessible method net/minecraft/client/renderer/texture/TextureAtlasSprite$AnimatedTexture getFrameX (I)I
 transitive-accessible method net/minecraft/client/renderer/texture/TextureAtlasSprite$AnimatedTexture getFrameY (I)I
+transitive-accessible method net/minecraft/client/renderer/block/model/BlockModel bakeFace (Lnet/minecraft/client/renderer/block/model/BlockElement;Lnet/minecraft/client/renderer/block/model/BlockElementFace;Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;Lnet/minecraft/core/Direction;Lnet/minecraft/client/resources/model/ModelState;Lnet/minecraft/resources/ResourceLocation;)Lnet/minecraft/client/renderer/block/model/BakedQuad;
 transitive-extendable method net/minecraft/client/gui/screens/inventory/AbstractContainerScreen renderSlot (Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/world/inventory/Slot;)V
 transitive-extendable method net/minecraft/client/gui/screens/inventory/AbstractContainerScreen isHovering (Lnet/minecraft/world/inventory/Slot;DD)Z
 transitive-extendable class net/minecraft/world/item/crafting/Ingredient

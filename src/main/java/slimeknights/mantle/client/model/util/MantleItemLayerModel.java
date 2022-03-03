@@ -27,10 +27,12 @@ import net.minecraft.util.GsonHelper;
 import slimeknights.mantle.lib.extensions.TextureAtlasSpriteExtensions;
 import slimeknights.mantle.lib.extensions.TransformationExtensions;
 import slimeknights.mantle.lib.model.BakedQuadBuilder;
+import slimeknights.mantle.lib.model.CompositeModelState;
 import slimeknights.mantle.lib.model.IModelConfiguration;
 import slimeknights.mantle.lib.model.IModelGeometry;
 import slimeknights.mantle.lib.model.IModelLoader;
 import slimeknights.mantle.lib.model.IVertexConsumer;
+import slimeknights.mantle.lib.model.PerspectiveMapWrapper;
 import slimeknights.mantle.lib.model.TRSRTransformer;
 import slimeknights.mantle.util.ItemLayerPixels;
 import slimeknights.mantle.util.JsonHelper;
@@ -96,7 +98,7 @@ public class MantleItemLayerModel implements IModelGeometry<MantleItemLayerModel
       builder.addAll(getQuadsForSprite(data.color(), data.noTint() ? -1 : i, sprite, transform, data.luminosity(), pixels));
     }
     // transform data
-    ImmutableMap<ItemTransforms.TransformType,Transformation> transformMap = Maps.immutableEnumMap(Maps.newEnumMap(ItemTransforms.TransformType.class));//PerspectiveMapWrapper.getTransforms(new CompositeModelState(owner.getCombinedTransform(), modelTransform));
+    ImmutableMap<ItemTransforms.TransformType,Transformation> transformMap = PerspectiveMapWrapper.getTransforms(new CompositeModelState(owner.getCombinedTransform(), modelTransform));
     return new BakedItemModel(builder.build(), particle, Maps.immutableEnumMap(transformMap), overrides, true, owner.isSideLit());
   }
 

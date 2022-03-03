@@ -43,6 +43,7 @@
     "client.BlockModelMixin",
     "client.ModelBakeryMixin",
     "client.ModelLayersMixin",
+    "client.ModelStateMixin",
     "client.SheetsMixin",
     "common.AbstractHorseMixin",
     "common.BlockBehaviourMixin",

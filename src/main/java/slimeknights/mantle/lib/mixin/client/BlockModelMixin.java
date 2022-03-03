@@ -52,11 +52,18 @@ public abstract class BlockModelMixin implements BlockModelExtensions {
 	@Final
 	private static Logger LOGGER;
 	@Unique
-  private BlockModelConfiguration data = new BlockModelConfiguration((BlockModel) (Object) this);
+  private final BlockModelConfiguration data = new BlockModelConfiguration((BlockModel) (Object) this);
 
+  @Unique
   @Override
   public BlockModelConfiguration getGeometry() {
     return data;
+  }
+
+  @Unique
+  @Override
+  public ItemOverrides getOverrides(ModelBakery pModelBakery, BlockModel pModel, Function<Material, TextureAtlasSprite> textureGetter) {
+    return this.overrides.isEmpty() ? ItemOverrides.EMPTY : new ItemOverrides(pModelBakery, pModel, pModelBakery::getModel/*, textureGetter*/, this.overrides);
   }
 
 	  /**
@@ -124,9 +131,16 @@ public abstract class BlockModelMixin implements BlockModelExtensions {
   @Inject(method = "bake(Lnet/minecraft/client/resources/model/ModelBakery;Lnet/minecraft/client/renderer/block/model/BlockModel;Ljava/util/function/Function;Lnet/minecraft/client/resources/model/ModelState;Lnet/minecraft/resources/ResourceLocation;Z)Lnet/minecraft/client/resources/model/BakedModel;", at = @At("HEAD"), cancellable = true)
   public void handleCustomModels(ModelBakery modelBakery, BlockModel otherModel, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelTransform, ResourceLocation modelLocation, boolean guiLight3d, CallbackInfoReturnable<BakedModel> cir) {
     BlockModel blockModel = (BlockModel) (Object) this;
-    IModelGeometry<?> customModel = blockModel.getGeometry().getCustomGeometry();
+    IModelGeometry<?> customModel = data.getCustomGeometry();
 
     if (customModel != null)
       cir.setReturnValue(customModel.bake(blockModel.getGeometry(), modelBakery, spriteGetter, modelTransform, blockModel.getOverrides(modelBakery, otherModel, spriteGetter), modelLocation));
   }
+
+  @Inject(method = "getElements", at = @At("HEAD"), cancellable = true)
+  public void fixElements(CallbackInfoReturnable<List<BlockElement>> cir) {
+    if (data.hasCustomGeometry()) cir.setReturnValue(java.util.Collections.emptyList());
+  }
+
+
 }
