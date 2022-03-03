@@ -9,6 +9,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import com.mojang.datafixers.util.Either;
 import com.mojang.datafixers.util.Pair;
+import io.github.fabricators_of_create.porting_lib.mixin.client.accessor.BlockModel$DeserializerAccessor;
+import io.github.fabricators_of_create.porting_lib.mixin.client.accessor.BlockModelAccessor;
 import lombok.Getter;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockElement;
@@ -29,11 +31,9 @@ import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.inventory.InventoryMenu;
 import slimeknights.mantle.Mantle;
-import slimeknights.mantle.lib.mixin.accessor.BlockModelAccessor;
-import slimeknights.mantle.lib.mixin.accessor.DeserializerAccessor;
-import slimeknights.mantle.lib.model.IModelConfiguration;
-import slimeknights.mantle.lib.model.IModelGeometry;
-import slimeknights.mantle.lib.model.IModelLoader;
+import io.github.fabricators_of_create.porting_lib.model.IModelConfiguration;
+import io.github.fabricators_of_create.porting_lib.model.IModelGeometry;
+import io.github.fabricators_of_create.porting_lib.model.IModelLoader;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -231,7 +231,7 @@ public class SimpleBlockModel implements IModelGeometry<SimpleBlockModel> {
       }
       // bake the face
       TextureAtlasSprite sprite = spriteGetter.apply(owner.resolveTexture(texture));
-      BakedQuad bakedQuad = BlockModelAccessor.callBakeFace(part, face, sprite, direction, transform, location);
+      BakedQuad bakedQuad = BlockModelAccessor.port_lib$bakeFace(part, face, sprite, direction, transform, location);
       // apply cull face
       if (face.cullForDirection == null) {
         builder.addUnculledFace(bakedQuad);
@@ -321,7 +321,7 @@ public class SimpleBlockModel implements IModelGeometry<SimpleBlockModel> {
       ResourceLocation atlas = InventoryMenu.BLOCK_ATLAS;
       JsonObject textures = GsonHelper.getAsJsonObject(json, "textures");
       for(Entry<String, JsonElement> entry : textures.entrySet()) {
-        builder.put(entry.getKey(), DeserializerAccessor.callParseTextureLocationOrReference(atlas, entry.getValue().getAsString()));
+        builder.put(entry.getKey(), BlockModel$DeserializerAccessor.port_lib$parseTextureLocationOrReference(atlas, entry.getValue().getAsString()));
       }
       textureMap = builder.build();
     } else {

@@ -18,7 +18,7 @@ import net.minecraft.client.renderer.block.model.ItemTransforms.TransformType;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.Direction;
-import slimeknights.mantle.lib.render.TransformTypeDependentItemBakedModel;
+import io.github.fabricators_of_create.porting_lib.render.TransformTypeDependentItemBakedModel;
 
 public class BakedItemModel implements BakedModel, TransformTypeDependentItemBakedModel {
   protected final ImmutableList<BakedQuad> quads;

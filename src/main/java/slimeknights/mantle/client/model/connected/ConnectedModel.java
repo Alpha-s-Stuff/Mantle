@@ -46,11 +46,11 @@
 //import slimeknights.mantle.client.model.util.ExtraTextureConfiguration;
 //import slimeknights.mantle.client.model.util.ModelTextureIteratable;
 //import slimeknights.mantle.client.model.util.SimpleBlockModel;
-//import slimeknights.mantle.lib.model.IModelConfiguration;
-//import slimeknights.mantle.lib.model.IModelData;
-//import slimeknights.mantle.lib.model.IModelGeometry;
-//import slimeknights.mantle.lib.model.IModelLoader;
-//import slimeknights.mantle.lib.model.ModelProperty;
+//import io.github.fabricators_of_create.porting_lib.model.IModelConfiguration;
+//import io.github.fabricators_of_create.porting_lib.model.IModelData;
+//import io.github.fabricators_of_create.porting_lib.model.IModelGeometry;
+//import io.github.fabricators_of_create.porting_lib.model.IModelLoader;
+//import io.github.fabricators_of_create.porting_lib.model.ModelProperty;
 //
 //import javax.annotation.Nonnull;
 //import javax.annotation.Nullable;

@@ -21,6 +21,7 @@ repositories {
     maven { url = "https://maven.shedaniel.me/" }
     maven { url = "https://cursemaven.com" }
     maven { url = "https://maven.devos.community/releases/" }
+    maven { url = "https://maven.devos.community/snapshots/" }
     maven { url = "https://maven.terraformersmc.com/releases/" }
     maven { url = "https://ladysnake.jfrog.io/artifactory/mods" }
     maven { url = "https://maven.jamieswhiteshirt.com/libs-release" }
@@ -120,6 +121,7 @@ dependencies {
     modImplementation(include("io.github.ladysnake:satin:${project.satin_version}"))
 
     modImplementation(include("me.alphamode:ForgeTags:2.0"))
+    modImplementation(include("io.github.fabricators_of_create:Porting-Lib:0.1.0+1.18.${project.port_lib_hash}")) { transitive(false) }
 
     // compile against the REI API but do not include it at runtime
     modCompileOnly("me.shedaniel:RoughlyEnoughItems-api-fabric:${project.rei_version}") { transitive = false }

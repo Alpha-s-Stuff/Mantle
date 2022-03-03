@@ -6,8 +6,8 @@ import com.google.gson.JsonObject;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.resources.ResourceLocation;
-import slimeknights.mantle.lib.crafting.IIngredientSerializer;
-import slimeknights.mantle.lib.crafting.VanillaIngredientSerializer;
+import io.github.fabricators_of_create.porting_lib.crafting.IIngredientSerializer;
+import io.github.fabricators_of_create.porting_lib.crafting.VanillaIngredientSerializer;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;

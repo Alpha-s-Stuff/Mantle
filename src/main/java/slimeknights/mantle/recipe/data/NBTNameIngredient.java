@@ -9,8 +9,8 @@ import net.minecraft.resources.ResourceLocation;
 import javax.annotation.Nullable;
 import java.util.Objects;
 
-import slimeknights.mantle.lib.crafting.NBTIngredient.Serializer;
-import slimeknights.mantle.lib.crafting.CraftingHelper;
+import io.github.fabricators_of_create.porting_lib.crafting.NBTIngredient.Serializer;
+import io.github.fabricators_of_create.porting_lib.crafting.CraftingHelper;
 
 /**
  * Ingredient for a NBT sensitive item from another mod, should never be used outside datagen

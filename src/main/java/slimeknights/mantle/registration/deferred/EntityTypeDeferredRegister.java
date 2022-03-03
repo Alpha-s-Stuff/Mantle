@@ -1,14 +1,14 @@
 package slimeknights.mantle.registration.deferred;
 
+import io.github.fabricators_of_create.porting_lib.util.LazyRegistrar;
+import io.github.fabricators_of_create.porting_lib.util.LazySpawnEggItem;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
 import net.minecraft.core.Registry;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.Item;
-import slimeknights.mantle.lib.util.MantleRegistry;
-import slimeknights.mantle.lib.util.MantleSpawnEggItem;
-import slimeknights.mantle.lib.util.RegistryObject;
+import io.github.fabricators_of_create.porting_lib.util.RegistryObject;
 import slimeknights.mantle.registration.ItemProperties;
 
 import java.util.function.Supplier;
@@ -19,10 +19,10 @@ import java.util.function.Supplier;
 @SuppressWarnings("unused")
 public class EntityTypeDeferredRegister extends DeferredRegisterWrapper<EntityType<?>> {
 
-  private final MantleRegistry<Item> itemRegistry;
+  private final LazyRegistrar<Item> itemRegistry;
   public EntityTypeDeferredRegister(String modID) {
     super(Registry.ENTITY_TYPE, modID);
-    itemRegistry = MantleRegistry.create(Registry.ITEM, modID);
+    itemRegistry = LazyRegistrar.create(Registry.ITEM, modID);
   }
 
   @Override
@@ -53,7 +53,7 @@ public class EntityTypeDeferredRegister extends DeferredRegisterWrapper<EntityTy
    */
   public <T extends Mob> RegistryObject<EntityType<T>> registerWithEgg(String name, Supplier<FabricEntityTypeBuilder<T>> sup, int primary, int secondary) {
     RegistryObject<EntityType<T>> object = register(name, sup);
-    itemRegistry.register(name + "_spawn_egg", () -> new MantleSpawnEggItem(object, primary, secondary, ItemProperties.EGG_PROPS));
+    itemRegistry.register(name + "_spawn_egg", () -> new LazySpawnEggItem(object, primary, secondary, ItemProperties.EGG_PROPS));
     return object;
   }
 }

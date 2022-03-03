@@ -1,5 +1,6 @@
 package slimeknights.mantle.registration.adapter;
 
+import io.github.fabricators_of_create.porting_lib.util.LazySpawnEggItem;
 import net.minecraft.core.Registry;
 import net.minecraft.data.models.blockstates.PropertyDispatch.TriFunction;
 import net.minecraft.world.entity.EntityType;
@@ -18,7 +19,6 @@ import slimeknights.mantle.item.BurnableBlockItem;
 import slimeknights.mantle.item.BurnableSignItem;
 import slimeknights.mantle.item.BurnableTallBlockItem;
 import slimeknights.mantle.item.TooltipItem;
-import slimeknights.mantle.lib.util.MantleSpawnEggItem;
 import slimeknights.mantle.registration.ItemProperties;
 import slimeknights.mantle.registration.object.BuildingBlockObject;
 import slimeknights.mantle.registration.object.EnumObject;
@@ -265,6 +265,6 @@ public class ItemRegistryAdapter extends EnumRegistryAdapter<Item> {
    * @return  Spawn egg item instance
    */
   public SpawnEggItem registerSpawnEgg(Supplier<? extends EntityType<? extends Mob>> type, int primary, int secondary, String baseName) {
-    return register(new MantleSpawnEggItem(type, primary, secondary, ItemProperties.EGG_PROPS), baseName + "_spawn_egg");
+    return register(new LazySpawnEggItem(type, primary, secondary, ItemProperties.EGG_PROPS), baseName + "_spawn_egg");
   }
 }

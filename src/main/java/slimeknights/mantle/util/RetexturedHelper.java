@@ -8,7 +8,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import slimeknights.mantle.lib.model.ModelProperty;
+import io.github.fabricators_of_create.porting_lib.model.ModelProperty;
 
 import javax.annotation.Nullable;
 

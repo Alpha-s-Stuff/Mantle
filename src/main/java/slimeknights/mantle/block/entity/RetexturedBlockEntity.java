@@ -7,9 +7,8 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import net.fabricmc.fabric.api.rendering.data.v1.RenderAttachmentBlockEntity;
 import slimeknights.mantle.block.RetexturedBlock;
-import slimeknights.mantle.lib.model.IModelData;
-import slimeknights.mantle.lib.util.Lazy;
-import slimeknights.mantle.lib.util.TileEntityHelper;
+import io.github.fabricators_of_create.porting_lib.model.IModelData;
+import io.github.fabricators_of_create.porting_lib.util.Lazy;
 import slimeknights.mantle.util.RetexturedHelper;
 
 import javax.annotation.Nonnull;

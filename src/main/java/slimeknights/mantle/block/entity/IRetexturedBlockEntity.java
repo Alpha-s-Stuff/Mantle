@@ -5,7 +5,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import slimeknights.mantle.block.RetexturedBlock;
 import slimeknights.mantle.client.model.data.SinglePropertyData;
-import slimeknights.mantle.lib.model.IModelData;
+import io.github.fabricators_of_create.porting_lib.model.IModelData;
 import slimeknights.mantle.util.RetexturedHelper;
 
 /**

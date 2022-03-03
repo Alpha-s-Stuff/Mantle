@@ -8,7 +8,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.resources.ResourceLocation;
-import slimeknights.mantle.lib.crafting.CraftingHelper;
+import io.github.fabricators_of_create.porting_lib.crafting.CraftingHelper;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;

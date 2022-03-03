@@ -17,11 +17,11 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
-import slimeknights.mantle.lib.transfer.item.IItemHandler;
-import slimeknights.mantle.lib.transfer.item.IItemHandlerModifiable;
-import slimeknights.mantle.lib.transfer.item.InvWrapper;
-import slimeknights.mantle.lib.transfer.item.ItemTransferable;
-import slimeknights.mantle.lib.util.LazyOptional;
+import io.github.fabricators_of_create.porting_lib.transfer.item.IItemHandler;
+import io.github.fabricators_of_create.porting_lib.transfer.item.IItemHandlerModifiable;
+import io.github.fabricators_of_create.porting_lib.transfer.item.InvWrapper;
+import io.github.fabricators_of_create.porting_lib.transfer.item.ItemTransferable;
+import io.github.fabricators_of_create.porting_lib.util.LazyOptional;
 import slimeknights.mantle.util.ItemStackList;
 
 import javax.annotation.Nonnull;

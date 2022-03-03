@@ -38,7 +38,7 @@ import slimeknights.mantle.client.book.repository.BookRepository;
 import slimeknights.mantle.client.book.transformer.BookTransformer;
 import slimeknights.mantle.client.book.transformer.IndexTransformer;
 import slimeknights.mantle.data.ResourceLocationSerializer;
-import slimeknights.mantle.lib.util.IdentifiableResourceManagerReloadListener;
+import io.github.fabricators_of_create.porting_lib.util.IdentifiableResourceManagerReloadListener;
 import slimeknights.mantle.network.MantleNetwork;
 import slimeknights.mantle.network.packet.UpdateHeldPagePacket;
 import slimeknights.mantle.network.packet.UpdateLecternPagePacket;

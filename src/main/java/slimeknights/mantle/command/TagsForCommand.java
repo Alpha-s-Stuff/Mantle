@@ -5,6 +5,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.Dynamic2CommandExceptionType;
+import io.github.fabricators_of_create.porting_lib.mixin.common.accessor.ItemAccessor;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.ResourceLocationArgument;
@@ -38,14 +39,12 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import slimeknights.mantle.lib.extensions.ResourceLocationEx;
-import slimeknights.mantle.lib.mixin.accessor.ItemAccessor;
-import slimeknights.mantle.lib.transfer.TransferUtil;
-import slimeknights.mantle.lib.transfer.fluid.EmptyFluidHandler;
-import slimeknights.mantle.lib.transfer.fluid.FluidStack;
-import slimeknights.mantle.lib.transfer.fluid.IFluidHandler;
-import slimeknights.mantle.lib.transfer.fluid.IFluidHandlerItem;
-import slimeknights.mantle.lib.util.LazyOptional;
+import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
+import io.github.fabricators_of_create.porting_lib.transfer.fluid.EmptyFluidHandler;
+import io.github.fabricators_of_create.porting_lib.transfer.fluid.FluidStack;
+import io.github.fabricators_of_create.porting_lib.transfer.fluid.IFluidHandler;
+import io.github.fabricators_of_create.porting_lib.transfer.fluid.IFluidHandlerItem;
+import io.github.fabricators_of_create.porting_lib.util.LazyOptional;
 
 import java.util.Collection;
 import java.util.Map;
@@ -236,7 +235,7 @@ public class TagsForCommand {
     CommandSourceStack source = context.getSource();
     Player player = source.getPlayerOrException();
     Level level = source.getLevel();
-    BlockHitResult blockTrace = ItemAccessor.callGetPlayerPOVHitResult(level, player, ClipContext.Fluid.NONE);
+    BlockHitResult blockTrace = ItemAccessor.port_lib$getPlayerPOVHitResult(level, player, ClipContext.Fluid.NONE);
     if (blockTrace.getType() == HitResult.Type.BLOCK) {
       BlockEntity be = level.getBlockEntity(blockTrace.getBlockPos());
       if (be != null) {

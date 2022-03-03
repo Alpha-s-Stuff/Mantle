@@ -10,7 +10,7 @@ import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextComponent;
 import slimeknights.mantle.client.book.data.element.TextComponentData;
-import slimeknights.mantle.lib.util.GuiUtils;
+import io.github.fabricators_of_create.porting_lib.util.GuiUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;

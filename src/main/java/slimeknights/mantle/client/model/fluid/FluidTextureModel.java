@@ -21,9 +21,9 @@ import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.level.material.Fluid;
 import slimeknights.mantle.client.model.util.ModelHelper;
-import slimeknights.mantle.lib.model.IModelConfiguration;
-import slimeknights.mantle.lib.model.IModelGeometry;
-import slimeknights.mantle.lib.model.IModelLoader;
+import io.github.fabricators_of_create.porting_lib.model.IModelConfiguration;
+import io.github.fabricators_of_create.porting_lib.model.IModelGeometry;
+import io.github.fabricators_of_create.porting_lib.model.IModelLoader;
 import slimeknights.mantle.registration.ModelFluidAttributes;
 import slimeknights.mantle.registration.ModelFluidAttributes.IFluidModelProvider;
 

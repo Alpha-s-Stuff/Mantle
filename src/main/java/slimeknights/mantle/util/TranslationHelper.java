@@ -6,7 +6,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.item.ItemStack;
-import slimeknights.mantle.lib.util.ForgeI18n;
+import io.github.fabricators_of_create.porting_lib.util.ForgeI18n;
 
 import javax.annotation.Nullable;
 import java.util.List;

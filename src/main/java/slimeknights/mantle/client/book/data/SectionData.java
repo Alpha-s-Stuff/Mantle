@@ -2,6 +2,7 @@ package slimeknights.mantle.client.book.data;
 
 import com.google.common.collect.Sets;
 import com.google.gson.JsonElement;
+import io.github.fabricators_of_create.porting_lib.util.TrueCondition;
 import net.fabricmc.fabric.api.resource.conditions.v1.ConditionJsonProvider;
 import net.fabricmc.fabric.api.resource.conditions.v1.ResourceConditions;
 import net.minecraft.advancements.AdvancementProgress;
@@ -12,7 +13,6 @@ import slimeknights.mantle.client.book.data.content.ContentError;
 import slimeknights.mantle.client.book.data.element.ImageData;
 import slimeknights.mantle.client.book.repository.BookRepository;
 import slimeknights.mantle.client.screen.book.BookScreen;
-import slimeknights.mantle.lib.condition.TrueCondition;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;

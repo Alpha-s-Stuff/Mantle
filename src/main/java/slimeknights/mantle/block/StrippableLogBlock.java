@@ -2,7 +2,6 @@ package slimeknights.mantle.block;
 
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.tool.attribute.v1.FabricToolTags;
-import slimeknights.mantle.lib.util.Constants;
 import java.util.function.Supplier;
 
 import javax.annotation.Nullable;

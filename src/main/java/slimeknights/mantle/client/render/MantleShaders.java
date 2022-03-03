@@ -4,7 +4,7 @@ import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import net.minecraft.client.renderer.ShaderInstance;
 import net.minecraft.server.packs.resources.ResourceManager;
 import slimeknights.mantle.Mantle;
-import slimeknights.mantle.lib.event.RegisterShadersCallback;
+import io.github.fabricators_of_create.porting_lib.event.RegisterShadersCallback;
 
 import java.io.IOException;
 

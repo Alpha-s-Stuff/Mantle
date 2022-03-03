@@ -1,5 +1,6 @@
 package slimeknights.mantle.registration.deferred;
 
+import io.github.fabricators_of_create.porting_lib.util.LazyRegistrar;
 import net.minecraft.core.Registry;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.Item;
@@ -8,27 +9,26 @@ import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Material;
-import slimeknights.mantle.lib.transfer.fluid.FluidAttributes;
-import slimeknights.mantle.lib.util.MantleRegistry;
-import slimeknights.mantle.lib.util.RegistryObject;
-import slimeknights.mantle.lib.fluid.SimpleFlowableFluid;
-import slimeknights.mantle.lib.fluid.SimpleFlowableFluid.Properties;
+import io.github.fabricators_of_create.porting_lib.transfer.fluid.FluidAttributes;
+import io.github.fabricators_of_create.porting_lib.util.RegistryObject;
 import slimeknights.mantle.registration.DelayedSupplier;
 import slimeknights.mantle.registration.FluidBuilder;
 import slimeknights.mantle.registration.ItemProperties;
 import slimeknights.mantle.registration.object.FluidObject;
+import slimeknights.mantle.util.SimpleFlowableFluid;
+import slimeknights.mantle.util.SimpleFlowableFluid.Properties;
 
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class FluidDeferredRegister extends DeferredRegisterWrapper<Fluid> {
-  private final MantleRegistry<Block> blockRegister;
-  private final MantleRegistry<Item> itemRegister;
+  private final LazyRegistrar<Block> blockRegister;
+  private final LazyRegistrar<Item> itemRegister;
   public FluidDeferredRegister(String modID) {
     super(Registry.FLUID, modID);
-    this.blockRegister = MantleRegistry.create(Registry.BLOCK, modID);
-    this.itemRegister = MantleRegistry.create(Registry.ITEM, modID);
+    this.blockRegister = LazyRegistrar.create(Registry.BLOCK, modID);
+    this.itemRegister = LazyRegistrar.create(Registry.ITEM, modID);
   }
 
   @Override
@@ -61,7 +61,7 @@ public class FluidDeferredRegister extends DeferredRegisterWrapper<Fluid> {
    * @return  Fluid object
    */
   public <F extends SimpleFlowableFluid> FluidObject<F> register(String name, String tagName, FluidBuilder builder, Function<Properties,? extends F> still,
-      Function<Properties,? extends F> flowing, Function<Supplier<? extends FlowingFluid>,? extends LiquidBlock> block) {
+                                                                 Function<Properties,? extends F> flowing, Function<Supplier<? extends FlowingFluid>,? extends LiquidBlock> block) {
 
     // have to create still and flowing later, as the props need these suppliers
     DelayedSupplier<F> stillDelayed = new DelayedSupplier<>();
@@ -112,7 +112,7 @@ public class FluidDeferredRegister extends DeferredRegisterWrapper<Fluid> {
    * @return  Fluid object
    */
   public <F extends SimpleFlowableFluid> FluidObject<F> register(String name, String tagName, FluidAttributes.Builder builder,
-                                                               Function<Properties,? extends F> still, Function<Properties,? extends F> flowing, Material material, int lightLevel) {
+                                                                 Function<Properties,? extends F> still, Function<Properties,? extends F> flowing, Material material, int lightLevel) {
     return register(
       name, tagName, new FluidBuilder(builder.luminosity(lightLevel)).explosionResistance(100f), still, flowing,
       fluid -> new LiquidBlock(fluid.get(), Block.Properties.of(material).noCollission().strength(100.0F).noDrops().lightLevel(state -> lightLevel))

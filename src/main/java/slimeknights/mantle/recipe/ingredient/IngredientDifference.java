@@ -11,8 +11,8 @@ import net.minecraft.world.entity.player.StackedContents;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import slimeknights.mantle.Mantle;
-import slimeknights.mantle.lib.crafting.CraftingHelper;
-import slimeknights.mantle.lib.crafting.IIngredientSerializer;
+import io.github.fabricators_of_create.porting_lib.crafting.CraftingHelper;
+import io.github.fabricators_of_create.porting_lib.crafting.IIngredientSerializer;
 import slimeknights.mantle.util.JsonHelper;
 
 import javax.annotation.Nullable;

@@ -3,8 +3,8 @@ package slimeknights.mantle.loot.builder;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import slimeknights.mantle.data.GlobalLootModifierProvider;
-import slimeknights.mantle.lib.loot.GlobalLootModifierSerializer;
-import slimeknights.mantle.lib.loot.LootModifier;
+import io.github.fabricators_of_create.porting_lib.loot.GlobalLootModifierSerializer;
+import io.github.fabricators_of_create.porting_lib.loot.LootModifier;
 
 import java.util.function.Function;
 

@@ -1,12 +1,12 @@
 package slimeknights.mantle.client.model.util;
 
 import com.mojang.datafixers.util.Either;
+import io.github.fabricators_of_create.porting_lib.mixin.client.accessor.BlockModelAccessor;
 import lombok.AllArgsConstructor;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.client.resources.model.Material;
-import slimeknights.mantle.lib.mixin.accessor.BlockModelAccessor;
-import slimeknights.mantle.lib.model.IModelConfiguration;
+import io.github.fabricators_of_create.porting_lib.model.IModelConfiguration;
 
 import javax.annotation.Nullable;
 import java.util.Iterator;
@@ -70,7 +70,7 @@ public class ModelTextureIteratable implements Iterable<Map<String,Either<Materi
         map = initial;
         initial = null;
       } else if (model != null) {
-        map = ((BlockModelAccessor)model).getTextureMap();
+        map = ((BlockModelAccessor)model).port_lib$textureMap();
         model = model.parent;
       } else {
         throw new NoSuchElementException();

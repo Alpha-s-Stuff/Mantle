@@ -2,8 +2,8 @@ package slimeknights.mantle.client.model.data;
 
 import com.google.common.base.Preconditions;
 import lombok.RequiredArgsConstructor;
-import slimeknights.mantle.lib.model.IModelData;
-import slimeknights.mantle.lib.model.ModelProperty;
+import io.github.fabricators_of_create.porting_lib.model.IModelData;
+import io.github.fabricators_of_create.porting_lib.model.ModelProperty;
 
 import javax.annotation.Nullable;
 

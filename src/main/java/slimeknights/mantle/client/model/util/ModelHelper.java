@@ -24,7 +24,7 @@ import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import slimeknights.mantle.Mantle;
-import slimeknights.mantle.lib.util.IdentifiableResourceManagerReloadListener;
+import io.github.fabricators_of_create.porting_lib.util.IdentifiableResourceManagerReloadListener;
 
 import javax.annotation.Nullable;
 import java.util.Map;

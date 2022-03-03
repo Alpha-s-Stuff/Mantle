@@ -14,7 +14,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.fabricmc.api.EnvType;
-import slimeknights.mantle.lib.util.EnvExecutor;
+import io.github.fabricators_of_create.porting_lib.util.EnvExecutor;
 import slimeknights.mantle.util.BlockEntityHelper;
 
 import javax.annotation.Nullable;

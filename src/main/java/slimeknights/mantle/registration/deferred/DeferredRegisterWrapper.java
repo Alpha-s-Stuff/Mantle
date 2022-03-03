@@ -1,9 +1,9 @@
 package slimeknights.mantle.registration.deferred;
 
+import io.github.fabricators_of_create.porting_lib.util.LazyRegistrar;
 import net.minecraft.core.Registry;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.resources.ResourceLocation;
-import slimeknights.mantle.lib.util.MantleRegistry;
 import slimeknights.mantle.registration.object.EnumObject;
 
 import java.util.function.BiFunction;
@@ -16,12 +16,12 @@ import java.util.function.Supplier;
 @SuppressWarnings("WeakerAccess")
 public abstract class DeferredRegisterWrapper<T> {
   /** Registry instance, use this to provide register methods */
-  protected final MantleRegistry<T> register;
+  protected final LazyRegistrar<T> register;
   /** Mod ID for registration */
   private final String modID;
 
   protected DeferredRegisterWrapper(Registry<T> reg, String modID) {
-    register = MantleRegistry.create(reg, modID);
+    register = LazyRegistrar.create(reg, modID);
     this.modID = modID;
   }
 

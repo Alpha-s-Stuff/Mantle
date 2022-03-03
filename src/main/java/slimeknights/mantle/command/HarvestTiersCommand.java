@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import io.github.fabricators_of_create.porting_lib.util.TierSortingRegistry;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.Registry;
@@ -21,8 +22,7 @@ import net.minecraft.tags.TagCollection;
 import net.minecraft.world.item.Tier;
 import net.minecraft.world.level.block.Block;
 import slimeknights.mantle.Mantle;
-import slimeknights.mantle.lib.tiers.TierSortingRegistry;
-import slimeknights.mantle.lib.util.TagUtil;
+import io.github.fabricators_of_create.porting_lib.util.TagUtil;
 
 import java.io.BufferedWriter;
 import java.io.File;

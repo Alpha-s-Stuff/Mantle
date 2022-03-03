@@ -18,9 +18,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import slimeknights.mantle.block.entity.INameableMenuProvider;
 import slimeknights.mantle.inventory.BaseContainerMenu;
-import slimeknights.mantle.lib.transfer.TransferUtil;
-import slimeknights.mantle.lib.transfer.item.IItemHandler;
-import slimeknights.mantle.lib.util.NetworkUtil;
+import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
+import io.github.fabricators_of_create.porting_lib.transfer.item.IItemHandler;
+import io.github.fabricators_of_create.porting_lib.util.NetworkUtil;
 
 import javax.annotation.Nullable;
 

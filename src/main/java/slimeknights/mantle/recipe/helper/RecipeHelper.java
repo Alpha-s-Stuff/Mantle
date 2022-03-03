@@ -2,11 +2,11 @@ package slimeknights.mantle.recipe.helper;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
+import io.github.fabricators_of_create.porting_lib.mixin.common.accessor.RecipeManagerAccessor;
 import io.netty.handler.codec.DecoderException;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import slimeknights.mantle.lib.mixin.accessor.RecipeManagerAccessor;
-import slimeknights.mantle.lib.transfer.fluid.FluidStack;
+import io.github.fabricators_of_create.porting_lib.transfer.fluid.FluidStack;
 import slimeknights.mantle.recipe.IMultiRecipe;
 import java.util.Comparator;
 import java.util.List;
@@ -61,7 +61,7 @@ public class RecipeHelper {
    * @return  List of recipes from the manager
    */
   public static <I extends Container, T extends Recipe<I>, C extends T> List<C> getRecipes(RecipeManager manager, RecipeType<T> type, Class<C> clazz) {
-    return ((RecipeManagerAccessor)manager).callByType(type).values().stream()
+    return ((RecipeManagerAccessor) manager).port_lib$byType(type).values().stream()
                   .filter(clazz::isInstance)
                   .map(clazz::cast)
                   .collect(Collectors.toList());
@@ -79,7 +79,7 @@ public class RecipeHelper {
    * @return  Recipe list
    */
   public static <I extends Container, T extends Recipe<I>, C extends T> List<C> getUIRecipes(RecipeManager manager, RecipeType<T> type, Class<C> clazz, Predicate<? super C> filter) {
-    return ((RecipeManagerAccessor)manager).callByType(type).values().stream()
+    return ((RecipeManagerAccessor) manager).port_lib$byType(type).values().stream()
                   .filter(clazz::isInstance)
                   .map(clazz::cast)
                   .filter(filter)
@@ -126,7 +126,7 @@ public class RecipeHelper {
    * @return  List of flattened recipes from the manager
    */
   public static <I extends Container, T extends Recipe<I>, C> List<C> getJEIRecipes(RecipeManager manager, RecipeType<T> type, Class<C> clazz) {
-    return getJEIRecipes(((RecipeManagerAccessor)manager).callByType(type).values().stream(), clazz);
+    return getJEIRecipes(((RecipeManagerAccessor) manager).port_lib$byType(type).values().stream(), clazz);
   }
 
 

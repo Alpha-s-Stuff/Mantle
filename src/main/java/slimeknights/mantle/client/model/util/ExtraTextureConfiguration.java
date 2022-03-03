@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.resources.ResourceLocation;
-import slimeknights.mantle.lib.model.IModelConfiguration;
+import io.github.fabricators_of_create.porting_lib.model.IModelConfiguration;
 
 import java.util.Map;
 

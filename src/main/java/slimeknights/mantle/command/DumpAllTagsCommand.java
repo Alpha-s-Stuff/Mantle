@@ -4,6 +4,7 @@ import com.google.common.collect.Maps;
 import com.google.gson.JsonObject;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
+import io.github.fabricators_of_create.porting_lib.mixin.common.accessor.TagContainerAccessor;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.Registry;
@@ -22,7 +23,6 @@ import net.minecraft.tags.Tag;
 import net.minecraft.util.GsonHelper;
 import org.apache.commons.io.IOUtils;
 import slimeknights.mantle.Mantle;
-import slimeknights.mantle.lib.mixin.accessor.TagContainerAccessor;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -75,7 +75,7 @@ public class DumpAllTagsCommand {
   private static int runAll(CommandContext<CommandSourceStack> context) {
     File output = getOutputFile(context);
     int tagsDumped = 0;
-    for (ResourceKey<? extends Registry<?>> key : ((TagContainerAccessor)SerializationTags.getInstance()).getCollections().keySet()) {
+    for (ResourceKey<? extends Registry<?>> key : ((TagContainerAccessor)SerializationTags.getInstance()).port_lib$collections().keySet()) {
       ResourceLocation name = key.location();
       tagsDumped += runForFolder(context, name, TagCollectionArgument.getTagFolder(name), output);
     }

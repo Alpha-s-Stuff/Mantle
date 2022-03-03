@@ -6,8 +6,8 @@ import lombok.experimental.Accessors;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.item.Item;
-import slimeknights.mantle.lib.fluid.SimpleFlowableFluid;
-import slimeknights.mantle.lib.transfer.fluid.FluidAttributes;
+import io.github.fabricators_of_create.porting_lib.transfer.fluid.FluidAttributes;
+import slimeknights.mantle.util.SimpleFlowableFluid;
 
 import java.util.function.Supplier;
 

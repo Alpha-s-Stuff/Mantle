@@ -10,9 +10,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.material.Fluid;
 import slimeknights.mantle.Mantle;
 import slimeknights.mantle.config.Config;
-import slimeknights.mantle.lib.event.TagsUpdatedCallback;
-import slimeknights.mantle.lib.extensions.ResourceLocationEx;
-import slimeknights.mantle.lib.util.RegistryHelper;
+import io.github.fabricators_of_create.porting_lib.event.TagsUpdatedCallback;
+import io.github.fabricators_of_create.porting_lib.util.RegistryHelper;
 import slimeknights.mantle.util.LogicHelper;
 
 import java.util.Comparator;

@@ -15,7 +15,7 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
-import slimeknights.mantle.lib.crafting.CraftingHelper;
+import io.github.fabricators_of_create.porting_lib.crafting.CraftingHelper;
 
 import java.util.Objects;
 import java.util.function.Supplier;

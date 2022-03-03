@@ -8,11 +8,11 @@ import net.minecraft.data.HashCache;
 import net.minecraft.data.DataProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Tuple;
-import slimeknights.mantle.lib.loot.GlobalLootModifierSerializer;
-import slimeknights.mantle.lib.loot.IGlobalLootModifier;
-import slimeknights.mantle.lib.loot.LootModifier;
-import slimeknights.mantle.lib.loot.LootModifierManager;
-import slimeknights.mantle.lib.util.LamdbaExceptionUtils;
+import io.github.fabricators_of_create.porting_lib.loot.GlobalLootModifierSerializer;
+import io.github.fabricators_of_create.porting_lib.loot.IGlobalLootModifier;
+import io.github.fabricators_of_create.porting_lib.loot.LootModifier;
+import io.github.fabricators_of_create.porting_lib.loot.LootModifierManager;
+import io.github.fabricators_of_create.porting_lib.util.LamdbaExceptionUtils;
 
 import java.io.IOException;
 import java.nio.file.Path;

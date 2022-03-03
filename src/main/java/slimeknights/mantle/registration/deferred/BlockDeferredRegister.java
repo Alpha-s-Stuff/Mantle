@@ -1,5 +1,6 @@
 package slimeknights.mantle.registration.deferred;
 
+import io.github.fabricators_of_create.porting_lib.util.LazyRegistrar;
 import net.minecraft.core.Registry;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.item.BlockItem;
@@ -33,8 +34,7 @@ import slimeknights.mantle.block.entity.MantleSignBlockEntity;
 import slimeknights.mantle.item.BurnableBlockItem;
 import slimeknights.mantle.item.BurnableSignItem;
 import slimeknights.mantle.item.BurnableTallBlockItem;
-import slimeknights.mantle.lib.util.MantleRegistry;
-import slimeknights.mantle.lib.util.RegistryObject;
+import io.github.fabricators_of_create.porting_lib.util.RegistryObject;
 import slimeknights.mantle.registration.RegistrationHelper;
 import slimeknights.mantle.registration.object.BuildingBlockObject;
 import slimeknights.mantle.registration.object.EnumObject;
@@ -55,10 +55,10 @@ import java.util.function.Supplier;
 @SuppressWarnings({"WeakerAccess", "unused"})
 public class BlockDeferredRegister extends DeferredRegisterWrapper<Block> {
 
-  protected final MantleRegistry<Item> itemRegister;
+  protected final LazyRegistrar<Item> itemRegister;
   public BlockDeferredRegister(String modID) {
     super(Registry.BLOCK, modID);
-    this.itemRegister = MantleRegistry.create(Registry.ITEM, modID);
+    this.itemRegister = LazyRegistrar.create(Registry.ITEM, modID);
   }
 
   @Override

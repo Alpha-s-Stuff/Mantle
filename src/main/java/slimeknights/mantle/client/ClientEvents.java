@@ -4,6 +4,7 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import io.github.fabricators_of_create.porting_lib.util.LazySpawnEggItem;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
@@ -19,10 +20,9 @@ import slimeknights.mantle.client.book.BookLoader;
 import slimeknights.mantle.client.book.repository.FileRepository;
 import slimeknights.mantle.client.model.util.ModelHelper;
 import slimeknights.mantle.client.render.MantleShaders;
-import slimeknights.mantle.lib.event.OverlayRenderCallback;
-import slimeknights.mantle.lib.event.OverlayRenderCallback.Types;
-import slimeknights.mantle.lib.event.RegisterShadersCallback;
-import slimeknights.mantle.lib.util.MantleSpawnEggItem;
+import io.github.fabricators_of_create.porting_lib.event.OverlayRenderCallback;
+import io.github.fabricators_of_create.porting_lib.event.OverlayRenderCallback.Types;
+import io.github.fabricators_of_create.porting_lib.event.RegisterShadersCallback;
 import slimeknights.mantle.util.OffhandCooldownTracker;
 
 import java.util.function.Function;
@@ -51,7 +51,6 @@ public class ClientEvents implements ClientModInitializer {
     registerEntityRenderers();
     registerListeners();
     RegisterShadersCallback.EVENT.register(MantleShaders::registerShaders);
-    MantleSpawnEggItem.MOD_EGGS.forEach(egg -> ColorProviderRegistry.ITEM.register((stack, layer) -> egg.getColor(layer), egg));
     commonSetup();
   }
 

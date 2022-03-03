@@ -1,7 +1,7 @@
 package slimeknights.mantle.util;
 
-import slimeknights.mantle.lib.util.LazyOptional;
-import slimeknights.mantle.lib.util.NonNullConsumer;
+import io.github.fabricators_of_create.porting_lib.util.LazyOptional;
+import io.github.fabricators_of_create.porting_lib.util.NonNullConsumer;
 
 import java.lang.ref.WeakReference;
 

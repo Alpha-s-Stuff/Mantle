@@ -3,8 +3,8 @@ package slimeknights.mantle.registration;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.material.Fluid;
 import slimeknights.mantle.client.model.fluid.FluidTextureModel;
-import slimeknights.mantle.lib.transfer.fluid.FluidAttributes;
-import slimeknights.mantle.lib.util.EnvExecutor;
+import io.github.fabricators_of_create.porting_lib.transfer.fluid.FluidAttributes;
+import io.github.fabricators_of_create.porting_lib.util.EnvExecutor;
 
 import javax.annotation.Nullable;
 import java.util.function.BiFunction;

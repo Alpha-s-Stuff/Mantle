@@ -1,5 +1,6 @@
 package slimeknights.mantle;
 
+import io.github.fabricators_of_create.porting_lib.util.TierSortingRegistry;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.minecraft.core.Registry;
@@ -13,8 +14,7 @@ import slimeknights.mantle.block.entity.MantleSignBlockEntity;
 import slimeknights.mantle.command.MantleCommand;
 import slimeknights.mantle.config.Config;
 import slimeknights.mantle.item.LecternBookItem;
-import slimeknights.mantle.lib.crafting.CraftingHelper;
-import slimeknights.mantle.lib.tiers.TierSortingRegistry;
+import io.github.fabricators_of_create.porting_lib.crafting.CraftingHelper;
 import slimeknights.mantle.loot.MantleLoot;
 import slimeknights.mantle.network.MantleNetwork;
 import slimeknights.mantle.recipe.crafting.ShapedFallbackRecipe;
@@ -24,7 +24,6 @@ import slimeknights.mantle.recipe.ingredient.IngredientDifference;
 import slimeknights.mantle.recipe.ingredient.IngredientIntersection;
 import slimeknights.mantle.registration.adapter.BlockEntityTypeRegistryAdapter;
 import slimeknights.mantle.registration.adapter.RegistryAdapter;
-import slimeknights.mantle.util.OffhandCooldownTracker;
 
 /**
  * Mantle

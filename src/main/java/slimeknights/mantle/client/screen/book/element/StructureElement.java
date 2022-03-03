@@ -20,8 +20,8 @@ import slimeknights.mantle.client.book.structure.StructureInfo;
 import slimeknights.mantle.client.book.structure.level.TemplateLevel;
 import slimeknights.mantle.client.render.MantleRenderTypes;
 import slimeknights.mantle.client.screen.book.BookScreen;
-import slimeknights.mantle.lib.model.EmptyModelData;
-import slimeknights.mantle.lib.model.IModelData;
+import io.github.fabricators_of_create.porting_lib.model.EmptyModelData;
+import io.github.fabricators_of_create.porting_lib.model.IModelData;
 
 import java.util.List;
 import java.util.stream.IntStream;

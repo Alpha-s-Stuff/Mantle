@@ -10,7 +10,7 @@ import net.minecraft.world.level.ItemLike;
 import net.minecraft.resources.ResourceLocation;
 
 import net.fabricmc.fabric.api.tag.TagFactory;
-import slimeknights.mantle.lib.fluid.SimpleFlowableFluid;
+import slimeknights.mantle.util.SimpleFlowableFluid;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
