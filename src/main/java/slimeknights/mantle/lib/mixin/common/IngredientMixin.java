@@ -1,4 +1,4 @@
-package slimeknights.mantle.lib.mixin;
+package slimeknights.mantle.lib.mixin.common;
 
 import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.network.FriendlyByteBuf;

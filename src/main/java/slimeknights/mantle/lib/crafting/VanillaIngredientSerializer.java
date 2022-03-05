@@ -1,12 +1,12 @@
 package slimeknights.mantle.lib.crafting;
 
 import com.google.gson.JsonObject;
-import slimeknights.mantle.lib.mixin.IngredientAccessor;
 import java.util.stream.Stream;
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
+import slimeknights.mantle.lib.mixin.IngredientAccessor;
 
 public class VanillaIngredientSerializer implements IIngredientSerializer<Ingredient>
 {

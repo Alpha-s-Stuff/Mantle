@@ -10,9 +10,10 @@ import net.minecraft.world.level.BlockGetter;
 import javax.annotation.Nullable;
 
 import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
+import slimeknights.mantle.lib.block.CustomPathNodeTypeBlock;
 import slimeknights.mantle.lib.extensions.BlockExtensions;
 
-public class WoodenDoorBlock extends DoorBlock implements BlockExtensions {
+public class WoodenDoorBlock extends DoorBlock implements CustomPathNodeTypeBlock {
   public WoodenDoorBlock(Properties builder) {
     super(builder);
   }
