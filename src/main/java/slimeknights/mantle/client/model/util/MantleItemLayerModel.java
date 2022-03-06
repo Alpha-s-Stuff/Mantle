@@ -9,6 +9,16 @@ import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormatElement;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.math.Transformation;
+import io.github.fabricators_of_create.porting_lib.extensions.TextureAtlasSpriteExtensions;
+import io.github.fabricators_of_create.porting_lib.extensions.TransformationExtensions;
+import io.github.fabricators_of_create.porting_lib.model.BakedQuadBuilder;
+import io.github.fabricators_of_create.porting_lib.model.CompositeModelState;
+import io.github.fabricators_of_create.porting_lib.model.IModelConfiguration;
+import io.github.fabricators_of_create.porting_lib.model.IModelGeometry;
+import io.github.fabricators_of_create.porting_lib.model.IModelLoader;
+import io.github.fabricators_of_create.porting_lib.model.IVertexConsumer;
+import io.github.fabricators_of_create.porting_lib.model.PerspectiveMapWrapper;
+import io.github.fabricators_of_create.porting_lib.model.TRSRTransformer;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
@@ -24,16 +34,6 @@ import net.minecraft.core.Direction.Axis;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.GsonHelper;
-import slimeknights.mantle.lib.extensions.TextureAtlasSpriteExtensions;
-import slimeknights.mantle.lib.extensions.TransformationExtensions;
-import slimeknights.mantle.lib.model.BakedQuadBuilder;
-import slimeknights.mantle.lib.model.CompositeModelState;
-import slimeknights.mantle.lib.model.IModelConfiguration;
-import slimeknights.mantle.lib.model.IModelGeometry;
-import slimeknights.mantle.lib.model.IModelLoader;
-import slimeknights.mantle.lib.model.IVertexConsumer;
-import slimeknights.mantle.lib.model.PerspectiveMapWrapper;
-import slimeknights.mantle.lib.model.TRSRTransformer;
 import slimeknights.mantle.util.ItemLayerPixels;
 import slimeknights.mantle.util.JsonHelper;
 import slimeknights.mantle.util.ReversedListBuilder;
@@ -359,7 +359,7 @@ public class MantleItemLayerModel implements IModelGeometry<MantleItemLayerModel
     builder.setQuadOrientation(side);
     builder.setApplyDiffuseLighting(false); // TODO: luminosity == 0?
 
-    boolean hasTransform = !((TransformationExtensions)(Object)transform).isIdentity();
+    boolean hasTransform = !transform.isIdentity();
     IVertexConsumer consumer = hasTransform ? new TRSRTransformer(builder, transform) : builder;
 
     putVertex(consumer, side, x0, y0, z0, u0, v0, color, luminosity);

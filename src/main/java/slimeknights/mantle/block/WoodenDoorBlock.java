@@ -1,5 +1,6 @@
 package slimeknights.mantle.block;
 
+import io.github.fabricators_of_create.porting_lib.block.CustomPathNodeTypeBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.entity.Mob;
@@ -8,10 +9,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockGetter;
 
 import javax.annotation.Nullable;
-
-import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
-import slimeknights.mantle.lib.block.CustomPathNodeTypeBlock;
-import slimeknights.mantle.lib.extensions.BlockExtensions;
 
 public class WoodenDoorBlock extends DoorBlock implements CustomPathNodeTypeBlock {
   public WoodenDoorBlock(Properties builder) {

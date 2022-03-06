@@ -4,14 +4,22 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import io.github.fabricators_of_create.porting_lib.event.ModelLoadCallback;
+import io.github.fabricators_of_create.porting_lib.event.OverlayRenderCallback;
+import io.github.fabricators_of_create.porting_lib.event.OverlayRenderCallback.Types;
+import io.github.fabricators_of_create.porting_lib.event.RegisterShadersCallback;
+import io.github.fabricators_of_create.porting_lib.model.ModelLoaderRegistry;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.client.AttackIndicatorStatus;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
+import net.minecraft.client.color.block.BlockColors;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.level.GameType;
 import slimeknights.mantle.Mantle;
@@ -27,12 +35,6 @@ import slimeknights.mantle.client.model.util.ColoredBlockModel;
 import slimeknights.mantle.client.model.util.MantleItemLayerModel;
 import slimeknights.mantle.client.model.util.ModelHelper;
 import slimeknights.mantle.client.render.MantleShaders;
-import slimeknights.mantle.lib.event.ModelLoadCallback;
-import slimeknights.mantle.lib.event.OverlayRenderCallback;
-import slimeknights.mantle.lib.event.OverlayRenderCallback.Types;
-import slimeknights.mantle.lib.event.RegisterShadersCallback;
-import slimeknights.mantle.lib.model.ModelLoaderRegistry;
-import slimeknights.mantle.lib.util.MantleSpawnEggItem;
 import slimeknights.mantle.util.OffhandCooldownTracker;
 
 import java.util.function.Function;
@@ -52,7 +54,6 @@ public class ClientEvents implements ClientModInitializer {
 
   @Override
   public void onInitializeClient() {
-    ModelLoadCallback.EVENT.register(ModelLoaderRegistry::init);
 //    RegistrationHelper.forEachWoodType(woodType ->  {
 //      ResourceLocation location = new ResourceLocation(woodType.name());
 //      Sheets.SIGN_MATERIALS.put(woodType, new Material(SIGN_SHEET, new ResourceLocation(location.getNamespace(), "entity/signs/" + location.getPath())));
@@ -63,13 +64,12 @@ public class ClientEvents implements ClientModInitializer {
     registerEntityRenderers();
     registerListeners();
     RegisterShadersCallback.EVENT.register(MantleShaders::registerShaders);
-    MantleSpawnEggItem.MOD_EGGS.forEach(egg -> ColorProviderRegistry.ITEM.register((stack, layer) -> egg.getColor(layer), egg));
     ModelLoadCallback.EVENT.register(ClientEvents::registerModelLoaders);
     commonSetup();
   }
 
   // PAINNNNNN
-  static void registerModelLoaders() {
+  static void registerModelLoaders(ResourceManager manager, BlockColors colors, ProfilerFiller profiler, int mipLevel) {
     // standard models - useful in resource packs for any model
 //    ModelLoaderRegistry.registerLoader(Mantle.getResource("connected"), ConnectedModel.Loader.INSTANCE); TODO: PORT
     ModelLoaderRegistry.registerLoader(Mantle.getResource("item_layer"), MantleItemLayerModel.LOADER);
