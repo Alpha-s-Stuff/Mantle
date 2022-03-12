@@ -29,7 +29,9 @@
     ]
   },
   "accessWidener": "mantle.accesswidener",
-
+  "mixins": [
+    "mantle.mixins.json"
+  ],
   "custom": {
     "cardinal-components": [
       "mantle:offhand_cooldown"
