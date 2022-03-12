@@ -27,14 +27,6 @@ public class ModelFluidAttributes extends FluidAttributes {
   protected ModelFluidAttributes(FluidAttributes.Builder builder, Fluid fluid) {
     super(builder, fluid);
     this.fluid = fluid;
-    EnvExecutor.runWhenOn(EnvType.CLIENT, () -> () -> {
-      FluidRenderHandlerRegistry.INSTANCE.register(fluid, new SimpleFluidRenderHandler(getStillTexture(), getFlowingTexture(), getOverlayTexture()));
-      ClientSpriteRegistryCallback.event(TextureAtlas.LOCATION_BLOCKS).register((atlasTexture, registry) -> {
-        registry.register(getStillTexture());
-        registry.register(getFlowingTexture());
-        registry.register(getStillTexture());
-      });
-    });
   }
 
   @Override

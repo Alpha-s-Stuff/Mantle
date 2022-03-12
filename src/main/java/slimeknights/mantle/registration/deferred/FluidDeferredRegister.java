@@ -1,5 +1,10 @@
 package slimeknights.mantle.registration.deferred;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandlerRegistry;
+import net.fabricmc.fabric.api.client.render.fluid.v1.SimpleFluidRenderHandler;
+import net.fabricmc.fabric.api.event.client.ClientSpriteRegistryCallback;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.core.Registry;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.Item;
@@ -9,6 +14,7 @@ import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Material;
 import slimeknights.mantle.lib.transfer.fluid.FluidAttributes;
+import slimeknights.mantle.lib.util.EnvExecutor;
 import slimeknights.mantle.lib.util.MantleRegistry;
 import slimeknights.mantle.lib.util.RegistryObject;
 import slimeknights.mantle.lib.fluid.SimpleFlowableFluid;
@@ -79,6 +85,14 @@ public class FluidDeferredRegister extends DeferredRegisterWrapper<Fluid> {
     stillDelayed.setSupplier(stillSup);
     Supplier<F> flowingSup = registerFluid("flowing_" + name, () -> flowing.apply(props));
     flowingDelayed.setSupplier(flowingSup);
+    EnvExecutor.runWhenOn(EnvType.CLIENT, () -> () -> {
+      FluidRenderHandlerRegistry.INSTANCE.register(stillSup.get(), new SimpleFluidRenderHandler(stillSup.get().getAttributes().getStillTexture(), stillSup.get().getAttributes().getFlowingTexture(), stillSup.get().getAttributes().getOverlayTexture()));
+      ClientSpriteRegistryCallback.event(TextureAtlas.LOCATION_BLOCKS).register((atlasTexture, registry) -> {
+        registry.register(stillSup.get().getAttributes().getStillTexture());
+        registry.register(stillSup.get().getAttributes().getFlowingTexture());
+        registry.register(stillSup.get().getAttributes().getOverlayTexture());
+      });
+    });
 
     // return the final nice object
     return new FluidObject<>(resource(name), tagName, stillSup, flowingSup, blockObj);
