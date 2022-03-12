@@ -1,6 +1,12 @@
 package slimeknights.mantle.registration.deferred;
 
+import io.github.fabricators_of_create.porting_lib.util.EnvExecutor;
 import io.github.fabricators_of_create.porting_lib.util.LazyRegistrar;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandlerRegistry;
+import net.fabricmc.fabric.api.client.render.fluid.v1.SimpleFluidRenderHandler;
+import net.fabricmc.fabric.api.event.client.ClientSpriteRegistryCallback;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.core.Registry;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.Item;
@@ -79,6 +85,14 @@ public class FluidDeferredRegister extends DeferredRegisterWrapper<Fluid> {
     stillDelayed.setSupplier(stillSup);
     Supplier<F> flowingSup = registerFluid("flowing_" + name, () -> flowing.apply(props));
     flowingDelayed.setSupplier(flowingSup);
+    EnvExecutor.runWhenOn(EnvType.CLIENT, () -> () -> {
+      FluidRenderHandlerRegistry.INSTANCE.register(stillSup.get(), new SimpleFluidRenderHandler(stillSup.get().getAttributes().getStillTexture(), stillSup.get().getAttributes().getFlowingTexture(), stillSup.get().getAttributes().getOverlayTexture()));
+      ClientSpriteRegistryCallback.event(TextureAtlas.LOCATION_BLOCKS).register((atlasTexture, registry) -> {
+        registry.register(stillSup.get().getAttributes().getStillTexture());
+        registry.register(stillSup.get().getAttributes().getFlowingTexture());
+        registry.register(stillSup.get().getAttributes().getOverlayTexture());
+      });
+    });
 
     // return the final nice object
     return new FluidObject<>(resource(name), tagName, stillSup, flowingSup, blockObj);
