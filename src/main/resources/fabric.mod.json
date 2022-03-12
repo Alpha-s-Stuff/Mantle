@@ -29,10 +29,12 @@
     ]
   },
   "accessWidener": "mantle.accesswidener",
-  "mixins": [
-    "mantle.mixin.json"
-  ],
 
+  "custom": {
+    "cardinal-components": [
+      "mantle:offhand_cooldown"
+    ]
+  },
   "depends": {
     "fabricloader": ">=0.12.12",
     "fabric": ">=0.44.0",
