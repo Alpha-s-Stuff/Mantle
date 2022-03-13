@@ -214,9 +214,18 @@ public class SimpleChannel {
 				Constructor<?> ctor = clazz.getDeclaredConstructor(FriendlyByteBuf.class);
 				ctor.setAccessible(true);
 				packet = (S2CPacket) ctor.newInstance(buf);
+			} catch (NoSuchMethodException e) {
+        try {
+          Class<?> clazz = s2cIdMap.get(id);
+          Constructor<?> ctor = clazz.getDeclaredConstructor();
+          ctor.setAccessible(true);
+          packet = (S2CPacket) ctor.newInstance();
+        } catch (Exception ex) {
+          LOGGER.error("Could not create S2C packet in channel '" + channelName + "' with id " + id, ex);
+        }
 			} catch (Exception e) {
-				LOGGER.error("Could not create S2C packet in channel '" + channelName + "' with id " + id, e);
-			}
+        LOGGER.error("Could not create S2C packet in channel '" + channelName + "' with id " + id, e);
+      }
 			if (packet != null) {
 				packet.handle(client, handler, new ResponseTarget(responseSender));
 			}

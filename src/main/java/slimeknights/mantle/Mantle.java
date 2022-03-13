@@ -46,7 +46,6 @@ public class Mantle implements ModInitializer {
     ModLoadingContext.registerConfig(modId, Type.SERVER, Config.SERVER_SPEC);
 
     instance = this;
-    TierSortingRegistry.init();
     commonSetup();
     this.registerCapabilities();
     this.registerRecipeSerializers();

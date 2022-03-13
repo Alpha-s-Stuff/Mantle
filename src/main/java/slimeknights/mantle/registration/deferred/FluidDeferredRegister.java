@@ -85,14 +85,6 @@ public class FluidDeferredRegister extends DeferredRegisterWrapper<Fluid> {
     stillDelayed.setSupplier(stillSup);
     Supplier<F> flowingSup = registerFluid("flowing_" + name, () -> flowing.apply(props));
     flowingDelayed.setSupplier(flowingSup);
-    EnvExecutor.runWhenOn(EnvType.CLIENT, () -> () -> {
-      FluidRenderHandlerRegistry.INSTANCE.register(stillSup.get(), new SimpleFluidRenderHandler(stillSup.get().getAttributes().getStillTexture(), stillSup.get().getAttributes().getFlowingTexture(), stillSup.get().getAttributes().getOverlayTexture()));
-      ClientSpriteRegistryCallback.event(TextureAtlas.LOCATION_BLOCKS).register((atlasTexture, registry) -> {
-        registry.register(stillSup.get().getAttributes().getStillTexture());
-        registry.register(stillSup.get().getAttributes().getFlowingTexture());
-        registry.register(stillSup.get().getAttributes().getOverlayTexture());
-      });
-    });
 
     // return the final nice object
     return new FluidObject<>(resource(name), tagName, stillSup, flowingSup, blockObj);
