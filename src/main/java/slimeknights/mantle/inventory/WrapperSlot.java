@@ -15,7 +15,7 @@ public class WrapperSlot extends Slot implements SlotExtensions {
   public final Slot parent;
 
   public WrapperSlot(Slot slot) {
-    super(slot.container, slot.getContainerSlot(), slot.x, slot.y);
+    super(slot.container, slot.getSlotIndex(), slot.x, slot.y);
     this.parent = slot;
   }
 

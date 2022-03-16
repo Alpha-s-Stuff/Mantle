@@ -91,7 +91,7 @@ public class StructureElement extends SizedBookElement {
 
       transform.translate(this.transX, this.transY, Math.max(structureHeight, Math.max(structureWidth, structureLength)));
       transform.scale(this.scale, -this.scale, 1);
-//      this.additionalTransform.push(transform); todo: port
+      this.additionalTransform.push(transform);
       transform.mulPose(new Quaternion(0, 0, 0, true));
 
       transform.translate(structureLength / -2f, structureHeight / -2f, structureWidth / -2f);

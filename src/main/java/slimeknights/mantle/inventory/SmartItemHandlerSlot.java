@@ -12,6 +12,6 @@ public class SmartItemHandlerSlot extends SlotItemHandler {
 
 	@Override
 	public int getMaxStackSize(ItemStack stack) {
-		return getItemHandler().getSlotLimit(getContainerSlot());
+		return getItemHandler().getSlotLimit(getSlotIndex());
 	}
 }

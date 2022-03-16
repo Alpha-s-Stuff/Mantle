@@ -25,6 +25,7 @@ repositories {
     maven { url = "https://maven.terraformersmc.com/releases/" }
     maven { url = "https://ladysnake.jfrog.io/artifactory/mods" }
     maven { url = "https://maven.jamieswhiteshirt.com/libs-release" }
+    maven { url = "https://jitpack.io" }
 }
 
 group = 'slimeknights.mantle'
@@ -155,6 +156,9 @@ dependencies {
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.22'
 
     annotationProcessor "net.fabricmc:fabric-mixin-compile-extensions:0.4.7"
+
+    api(include("com.github.LlamaLad7:MixinExtras:0.0.6"))
+    annotationProcessor(include("com.github.LlamaLad7:MixinExtras:0.0.6"))
 }
 
 task buildOrPublish {
