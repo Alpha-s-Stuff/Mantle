@@ -4,6 +4,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.Dynamic2CommandExceptionType;
+import io.github.fabricators_of_create.porting_lib.extensions.ResourceLocationExtensions;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.ResourceLocationArgument;
@@ -54,7 +55,7 @@ public class ViewTagCommand {
       } else {
         values.stream()
               .map(result::getKey)
-              .sorted((a, b) -> Objects.requireNonNull(a).compareNamespaced(Objects.requireNonNull(b)))
+              .sorted((a, b) -> ((ResourceLocationExtensions)Objects.requireNonNull(a)).compareNamespaced(Objects.requireNonNull(b)))
               .forEach(value -> output.append("\n* " + Objects.requireNonNull(value)));
       }
       context.getSource().sendSuccess(output, true);

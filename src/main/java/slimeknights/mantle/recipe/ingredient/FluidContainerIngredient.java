@@ -2,6 +2,7 @@ package slimeknights.mantle.recipe.ingredient;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import io.github.fabricators_of_create.porting_lib.extensions.IngredientExtensions;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -22,7 +23,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 /** Ingredient that matches a container of fluid */
-public class FluidContainerIngredient extends Ingredient {
+public class FluidContainerIngredient extends Ingredient implements IngredientExtensions {
   public static final ResourceLocation ID = Mantle.getResource("fluid_container");
   public static final Serializer SERIALIZER = new Serializer();
 
@@ -109,7 +110,7 @@ public class FluidContainerIngredient extends Ingredient {
 
   @Override
   public void invalidate() {
-    super.invalidate();
+    IngredientExtensions.super.invalidate();
     this.displayStacks = null;
   }
 

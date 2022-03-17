@@ -1,5 +1,6 @@
 package slimeknights.mantle.recipe.helper;
 
+import io.github.fabricators_of_create.porting_lib.extensions.ResourceLocationExtensions;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -46,7 +47,7 @@ public class TagPreference<T> {
       return Integer.compare(indexA, indexB);
     }
     // for stability, fallback to registry name compare
-    return idA.compareNamespaced(idB);
+    return ((ResourceLocationExtensions)idA).compareNamespaced(idB);
   };
 
   /**

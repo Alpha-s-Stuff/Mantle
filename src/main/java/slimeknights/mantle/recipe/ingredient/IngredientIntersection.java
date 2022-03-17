@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import io.github.fabricators_of_create.porting_lib.extensions.IngredientExtensions;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntComparators;
 import it.unimi.dsi.fastutil.ints.IntList;
@@ -23,7 +24,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 /** Ingredient that matches anything that matches all of the sub ingredients */
-public class IngredientIntersection extends Ingredient {
+public class IngredientIntersection extends Ingredient implements IngredientExtensions {
   public static final ResourceLocation ID = Mantle.getResource("intersection");
   public static final IIngredientSerializer<IngredientIntersection> SERIALIZER = new Serializer();
 
@@ -95,7 +96,7 @@ public class IngredientIntersection extends Ingredient {
   @Override
   public boolean isSimple() {
     for (Ingredient ingredient : ingredients) {
-      if (!ingredient.isSimple()) {
+      if (!((IngredientExtensions)ingredient).isSimple()) {
         return false;
       }
     }
@@ -104,7 +105,7 @@ public class IngredientIntersection extends Ingredient {
 
   @Override
   public void invalidate() {
-    super.invalidate();
+    IngredientExtensions.super.invalidate();
     this.intersectedMatchingStacks = null;
     this.packedMatchingStacks = null;
   }

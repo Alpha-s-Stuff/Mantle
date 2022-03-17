@@ -3,6 +3,7 @@ package slimeknights.mantle.recipe.data;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import io.github.fabricators_of_create.porting_lib.extensions.IngredientExtensions;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.resources.ResourceLocation;
@@ -17,7 +18,7 @@ import java.util.stream.Stream;
 /**
  * Ingredient for a non-NBT sensitive item from another mod, should never be used outside datagen
  */
-public class ItemNameIngredient extends Ingredient {
+public class ItemNameIngredient extends Ingredient implements IngredientExtensions {
   private final List<ResourceLocation> names;
 
   protected ItemNameIngredient(List<ResourceLocation> names) {

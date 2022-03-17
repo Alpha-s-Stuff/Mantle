@@ -1,5 +1,6 @@
 package slimeknights.mantle.util;
 
+import io.github.fabricators_of_create.porting_lib.extensions.FluidExtensions;
 import io.github.fabricators_of_create.porting_lib.transfer.fluid.FluidAttributes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -22,7 +23,7 @@ import javax.annotation.Nullable;
 import java.util.function.Supplier;
 
 // from Registrate
-public abstract class SimpleFlowableFluid extends FlowingFluid {
+public abstract class SimpleFlowableFluid extends FlowingFluid implements FluidExtensions {
   private final Supplier<? extends Fluid> flowing;
   private final Supplier<? extends Fluid> still;
   @Nullable

@@ -11,6 +11,7 @@ import com.google.gson.JsonSyntaxException;
 import com.mojang.datafixers.util.Either;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.math.Transformation;
+import io.github.fabricators_of_create.porting_lib.extensions.TransformationExtensions;
 import io.github.fabricators_of_create.porting_lib.model.IModelConfiguration;
 import io.github.fabricators_of_create.porting_lib.model.IModelData;
 import io.github.fabricators_of_create.porting_lib.model.IModelGeometry;
@@ -380,7 +381,7 @@ public class ConnectedModel implements IModelGeometry<ConnectedModel> {
 
       // gather connections data
       Transformation rotation = transforms.getRotation();
-      data.setData(CONNECTIONS, getConnections((dir) -> parent.sides.contains(dir) && parent.connectionPredicate.test(state, world.getBlockState(pos.relative(rotation.rotateTransform(dir))))));
+      data.setData(CONNECTIONS, getConnections((dir) -> parent.sides.contains(dir) && parent.connectionPredicate.test(state, world.getBlockState(pos.relative(((TransformationExtensions)(Object)rotation).rotateTransform(dir))))));
       return data;
     }
 
@@ -424,7 +425,7 @@ public class ConnectedModel implements IModelGeometry<ConnectedModel> {
             if (!parent.sides.contains(dir)) {
               return false;
             }
-            BooleanProperty prop = IMultipartConnectedBlock.CONNECTED_DIRECTIONS.get(rotation.rotateTransform(dir));
+            BooleanProperty prop = IMultipartConnectedBlock.CONNECTED_DIRECTIONS.get(((TransformationExtensions)(Object)rotation).rotateTransform(dir));
             return state.hasProperty(prop) && state.getValue(prop);
           });
         }

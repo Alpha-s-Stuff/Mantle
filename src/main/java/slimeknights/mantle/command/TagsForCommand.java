@@ -5,6 +5,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.Dynamic2CommandExceptionType;
+import io.github.fabricators_of_create.porting_lib.extensions.ResourceLocationExtensions;
 import io.github.fabricators_of_create.porting_lib.mixin.common.accessor.ItemAccessor;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -111,7 +112,7 @@ public class TagsForCommand {
       output.append("\n* ").append(NO_TAGS);
     } else {
       tags.stream()
-          .sorted(ResourceLocation::compareNamespaced)
+          .sorted((resourceLocation, compare) -> ((ResourceLocationExtensions)resourceLocation).compareNamespaced(compare))
           .forEach(tag -> output.append("\n* " + tag));
     }
     context.getSource().sendSuccess(output, true);

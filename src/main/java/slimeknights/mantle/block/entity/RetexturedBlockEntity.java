@@ -1,5 +1,6 @@
 package slimeknights.mantle.block.entity;
 
+import io.github.fabricators_of_create.porting_lib.extensions.BlockEntityExtensions;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -51,6 +52,6 @@ public class RetexturedBlockEntity extends MantleBlockEntity implements IRetextu
 
   @Override
   public CompoundTag getTileData() {
-    return this.getExtraCustomData();
+    return ((BlockEntityExtensions)this).getExtraCustomData();
   }
 }

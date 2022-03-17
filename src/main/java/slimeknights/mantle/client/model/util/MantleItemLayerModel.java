@@ -359,7 +359,7 @@ public class MantleItemLayerModel implements IModelGeometry<MantleItemLayerModel
     builder.setQuadOrientation(side);
     builder.setApplyDiffuseLighting(false); // TODO: luminosity == 0?
 
-    boolean hasTransform = !transform.isIdentity();
+    boolean hasTransform = !((TransformationExtensions)(Object)transform).isIdentity();
     IVertexConsumer consumer = hasTransform ? new TRSRTransformer(builder, transform) : builder;
 
     putVertex(consumer, side, x0, y0, z0, u0, v0, color, luminosity);

@@ -2,6 +2,7 @@ package slimeknights.mantle.recipe.ingredient;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import io.github.fabricators_of_create.porting_lib.extensions.IngredientExtensions;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntComparators;
 import it.unimi.dsi.fastutil.ints.IntList;
@@ -22,7 +23,7 @@ import java.util.stream.Stream;
 /**
  * Ingredient that matches everything from another ingredient, minus a second ingredient
  */
-public class IngredientDifference extends Ingredient {
+public class IngredientDifference extends Ingredient implements IngredientExtensions {
   public static final ResourceLocation ID = Mantle.getResource("difference");
   public static final IIngredientSerializer<IngredientDifference> SERIALIZER = new Serializer();
 
@@ -72,12 +73,12 @@ public class IngredientDifference extends Ingredient {
 
   @Override
   public boolean isSimple() {
-    return base.isSimple() && subtracted.isSimple();
+    return ((IngredientExtensions)base).isSimple() && ((IngredientExtensions)subtracted).isSimple();
   }
 
   @Override
   public void invalidate() {
-    super.invalidate();
+    IngredientExtensions.super.invalidate();
     this.filteredMatchingStacks = null;
     this.packedMatchingStacks = null;
   }

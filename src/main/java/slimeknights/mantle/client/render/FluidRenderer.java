@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Matrix4f;
 import com.mojang.math.Vector3f;
+import io.github.fabricators_of_create.porting_lib.extensions.FluidExtensions;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -254,7 +255,7 @@ public class FluidRenderer {
     }
 
     // fluid attributes, fetch once for all fluids to save effort
-    FluidAttributes attributes = fluid.getFluid().getAttributes();
+    FluidAttributes attributes = ((FluidExtensions)fluid.getFluid()).getAttributes();
     TextureAtlasSprite still = getBlockSprite(attributes.getStillTexture(fluid));
     TextureAtlasSprite flowing = getBlockSprite(attributes.getFlowingTexture(fluid));
     int color = attributes.getColor(fluid);
@@ -308,7 +309,7 @@ public class FluidRenderer {
     }
 
     // fluid attributes
-    FluidAttributes attributes = fluid.getFluid().getAttributes();
+    FluidAttributes attributes = ((FluidExtensions)fluid.getFluid()).getAttributes();
     TextureAtlasSprite still = getBlockSprite(attributes.getStillTexture(fluid));
     TextureAtlasSprite flowing = getBlockSprite(attributes.getFlowingTexture(fluid));
     boolean isGas = attributes.isGaseous(fluid);
@@ -330,6 +331,6 @@ public class FluidRenderer {
     }
 
     // draw cuboid
-    renderCuboid(matrices, buffer.getBuffer(MantleRenderTypes.FLUID), cube, still, flowing, from, to, fluid.getFluid().getAttributes().getColor(fluid), light, isGas);
+    renderCuboid(matrices, buffer.getBuffer(MantleRenderTypes.FLUID), cube, still, flowing, from, to, ((FluidExtensions)fluid.getFluid()).getAttributes().getColor(fluid), light, isGas);
   }
 }

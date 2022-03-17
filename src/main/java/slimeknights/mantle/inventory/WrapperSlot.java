@@ -15,7 +15,7 @@ public class WrapperSlot extends Slot implements SlotExtensions {
   public final Slot parent;
 
   public WrapperSlot(Slot slot) {
-    super(slot.container, slot.getSlotIndex(), slot.x, slot.y);
+    super(slot.container, ((SlotExtensions)slot).getSlotIndex(), slot.x, slot.y);
     this.parent = slot;
   }
 
@@ -76,7 +76,7 @@ public class WrapperSlot extends Slot implements SlotExtensions {
 
   @Override
   public Slot setBackground(ResourceLocation atlas, ResourceLocation sprite) {
-    return this.parent.setBackground(atlas, sprite);
+    return ((SlotExtensions)this.parent).setBackground(atlas, sprite);
   }
 
   @Override
