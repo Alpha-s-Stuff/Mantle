@@ -4,6 +4,7 @@ import lombok.Getter;
 
 import net.minecraft.tags.Tag;
 import net.minecraft.world.level.block.LiquidBlock;
+import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
@@ -22,7 +23,7 @@ import java.util.function.Supplier;
  * @param <F>  Fluid class
  */
 @SuppressWarnings("WeakerAccess")
-public class FluidObject<F extends SimpleFlowableFluid> implements Supplier<F>, ItemLike {
+public class FluidObject<F extends FlowingFluid> implements Supplier<F>, ItemLike {
   /** Fluid name, used for tag creation */
   @Getter @Nonnull
   protected final ResourceLocation id;
