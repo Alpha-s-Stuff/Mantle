@@ -59,6 +59,7 @@ public class Mantle implements ModInitializer {
   }
 
   private void commonSetup() {
+    MantleNetwork.INSTANCE.network.initServerListener();
     MantleNetwork.registerPackets();
     MantleCommand.init();
 //    OffhandCooldownTracker.register();

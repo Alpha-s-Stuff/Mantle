@@ -36,6 +36,7 @@ import slimeknights.mantle.client.model.util.ColoredBlockModel;
 import slimeknights.mantle.client.model.util.MantleItemLayerModel;
 import slimeknights.mantle.client.model.util.ModelHelper;
 import slimeknights.mantle.client.render.MantleShaders;
+import slimeknights.mantle.network.MantleNetwork;
 import slimeknights.mantle.util.OffhandCooldownTracker;
 
 import java.util.function.Function;
@@ -67,6 +68,7 @@ public class ClientEvents implements ClientModInitializer {
     RegisterShadersCallback.EVENT.register(MantleShaders::registerShaders);
     ModelLoadCallback.EVENT.register(ClientEvents::registerModelLoaders);
     commonSetup();
+    MantleNetwork.INSTANCE.network.initClientListener();
   }
 
   static void registerModelLoaders(ResourceManager manager, BlockColors colors, ProfilerFiller profiler, int mipLevel) {

@@ -20,8 +20,8 @@ repositories {
     maven { url = "https://maven.parchmentmc.org" }
     maven { url = "https://maven.shedaniel.me/" }
     maven { url = "https://cursemaven.com" }
-    maven { url = "https://maven.devos.community/releases/" }
-    maven { url = "https://maven.devos.community/snapshots/" }
+    maven { url = "https://mvn.devos.one/releases/" }
+    maven { url = "https://mvn.devos.one/snapshots/" }
     maven { url = "https://maven.terraformersmc.com/releases/" }
     maven { url = "https://ladysnake.jfrog.io/artifactory/mods" }
     maven { url = "https://maven.jamieswhiteshirt.com/libs-release" }
@@ -226,7 +226,7 @@ publishing {
 
     repositories {
         maven {
-            url = "https://maven.devos.community/${System.getenv().PUBLISH_SUFFIX}/"
+            url = "https://mvn.devos.one/${System.getenv().PUBLISH_SUFFIX}/"
             credentials {
                 username = System.getenv().MAVEN_USER
                 password = System.getenv().MAVEN_PASS
