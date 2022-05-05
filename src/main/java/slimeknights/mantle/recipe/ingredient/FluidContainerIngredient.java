@@ -23,7 +23,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 /** Ingredient that matches a container of fluid */
-public class FluidContainerIngredient extends Ingredient implements IngredientExtensions {
+public class FluidContainerIngredient extends AbstractIngredient {
   public static final ResourceLocation ID = Mantle.getResource("fluid_container");
   public static final Serializer SERIALIZER = new Serializer();
 

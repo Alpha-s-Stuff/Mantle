@@ -21,7 +21,7 @@ import java.util.function.Supplier;
  */
 public class BlockEntityTypeDeferredRegister extends DeferredRegisterWrapper<BlockEntityType<?>> {
   public BlockEntityTypeDeferredRegister(String modID) {
-    super(Registry.BLOCK_ENTITY_TYPE, modID);
+    super(Registry.BLOCK_ENTITY_TYPE_REGISTRY, modID);
   }
 
   /**

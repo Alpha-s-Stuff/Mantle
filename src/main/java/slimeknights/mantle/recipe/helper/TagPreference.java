@@ -1,23 +1,18 @@
 package slimeknights.mantle.recipe.helper;
 
-import io.github.fabricators_of_create.porting_lib.extensions.ResourceLocationExtensions;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.SerializationTags;
-import net.minecraft.tags.Tag;
-import net.minecraft.tags.TagContainer;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.level.material.Fluid;
-import slimeknights.mantle.Mantle;
+import net.minecraft.tags.TagKey;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.TagsUpdatedEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
 import slimeknights.mantle.config.Config;
-import io.github.fabricators_of_create.porting_lib.event.TagsUpdatedCallback;
-import io.github.fabricators_of_create.porting_lib.util.RegistryHelper;
 import slimeknights.mantle.util.LogicHelper;
+import slimeknights.mantle.util.RegistryHelper;
 
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -25,97 +20,37 @@ import java.util.Optional;
 
 /**
  * Utility that helps get the preferred item from a tag based on mod ID.
- * @param <T>  Registry type
  */
-public class TagPreference<T> {
+public class TagPreference {
   /** Just an alphabetically late RL to simplify null checks */
   private static final ResourceLocation DEFAULT_ID = new ResourceLocation("zzzzz:zzzzz"); // simplfies null checks
-  /** Map of each tag type to the preference instance for that type */
-  private static final Map<ResourceKey<?>, TagPreference<?>> PREFERENCE_MAP = new IdentityHashMap<>();
-
-  /** Comparator to decide which registry entry is preferred */
-  private static final Comparator<?> ENTRY_COMPARATOR = (a, b) -> {
-    // first get registry names, use default ID if null (unlikely)
-    ResourceLocation idA = Objects.requireNonNullElse(RegistryHelper.getRegistryKey(a), DEFAULT_ID);
-    ResourceLocation idB = Objects.requireNonNullElse(RegistryHelper.getRegistryKey(b), DEFAULT_ID);
-    // first compare preferences
-    List<? extends String> entries = Config.TAG_PREFERENCES.get();
-    int size = entries.size();
-    int indexA = LogicHelper.defaultIf(entries.indexOf(idA.getNamespace()), -1, size);
-    int indexB = LogicHelper.defaultIf(entries.indexOf(idB.getNamespace()), -1, size);
-    if (indexA != indexB) {
-      return Integer.compare(indexA, indexB);
-    }
-    // for stability, fallback to registry name compare
-    return ((ResourceLocationExtensions)idA).compareNamespaced(idB);
-  };
-
-  /**
-   * Gets the tag preference instance associated with the given tag collection
-   * @param key   Registry key for the relevant collection
-   * @param <T>    Tag value type
-   * @return  Tag preference instance
-   */
-  @SuppressWarnings("unchecked")
-  public static <T> TagPreference<T> getInstance(ResourceKey<Registry<T>> key) {
-    // should always be the right instance as only we add entries to the map
-    return (TagPreference<T>) PREFERENCE_MAP.computeIfAbsent(key, c -> new TagPreference<>(key));
-  }
-
-  /**
-   * Gets an instance for item tags
-   * @return  Instance for item tags
-   */
-  public static TagPreference<Item> getItems() {
-    return getInstance(Registry.ITEM_REGISTRY);
-  }
-
-  /**
-   * Gets an instance for fluid tags
-   * @return  Instance for fluid tags
-   */
-  public static TagPreference<Fluid> getFluids() {
-    return getInstance(Registry.FLUID_REGISTRY);
-  }
-
-  /** Supplier to tag collection */
-  private final ResourceKey<Registry<T>> key;
 
   /** Specific cache to this tag preference class type */
-  private final Map<ResourceLocation, Optional<T>> preferenceCache = new HashMap<>();
+  private static final Map<ResourceLocation, Optional<?>> PREFERENCE_CACHE = new HashMap<>();
 
-  private TagPreference(ResourceKey<Registry<T>> key) {
-    this.key = key;
-    TagsUpdatedCallback.EVENT.register(this::clearCache);
+  /** Specific cache to this tag preference class type */
+  private static final Map<ResourceKey<?>, RegistryComparator<?>> COMPARATOR_CACHE = new HashMap<>();
+
+  /** Registers the listener with the event bus */
+  public static void init() {
+    MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, TagsUpdatedEvent.class, e -> PREFERENCE_CACHE.clear());
   }
 
-  /**
-   * Clears the tag cache from the event
-   * @param container  Tag Container
-   */
-  private void clearCache(TagContainer container) {
-    preferenceCache.clear();
+  /** Gets the comparator for the given registry */
+  @SuppressWarnings("unchecked")
+  private static <T> Comparator<T> getComparator(Registry<T> registry) {
+    return (Comparator<T>)COMPARATOR_CACHE.computeIfAbsent(registry.key(), k -> new RegistryComparator<>(registry));
   }
 
-  /** Gets the preference from a tag without going through the cache, internal logic behind {@link #getPreference(Tag)} */
-  private Optional<T> getUncachedPreference(Tag<T> tag) {
-    // if no items, empty optional
-    if (tag instanceof Tag.Named/* && ((Tag.Named<?>) tag).isDefaulted()*/) {
+  /** Gets the preference from a tag without going through the cache, internal logic behind {@link #getPreference(TagKey)} */
+  private static <T> Optional<T> getUncachedPreference(TagKey<T> tag) {
+    Registry<T> registry = RegistryHelper.getRegistry(tag.registry());
+    if (registry == null) {
       return Optional.empty();
-    }
-    List<T> elements = tag.getValues();
-    if (elements.isEmpty()) {
-      return Optional.empty();
-    }
-
-    // if size 1, quick exit
-    if (elements.size() == 1) {
-      return Optional.of(elements.get(0));
     }
     // streams have a lovely function to get the minimum element based on a comparator
-    return elements.stream()
-                   .min((Comparator<? super T>) ENTRY_COMPARATOR)
-                   .map(t -> (T) t); // required for generics to be happy
+    // if the tag is empty, stream is empty so returns empty
+    return RegistryHelper.getTagValueStream(tag).min(getComparator(registry));
   }
 
   /**
@@ -123,13 +58,29 @@ public class TagPreference<T> {
    * @param tag    Tag to fetch
    * @return  Preferred value from the tag, or empty optional if the tag is empty
    */
-  public Optional<T> getPreference(Tag<T> tag) {
+  @SuppressWarnings("unchecked")
+  public static <T> Optional<T> getPreference(TagKey<T> tag) {
     // fetch cached value if we have one
-    ResourceLocation tagName = SerializationTags.getInstance().getOrEmpty(key).getId(tag);
-    if (tagName != null) {
-      return preferenceCache.computeIfAbsent(tagName, name -> getUncachedPreference(tag));
+    return (Optional<T>) PREFERENCE_CACHE.computeIfAbsent(tag.location(), name -> getUncachedPreference(tag));
+  }
+
+  /** Logic to compare two registry values */
+  private record RegistryComparator<T>(Registry<T> registry) implements Comparator<T> {
+    @Override
+    public int compare(T a, T b) {
+      // first get registry names, use default ID if null (unlikely)
+      ResourceLocation idA = Objects.requireNonNullElse(registry.getKey(a), DEFAULT_ID);
+      ResourceLocation idB = Objects.requireNonNullElse(registry.getKey(b), DEFAULT_ID);
+      // first compare preferences
+      List<? extends String> entries = Config.TAG_PREFERENCES.get();
+      int size = entries.size();
+      int indexA = LogicHelper.defaultIf(entries.indexOf(idA.getNamespace()), -1, size);
+      int indexB = LogicHelper.defaultIf(entries.indexOf(idB.getNamespace()), -1, size);
+      if (indexA != indexB) {
+        return Integer.compare(indexA, indexB);
+      }
+      // for stability, fallback to registry name compare
+      return idA.compareNamespaced(idB);
     }
-    Mantle.logger.warn("Attempting to get tag preference for unregistered tag {}", tag);
-    return getUncachedPreference(tag);
   }
 }
