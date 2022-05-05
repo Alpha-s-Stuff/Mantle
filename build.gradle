@@ -115,8 +115,8 @@ dependencies {
 
     modImplementation(include("io.github.ladysnake:satin:${project.satin_version}"))
 
-    modImplementation(include("me.alphamode:ForgeTags:2.0"))
-    modImplementation(include("io.github.fabricators_of_create:Porting-Lib:0.1.0-interfacent+1.18-faceless.${project.port_lib_hash}")) { transitive = false }
+    modImplementation(include("me.alphamode:ForgeTags:2.1"))
+    modImplementation(include("io.github.fabricators_of_create:Porting-Lib:0.2.0+1.18.2.${project.port_lib_hash}")) { transitive = false }
 
     // compile against the REI API but do not include it at runtime
     modCompileOnly("me.shedaniel:RoughlyEnoughItems-api-fabric:${project.rei_version}") { transitive = false }
@@ -154,7 +154,7 @@ dependencies {
     api(include("com.github.LlamaLad7:MixinExtras:0.0.6"))
     annotationProcessor(include("com.github.LlamaLad7:MixinExtras:0.0.6"))
 
-    modImplementation "me.alphamode:Star:1.0+1.18.1"
+    modImplementation(include("me.alphamode:Star:1.0+1.18.1"))
 }
 
 task buildOrPublish {
