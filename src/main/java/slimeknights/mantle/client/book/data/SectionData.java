@@ -4,7 +4,6 @@ import com.google.common.collect.Sets;
 import com.google.gson.JsonElement;
 import io.github.fabricators_of_create.porting_lib.util.TrueCondition;
 import net.fabricmc.fabric.api.resource.conditions.v1.ConditionJsonProvider;
-import net.fabricmc.fabric.api.resource.conditions.v1.ResourceConditions;
 import net.minecraft.advancements.AdvancementProgress;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;

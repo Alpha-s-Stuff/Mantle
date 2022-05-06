@@ -16,7 +16,7 @@ import java.util.function.Supplier;
 public class ItemDeferredRegister extends DeferredRegisterWrapper<Item> {
 
   public ItemDeferredRegister(String modID) {
-    super(Registry.ITEM_REGISTRY, modID);
+    super(Registry.ITEM, modID);
   }
 
   /**

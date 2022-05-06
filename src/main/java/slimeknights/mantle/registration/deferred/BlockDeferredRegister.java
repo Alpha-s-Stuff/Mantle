@@ -57,7 +57,7 @@ public class BlockDeferredRegister extends DeferredRegisterWrapper<Block> {
 
   protected final LazyRegistrar<Item> itemRegister;
   public BlockDeferredRegister(String modID) {
-    super(Registry.BLOCK_REGISTRY, modID);
+    super(Registry.BLOCK, modID);
     this.itemRegister = LazyRegistrar.create(Registry.ITEM, modID);
   }
 

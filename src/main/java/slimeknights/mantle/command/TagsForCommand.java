@@ -1,9 +1,13 @@
 package slimeknights.mantle.command;
 
+import com.jamieswhiteshirt.reachentityattributes.ReachEntityAttributes;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.Dynamic2CommandExceptionType;
+import io.github.fabricators_of_create.porting_lib.extensions.ResourceLocationExtensions;
+import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
+import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.ResourceLocationArgument;
@@ -37,17 +41,11 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.ForgeMod;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.fluids.capability.IFluidHandlerItem;
-import net.minecraftforge.fluids.capability.templates.EmptyFluidHandler;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Command to list all tags for an entry
@@ -102,12 +100,12 @@ public class TagsForCommand {
    */
   private static <T> int printOwningTags(CommandContext<CommandSourceStack> context, Registry<T> registry, T value) {
     MutableComponent output = new TranslatableComponent("command.mantle.tags_for.success", registry.key().location(), registry.getKey(value));
-    List<ResourceLocation> tags = registry.getHolder(registry.getId(value)).stream().flatMap(Holder::getTagKeys).map(TagKey::location).toList();
+    List<ResourceLocation> tags = registry.getHolder(registry.getId(value)).stream().flatMap(Holder::tags).map(TagKey::location).toList();
     if (tags.isEmpty()) {
       output.append("\n* ").append(NO_TAGS);
     } else {
       tags.stream()
-          .sorted(ResourceLocation::compareNamespaced)
+          .sorted((o1, o2) -> ((ResourceLocationExtensions)o1).compareNamespaced(o2))
           .forEach(tag -> output.append("\n* " + tag));
     }
     context.getSource().sendSuccess(output, true);
@@ -159,16 +157,13 @@ public class TagsForCommand {
   private static int heldFluid(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
     CommandSourceStack source = context.getSource();
     ItemStack stack = source.getPlayerOrException().getMainHandItem();
-    LazyOptional<IFluidHandlerItem> capability = stack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY);
+    Optional<FluidStack> capability = TransferUtil.getFluidContained(stack);
     if (capability.isPresent()) {
-      IFluidHandler handler = capability.map(h -> (IFluidHandler) h).orElse(EmptyFluidHandler.INSTANCE);
-      if (handler.getTanks() > 0) {
-        FluidStack fluidStack = handler.getFluidInTank(0);
+      FluidStack fluidStack = capability.get();
         if (!fluidStack.isEmpty()) {
           Fluid fluid = fluidStack.getFluid();
           return printOwningTags(context, Registry.FLUID, fluid);
         }
-      }
     }
     source.sendSuccess(NO_HELD_FLUID, true);
     return 0;
@@ -252,7 +247,7 @@ public class TagsForCommand {
     Player player = source.getPlayerOrException();
     Vec3 start = player.getEyePosition(1F);
     Vec3 look = player.getLookAngle();
-    double range = Objects.requireNonNull(player.getAttribute(ForgeMod.REACH_DISTANCE.get())).getValue();
+    double range = Objects.requireNonNull(player.getAttribute(ReachEntityAttributes.REACH)).getValue();
     Vec3 direction = start.add(look.x * range, look.y * range, look.z * range);
     AABB bb = player.getBoundingBox().expandTowards(look.x * range, look.y * range, look.z * range).expandTowards(1, 1, 1);
     EntityHitResult entityTrace = ProjectileUtil.getEntityHitResult(source.getLevel(), player, start, direction, bb, e -> true);

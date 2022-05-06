@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraftforge.common.crafting.AbstractIngredient;
+import io.github.fabricators_of_create.porting_lib.crafting.AbstractIngredient;
 import io.github.fabricators_of_create.porting_lib.crafting.IIngredientSerializer;
 import io.github.fabricators_of_create.porting_lib.crafting.VanillaIngredientSerializer;
 

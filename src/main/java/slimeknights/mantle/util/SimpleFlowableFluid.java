@@ -1,7 +1,8 @@
 package slimeknights.mantle.util;
 
 import io.github.fabricators_of_create.porting_lib.extensions.FluidExtensions;
-import io.github.fabricators_of_create.porting_lib.transfer.fluid.FluidAttributes;
+
+import io.github.fabricators_of_create.porting_lib.util.FluidAttributes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.Item;

@@ -1,8 +1,8 @@
 package slimeknights.mantle.block;
 
+import io.github.fabricators_of_create.porting_lib.tags.ToolTags;
 import io.github.fabricators_of_create.porting_lib.util.Constants;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
-import net.fabricmc.fabric.api.tool.attribute.v1.FabricToolTags;
 import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
@@ -28,7 +28,7 @@ public class StrippableLogBlock extends RotatedPillarBlock {
   // todo: port?
   @Nullable
   public InteractionResult getToolModifiedState(Player player, Level world, InteractionHand hand, BlockHitResult hitResult) {
-    if (player.getItemInHand(hand).is(FabricToolTags.AXES)) {
+    if (player.getItemInHand(hand).is(ToolTags.AXES)) {
       if(world.isClientSide)
         return InteractionResult.PASS;
       world.setBlock(hitResult.getBlockPos(), stripped.get().defaultBlockState().setValue(AXIS, world.getBlockState(hitResult.getBlockPos()).getValue(AXIS)) , Constants.BlockFlags.BLOCK_UPDATE);

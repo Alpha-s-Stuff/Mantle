@@ -2,7 +2,12 @@ package slimeknights.mantle.recipe.ingredient;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import io.github.fabricators_of_create.porting_lib.crafting.AbstractIngredient;
 import io.github.fabricators_of_create.porting_lib.extensions.IngredientExtensions;
+import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -13,7 +18,7 @@ import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import slimeknights.mantle.Mantle;
 import io.github.fabricators_of_create.porting_lib.crafting.IIngredientSerializer;
 import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
-import io.github.fabricators_of_create.porting_lib.transfer.fluid.FluidStack;
+import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import io.github.fabricators_of_create.porting_lib.transfer.item.ItemHandlerHelper;
 import slimeknights.mantle.registration.object.FluidObject;
 import slimeknights.mantle.util.JsonHelper;
@@ -57,7 +62,8 @@ public class FluidContainerIngredient extends AbstractIngredient {
   @Override
   public boolean test(@Nullable ItemStack stack) {
     // first, must have a fluid capability
-    return stack != null && !stack.isEmpty() && TransferUtil.getFluidHandlerItem(stack).resolve().flatMap(cap -> {
+    Storage<FluidVariant> cap = ContainerItemContext.withInitial(stack).find(FluidStorage.ITEM);
+    return stack != null && !stack.isEmpty() && cap.flatMap(cap -> {
       // second, must contain enough fluid
       if (cap.getTanks() == 1) {
         FluidStack contained = cap.getFluidInTank(0);

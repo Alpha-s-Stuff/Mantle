@@ -18,7 +18,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import slimeknights.mantle.Mantle;
 import slimeknights.mantle.config.Config;
-import io.github.fabricators_of_create.porting_lib.event.OverlayRenderCallback.Types;
+import io.github.fabricators_of_create.porting_lib.event.client.OverlayRenderCallback.Types;
 
 import java.util.Random;
 

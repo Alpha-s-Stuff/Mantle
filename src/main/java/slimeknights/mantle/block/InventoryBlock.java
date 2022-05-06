@@ -1,5 +1,8 @@
 package slimeknights.mantle.block;
 
+import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Containers;
@@ -19,7 +22,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import slimeknights.mantle.block.entity.INameableMenuProvider;
 import slimeknights.mantle.inventory.BaseContainerMenu;
 import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
-import io.github.fabricators_of_create.porting_lib.transfer.item.IItemHandler;
 import io.github.fabricators_of_create.porting_lib.util.NetworkUtil;
 
 import javax.annotation.Nullable;
@@ -27,7 +29,7 @@ import javax.annotation.Nullable;
 /**
  * Base class for blocks with an inventory
  */
-@SuppressWarnings("WeakerAccess")
+@SuppressWarnings({"WeakerAccess", "UnstableApiUsage"})
 public abstract class InventoryBlock extends Block implements EntityBlock {
 
   protected InventoryBlock(BlockBehaviour.Properties builder) {
@@ -103,7 +105,9 @@ public abstract class InventoryBlock extends Block implements EntityBlock {
     if (state.getBlock() != newState.getBlock()) {
       BlockEntity te = worldIn.getBlockEntity(pos);
       if (te != null) {
-        TransferUtil.getItemHandler(te).ifPresent(inventory -> dropInventoryItems(state, worldIn, pos, inventory));
+        Storage<ItemVariant> storage = TransferUtil.getItemStorage(te);
+        if(storage != null)
+          dropInventoryItems(state, worldIn, pos, storage);
         worldIn.updateNeighbourForOutputSignal(pos, this);
       }
     }
@@ -118,7 +122,7 @@ public abstract class InventoryBlock extends Block implements EntityBlock {
    * @param pos         Tile position
    * @param inventory   Item handler
    */
-  protected void dropInventoryItems(BlockState state, Level worldIn, BlockPos pos, IItemHandler inventory) {
+  protected void dropInventoryItems(BlockState state, Level worldIn, BlockPos pos, Storage<ItemVariant> inventory) {
     dropInventoryItems(worldIn, pos, inventory);
   }
 
@@ -128,13 +132,13 @@ public abstract class InventoryBlock extends Block implements EntityBlock {
    * @param pos        Position to drop
    * @param inventory  Inventory instance
    */
-  public static void dropInventoryItems(Level world, BlockPos pos, IItemHandler inventory) {
+  public static void dropInventoryItems(Level world, BlockPos pos, Storage<ItemVariant> inventory) {
     double x = pos.getX();
     double y = pos.getY();
     double z = pos.getZ();
-    for(int i = 0; i < inventory.getSlots(); ++i) {
-      Containers.dropItemStack(world, x, y, z, inventory.getStackInSlot(i));
-    }
+    inventory.iterable(TransferUtil.getTransaction()).forEach(view -> {
+      Containers.dropItemStack(world, x, y, z, new ItemStack(view.getResource().getItem(), (int) view.getAmount()));
+    });
   }
 
   @SuppressWarnings("deprecation")

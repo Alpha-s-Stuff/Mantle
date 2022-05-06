@@ -2,15 +2,14 @@ package slimeknights.mantle.recipe.data;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.minecraft.world.item.ItemStack;
+import io.github.fabricators_of_create.porting_lib.crafting.CraftingHelper;
+import io.github.fabricators_of_create.porting_lib.crafting.NBTIngredient;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 
 import javax.annotation.Nullable;
 import java.util.Objects;
-
-import io.github.fabricators_of_create.porting_lib.crafting.NBTIngredient.Serializer;
-import io.github.fabricators_of_create.porting_lib.crafting.CraftingHelper;
 
 /**
  * Ingredient for a NBT sensitive item from another mod, should never be used outside datagen

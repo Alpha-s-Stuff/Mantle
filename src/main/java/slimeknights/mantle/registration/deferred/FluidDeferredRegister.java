@@ -1,5 +1,8 @@
 package slimeknights.mantle.registration.deferred;
 
+import io.github.fabricators_of_create.porting_lib.util.FluidAttributes;
+import io.github.fabricators_of_create.porting_lib.util.LazyRegistrar;
+import io.github.fabricators_of_create.porting_lib.util.RegistryObject;
 import net.minecraft.core.Registry;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.Item;
@@ -8,35 +11,31 @@ import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Material;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fluids.FluidAttributes;
-import net.minecraftforge.fluids.ForgeFlowingFluid;
-import net.minecraftforge.fluids.ForgeFlowingFluid.Properties;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.RegistryObject;
 import slimeknights.mantle.registration.DelayedSupplier;
 import slimeknights.mantle.registration.FluidBuilder;
 import slimeknights.mantle.registration.ItemProperties;
 import slimeknights.mantle.registration.object.FluidObject;
+import slimeknights.mantle.util.SimpleFlowableFluid;
+import slimeknights.mantle.util.SimpleFlowableFluid.Properties;
 
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class FluidDeferredRegister extends DeferredRegisterWrapper<Fluid> {
-  private final DeferredRegister<Block> blockRegister;
-  private final DeferredRegister<Item> itemRegister;
+  private final LazyRegistrar<Block> blockRegister;
+  private final LazyRegistrar<Item> itemRegister;
   public FluidDeferredRegister(String modID) {
-    super(Registry.FLUID_REGISTRY, modID);
-    this.blockRegister = DeferredRegister.create(Registry.BLOCK_REGISTRY, modID);
-    this.itemRegister = DeferredRegister.create(Registry.ITEM_REGISTRY, modID);
+    super(Registry.FLUID, modID);
+    this.blockRegister = LazyRegistrar.create(Registry.BLOCK, modID);
+    this.itemRegister = LazyRegistrar.create(Registry.ITEM, modID);
   }
 
   @Override
-  public void register(IEventBus bus) {
-    super.register(bus);
-    blockRegister.register(bus);
-    itemRegister.register(bus);
+  public void register() {
+    super.register();
+    blockRegister.register();
+    itemRegister.register();
   }
 
   /**
@@ -47,7 +46,7 @@ public class FluidDeferredRegister extends DeferredRegisterWrapper<Fluid> {
    * @return  Fluid to supply
    */
   public <I extends Fluid> RegistryObject<I> registerFluid(final String name, final Supplier<? extends I> sup) {
-    return register.register(name, sup);
+    return register.register(name, sup.get());
   }
 
   /**
@@ -61,7 +60,7 @@ public class FluidDeferredRegister extends DeferredRegisterWrapper<Fluid> {
    * @param <F>      Fluid type
    * @return  Fluid object
    */
-  public <F extends ForgeFlowingFluid> FluidObject<F> register(String name, String tagName, FluidBuilder builder, Function<Properties,? extends F> still,
+  public <F extends SimpleFlowableFluid> FluidObject<F> register(String name, String tagName, FluidBuilder builder, Function<Properties,? extends F> still,
       Function<Properties,? extends F> flowing, Function<Supplier<? extends FlowingFluid>,? extends LiquidBlock> block) {
 
     // have to create still and flowing later, as the props need these suppliers
@@ -70,7 +69,7 @@ public class FluidDeferredRegister extends DeferredRegisterWrapper<Fluid> {
 
     // create block and bucket, they just need a still supplier
     RegistryObject<LiquidBlock> blockObj = blockRegister.register(name + "_fluid", () -> block.apply(stillDelayed));
-    builder.bucket(itemRegister.register(name + "_bucket", () -> new BucketItem(stillDelayed, ItemProperties.BUCKET_PROPS)));
+    builder.bucket(itemRegister.register(name + "_bucket", () -> new BucketItem(stillDelayed.get(), ItemProperties.BUCKET_PROPS)));
 
     // create props with the suppliers
     Properties props = builder.block(blockObj).build(stillDelayed, flowingDelayed);
@@ -95,7 +94,7 @@ public class FluidDeferredRegister extends DeferredRegisterWrapper<Fluid> {
    * @param <F>      Fluid type
    * @return  Fluid object
    */
-  public <F extends ForgeFlowingFluid> FluidObject<F> register(String name, FluidBuilder builder, Function<Properties,? extends F> still,
+  public <F extends SimpleFlowableFluid> FluidObject<F> register(String name, FluidBuilder builder, Function<Properties,? extends F> still,
       Function<Properties,? extends F> flowing, Function<Supplier<? extends FlowingFluid>,? extends LiquidBlock> block) {
     return register(name, name, builder, still, flowing, block);
   }
@@ -112,11 +111,11 @@ public class FluidDeferredRegister extends DeferredRegisterWrapper<Fluid> {
    * @param <F>      Fluid type
    * @return  Fluid object
    */
-  public <F extends ForgeFlowingFluid> FluidObject<F> register(String name, String tagName, FluidAttributes.Builder builder,
+  public <F extends SimpleFlowableFluid> FluidObject<F> register(String name, String tagName, FluidAttributes.Builder builder,
                                                                Function<Properties,? extends F> still, Function<Properties,? extends F> flowing, Material material, int lightLevel) {
     return register(
       name, tagName, new FluidBuilder(builder.luminosity(lightLevel)).explosionResistance(100f), still, flowing,
-      fluid -> new LiquidBlock(fluid, Block.Properties.of(material).noCollission().strength(100.0F).noDrops().lightLevel(state -> lightLevel))
+      fluid -> new LiquidBlock(fluid.get(), Block.Properties.of(material).noCollission().strength(100.0F).noDrops().lightLevel(state -> lightLevel))
     );
   }
 
@@ -131,7 +130,7 @@ public class FluidDeferredRegister extends DeferredRegisterWrapper<Fluid> {
    * @param <F>      Fluid type
    * @return  Fluid object
    */
-  public <F extends ForgeFlowingFluid> FluidObject<F> register(String name, FluidAttributes.Builder builder,
+  public <F extends SimpleFlowableFluid> FluidObject<F> register(String name, FluidAttributes.Builder builder,
       Function<Properties,? extends F> still, Function<Properties,? extends F> flowing, Material material, int lightLevel) {
     return register(name, name, builder, still, flowing, material, lightLevel);
   }
@@ -145,8 +144,8 @@ public class FluidDeferredRegister extends DeferredRegisterWrapper<Fluid> {
    * @param lightLevel Block light level
    * @return  Fluid object
    */
-  public FluidObject<ForgeFlowingFluid> register(String name, String tagName, FluidAttributes.Builder builder, Material material, int lightLevel) {
-    return register(name, tagName, builder, ForgeFlowingFluid.Source::new, ForgeFlowingFluid.Flowing::new, material, lightLevel);
+  public FluidObject<SimpleFlowableFluid> register(String name, String tagName, FluidAttributes.Builder builder, Material material, int lightLevel) {
+    return register(name, tagName, builder, SimpleFlowableFluid.Still::new, SimpleFlowableFluid.Flowing::new, material, lightLevel);
   }
 
   /**
@@ -157,7 +156,7 @@ public class FluidDeferredRegister extends DeferredRegisterWrapper<Fluid> {
    * @param lightLevel Block light level
    * @return  Fluid object
    */
-  public FluidObject<ForgeFlowingFluid> register(String name, FluidAttributes.Builder builder, Material material, int lightLevel) {
+  public FluidObject<SimpleFlowableFluid> register(String name, FluidAttributes.Builder builder, Material material, int lightLevel) {
     return register(name, name, builder, material, lightLevel);
   }
 }
