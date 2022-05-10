@@ -20,6 +20,7 @@ repositories {
     maven { url = "https://maven.parchmentmc.org" }
     maven { url = "https://maven.shedaniel.me/" }
     maven { url = "https://cursemaven.com" }
+    maven { url 'https://maven.wispforest.io' }
     maven { url = "https://mvn.devos.one/releases/" }
     maven { url = "https://mvn.devos.one/snapshots/" }
     maven { url = "https://maven.terraformersmc.com/releases/" }
@@ -154,7 +155,7 @@ dependencies {
     api(include("com.github.LlamaLad7:MixinExtras:0.0.6"))
     annotationProcessor(include("com.github.LlamaLad7:MixinExtras:0.0.6"))
 
-    modImplementation(include("me.alphamode:Star:1.0+1.18.1"))
+    modImplementation(include("me.alphamode:Star:1.1+1.18.2"))
 }
 
 task buildOrPublish {
