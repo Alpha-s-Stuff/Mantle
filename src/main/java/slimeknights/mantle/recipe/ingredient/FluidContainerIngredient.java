@@ -62,25 +62,23 @@ public class FluidContainerIngredient extends AbstractIngredient {
   @Override
   public boolean test(@Nullable ItemStack stack) {
     // first, must have a fluid capability
-    Storage<FluidVariant> cap = ContainerItemContext.withInitial(stack).find(FluidStorage.ITEM);
-    return stack != null && !stack.isEmpty() && cap.flatMap(cap -> {
+    ContainerItemContext ctxItem = ContainerItemContext.withInitial(stack);
+    return stack != null && !stack.isEmpty() && Optional.ofNullable(ctxItem.find(FluidStorage.ITEM)).flatMap(cap -> {
       // second, must contain enough fluid
-      if (cap.getTanks() == 1) {
-        FluidStack contained = cap.getFluidInTank(0);
-        if (!contained.isEmpty() && fluidIngredient.getAmount(contained.getFluid()) == contained.getAmount() && fluidIngredient.test(contained.getFluid())) {
-          // so far so good, from this point on we are forced to make copies as we need to try draining, so copy and fetch the copy's cap
-          ItemStack copy = ItemHandlerHelper.copyStackWithSize(stack, 1);
-          return TransferUtil.getFluidHandlerItem(copy).resolve();
-        }
+      Optional<FluidStack> stackOptional = TransferUtil.getFluidContained(stack);
+      if (stackOptional.isPresent()){
+        // so far so good, from this point on we are forced to make copies as we need to try draining, so copy and fetch the copy's cap
+        ItemStack copy = ItemHandlerHelper.copyStackWithSize(stack, 1);
+        return Optional.ofNullable(ContainerItemContext.withInitial(copy).find(FluidStorage.ITEM));
       }
       return Optional.empty();
     }).filter(cap -> {
       // alright, we know it has the fluid, the question is just whether draining the fluid will give us the desired result
-      Fluid fluid = cap.getFluidInTank(0).getFluid();
+      Fluid fluid = TransferUtil.getFirstFluid(cap).getFluid();
       long amount = fluidIngredient.getAmount(fluid);
-      FluidStack drained = cap.drain(amount, false);
+      FluidStack drained = TransferUtil.extractAnyFluid(cap, amount);
       // we need an exact match, and we need the resulting container item to be the same as the item stack's container item
-      return drained.getFluid() == fluid && drained.getAmount() == amount && ItemStack.matches(stack.getItem().getCraftingRemainingItem().getDefaultInstance(), cap.getContainer());
+      return drained.getFluid() == fluid && drained.getAmount() == amount && ItemStack.matches(stack.getItem().getCraftingRemainingItem().getDefaultInstance(), ctxItem.getItemVariant().toStack((int) ctxItem.getAmount()));
     }).isPresent();
   }
 
@@ -116,7 +114,7 @@ public class FluidContainerIngredient extends AbstractIngredient {
 
   @Override
   public void invalidate() {
-    IngredientExtensions.super.invalidate();
+    super.invalidate();
     this.displayStacks = null;
   }
 
