@@ -3,6 +3,7 @@ package slimeknights.mantle.client.book;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
+import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.fabricmc.fabric.api.resource.conditions.v1.ConditionJsonProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
@@ -38,7 +39,6 @@ import slimeknights.mantle.client.book.repository.BookRepository;
 import slimeknights.mantle.client.book.transformer.BookTransformer;
 import slimeknights.mantle.client.book.transformer.IndexTransformer;
 import slimeknights.mantle.data.ResourceLocationSerializer;
-import io.github.fabricators_of_create.porting_lib.util.IdentifiableResourceManagerReloadListener;
 import slimeknights.mantle.network.MantleNetwork;
 import slimeknights.mantle.network.packet.UpdateHeldPagePacket;
 import slimeknights.mantle.network.packet.UpdateLecternPagePacket;
@@ -47,7 +47,7 @@ import javax.annotation.Nullable;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 
-public class BookLoader implements IdentifiableResourceManagerReloadListener {
+public class BookLoader implements SimpleSynchronousResourceReloadListener {
 
   /**
    * GSON object to be used for book loading purposes

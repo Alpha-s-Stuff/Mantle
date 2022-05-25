@@ -1,9 +1,10 @@
 package slimeknights.mantle.network.packet;
 
+import io.github.fabricators_of_create.porting_lib.util.NetworkDirection;
 import me.pepperbell.simplenetworking.C2SPacket;
-import me.pepperbell.simplenetworking.NetworkDirection;
 import me.pepperbell.simplenetworking.S2CPacket;
 import me.pepperbell.simplenetworking.SimpleChannel;
+import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.network.FriendlyByteBuf;
@@ -33,16 +34,16 @@ public interface ISimplePacket extends S2CPacket, C2SPacket {
   void handle(Supplier<Context> context);
 
   @Override
-  default void handle(MinecraftServer server, ServerPlayer player, ServerGamePacketListenerImpl handler, SimpleChannel.ResponseTarget responseTarget) {
-    handle(new Context(server, handler, player, responseTarget));
+  default void handle(MinecraftServer server, ServerPlayer player, ServerGamePacketListenerImpl handler, PacketSender responseSender, SimpleChannel channel) {
+    handle(new Context(server, handler, player, responseSender, channel));
   }
 
   @Override
-  default void handle(Minecraft client, ClientPacketListener handler, SimpleChannel.ResponseTarget responseTarget) {
-    handle(new Context(client, handler, null, responseTarget));
+  default void handle(Minecraft client, ClientPacketListener handler, PacketSender responseSender, SimpleChannel channel) {
+    handle(new Context(client, handler, null, responseSender, channel));
   }
 
-  public record Context(Executor exec, PacketListener handler, @Nullable ServerPlayer sender, SimpleChannel.ResponseTarget responseTarget) implements Supplier<Context> {
+  public record Context(Executor exec, PacketListener handler, @Nullable ServerPlayer sender, PacketSender responseSender, SimpleChannel channel) implements Supplier<Context> {
     public void enqueueWork(Runnable runnable) {
       exec().execute(runnable);
     }

@@ -1,6 +1,6 @@
 package slimeknights.mantle.network;
 
-import me.pepperbell.simplenetworking.NetworkDirection;
+import io.github.fabricators_of_create.porting_lib.util.NetworkDirection;
 import me.pepperbell.simplenetworking.S2CPacket;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
@@ -119,8 +119,7 @@ public class NetworkWrapper {
    * @param position     Position within range
    */
   public void sendToClientsAround(ISimplePacket msg, ServerLevel serverWorld, BlockPos position) {
-    LevelChunk chunk = serverWorld.getChunkAt(position);
-    network.sendToClientsAround(msg, chunk);
+    network.sendToClientsTracking(msg, serverWorld, position);
   }
 
   /**

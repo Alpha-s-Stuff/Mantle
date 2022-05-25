@@ -5,26 +5,23 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexFormatElement;
 import com.mojang.math.Transformation;
 import com.mojang.math.Vector3f;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.MultiPartBakedModel;
 import net.minecraft.client.resources.model.WeightedBakedModel;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import slimeknights.mantle.Mantle;
-import io.github.fabricators_of_create.porting_lib.util.IdentifiableResourceManagerReloadListener;
 
 import javax.annotation.Nullable;
 import java.util.Map;
@@ -38,7 +35,7 @@ import java.util.function.Function;
 public class ModelHelper {
   private static final Map<Block,ResourceLocation> TEXTURE_NAME_CACHE = new ConcurrentHashMap<>();
   /** Listener instance to clear cache */
-  public static final IdentifiableResourceManagerReloadListener LISTENER = new IdentifiableResourceManagerReloadListener() {
+  public static final SimpleSynchronousResourceReloadListener LISTENER = new SimpleSynchronousResourceReloadListener() {
     @Override
     public ResourceLocation getFabricId() {
       return Mantle.getResource("model_helper");
