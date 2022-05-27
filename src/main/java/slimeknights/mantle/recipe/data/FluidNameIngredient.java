@@ -14,7 +14,7 @@ import java.util.List;
 @RequiredArgsConstructor(staticName = "of")
 public class FluidNameIngredient extends FluidIngredient {
   private final ResourceLocation fluidName;
-  private final int amount;
+  private final long amount;
 
   @Override
   public boolean test(Fluid fluid) {

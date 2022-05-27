@@ -67,4 +67,19 @@ public class EntityTypeDeferredRegister extends DeferredRegisterWrapper<EntityTy
     itemRegistry.register(name + "_spawn_egg", () -> new LazySpawnEggItem(object, primary, secondary, ItemProperties.EGG_PROPS));
     return object;
   }
+
+  /**
+   * Registers a entity type for the given entity type builder, and registers a spawn egg for it
+   * @param name       Entity name
+   * @param sup        Entity builder instance
+   * @param primary    Primary egg color
+   * @param secondary  Secondary egg color
+   * @param <T>   Entity class type
+   * @return  Entity registry object
+   */
+  public <T extends Mob> RegistryObject<EntityType<T>> registerWithEggFabric(String name, Supplier<FabricEntityTypeBuilder<T>> sup, int primary, int secondary) {
+    RegistryObject<EntityType<T>> object = registerFabric(name, sup);
+    itemRegistry.register(name + "_spawn_egg", () -> new LazySpawnEggItem(object, primary, secondary, ItemProperties.EGG_PROPS));
+    return object;
+  }
 }
