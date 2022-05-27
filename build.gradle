@@ -116,7 +116,7 @@ dependencies {
     modImplementation(include("io.github.ladysnake:satin:${project.satin_version}"))
 
     modImplementation(include("me.alphamode:ForgeTags:2.1"))
-    modImplementation(include("io.github.fabricators_of_create:Porting-Lib:${project.port_lib_version}+${project.minecraft_version}-forgetransfer.${project.port_lib_hash}"))
+    modImplementation(include("io.github.fabricators_of_create:Porting-Lib:${project.port_lib_version}+${project.minecraft_version}-forgetransfer.${project.port_lib_hash}")) { transitive = false }
 
     // compile against the REI API but do not include it at runtime
     modCompileOnly("me.shedaniel:RoughlyEnoughItems-api-fabric:${project.rei_version}") { transitive = false }
