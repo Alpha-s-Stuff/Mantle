@@ -3,6 +3,7 @@ package slimeknights.mantle.registration.deferred;
 import io.github.fabricators_of_create.porting_lib.util.LazyRegistrar;
 import io.github.fabricators_of_create.porting_lib.util.LazySpawnEggItem;
 import io.github.fabricators_of_create.porting_lib.util.RegistryObject;
+import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
 import net.minecraft.core.Registry;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -39,6 +40,17 @@ public class EntityTypeDeferredRegister extends DeferredRegisterWrapper<EntityTy
    */
   public <T extends Entity> RegistryObject<EntityType<T>> register(String name, Supplier<EntityType.Builder<T>> sup) {
     return register.register(name, () -> sup.get().build(resourceName(name)));
+  }
+
+  /**
+   * Registers a entity type for the given entity type builder
+   * @param name  Entity name
+   * @param sup   Entity builder instance
+   * @param <T>   Entity class type
+   * @return  Entity registry object
+   */
+  public <T extends Entity> RegistryObject<EntityType<T>> registerFabric(String name, Supplier<FabricEntityTypeBuilder<T>> sup) {
+    return register.register(name, () -> sup.get().build());
   }
 
   /**
