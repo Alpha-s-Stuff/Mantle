@@ -1,33 +1,51 @@
 package slimeknights.mantle.inventory;
 
+import io.github.fabricators_of_create.porting_lib.transfer.fluid.EmptyFluidHandler;
+import io.github.fabricators_of_create.porting_lib.transfer.item.IItemHandler;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
-import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
-import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
+import net.minecraft.world.item.ItemStack;
 
-import java.util.Iterator;
+import javax.annotation.Nonnull;
 
 /**
- * Item handler that contains no items. Use similarly to {@link slimeknights.mantle.lib.transfer.fluid.EmptyFluidHandler}
+ * Item handler that contains no items. Use similarly to {@link EmptyFluidHandler}
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class EmptyItemHandler implements Storage<ItemVariant> {
+public class EmptyItemHandler implements IItemHandler {
   public static final EmptyItemHandler INSTANCE = new EmptyItemHandler();
 
   @Override
-  public long insert(ItemVariant resource, long maxAmount, TransactionContext transaction) {
+  public int getSlots() {
     return 0;
   }
 
   @Override
-  public long extract(ItemVariant resource, long maxAmount, TransactionContext transaction) {
+  public int getSlotLimit(int slot) {
     return 0;
   }
 
+  @Nonnull
   @Override
-  public Iterator<? extends StorageView<ItemVariant>> iterator(TransactionContext transaction) {
-    return null;
+  public ItemStack getStackInSlot(int slot) {
+    return ItemStack.EMPTY;
+  }
+
+  @Override
+  public boolean isItemValid(int slot, ItemStack stack) {
+    return false;
+  }
+
+  @Nonnull
+  @Override
+  public ItemStack insertItem(int slot, ItemStack stack, TransactionContext t) {
+    return stack;
+  }
+
+  @Nonnull
+  @Override
+  public ItemStack extractItem(int slot, int amount, TransactionContext t) {
+    return ItemStack.EMPTY;
   }
 }
