@@ -62,8 +62,8 @@ public abstract class InventoryBlockEntity extends NameableBlockEntity implement
 
   @Nonnull
   @Override
-  public Storage<ItemVariant> getItemStorage(@Nullable Direction direction) {
-    return this.itemHandlerCap.getValueUnsafer();
+  public LazyOptional<Storage<ItemVariant>> getItemStorage(@Nullable Direction direction) {
+    return this.itemHandlerCap;
   }
 
   @Override
