@@ -38,8 +38,8 @@ public abstract class InventoryBlockEntity extends NameableBlockEntity implement
   private final boolean saveSizeToNBT;
   protected int stackSizeLimit;
   @Getter
-  protected InventoryStorage itemHandler;
-  protected LazyOptional<InventoryStorage> itemHandlerCap;
+  protected Storage<ItemVariant> itemHandler;
+  protected LazyOptional<Storage<ItemVariant>> itemHandlerCap;
 
   /**
    * @param name Localization String for the inventory title. Can be overridden through setCustomName
@@ -66,9 +66,9 @@ public abstract class InventoryBlockEntity extends NameableBlockEntity implement
     return this.itemHandlerCap.getValueUnsafer();
   }
 
-  //  @Override
+  @Override
   public void invalidateCaps() {
-//    super.invalidateCaps();
+    super.invalidateCaps();
     this.itemHandlerCap.invalidate();
   }
 

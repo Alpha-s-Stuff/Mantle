@@ -1,15 +1,13 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "slimeknights.mantle.mixin",
+  "package": "slimeknights.mantle.mixin.client",
   "compatibilityLevel": "JAVA_17",
   "client": [
-    "client.SheetsMixin"
+    "SheetsMixin",
+    "ModelLayersMixin"
   ],
   "injectors": {
     "defaultRequire": 1
-  },
-  "mixins": [
-    "client.ModelLayersMixin"
-  ]
+  }
 }
