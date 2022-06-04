@@ -19,7 +19,7 @@ repositories {
     maven { url = "https://maven.parchmentmc.org" }
     maven { url = "https://maven.shedaniel.me/" }
     maven { url = "https://cursemaven.com" }
-    maven { url 'https://maven.wispforest.io' }
+    maven { url = "https://maven.wispforest.io" }
     maven { url = "https://mvn.devos.one/releases/" }
     maven { url = "https://mvn.devos.one/snapshots/" }
     maven { url = "https://maven.terraformersmc.com/releases/" }
@@ -116,7 +116,10 @@ dependencies {
     modImplementation(include("io.github.ladysnake:satin:${project.satin_version}"))
 
     modImplementation(include("me.alphamode:ForgeTags:2.1"))
+    modImplementation(include("com.electronwill.night-config:core:${project.night_config_core_version}"))
+    modImplementation(include("com.electronwill.night-config:toml:${project.night_config_toml_version}"))
     modImplementation(include("io.github.fabricators_of_create:Porting-Lib:${project.port_lib_version}+${project.minecraft_version}-dev.${project.port_lib_hash}")) { transitive = false }
+    modImplementation(include("io.github.tropheusj:serialization-hooks:${project.serialization_hooks_version}+1.18.${project.serialization_hooks_hash}"))
 
     // compile against the REI API but do not include it at runtime
     modCompileOnly("me.shedaniel:RoughlyEnoughItems-api-fabric:${project.rei_version}") { transitive = false }

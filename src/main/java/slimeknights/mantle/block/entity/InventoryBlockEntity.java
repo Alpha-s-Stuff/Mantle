@@ -39,7 +39,6 @@ public abstract class InventoryBlockEntity extends NameableBlockEntity implement
   protected int stackSizeLimit;
   @Getter
   protected Storage<ItemVariant> itemHandler;
-  protected LazyOptional<Storage<ItemVariant>> itemHandlerCap;
 
   /**
    * @param name Localization String for the inventory title. Can be overridden through setCustomName
@@ -57,19 +56,12 @@ public abstract class InventoryBlockEntity extends NameableBlockEntity implement
     this.inventory = NonNullList.withSize(inventorySize, ItemStack.EMPTY);
     this.stackSizeLimit = maxStackSize;
     this.itemHandler = InventoryStorage.of(this, null);
-    this.itemHandlerCap = LazyOptional.of(() -> this.itemHandler);
   }
 
   @Nonnull
   @Override
-  public LazyOptional<Storage<ItemVariant>> getItemStorage(@Nullable Direction direction) {
-    return this.itemHandlerCap;
-  }
-
-  @Override
-  public void invalidateCaps() {
-    super.invalidateCaps();
-    this.itemHandlerCap.invalidate();
+  public Storage<ItemVariant> getItemStorage(@Nullable Direction direction) {
+    return this.itemHandler;
   }
 
   /* Inventory management */

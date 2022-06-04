@@ -3,6 +3,7 @@ package slimeknights.mantle.block;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Containers;
@@ -25,6 +26,7 @@ import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
 import io.github.fabricators_of_create.porting_lib.util.NetworkUtil;
 
 import javax.annotation.Nullable;
+import java.util.Optional;
 
 /**
  * Base class for blocks with an inventory
@@ -105,7 +107,9 @@ public abstract class InventoryBlock extends Block implements EntityBlock {
     if (state.getBlock() != newState.getBlock()) {
       BlockEntity te = worldIn.getBlockEntity(pos);
       if (te != null) {
-        TransferUtil.getItemStorage(te).ifPresent(inventory -> dropInventoryItems(state, worldIn, pos, inventory));
+        Storage<ItemVariant> storage = TransferUtil.getItemStorage(te);
+        if (storage != null)
+          dropInventoryItems(state, worldIn, pos, storage);
         worldIn.updateNeighbourForOutputSignal(pos, this);
       }
     }
@@ -134,9 +138,11 @@ public abstract class InventoryBlock extends Block implements EntityBlock {
     double x = pos.getX();
     double y = pos.getY();
     double z = pos.getZ();
-    inventory.iterable(TransferUtil.getTransaction()).forEach(view -> {
-      Containers.dropItemStack(world, x, y, z, new ItemStack(view.getResource().getItem(), (int) view.getAmount()));
-    });
+    try (Transaction t = TransferUtil.getTransaction()) {
+      inventory.iterable(t).forEach(view -> {
+        Containers.dropItemStack(world, x, y, z, new ItemStack(view.getResource().getItem(), (int) view.getAmount()));
+      });
+    }
   }
 
   @SuppressWarnings("deprecation")

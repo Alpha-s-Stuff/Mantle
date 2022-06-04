@@ -33,6 +33,10 @@
     "mantle.mixins.json"
   ],
   "custom": {
+    "/* you need to enable this (and move it out of 'custom') if you want to run datagen because yes */ provides": [
+      "com_electronwill_night-config_core",
+      "com_electronwill_night-config_toml"
+    ],
     "cardinal-components": [
       "mantle:offhand_cooldown"
     ]

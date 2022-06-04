@@ -98,7 +98,7 @@ public class ShapedRetexturedRecipe extends ShapedRecipe {
     @Override
     public ShapedRetexturedRecipe fromJson(ResourceLocation recipeId, JsonObject json) {
       ShapedRecipe recipe = SHAPED_RECIPE.fromJson(recipeId, json);
-      Ingredient texture = CraftingHelper.getIngredient(JsonHelper.getElement(json, "texture"));
+      Ingredient texture = Ingredient.fromJson(JsonHelper.getElement(json, "texture"));
       boolean matchAll = false;
       if (json.has("match_all")) {
         matchAll = json.get("match_all").getAsBoolean();

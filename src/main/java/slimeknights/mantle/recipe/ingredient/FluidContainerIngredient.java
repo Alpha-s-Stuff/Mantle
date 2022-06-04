@@ -3,11 +3,9 @@ package slimeknights.mantle.recipe.ingredient;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import io.github.fabricators_of_create.porting_lib.crafting.AbstractIngredient;
-import io.github.fabricators_of_create.porting_lib.extensions.IngredientExtensions;
+import io.github.tropheusj.serialization_hooks.ingredient.IngredientDeserializer;
 import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
-import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -16,7 +14,6 @@ import net.minecraft.world.level.material.Fluid;
 
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import slimeknights.mantle.Mantle;
-import io.github.fabricators_of_create.porting_lib.crafting.IIngredientSerializer;
 import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import io.github.fabricators_of_create.porting_lib.transfer.item.ItemHandlerHelper;
@@ -34,6 +31,7 @@ public class FluidContainerIngredient extends AbstractIngredient {
 
   /** Ingredient to use for matching */
   private final FluidIngredient fluidIngredient;
+  private final Value[] values;
   /** Internal ingredient to display the ingredient recipe viewers */
   @Nullable
   private final Ingredient display;
@@ -42,6 +40,12 @@ public class FluidContainerIngredient extends AbstractIngredient {
     super(Stream.of());
     this.fluidIngredient = fluidIngredient;
     this.display = display;
+    this.values = new Value[] { new FluidIngredientValue(fluidIngredient) };
+  }
+
+  @Override
+  public Value[] getValues() {
+    return values;
   }
 
   /** Creates an instance from a fluid ingredient with a display container */
@@ -61,6 +65,12 @@ public class FluidContainerIngredient extends AbstractIngredient {
 
   @Override
   public boolean test(@Nullable ItemStack stack) {
+    if (stack == null)
+      return false;
+    return testStack(stack, fluidIngredient);
+  }
+
+  public static boolean testStack(ItemStack stack, FluidIngredient fluidIngredient) {
     // first, must have a fluid capability
     ContainerItemContext ctxItem = ContainerItemContext.withInitial(stack);
     return stack != null && !stack.isEmpty() && Optional.ofNullable(ctxItem.find(FluidStorage.ITEM)).flatMap(cap -> {
@@ -78,7 +88,7 @@ public class FluidContainerIngredient extends AbstractIngredient {
       long amount = fluidIngredient.getAmount(fluid);
       FluidStack drained = TransferUtil.extractAnyFluid(cap, amount);
       // we need an exact match, and we need the resulting container item to be the same as the item stack's container item
-      return drained.getFluid() == fluid && drained.getAmount() == amount && ItemStack.matches(stack.getItem().getCraftingRemainingItem().getDefaultInstance(), ctxItem.getItemVariant().toStack((int) ctxItem.getAmount()));
+      return drained.getFluid() == fluid && drained.getAmount() == amount && ItemStack.matches(new ItemStack(stack.getItem().getCraftingRemainingItem()), ctxItem.getItemVariant().toStack((int) ctxItem.getAmount()));
     }).isPresent();
   }
 
@@ -113,25 +123,26 @@ public class FluidContainerIngredient extends AbstractIngredient {
   }
 
   @Override
-  public void invalidate() {
-    super.invalidate();
-    this.displayStacks = null;
-  }
-
-  @Override
-  public boolean isSimple() {
-    return false;
-  }
-
-  @Override
-  public IIngredientSerializer<? extends Ingredient> getSerializer() {
+  public IngredientDeserializer getDeserializer() {
     return SERIALIZER;
   }
 
+  @Override
+  public void toNetwork(FriendlyByteBuf buffer) {
+    fluidIngredient.write(buffer);
+    if (display != null) {
+      buffer.writeBoolean(true);
+      display.toNetwork(buffer);
+    } else {
+      buffer.writeBoolean(false);
+    }
+  }
+
   /** Serializer logic */
-  private static class Serializer implements IIngredientSerializer<FluidContainerIngredient> {
+  private static class Serializer implements IngredientDeserializer {
+
     @Override
-    public FluidContainerIngredient parse(JsonObject json) {
+    public Ingredient fromJson(JsonObject json) {
       FluidIngredient fluidIngredient;
       // if we have fluid, its a nested ingredient. Otherwise this object itself is the ingredient
       if (json.has("fluid")) {
@@ -147,24 +158,13 @@ public class FluidContainerIngredient extends AbstractIngredient {
     }
 
     @Override
-    public FluidContainerIngredient parse(FriendlyByteBuf buffer) {
+    public Ingredient fromNetwork(FriendlyByteBuf buffer) {
       FluidIngredient fluidIngredient = FluidIngredient.read(buffer);
       Ingredient display = null;
       if (buffer.readBoolean()) {
         display = Ingredient.fromNetwork(buffer);
       }
       return new FluidContainerIngredient(fluidIngredient, display);
-    }
-
-    @Override
-    public void write(FriendlyByteBuf buffer, FluidContainerIngredient ingredient) {
-      ingredient.fluidIngredient.write(buffer);
-      if (ingredient.display != null) {
-        buffer.writeBoolean(true);
-        ingredient.display.toNetwork(buffer);
-      } else {
-        buffer.writeBoolean(false);
-      }
     }
   }
 }
