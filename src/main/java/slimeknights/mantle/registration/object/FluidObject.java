@@ -1,15 +1,14 @@
 package slimeknights.mantle.registration.object;
 
+import io.github.fabricators_of_create.porting_lib.util.SimpleFlowableFluid;
 import lombok.Getter;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.FluidTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.material.Fluid;
-import slimeknights.mantle.util.SimpleFlowableFluid;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

@@ -2,6 +2,7 @@ package slimeknights.mantle.fabric.fluid;
 
 import io.github.fabricators_of_create.porting_lib.extensions.FluidExtensions;
 import io.github.fabricators_of_create.porting_lib.util.FluidAttributes;
+import io.github.fabricators_of_create.porting_lib.util.SimpleFlowableFluid;
 import me.alphamode.star.world.fluids.StarFluid;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -18,7 +19,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
-import slimeknights.mantle.util.SimpleFlowableFluid;
 
 import javax.annotation.Nullable;
 import java.util.function.Supplier;

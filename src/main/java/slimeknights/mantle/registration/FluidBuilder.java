@@ -1,5 +1,6 @@
 package slimeknights.mantle.registration;
 
+import io.github.fabricators_of_create.porting_lib.util.SimpleFlowableFluid;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -9,7 +10,6 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.item.Item;
 import io.github.fabricators_of_create.porting_lib.util.FluidAttributes;
 import slimeknights.mantle.fabric.fluid.SimpleDirectionalFluid;
-import slimeknights.mantle.util.SimpleFlowableFluid;
 
 import java.util.function.Supplier;
 

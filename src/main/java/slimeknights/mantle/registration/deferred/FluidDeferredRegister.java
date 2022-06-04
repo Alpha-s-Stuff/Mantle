@@ -3,6 +3,8 @@ package slimeknights.mantle.registration.deferred;
 import io.github.fabricators_of_create.porting_lib.util.FluidAttributes;
 import io.github.fabricators_of_create.porting_lib.util.LazyRegistrar;
 import io.github.fabricators_of_create.porting_lib.util.RegistryObject;
+import io.github.fabricators_of_create.porting_lib.util.SimpleFlowableFluid;
+import io.github.fabricators_of_create.porting_lib.util.SimpleFlowableFluid.Properties;
 import net.minecraft.core.Registry;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.Item;
@@ -15,8 +17,6 @@ import slimeknights.mantle.registration.DelayedSupplier;
 import slimeknights.mantle.registration.FluidBuilder;
 import slimeknights.mantle.registration.ItemProperties;
 import slimeknights.mantle.registration.object.FluidObject;
-import slimeknights.mantle.util.SimpleFlowableFluid;
-import slimeknights.mantle.util.SimpleFlowableFluid.Properties;
 
 import java.util.function.Function;
 import java.util.function.Supplier;
