@@ -2,7 +2,8 @@ package slimeknights.mantle.registration.deferred;
 
 import io.github.fabricators_of_create.porting_lib.util.LazyRegistrar;
 import net.minecraft.core.Registry;
-import net.minecraft.util.StringRepresentable;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import slimeknights.mantle.registration.object.EnumObject;
 
@@ -20,8 +21,12 @@ public abstract class DeferredRegisterWrapper<T> {
   /** Mod ID for registration */
   private final String modID;
 
-  protected DeferredRegisterWrapper(Registry<T> reg, String modID) {
-    register = LazyRegistrar.create(reg, modID);
+  protected DeferredRegisterWrapper(ResourceKey<Registry<T>> reg, String modID) {
+    this(DeferredRegister.create(reg, modID), modID);
+  }
+
+  protected DeferredRegisterWrapper(DeferredRegister<T> register, String modID) {
+    this.register = register;
     this.modID = modID;
   }
 

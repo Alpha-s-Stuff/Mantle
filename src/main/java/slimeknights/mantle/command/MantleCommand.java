@@ -6,9 +6,9 @@ import com.mojang.brigadier.suggestion.SuggestionProvider;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
-import net.minecraft.commands.synchronization.ArgumentTypes;
-import net.minecraft.commands.synchronization.EmptyArgumentSerializer;
 import net.minecraft.commands.synchronization.SuggestionProviders;
+import net.minecraft.core.Registry;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.GameRules;
 
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
@@ -35,21 +35,24 @@ public class MantleCommand {
   public static SuggestionProvider<CommandSourceStack> REGISTRY_VALUES;
   /** Suggestion provider that lists registered book ids **/
   public static SuggestionProvider<CommandSourceStack> REGISTERED_BOOKS;
+  /** Suggestion provider that lists registered book ids **/
+  public static SuggestionProvider<CommandSourceStack> REGISTRY;
 
   /** Registers all Mantle command related content */
   public static void init() {
     // register arguments
-    ArgumentTypes.register("mantle:tag_collection", TagCollectionArgument.class, new EmptyArgumentSerializer<>(TagCollectionArgument::collection));
     VALID_TAGS = SuggestionProviders.register(Mantle.getResource("valid_tags"), (context, builder) -> {
-      TagCollectionArgument.Result<?> result = context.getArgument("type", TagCollectionArgument.Result.class);
-      return SharedSuggestionProvider.suggestResource(result.getCollection().getAvailableTags(), builder);
+      Registry<?> result = RegistryArgument.getResult(context, "type");
+      return SharedSuggestionProvider.suggestResource(result.getTagNames().map(TagKey::location), builder);
     });
     REGISTRY_VALUES = SuggestionProviders.register(Mantle.getResource("registry_values"), (context, builder) -> {
-      TagCollectionArgument.Result<?> result = context.getArgument("type", TagCollectionArgument.Result.class);
-      return SharedSuggestionProvider.suggestResource(result.getKeys(), builder);
+      Registry<?> result = RegistryArgument.getResult(context, "type");
+      return SharedSuggestionProvider.suggestResource(result.keySet(), builder);
     });
     REGISTERED_BOOKS = SuggestionProviders.register(Mantle.getResource("registered_books"), (context, builder) ->
       SharedSuggestionProvider.suggestResource(BookTestCommand.getBookSuggestions(), builder));
+    REGISTRY = SuggestionProviders.register(Mantle.getResource("registry"), (context, builder) ->
+      SharedSuggestionProvider.suggestResource(context.getSource().registryAccess().registries().map(entry -> entry.key().location()), builder));
 
     // add command listener
     CommandRegistrationCallback.EVENT.register(MantleCommand::registerCommand);
@@ -74,6 +77,7 @@ public class MantleCommand {
     register(builder, "tags_for", TagsForCommand::register);
     register(builder, "book_test", BookTestCommand::register);
     register(builder, "harvest_tiers", HarvestTiersCommand::register);
+    register(builder, "tag_preference", TagPreferenceCommand::register);
 
     // register final command
     dispatcher.register(builder);

@@ -3,26 +3,26 @@ package slimeknights.mantle.recipe.data;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import io.github.fabricators_of_create.porting_lib.extensions.IngredientExtensions;
+import lombok.RequiredArgsConstructor;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.common.crafting.AbstractIngredient;
 import io.github.fabricators_of_create.porting_lib.crafting.IIngredientSerializer;
 import io.github.fabricators_of_create.porting_lib.crafting.VanillaIngredientSerializer;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.stream.Stream;
 
 /**
  * Ingredient for a non-NBT sensitive item from another mod, should never be used outside datagen
  */
-public class ItemNameIngredient extends Ingredient implements IngredientExtensions {
+public class ItemNameIngredient extends AbstractIngredient {
   private final List<ResourceLocation> names;
-
   protected ItemNameIngredient(List<ResourceLocation> names) {
-    super(Stream.empty());
+    super(names.stream().map(NamedValue::new));
     this.names = names;
   }
 
@@ -61,7 +61,29 @@ public class ItemNameIngredient extends Ingredient implements IngredientExtensio
   }
 
   @Override
+  public boolean isSimple() {
+    return false;
+  }
+
+  @Override
   public IIngredientSerializer<? extends Ingredient> getSerializer() {
     return VanillaIngredientSerializer.INSTANCE;
+  }
+
+  @RequiredArgsConstructor
+  public static class NamedValue implements Ingredient.Value {
+    private final ResourceLocation name;
+
+    @Override
+    public Collection<ItemStack> getItems() {
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public JsonObject serialize() {
+      JsonObject json = new JsonObject();
+      json.addProperty("item", name.toString());
+      return json;
+    }
   }
 }

@@ -1,34 +1,43 @@
 package slimeknights.mantle.recipe.ingredient;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 import com.google.gson.JsonSyntaxException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.SerializationTags;
-import net.minecraft.tags.Tag;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import io.github.fabricators_of_create.porting_lib.transfer.fluid.FluidStack;
 import slimeknights.mantle.util.JsonHelper;
 
+import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @SuppressWarnings("unused")
 public abstract class FluidIngredient {
   /** Empty fluid ingredient, matches nothing */
   public static final FluidIngredient EMPTY = new Empty();
+  /** Fluid json serializer instance */
+  public static Serializer SERIALIZER = new Serializer();
 
   /** Cached list of display fluids */
   private List<FluidStack> displayFluids;
@@ -126,7 +135,7 @@ public abstract class FluidIngredient {
    * @param amount  Minimum fluid amount
    * @return  Fluid ingredient from a tag
    */
-  public static FluidIngredient of(Tag<Fluid> fluid, long amount) {
+  public static FluidIngredient of(TagKey<Fluid> fluid, long amount) {
     return new FluidIngredient.TagMatch(fluid, amount);
   }
 
@@ -326,12 +335,12 @@ public abstract class FluidIngredient {
    */
   @AllArgsConstructor(access=AccessLevel.PRIVATE)
   private static class TagMatch extends FluidIngredient {
-    private final Tag<Fluid> tag;
+    private final TagKey<Fluid> tag;
     private final long amount;
 
     @Override
     public boolean test(Fluid fluid) {
-      return tag.contains(fluid);
+      return fluid.is(tag);
     }
 
     @Override
@@ -341,13 +350,16 @@ public abstract class FluidIngredient {
 
     @Override
     public List<FluidStack> getAllFluids() {
-      return tag.getValues().stream().map((fluid) -> new FluidStack(fluid, amount)).collect(Collectors.toList());
+      return StreamSupport.stream(Registry.FLUID.getTagOrEmpty(tag).spliterator(), false)
+                          .filter(Holder::isBound)
+                          .map(fluid -> new FluidStack(fluid.value(), amount))
+                          .toList();
     }
 
     @Override
     public JsonElement serialize() {
       JsonObject object = new JsonObject();
-      object.addProperty("tag", SerializationTags.getInstance().getIdOrThrow(Registry.FLUID_REGISTRY, this.tag, () -> new IllegalStateException("Unregistered fluid tag " + tag)).toString());
+      object.addProperty("tag", this.tag.location().toString());
       object.addProperty("amount", amount);
       return object;
     }
@@ -358,8 +370,7 @@ public abstract class FluidIngredient {
      * @return Fluid ingredient instance
      */
     private static TagMatch deserialize(JsonObject json) {
-      String tagName = GsonHelper.getAsString(json, "tag");
-      Tag<Fluid> tag = SerializationTags.getInstance().getTagOrThrow(Registry.FLUID_REGISTRY, new ResourceLocation(tagName), n -> new JsonSyntaxException("Unknown fluid tag '" + n + "'"));
+      TagKey<Fluid> tag = TagKey.create(Registry.FLUID_REGISTRY, JsonHelper.getResourceLocation(json, "tag"));
       int amount = GsonHelper.getAsInt(json, "amount");
       return new TagMatch(tag, amount);
     }
@@ -427,6 +438,21 @@ public abstract class FluidIngredient {
         ingredients[i] = deserializeObject(GsonHelper.convertToJsonObject(array.get(i), name + "[" + i + "]"));
       }
       return new Compound(ingredients);
+    }
+  }
+
+  /** Json serializer for fluids */
+  public static class Serializer implements JsonDeserializer<FluidIngredient>, JsonSerializer<FluidIngredient> {
+    private Serializer() {}
+
+    @Override
+    public FluidIngredient deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+      return FluidIngredient.deserialize(json, "ingredient");
+    }
+
+    @Override
+    public JsonElement serialize(FluidIngredient src, Type typeOfSrc, JsonSerializationContext context) {
+      return src.serialize();
     }
   }
 }

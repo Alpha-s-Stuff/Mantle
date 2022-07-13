@@ -1,8 +1,9 @@
 package slimeknights.mantle.registration.deferred;
 
 import net.minecraft.core.Registry;
-import net.minecraft.world.item.Item;
+import net.minecraft.core.Registry;
 import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.item.Item;
 import slimeknights.mantle.registration.object.EnumObject;
 import slimeknights.mantle.registration.object.ItemObject;
 

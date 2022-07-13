@@ -9,12 +9,12 @@ import net.minecraft.world.inventory.MenuType;
 import io.github.fabricators_of_create.porting_lib.util.RegistryObject;
 
 /**
- * Deferred register for container types, automatically mapping a factory argument in {@link IForgeMenuType}
+ * Deferred register for menu types, automatically mapping a factory argument in {@link IForgeMenuType}
  */
 @SuppressWarnings("unused")
-public class ContainerTypeDeferredRegister extends DeferredRegisterWrapper<MenuType<?>> {
+public class MenuTypeDeferredRegister extends DeferredRegisterWrapper<MenuType<?>> {
 
-  public ContainerTypeDeferredRegister(String modID) {
+  public MenuTypeDeferredRegister(String modID) {
     super(Registry.MENU, modID);
   }
 

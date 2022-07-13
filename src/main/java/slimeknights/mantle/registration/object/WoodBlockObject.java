@@ -5,7 +5,7 @@ import net.fabricmc.fabric.api.tag.TagFactory;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.tags.Tag;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.DoorBlock;
@@ -45,9 +45,9 @@ public class WoodBlockObject extends FenceBuildingBlockObject {
   private final Supplier<? extends WallSignBlock> wallSign;
   // tags
   @Getter
-  private final Tag.Named<Block> logBlockTag;
+  private final TagKey<Block> logBlockTag;
   @Getter
-  private final Tag.Named<Item> logItemTag;
+  private final TagKey<Item> logItemTag;
 
   public WoodBlockObject(ResourceLocation name, WoodType woodType, BuildingBlockObject planks,
                          Supplier<? extends Block> log, Supplier<? extends Block> strippedLog, Supplier<? extends Block> wood, Supplier<? extends Block> strippedWood,
@@ -68,8 +68,8 @@ public class WoodBlockObject extends FenceBuildingBlockObject {
     this.sign = sign;
     this.wallSign = wallSign;
     ResourceLocation tagName = new ResourceLocation(name.getNamespace(), name.getPath() + "_logs");
-    this.logBlockTag = TagFactory.BLOCK.create(tagName);
-    this.logItemTag = TagFactory.ITEM.create(tagName);
+    this.logBlockTag = BlockTags.create(tagName);
+    this.logItemTag = ItemTags.create(tagName);
   }
 
   public WoodBlockObject(ResourceLocation name, WoodType woodType, BuildingBlockObject planks,
@@ -90,8 +90,8 @@ public class WoodBlockObject extends FenceBuildingBlockObject {
     this.sign = castDelegate((StandingSignBlock) sign);
     this.wallSign = castDelegate((WallSignBlock) wallSign);
     ResourceLocation tagName = new ResourceLocation(name.getNamespace(), name.getPath() + "_logs");
-    this.logBlockTag = TagFactory.BLOCK.create(tagName);
-    this.logItemTag = TagFactory.ITEM.create(tagName);
+    this.logBlockTag = BlockTags.create(tagName);
+    this.logItemTag = ItemTags.create(tagName);
   }
 
   /** Gets the log for this wood type */

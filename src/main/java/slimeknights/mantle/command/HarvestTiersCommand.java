@@ -16,9 +16,7 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.SerializationTags;
-import net.minecraft.tags.Tag;
-import net.minecraft.tags.TagCollection;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Tier;
 import net.minecraft.world.level.block.Block;
 import slimeknights.mantle.Mantle;
@@ -55,11 +53,8 @@ public class HarvestTiersCommand {
   }
 
   /** Creates a clickable component for a block tag */
-  private static Object getTagComponent(TagCollection<Block> blockTags, Tag<Block> tag) {
-    ResourceLocation id = blockTags.getId(tag);
-    if (id == null) {
-      return "";
-    }
+  private static Object getTagComponent(TagKey<Block> tag) {
+    ResourceLocation id = tag.location();
     return new TextComponent(id.toString()).withStyle(style -> style.withUnderlined(true).withClickEvent(new ClickEvent(Action.SUGGEST_COMMAND, "/mantle dump_tag " + Registry.BLOCK_REGISTRY.location() + " " + id + " save")));
   }
 
@@ -73,13 +68,12 @@ public class HarvestTiersCommand {
     if (sortedTiers.isEmpty()) {
       output.append("\n* ").append(EMPTY);
     } else {
-      TagCollection<Block> blockTags = SerializationTags.getInstance().getOrEmpty(Registry.BLOCK_REGISTRY);
       for (Tier tier : sortedTiers) {
         output.append("\n* ");
-        Tag<Block> tag = TagUtil.getTagFromTier(tier);
+        TagKey<Block> tag = TagUtil.getTagFromTier(tier);
         ResourceLocation id = TierSortingRegistry.getName(tier);
         if (tag != null) {
-          output.append(new TranslatableComponent("command.mantle.harvest_tiers.tag", id, getTagComponent(blockTags, tag)));
+          output.append(new TranslatableComponent("command.mantle.harvest_tiers.tag", id, getTagComponent(tag)));
         } else {
           output.append(new TranslatableComponent("command.mantle.harvest_tiers.no_tag", id));
         }
