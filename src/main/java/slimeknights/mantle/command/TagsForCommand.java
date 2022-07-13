@@ -41,10 +41,10 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
-import io.github.fabricators_of_create.porting_lib.transfer.fluid.EmptyFluidHandler;
-import io.github.fabricators_of_create.porting_lib.transfer.fluid.IFluidHandler;
-import io.github.fabricators_of_create.porting_lib.transfer.fluid.IFluidHandlerItem;
+import slimeknights.mantle.transfer.TransferUtil;
+import slimeknights.mantle.transfer.fluid.EmptyFluidHandler;
+import slimeknights.mantle.transfer.fluid.IFluidHandler;
+import slimeknights.mantle.transfer.fluid.IFluidHandlerItem;
 import io.github.fabricators_of_create.porting_lib.util.LazyOptional;
 
 import java.util.List;

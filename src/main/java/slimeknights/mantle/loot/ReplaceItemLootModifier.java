@@ -16,7 +16,7 @@ import net.minecraft.resources.ResourceLocation;
 import slimeknights.mantle.data.GlobalLootModifierProvider;
 import io.github.fabricators_of_create.porting_lib.loot.GlobalLootModifierSerializer;
 import io.github.fabricators_of_create.porting_lib.loot.LootModifier;
-import io.github.fabricators_of_create.porting_lib.transfer.item.ItemHandlerHelper;
+import slimeknights.mantle.transfer.item.ItemHandlerHelper;
 import slimeknights.mantle.loot.builder.AbstractLootModifierBuilder;
 import slimeknights.mantle.recipe.helper.ItemOutput;
 import slimeknights.mantle.recipe.helper.RecipeHelper;

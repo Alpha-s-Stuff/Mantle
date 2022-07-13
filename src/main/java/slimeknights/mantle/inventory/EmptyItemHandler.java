@@ -3,7 +3,7 @@ package slimeknights.mantle.inventory;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import net.minecraft.world.item.ItemStack;
-import io.github.fabricators_of_create.porting_lib.transfer.item.IItemHandler;
+import slimeknights.mantle.transfer.item.IItemHandler;
 
 import javax.annotation.Nonnull;
 

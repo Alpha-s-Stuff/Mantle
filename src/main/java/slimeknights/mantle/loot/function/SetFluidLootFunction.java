@@ -10,7 +10,7 @@ import net.minecraft.world.level.storage.loot.functions.LootItemConditionalFunct
 import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.minecraft.util.GsonHelper;
-import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
+import slimeknights.mantle.transfer.TransferUtil;
 import slimeknights.mantle.loot.MantleLoot;
 import slimeknights.mantle.recipe.helper.RecipeHelper;
 

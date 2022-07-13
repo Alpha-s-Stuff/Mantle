@@ -13,8 +13,8 @@ import net.minecraft.world.level.material.Fluid;
 
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import slimeknights.mantle.Mantle;
-import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
-import io.github.fabricators_of_create.porting_lib.transfer.item.ItemHandlerHelper;
+import slimeknights.mantle.transfer.TransferUtil;
+import slimeknights.mantle.transfer.item.ItemHandlerHelper;
 import slimeknights.mantle.registration.object.FluidObject;
 import slimeknights.mantle.util.JsonHelper;
 
