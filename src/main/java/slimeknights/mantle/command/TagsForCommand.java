@@ -7,6 +7,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.Dynamic2CommandExceptionType;
 import io.github.fabricators_of_create.porting_lib.extensions.ResourceLocationExtensions;
 import io.github.fabricators_of_create.porting_lib.mixin.common.accessor.ItemAccessor;
+import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.ResourceLocationArgument;
@@ -42,7 +43,6 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
 import io.github.fabricators_of_create.porting_lib.transfer.fluid.EmptyFluidHandler;
-import io.github.fabricators_of_create.porting_lib.transfer.fluid.FluidStack;
 import io.github.fabricators_of_create.porting_lib.transfer.fluid.IFluidHandler;
 import io.github.fabricators_of_create.porting_lib.transfer.fluid.IFluidHandlerItem;
 import io.github.fabricators_of_create.porting_lib.util.LazyOptional;
@@ -104,12 +104,12 @@ public class TagsForCommand {
    */
   private static <T> int printOwningTags(CommandContext<CommandSourceStack> context, Registry<T> registry, T value) {
     MutableComponent output = new TranslatableComponent("command.mantle.tags_for.success", registry.key().location(), registry.getKey(value));
-    List<ResourceLocation> tags = registry.getHolder(registry.getId(value)).stream().flatMap(Holder::getTagKeys).map(TagKey::location).toList();
+    List<ResourceLocation> tags = registry.getHolder(registry.getId(value)).stream().flatMap(Holder::tags).map(TagKey::location).toList();
     if (tags.isEmpty()) {
       output.append("\n* ").append(NO_TAGS);
     } else {
       tags.stream()
-          .sorted((resourceLocation, compare) -> ((ResourceLocationExtensions)resourceLocation).compareNamespaced(compare))
+          .sorted(ResourceLocation::compareNamespaced)
           .forEach(tag -> output.append("\n* " + tag));
     }
     context.getSource().sendSuccess(output, true);

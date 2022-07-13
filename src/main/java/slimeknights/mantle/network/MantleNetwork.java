@@ -1,6 +1,6 @@
 package slimeknights.mantle.network;
 
-import me.pepperbell.simplenetworking.NetworkDirection;
+import io.github.fabricators_of_create.porting_lib.util.NetworkDirection;
 import slimeknights.mantle.Mantle;
 import slimeknights.mantle.fluid.transfer.FluidContainerTransferPacket;
 import slimeknights.mantle.network.packet.DropLecternBookPacket;

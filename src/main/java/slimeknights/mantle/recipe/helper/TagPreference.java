@@ -1,16 +1,11 @@
 package slimeknights.mantle.recipe.helper;
 
-import io.github.fabricators_of_create.porting_lib.extensions.ResourceLocationExtensions;
+import io.github.fabricators_of_create.porting_lib.event.common.TagsUpdatedCallback;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.TagsUpdatedEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
 import slimeknights.mantle.config.Config;
-import io.github.fabricators_of_create.porting_lib.event.common.TagsUpdatedCallback;
-import io.github.fabricators_of_create.porting_lib.util.RegistryHelper;
 import slimeknights.mantle.util.LogicHelper;
 import slimeknights.mantle.util.RegistryHelper;
 
@@ -36,7 +31,7 @@ public class TagPreference {
 
   /** Registers the listener with the event bus */
   public static void init() {
-    MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, TagsUpdatedEvent.class, e -> PREFERENCE_CACHE.clear());
+    TagsUpdatedCallback.EVENT.register(e -> PREFERENCE_CACHE.clear());
   }
 
   /** Gets the comparator for the given registry */

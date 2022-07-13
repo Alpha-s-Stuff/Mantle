@@ -1,9 +1,9 @@
 package slimeknights.mantle.fluid.transfer;
 
+import io.github.fabricators_of_create.porting_lib.transfer.fluid.IFluidHandler;
+import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.IFluidHandler;
 import slimeknights.mantle.data.GenericRegisteredSerializer.IJsonSerializable;
 
 import javax.annotation.Nullable;

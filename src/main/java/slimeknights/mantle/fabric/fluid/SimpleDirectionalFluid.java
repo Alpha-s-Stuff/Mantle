@@ -1,7 +1,7 @@
 package slimeknights.mantle.fabric.fluid;
 
 import io.github.fabricators_of_create.porting_lib.extensions.FluidExtensions;
-import io.github.fabricators_of_create.porting_lib.transfer.fluid.FluidAttributes;
+import io.github.fabricators_of_create.porting_lib.util.FluidAttributes;
 import me.alphamode.star.world.fluids.StarFluid;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;

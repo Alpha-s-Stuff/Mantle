@@ -6,20 +6,22 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
+import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import lombok.extern.log4j.Log4j2;
+import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Registry;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fml.ModList;
 import slimeknights.mantle.Mantle;
 import slimeknights.mantle.client.SafeClientAccess;
 import slimeknights.mantle.client.TooltipKey;
@@ -40,7 +42,7 @@ import java.util.function.BiConsumer;
 /** Handles fluid units displaying in tooltips */
 @SuppressWarnings("unused")
 @Log4j2
-public class FluidTooltipHandler extends SimpleJsonResourceReloadListener {
+public class FluidTooltipHandler extends SimpleJsonResourceReloadListener implements IdentifiableResourceReloadListener {
   /** Tooltip when not holding shift mentioning that is possible */
   public static final Component HOLD_SHIFT = Mantle.makeComponent("gui", "fluid.hold_shift").withStyle(ChatFormatting.GRAY);
   /** Folder for saving the logic */
@@ -78,10 +80,9 @@ public class FluidTooltipHandler extends SimpleJsonResourceReloadListener {
 
   /**
    * Initializes this manager, registering it with the resource manager
-   * @param manager  Manager
    */
-  public static void init(RegisterClientReloadListenersEvent manager) {
-    manager.registerReloadListener(INSTANCE);
+  public static void init() {
+    ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(INSTANCE);
   }
 
   private FluidTooltipHandler() {
@@ -183,15 +184,15 @@ public class FluidTooltipHandler extends SimpleJsonResourceReloadListener {
    * @param amount Amount override
    * @return  Fluid tooltip
    */
-  public static List<Component> getFluidTooltip(FluidStack fluid, int amount) {
+  public static List<Component> getFluidTooltip(FluidStack fluid, long amount) {
     List<Component> tooltip = new ArrayList<>();
     // fluid name, not sure if there is a cleaner way to do this
     tooltip.add(fluid.getDisplayName().plainCopy().withStyle(ChatFormatting.WHITE));
     // material
     appendMaterial(fluid.getFluid(), amount, tooltip);
     // add mod display name
-    ModList.get().getModContainerById(Objects.requireNonNull(fluid.getFluid().getRegistryName()).getNamespace())
-           .map(container -> container.getModInfo().getDisplayName())
+    FabricLoader.getInstance().getModContainer(Objects.requireNonNull(fluid.getFluid().getRegistryName()).getNamespace())
+           .map(container -> container.getMetadata().getName())
            .ifPresent(name -> tooltip.add(new TextComponent(name).withStyle(ChatFormatting.BLUE, ChatFormatting.ITALIC)));
     return tooltip;
   }
@@ -211,7 +212,7 @@ public class FluidTooltipHandler extends SimpleJsonResourceReloadListener {
    * @param amount     Input amount
    * @param tooltip    Tooltip to append information
    */
-  public static void appendMaterial(Fluid fluid, int amount, List<Component> tooltip) {
+  public static void appendMaterial(Fluid fluid, long amount, List<Component> tooltip) {
     if (appendMaterialNoShift(fluid, amount, tooltip)) {
       appendShift(tooltip);
     }
@@ -224,10 +225,10 @@ public class FluidTooltipHandler extends SimpleJsonResourceReloadListener {
    * @param tooltip    Tooltip to append information
    * @return  True if the amount is not in buckets
    */
-  public static boolean appendMaterialNoShift(Fluid fluid, int original, List<Component> tooltip) {
+  public static boolean appendMaterialNoShift(Fluid fluid, long original, List<Component> tooltip) {
     // if holding shift, skip specific units
     if (SafeClientAccess.getTooltipKey() != TooltipKey.SHIFT) {
-      int amount = original;
+      long amount = original;
       amount = INSTANCE.getUnitList(fluid).getText(tooltip, amount);
       MILLIBUCKET.getText(tooltip, amount);
       return INSTANCE.listCache.get(fluid) != INSTANCE.fallback;
@@ -255,7 +256,7 @@ public class FluidTooltipHandler extends SimpleJsonResourceReloadListener {
    * @param amount   Fluid amount
    * @param tooltip  Tooltip to append information
    */
-  public static void appendNamedList(ResourceLocation id, int amount, List<Component> tooltip) {
+  public static void appendNamedList(ResourceLocation id, long amount, List<Component> tooltip) {
     amount = INSTANCE.getUnitList(id).getText(tooltip, amount);
     appendBuckets(amount, tooltip);
   }
@@ -265,9 +266,13 @@ public class FluidTooltipHandler extends SimpleJsonResourceReloadListener {
    * @param amount     Fluid amount
    * @param tooltip  Tooltip to append information
    */
-  public static void appendBuckets(int amount, List<Component> tooltip) {
+  public static void appendBuckets(long amount, List<Component> tooltip) {
     amount = INSTANCE.fallback.getText(tooltip, amount);
     MILLIBUCKET.getText(tooltip, amount);
   }
 
+  @Override
+  public ResourceLocation getFabricId() {
+    return Mantle.getResource("fluid_tooltip_handler");
+  }
 }

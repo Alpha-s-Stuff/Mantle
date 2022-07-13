@@ -15,14 +15,14 @@ import java.util.List;
 public class FluidUnit {
 
   private final String key;
-  private final int needed;
+  private final long needed;
 
   /**
    * Gets the display text for this fluid entry
    * @return Display text
    */
-  public int getText(List<Component> tooltip, int amount) {
-    int full = amount / needed;
+  public long getText(List<Component> tooltip, long amount) {
+    long full = amount / needed;
     if (full > 0) {
       tooltip.add(new TranslatableComponent(key, full).withStyle(ChatFormatting.GRAY));
     }

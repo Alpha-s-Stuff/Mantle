@@ -1,7 +1,7 @@
 package slimeknights.mantle.registration.object;
 
 import lombok.Getter;
-import net.fabricmc.fabric.api.tag.TagFactory;
+import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
@@ -68,8 +68,8 @@ public class WoodBlockObject extends FenceBuildingBlockObject {
     this.sign = sign;
     this.wallSign = wallSign;
     ResourceLocation tagName = new ResourceLocation(name.getNamespace(), name.getPath() + "_logs");
-    this.logBlockTag = BlockTags.create(tagName);
-    this.logItemTag = ItemTags.create(tagName);
+    this.logBlockTag = TagKey.create(Registry.BLOCK_REGISTRY, tagName);
+    this.logItemTag = TagKey.create(Registry.ITEM_REGISTRY, tagName);
   }
 
   public WoodBlockObject(ResourceLocation name, WoodType woodType, BuildingBlockObject planks,
@@ -90,8 +90,8 @@ public class WoodBlockObject extends FenceBuildingBlockObject {
     this.sign = castDelegate((StandingSignBlock) sign);
     this.wallSign = castDelegate((WallSignBlock) wallSign);
     ResourceLocation tagName = new ResourceLocation(name.getNamespace(), name.getPath() + "_logs");
-    this.logBlockTag = BlockTags.create(tagName);
-    this.logItemTag = ItemTags.create(tagName);
+    this.logBlockTag = TagKey.create(Registry.BLOCK_REGISTRY, tagName);
+    this.logItemTag = TagKey.create(Registry.ITEM_REGISTRY, tagName);
   }
 
   /** Gets the log for this wood type */

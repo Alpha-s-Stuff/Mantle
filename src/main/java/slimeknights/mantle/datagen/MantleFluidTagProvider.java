@@ -12,8 +12,8 @@ import static slimeknights.mantle.datagen.MantleTags.Fluids.WATER;
 
 /** Provider for tags added by mantle, generally not useful for other mods */
 public class MantleFluidTagProvider extends FluidTagsProvider {
-  public MantleFluidTagProvider(DataGenerator gen, @Nullable ExistingFileHelper existingFileHelper) {
-    super(gen, Mantle.modId, existingFileHelper);
+  public MantleFluidTagProvider(DataGenerator gen) {
+    super(gen);
   }
 
   @Override

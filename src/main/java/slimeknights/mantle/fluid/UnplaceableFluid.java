@@ -1,5 +1,6 @@
 package slimeknights.mantle.fluid;
 
+import io.github.fabricators_of_create.porting_lib.util.FluidAttributes;
 import lombok.AllArgsConstructor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -13,7 +14,6 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.fluids.FluidAttributes;
 
 import java.util.function.Supplier;
 
@@ -51,7 +51,7 @@ public class UnplaceableFluid extends Fluid {
   }
 
   @Override
-  protected FluidAttributes createAttributes()
+  public FluidAttributes createAttributes()
   {
     return builder.build(this);
   }

@@ -1,7 +1,7 @@
 package slimeknights.mantle.datagen;
 
+import io.github.fabricators_of_create.porting_lib.util.FluidAttributes;
 import net.minecraft.data.DataGenerator;
-import net.minecraftforge.fluids.FluidAttributes;
 import slimeknights.mantle.Mantle;
 import slimeknights.mantle.fluid.tooltip.AbstractFluidTooltipProvider;
 import slimeknights.mantle.fluid.tooltip.FluidTooltipHandler;

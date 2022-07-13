@@ -6,16 +6,12 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSyntaxException;
+import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.GsonHelper;
-import net.minecraftforge.event.OnDatapackSyncEvent;
-import net.minecraftforge.network.PacketDistributor;
-import net.minecraftforge.network.PacketDistributor.PacketTarget;
-import net.minecraftforge.registries.IForgeRegistry;
-import net.minecraftforge.registries.IForgeRegistryEntry;
 import slimeknights.mantle.Mantle;
 import slimeknights.mantle.network.NetworkWrapper;
 import slimeknights.mantle.network.packet.ISimplePacket;
@@ -150,15 +146,15 @@ public class JsonHelper {
    * @return  Registry value
    * @throws JsonSyntaxException  If something failed to parse
    */
-  public static <T extends IForgeRegistryEntry<T>> T convertToEntry(IForgeRegistry<T> registry, JsonElement element, String key) {
+  public static <T> T convertToEntry(Registry<T> registry, JsonElement element, String key) {
     ResourceLocation name = JsonHelper.convertToResourceLocation(element, key);
     if (registry.containsKey(name)) {
-      T value = registry.getValue(name);
+      T value = registry.get(name);
       if (value != null) {
         return value;
       }
     }
-    throw new JsonSyntaxException("Unknown " + registry.getRegistryName() + " " + name);
+    throw new JsonSyntaxException("Unknown " + registry + " " + name);
   }
 
   /**
@@ -170,7 +166,7 @@ public class JsonHelper {
    * @return  Registry value
    * @throws JsonSyntaxException  If something failed to parse
    */
-  public static <T extends IForgeRegistryEntry<T>> T getAsEntry(IForgeRegistry<T> registry, JsonObject parent, String key) {
+  public static <T> T getAsEntry(Registry<T> registry, JsonObject parent, String key) {
     return convertToEntry(registry, JsonHelper.getElement(parent, key), key);
   }
 
@@ -274,24 +270,15 @@ public class JsonHelper {
     // on a dedicated server, the client is running a separate game instance, this is where we send packets, plus fully loaded should already be true
     // this event is not fired when connecting to a server
     if (!player.connection.getConnection().isMemoryConnection()) {
-      PacketTarget target = PacketDistributor.PLAYER.with(() -> player);
       for (ISimplePacket packet : packets) {
-        network.send(target, packet);
+        network.sendTo(packet, player);
       }
     }
   }
 
   /** Called when the player logs in to send packets */
-  public static void syncPackets(OnDatapackSyncEvent event, NetworkWrapper network, ISimplePacket... packets) {
+  public static void syncPackets(ServerPlayer targetedPlayer, boolean joined, NetworkWrapper network, ISimplePacket... packets) {
     // send to single player
-    ServerPlayer targetedPlayer = event.getPlayer();
-    if (targetedPlayer != null) {
-      sendPackets(network, targetedPlayer, packets);
-    } else {
-      // send to all players
-      for (ServerPlayer player : event.getPlayerList().getPlayers()) {
-        sendPackets(network, player, packets);
-      }
-    }
+    sendPackets(network, targetedPlayer, packets);
   }
 }

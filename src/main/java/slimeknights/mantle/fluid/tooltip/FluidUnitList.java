@@ -29,7 +29,7 @@ public class FluidUnitList {
   /**
    * Applies the text of all child units
    */
-  public int getText(List<Component> tooltip, int amount) {
+  public long getText(List<Component> tooltip, long amount) {
     if (units != null) {
       for (FluidUnit unit : units) {
         amount = unit.getText(tooltip, amount);

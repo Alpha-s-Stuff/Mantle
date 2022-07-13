@@ -5,9 +5,13 @@ import com.google.gson.JsonObject;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.network.chat.TextColor;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
+import slimeknights.mantle.Mantle;
 import slimeknights.mantle.data.ISafeManagerReloadListener;
 import slimeknights.mantle.util.JsonHelper;
 
@@ -23,7 +27,7 @@ import java.util.Map.Entry;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Log4j2
-public class ResourceColorManager implements ISafeManagerReloadListener {
+public class ResourceColorManager implements ISafeManagerReloadListener, IdentifiableResourceReloadListener {
   /** Modifier file to load, has merging behavior but forge prevents multiple mods from loading the same file */
   private static final String COLORS_PATH = "mantle/colors.json";
   /** Modifier file to load, has merging behavior but forge prevents multiple mods from loading the same file */
@@ -38,10 +42,9 @@ public class ResourceColorManager implements ISafeManagerReloadListener {
 
   /**
    * Initializes this manager, registering it with the resource manager
-   * @param manager  Manager
    */
-  public static void init(RegisterClientReloadListenersEvent manager) {
-    manager.registerReloadListener(INSTANCE);
+  public static void init() {
+    ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(INSTANCE);
   }
 
   /** Recursively parses the given objects */
@@ -106,5 +109,10 @@ public class ResourceColorManager implements ISafeManagerReloadListener {
   /** Gets an integer color for the given path */
   public static int getColor(String path) {
     return getTextColor(path).getValue();
+  }
+
+  @Override
+  public ResourceLocation getFabricId() {
+    return Mantle.getResource("resource_color_manager");
   }
 }

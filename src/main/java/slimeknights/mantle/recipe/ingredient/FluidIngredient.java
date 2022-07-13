@@ -9,6 +9,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.google.gson.JsonSyntaxException;
+import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -20,7 +21,6 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
-import io.github.fabricators_of_create.porting_lib.transfer.fluid.FluidStack;
 import slimeknights.mantle.util.JsonHelper;
 
 import java.lang.reflect.Type;
@@ -233,7 +233,7 @@ public abstract class FluidIngredient {
       if (fluid == null) {
         fluid = Fluids.EMPTY;
       }
-      int amount = buffer.readInt();
+      long amount = buffer.readLong();
       ingredients[i] = of(fluid, amount);
     }
     // if a single ingredient, do not wrap in compound
@@ -325,7 +325,7 @@ public abstract class FluidIngredient {
       if (fluid == null || fluid == Fluids.EMPTY) {
         throw new JsonSyntaxException("Unknown fluid '" + fluidName + "'");
       }
-      int amount = GsonHelper.getAsInt(json, "amount");
+      long amount = GsonHelper.getAsLong(json, "amount");
       return new FluidMatch(fluid, amount);
     }
   }

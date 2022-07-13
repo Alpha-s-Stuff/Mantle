@@ -1,15 +1,13 @@
 package slimeknights.mantle.registration.deferred;
 
-import net.fabricmc.fabric.api.screenhandler.v1.ScreenHandlerRegistry;
-import net.fabricmc.fabric.impl.screenhandler.ExtendedScreenHandlerType;
+import io.github.fabricators_of_create.porting_lib.util.RegistryObject;
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
 import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
-import io.github.fabricators_of_create.porting_lib.util.RegistryObject;
 
 /**
- * Deferred register for menu types, automatically mapping a factory argument in {@link IForgeMenuType}
+ * Deferred register for menu types, automatically mapping a factory argument in {@link ExtendedScreenHandlerType.ExtendedFactory}
  */
 @SuppressWarnings("unused")
 public class MenuTypeDeferredRegister extends DeferredRegisterWrapper<MenuType<?>> {
@@ -25,7 +23,7 @@ public class MenuTypeDeferredRegister extends DeferredRegisterWrapper<MenuType<?
    * @param <C>      Container type
    * @return  Registry object containing the container type
    */
-  public <C extends AbstractContainerMenu> RegistryObject<MenuType<C>> register(String name, ScreenHandlerRegistry.ExtendedClientHandlerFactory<C> factory) {
+  public <C extends AbstractContainerMenu> RegistryObject<MenuType<C>> register(String name, ExtendedScreenHandlerType.ExtendedFactory<C> factory) {
     return register.register(name, () -> new ExtendedScreenHandlerType(factory));
   }
 }

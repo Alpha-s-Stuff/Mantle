@@ -1,6 +1,9 @@
 package slimeknights.mantle;
 
+import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.minecraft.Util;
+import net.minecraft.core.Registry;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TranslatableComponent;
@@ -27,7 +30,6 @@ import slimeknights.mantle.loot.MantleLoot;
 import slimeknights.mantle.network.MantleNetwork;
 import slimeknights.mantle.recipe.crafting.ShapedFallbackRecipe;
 import slimeknights.mantle.recipe.crafting.ShapedRetexturedRecipe;
-import slimeknights.mantle.recipe.helper.TagEmptyCondition;
 import slimeknights.mantle.recipe.helper.TagPreference;
 import slimeknights.mantle.recipe.ingredient.FluidContainerIngredient;
 import slimeknights.mantle.registration.adapter.BlockEntityTypeRegistryAdapter;
@@ -82,7 +84,7 @@ public class Mantle implements ModInitializer {
     adapter.register(new ShapedFallbackRecipe.Serializer(), "crafting_shaped_fallback");
     adapter.register(new ShapedRetexturedRecipe.Serializer(), "crafting_shaped_retextured");
 
-    CraftingHelper.register(TagEmptyCondition.SERIALIZER);
+//    CraftingHelper.register(TagEmptyCondition.SERIALIZER);
     CraftingHelper.register(FluidContainerIngredient.ID, FluidContainerIngredient.SERIALIZER);
 
     // fluid container transfer
@@ -95,16 +97,6 @@ public class Mantle implements ModInitializer {
   private void registerBlockEntities() {
     BlockEntityTypeRegistryAdapter adapter = new BlockEntityTypeRegistryAdapter();
     adapter.register(MantleSignBlockEntity::new, "sign", MantleSignBlockEntity::buildSignBlocks);
-  }
-
-  private void gatherData(final GatherDataEvent event) {
-    DataGenerator generator = event.getGenerator();
-    if (event.includeServer()) {
-      generator.addProvider(new MantleFluidTagProvider(generator, event.getExistingFileHelper()));
-    }
-    if (event.includeClient()) {
-      generator.addProvider(new MantleFluidTooltipProvider(generator));
-    }
   }
 
   /**

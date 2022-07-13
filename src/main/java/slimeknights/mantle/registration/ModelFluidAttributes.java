@@ -1,5 +1,6 @@
 package slimeknights.mantle.registration;
 
+import io.github.fabricators_of_create.porting_lib.util.FluidAttributes;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandlerRegistry;
 import net.fabricmc.fabric.api.event.client.ClientSpriteRegistryCallback;
@@ -7,7 +8,6 @@ import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.material.Fluid;
 import slimeknights.mantle.client.model.fluid.FluidTextureModel;
-import io.github.fabricators_of_create.porting_lib.transfer.fluid.FluidAttributes;
 import io.github.fabricators_of_create.porting_lib.util.EnvExecutor;
 import slimeknights.mantle.client.render.MantleFluidRenderHandler;
 

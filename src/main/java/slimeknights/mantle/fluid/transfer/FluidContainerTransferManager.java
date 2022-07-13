@@ -6,22 +6,23 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
+import io.github.fabricators_of_create.porting_lib.crafting.CraftingHelper;
+import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.fabricmc.fabric.api.resource.conditions.v1.ResourceConditions;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.crafting.CraftingHelper;
-import net.minecraftforge.common.crafting.conditions.ICondition.IContext;
-import net.minecraftforge.event.AddReloadListenerEvent;
-import net.minecraftforge.event.OnDatapackSyncEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.fluids.FluidStack;
+import slimeknights.mantle.Mantle;
 import slimeknights.mantle.data.GenericRegisteredSerializer;
 import slimeknights.mantle.network.MantleNetwork;
 import slimeknights.mantle.util.JsonHelper;
@@ -36,7 +37,7 @@ import java.util.function.Consumer;
 
 /** Logic for filling and emptying fluid containers that are not fluid handlers */
 @Log4j2
-public class FluidContainerTransferManager extends SimpleJsonResourceReloadListener {
+public class FluidContainerTransferManager extends SimpleJsonResourceReloadListener implements IdentifiableResourceReloadListener {
   /** Map of all modifier types that are expected to load in data packs */
   public static final GenericRegisteredSerializer<IFluidContainerTransfer> TRANSFER_LOADERS = new GenericRegisteredSerializer<>();
   /** Folder for saving the logic */
@@ -59,7 +60,7 @@ public class FluidContainerTransferManager extends SimpleJsonResourceReloadListe
   private Set<Item> containerItems = Collections.emptySet();
 
   /** Condition context for tags */
-  private IContext context = IContext.EMPTY;
+//  private IContext context = IContext.EMPTY;
 
   private FluidContainerTransferManager() {
     super(GSON, FOLDER);
@@ -80,18 +81,19 @@ public class FluidContainerTransferManager extends SimpleJsonResourceReloadListe
 
   /** For internal use only */
   public void init() {
-    MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, AddReloadListenerEvent.class, e -> {
-      e.addListener(this);
-      this.context = e.getConditionContext();
-    });
-    MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, OnDatapackSyncEvent.class, e -> JsonHelper.syncPackets(e, MantleNetwork.INSTANCE, new FluidContainerTransferPacket(this.getContainerItems())));
+    ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(this);
+//    MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, AddReloadListenerEvent.class, e -> {
+//      e.addListener(this);
+//      this.context = e.getConditionContext();
+//    });
+    ServerLifecycleEvents.SYNC_DATA_PACK_CONTENTS.register((player, joined) -> JsonHelper.syncPackets(player, joined, MantleNetwork.INSTANCE, new FluidContainerTransferPacket(this.getContainerItems())));
   }
 
   /** Loads transfer from JSON */
   @Nullable
   private IFluidContainerTransfer loadFluidTransfer(ResourceLocation key, JsonObject json) {
     try {
-      if (!json.has("conditions") || CraftingHelper.processConditions(GsonHelper.getAsJsonArray(json, "conditions"), context)) {
+      if (!json.has(ResourceConditions.CONDITIONS_KEY) || CraftingHelper.processConditions(GsonHelper.getAsJsonArray(json, "conditions"))) {
         return GSON.fromJson(json, IFluidContainerTransfer.class);
       }
     } catch (JsonSyntaxException e) {
@@ -129,5 +131,10 @@ public class FluidContainerTransferManager extends SimpleJsonResourceReloadListe
       }
     }
     return null;
+  }
+
+  @Override
+  public ResourceLocation getFabricId() {
+    return Mantle.getResource("fluid_container_transfer_manager");
   }
 }

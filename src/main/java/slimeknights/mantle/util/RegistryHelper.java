@@ -53,7 +53,7 @@ public class RegistryHelper {
     if (index == Registry.DEFAULT) {
       return false;
     }
-    return registry.getHolder(index).filter(holder -> holder.containsTag(tag)).isPresent();
+    return registry.getHolder(index).filter(holder -> holder.is(tag)).isPresent();
   }
 
   /** Checks if the given tag contains the given registry object */

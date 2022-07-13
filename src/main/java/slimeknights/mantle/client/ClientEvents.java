@@ -53,8 +53,8 @@ public class ClientEvents implements ClientModInitializer {
   static void registerListeners() {
     ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(ModelHelper.LISTENER);
     ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new BookLoader());
-    ResourceColorManager.init(event);
-    FluidTooltipHandler.init(event);
+    ResourceColorManager.init();
+    FluidTooltipHandler.init();
   }
 
   @Override

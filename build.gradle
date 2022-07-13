@@ -15,7 +15,6 @@ plugins {
 }
 
 repositories {
-    mavenLocal()
     mavenCentral()
     maven { url = "https://maven.parchmentmc.org" }
     maven { url = "https://maven.shedaniel.me/" }
@@ -25,6 +24,7 @@ repositories {
     maven { url = "https://maven.terraformersmc.com/releases/" }
     maven { url = "https://ladysnake.jfrog.io/artifactory/mods" }
     maven { url = "https://maven.jamieswhiteshirt.com/libs-release" }
+    maven { url = "https://maven.wispforest.io" }
     maven { url = "https://jitpack.io" }
 }
 
@@ -130,8 +130,8 @@ dependencies {
     implementation(include('com.electronwill.night-config:toml:3.6.0'))
     implementation(include("com.google.code.findbugs:jsr305:3.0.2"))
 
-    modApi "com.terraformersmc:modmenu:2.0.2"
-    modApi("me.shedaniel.cloth:cloth-config-fabric:6.1.48") {
+    modApi "com.terraformersmc:modmenu:3.2.3"
+    modApi("me.shedaniel.cloth:cloth-config-fabric:6.2.62") {
         exclude(group: "net.fabricmc.fabric-api")
     }
 
@@ -154,7 +154,7 @@ dependencies {
     api(include("com.github.LlamaLad7:MixinExtras:0.0.6"))
     annotationProcessor(include("com.github.LlamaLad7:MixinExtras:0.0.6"))
 
-    modImplementation(include("me.alphamode:Star:1.0+1.18.1"))
+    modImplementation(include("me.alphamode:Star:1.0+1.18.2"))
 }
 
 task buildOrPublish {

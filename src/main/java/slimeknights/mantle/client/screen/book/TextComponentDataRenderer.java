@@ -2,6 +2,7 @@ package slimeknights.mantle.client.screen.book;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Matrix4f;
+import io.github.fabricators_of_create.porting_lib.util.client.GuiUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.Font;
 import net.minecraft.locale.Language;
@@ -10,7 +11,6 @@ import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextComponent;
 import slimeknights.mantle.client.book.data.element.TextComponentData;
-import io.github.fabricators_of_create.porting_lib.util.GuiUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;

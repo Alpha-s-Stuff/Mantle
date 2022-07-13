@@ -5,6 +5,8 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Matrix4f;
 import com.mojang.math.Vector3f;
 import io.github.fabricators_of_create.porting_lib.extensions.FluidExtensions;
+import io.github.fabricators_of_create.porting_lib.util.FluidAttributes;
+import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -13,8 +15,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.InventoryMenu;
 import slimeknights.mantle.client.model.fluid.FluidCuboid;
 import slimeknights.mantle.client.model.fluid.FluidCuboid.FluidFace;
-import io.github.fabricators_of_create.porting_lib.transfer.fluid.FluidAttributes;
-import io.github.fabricators_of_create.porting_lib.transfer.fluid.FluidStack;
 
 import java.util.List;
 
@@ -255,7 +255,7 @@ public class FluidRenderer {
     }
 
     // fluid attributes, fetch once for all fluids to save effort
-    FluidAttributes attributes = ((FluidExtensions)fluid.getFluid()).getAttributes();
+    FluidAttributes attributes = fluid.getFluid().getAttributes();
     TextureAtlasSprite still = getBlockSprite(attributes.getStillTexture(fluid));
     TextureAtlasSprite flowing = getBlockSprite(attributes.getFlowingTexture(fluid));
     int color = attributes.getColor(fluid);

@@ -10,6 +10,7 @@ import com.mojang.math.Transformation;
 import com.mojang.math.Vector3f;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
@@ -24,7 +25,6 @@ import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import slimeknights.mantle.Mantle;
-import io.github.fabricators_of_create.porting_lib.util.IdentifiableResourceManagerReloadListener;
 
 import javax.annotation.Nullable;
 import java.util.Map;
@@ -38,7 +38,7 @@ import java.util.function.Function;
 public class ModelHelper {
   private static final Map<Block,ResourceLocation> TEXTURE_NAME_CACHE = new ConcurrentHashMap<>();
   /** Listener instance to clear cache */
-  public static final IdentifiableResourceManagerReloadListener LISTENER = new IdentifiableResourceManagerReloadListener() {
+  public static final SimpleSynchronousResourceReloadListener LISTENER = new SimpleSynchronousResourceReloadListener() {
     @Override
     public ResourceLocation getFabricId() {
       return Mantle.getResource("model_helper");

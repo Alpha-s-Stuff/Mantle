@@ -1,11 +1,11 @@
 package slimeknights.mantle.client;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.loading.FMLEnvironment;
 
 import javax.annotation.Nullable;
 
@@ -13,7 +13,7 @@ import javax.annotation.Nullable;
 public class SafeClientAccess {
   /** Gets the currently pressed key for tooltips, returns UNKNOWN on a server */
   public static TooltipKey getTooltipKey() {
-    if (FMLEnvironment.dist == Dist.CLIENT) {
+    if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
       return ClientOnly.getPressedKey();
     }
     return TooltipKey.UNKNOWN;
@@ -22,7 +22,7 @@ public class SafeClientAccess {
   /** Gets the client player entity, or null on a server */
   @Nullable
   public static Player getPlayer() {
-    if (FMLEnvironment.dist == Dist.CLIENT) {
+    if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
       return ClientOnly.getClientPlayer();
     }
     return null;
@@ -31,7 +31,7 @@ public class SafeClientAccess {
   /** Gets the client player entity, or null on a server */
   @Nullable
   public static Level getLevel() {
-    if (FMLEnvironment.dist == Dist.CLIENT) {
+    if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
       return ClientOnly.getClientLevel();
     }
     return null;

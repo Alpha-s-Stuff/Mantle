@@ -6,15 +6,14 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
+import io.github.fabricators_of_create.porting_lib.transfer.fluid.IFluidHandler;
+import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
 import org.apache.commons.lang3.function.TriFunction;
 import slimeknights.mantle.Mantle;
 import slimeknights.mantle.recipe.helper.ItemOutput;
@@ -53,9 +52,9 @@ public class EmptyFluidContainerTransfer implements IFluidContainerTransfer {
   @Override
   public TransferResult transfer(ItemStack stack, FluidStack fluid, IFluidHandler handler) {
     FluidStack contained = getFluid(stack);
-    int simulated = handler.fill(contained.copy(), FluidAction.SIMULATE);
+    long simulated = handler.fill(contained.copy(), true);
     if (simulated == this.fluid.getAmount()) {
-      int actual = handler.fill(contained.copy(), FluidAction.EXECUTE);
+      long actual = handler.fill(contained.copy(), false);
       if (actual > 0) {
         if (actual != this.fluid.getAmount()) {
           Mantle.logger.error("Wrong amount filled from {}, expected {}, filled {}", stack.getItem().getRegistryName(), this.fluid.getAmount(), actual);
