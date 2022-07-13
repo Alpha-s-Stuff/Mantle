@@ -11,7 +11,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.material.Fluid;
 import slimeknights.mantle.Mantle;
 import slimeknights.mantle.config.Config;
-import io.github.fabricators_of_create.porting_lib.event.TagsUpdatedCallback;
+import io.github.fabricators_of_create.porting_lib.event.common.TagsUpdatedCallback;
 import io.github.fabricators_of_create.porting_lib.util.RegistryHelper;
 import slimeknights.mantle.util.LogicHelper;
 
