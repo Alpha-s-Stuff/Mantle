@@ -62,9 +62,9 @@ public class NetworkWrapper {
    */
   public <MSG extends ISimplePacket> void registerPacket(Class<MSG> clazz, BiConsumer<MSG, FriendlyByteBuf> encoder, Function<FriendlyByteBuf, MSG> decoder, BiConsumer<MSG,Supplier<ISimplePacket.Context>> consumer, @Nullable NetworkDirection direction) {
     if (direction == NetworkDirection.PLAY_TO_CLIENT) {
-      this.network.registerS2CPacket(clazz, this.id++);
+      this.network.registerS2CPacket(clazz, this.id++, decoder);
     } else {
-      this.network.registerC2SPacket(clazz, this.id++);
+      this.network.registerC2SPacket(clazz, this.id++, decoder);
     }
   }
 
