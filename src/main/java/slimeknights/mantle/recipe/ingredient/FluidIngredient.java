@@ -371,7 +371,7 @@ public abstract class FluidIngredient {
      */
     private static TagMatch deserialize(JsonObject json) {
       TagKey<Fluid> tag = TagKey.create(Registry.FLUID_REGISTRY, JsonHelper.getResourceLocation(json, "tag"));
-      int amount = GsonHelper.getAsInt(json, "amount");
+      long amount = GsonHelper.getAsLong(json, "amount");
       return new TagMatch(tag, amount);
     }
   }
