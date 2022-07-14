@@ -66,7 +66,7 @@ public class FluidTooltipHandler extends SimpleJsonResourceReloadListener implem
   private static final FluidUnitList DEFAULT_LIST = new FluidUnitList(null, Collections.singletonList(BUCKET));
 
   /** Formatter as a biconsumer, shows up in a few places */
-  public static final BiConsumer<Integer,List<Component>> BUCKET_FORMATTER = FluidTooltipHandler::appendBuckets;
+  public static final BiConsumer<Long,List<Component>> BUCKET_FORMATTER = FluidTooltipHandler::appendBuckets;
 
   /* Instance data */
   public static final FluidTooltipHandler INSTANCE = new FluidTooltipHandler();
