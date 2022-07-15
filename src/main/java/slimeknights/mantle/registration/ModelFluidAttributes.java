@@ -9,7 +9,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.material.Fluid;
 import slimeknights.mantle.client.model.fluid.FluidTextureModel;
 import io.github.fabricators_of_create.porting_lib.util.EnvExecutor;
-import slimeknights.mantle.client.render.MantleFluidRenderHandler;
 
 import javax.annotation.Nullable;
 import java.util.function.BiFunction;
@@ -27,14 +26,6 @@ public class ModelFluidAttributes extends FluidAttributes {
   protected ModelFluidAttributes(FluidAttributes.Builder builder, Fluid fluid) {
     super(builder, fluid);
     this.fluid = fluid;
-    EnvExecutor.runWhenOn(EnvType.CLIENT, () -> () -> {
-      ClientSpriteRegistryCallback.event(TextureAtlas.LOCATION_BLOCKS).register((atlasTexture, registry) -> {
-        registry.register(getStillTexture());
-        registry.register(getFlowingTexture());
-        registry.register(getStillTexture());
-      });
-      FluidRenderHandlerRegistry.INSTANCE.register(fluid, new MantleFluidRenderHandler(getStillTexture(), getFlowingTexture(), getOverlayTexture(), fluid));
-    });
   }
 
   @Override
