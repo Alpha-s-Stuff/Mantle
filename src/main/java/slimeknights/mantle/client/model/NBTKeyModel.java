@@ -10,6 +10,8 @@ import com.google.gson.JsonObject;
 import com.mojang.datafixers.util.Either;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.math.Transformation;
+import io.github.fabricators_of_create.porting_lib.model.ItemLayerModel;
+import io.github.fabricators_of_create.porting_lib.model.PerspectiveMapWrapper;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.block.model.BakedQuad;
@@ -111,14 +113,14 @@ public class NBTKeyModel implements IModelGeometry<NBTKeyModel> {
   /** Bakes a model for the given texture */
   private static BakedModel bakeModel(IModelConfiguration owner, Material texture, Function<Material,TextureAtlasSprite> spriteGetter, ImmutableMap<TransformType,Transformation> transformMap, ItemOverrides overrides) {
     TextureAtlasSprite sprite = spriteGetter.apply(texture);
-    ImmutableList<BakedQuad> quads = ImmutableList.<BakedQuad>builder().build();//ItemLayerUtil.getQuadsForSprite(-1, sprite, Transformation.identity());
+    ImmutableList<BakedQuad> quads = ItemLayerModel.getQuadsForSprite(-1, sprite, Transformation.identity());
     return new BakedItemModel(quads, sprite, transformMap, overrides, true, owner.isSideLit());
   }
 
   @Override
   public BakedModel bake(IModelConfiguration owner, ModelBakery bakery, Function<Material,TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides, ResourceLocation modelLocation) {
     ImmutableMap.Builder<String, BakedModel> variants = ImmutableMap.builder();
-    ImmutableMap<TransformType,Transformation> transformMap = Maps.immutableEnumMap(Maps.newEnumMap(TransformType.class));
+    ImmutableMap<TransformType,Transformation> transformMap = Maps.immutableEnumMap(PerspectiveMapWrapper.getTransforms(owner.getCombinedTransform()));
     for (Entry<String,Material> entry : textures.entrySet()) {
       String key = entry.getKey();
       if (!key.equals("default")) {
