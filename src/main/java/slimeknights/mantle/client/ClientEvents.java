@@ -17,6 +17,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.client.color.block.BlockColors;
 import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.renderer.Sheets;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
+import net.minecraft.client.renderer.blockentity.SignRenderer;
+import net.minecraft.client.resources.model.Material;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.profiling.ProfilerFiller;
@@ -38,16 +43,20 @@ import slimeknights.mantle.client.model.util.ModelHelper;
 import slimeknights.mantle.fluid.tooltip.FluidTooltipHandler;
 import slimeknights.mantle.client.render.MantleShaders;
 import slimeknights.mantle.network.MantleNetwork;
+import slimeknights.mantle.registration.MantleRegistrations;
+import slimeknights.mantle.registration.RegistrationHelper;
 import slimeknights.mantle.util.OffhandCooldownTracker;
 
 import java.util.function.Function;
+
+import static net.minecraft.client.renderer.Sheets.SIGN_SHEET;
 
 @SuppressWarnings("unused")
 public class ClientEvents implements ClientModInitializer {
   private static final Function<OffhandCooldownTracker,Float> COOLDOWN_TRACKER = OffhandCooldownTracker::getCooldown;
 
   static void registerEntityRenderers() {
-//    BlockEntityRenderers.register(MantleRegistrations.SIGN, SignRenderer::new);
+    BlockEntityRenderers.register(MantleRegistrations.SIGN, SignRenderer::new);
   }
 
   static void registerListeners() {
@@ -59,10 +68,10 @@ public class ClientEvents implements ClientModInitializer {
 
   @Override
   public void onInitializeClient() {
-//    RegistrationHelper.forEachWoodType(woodType ->  {
-//      ResourceLocation location = new ResourceLocation(woodType.name());
-//      Sheets.SIGN_MATERIALS.put(woodType, new Material(SIGN_SHEET, new ResourceLocation(location.getNamespace(), "entity/signs/" + location.getPath())));
-//    });
+    RegistrationHelper.forEachWoodType(woodType ->  {
+      ResourceLocation location = new ResourceLocation(woodType.name());
+      Sheets.SIGN_MATERIALS.put(woodType, new Material(SIGN_SHEET, new ResourceLocation(location.getNamespace(), "entity/signs/" + location.getPath())));
+    });
 
     BookLoader.registerBook(Mantle.getResource("test"), new FileRepository(Mantle.getResource("books/test")));
 
