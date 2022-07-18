@@ -2,9 +2,7 @@ package slimeknights.mantle.client.book.data;
 
 import com.google.common.collect.Sets;
 import com.google.gson.JsonElement;
-import io.github.fabricators_of_create.porting_lib.util.TrueCondition;
-import net.fabricmc.fabric.api.resource.conditions.v1.ConditionJsonProvider;
-import net.fabricmc.fabric.api.resource.conditions.v1.ResourceConditions;
+import com.google.gson.JsonObject;
 import net.minecraft.advancements.AdvancementProgress;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
@@ -21,6 +19,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class SectionData implements IDataItem, IConditional {
@@ -30,7 +29,7 @@ public class SectionData implements IDataItem, IConditional {
   public Set<String> requirements = Sets.newHashSet();
   public boolean hideWhenLocked = false;
   public String data = "";
-  public ConditionJsonProvider condition = TrueCondition.INSTANCE;
+  public Predicate<JsonObject> condition = (jsonObject -> true);
 
   /** Contains arbitrary data to be used by custom transformers and other things */
   public Map<ResourceLocation, JsonElement> extraData = Collections.emptyMap();
@@ -142,7 +141,6 @@ public class SectionData implements IDataItem, IConditional {
 
   @Override
   public boolean isConditionMet() {
-    return false;
-    /*return ResourceConditions.get(condition.getConditionId()).test();*/
+    return condition.test(null);
   }
 }
