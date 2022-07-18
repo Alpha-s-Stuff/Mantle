@@ -93,7 +93,7 @@ public class FluidContainerTransferManager extends SimpleJsonResourceReloadListe
   @Nullable
   private IFluidContainerTransfer loadFluidTransfer(ResourceLocation key, JsonObject json) {
     try {
-      if (!json.has(ResourceConditions.CONDITIONS_KEY) || CraftingHelper.processConditions(GsonHelper.getAsJsonArray(json, "conditions"))) {
+      if (!json.has(ResourceConditions.CONDITIONS_KEY) || CraftingHelper.processConditions(GsonHelper.getAsJsonArray(json, ResourceConditions.CONDITIONS_KEY))) {
         return GSON.fromJson(json, IFluidContainerTransfer.class);
       }
     } catch (JsonSyntaxException e) {

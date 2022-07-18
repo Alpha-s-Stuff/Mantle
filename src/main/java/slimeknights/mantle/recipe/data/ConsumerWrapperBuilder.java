@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import net.fabricmc.fabric.api.resource.conditions.v1.ConditionJsonProvider;
+import net.fabricmc.fabric.api.resource.conditions.v1.ResourceConditions;
 import net.minecraft.core.Registry;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -127,7 +128,7 @@ public class ConsumerWrapperBuilder {
         for (ConditionJsonProvider condition : conditions) {
           conditionsArray.add(condition.toJson());
         }
-        json.add("conditions", conditionsArray);
+        json.add(ResourceConditions.CONDITIONS_KEY, conditionsArray);
       }
       // serialize the normal recipe
       original.serializeRecipeData(json);

@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import net.fabricmc.fabric.api.resource.conditions.v1.ConditionJsonProvider;
+import net.fabricmc.fabric.api.resource.conditions.v1.ResourceConditions;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.HashCache;
 import net.minecraft.resources.ResourceLocation;
@@ -76,7 +77,7 @@ public abstract class AbstractFluidContainerTransferProvider extends GenericData
         for (ConditionJsonProvider condition : conditions) {
           array.add(condition.toJson());
         }
-        element.getAsJsonObject().add("conditions", array);
+        element.getAsJsonObject().add(ResourceConditions.CONDITIONS_KEY, array);
       }
       return element;
     }

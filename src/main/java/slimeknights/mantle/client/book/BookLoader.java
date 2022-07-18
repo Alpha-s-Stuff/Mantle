@@ -2,6 +2,7 @@ package slimeknights.mantle.client.book;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.fabricmc.fabric.api.resource.conditions.v1.ConditionJsonProvider;
@@ -46,6 +47,7 @@ import slimeknights.mantle.network.packet.UpdateLecternPagePacket;
 import javax.annotation.Nullable;
 import java.lang.reflect.Type;
 import java.util.HashMap;
+import java.util.function.Predicate;
 
 public class BookLoader implements SimpleSynchronousResourceReloadListener {
 
@@ -92,7 +94,7 @@ public class BookLoader implements SimpleSynchronousResourceReloadListener {
     // Register GSON type adapters
     registerGsonTypeAdapter(ResourceLocation.class, ResourceLocationSerializer.resourceLocation("mantle"));
     registerGsonTypeAdapter(int.class, new HexStringDeserializer());
-    registerGsonTypeAdapter(ConditionJsonProvider.class, new ConditionDeserializer());
+    registerGsonTypeAdapter(Predicate.class, new ConditionDeserializer());
     registerGsonTypeAdapter(IngredientData.class, new IngredientData.Deserializer());
 
     // Register page types that are implicitly hidden from indexes

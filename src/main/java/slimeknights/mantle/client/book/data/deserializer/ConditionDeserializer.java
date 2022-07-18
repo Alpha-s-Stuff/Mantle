@@ -18,6 +18,6 @@ public class ConditionDeserializer implements JsonDeserializer<Predicate<JsonObj
     if(!json.isJsonObject())
       throw new JsonParseException("A condition must be a JSON Object");
 
-    return ResourceConditions.get(ResourceLocation.tryParse(GsonHelper.getAsString(json.getAsJsonObject(), "condition")));
+    return ResourceConditions.get(ResourceLocation.tryParse(GsonHelper.getAsString(json.getAsJsonObject(), ResourceConditions.CONDITION_ID_KEY)));
   }
 }
