@@ -28,10 +28,12 @@ import slimeknights.mantle.item.LecternBookItem;
 import io.github.fabricators_of_create.porting_lib.crafting.CraftingHelper;
 import slimeknights.mantle.loot.MantleLoot;
 import slimeknights.mantle.network.MantleNetwork;
+import slimeknights.mantle.recipe.MantleRecipeSerializers;
 import slimeknights.mantle.recipe.crafting.ShapedFallbackRecipe;
 import slimeknights.mantle.recipe.crafting.ShapedRetexturedRecipe;
 import slimeknights.mantle.recipe.helper.TagPreference;
 import slimeknights.mantle.recipe.ingredient.FluidContainerIngredient;
+import slimeknights.mantle.registration.MantleRegistrations;
 import slimeknights.mantle.registration.adapter.BlockEntityTypeRegistryAdapter;
 import slimeknights.mantle.registration.adapter.RegistryAdapter;
 
@@ -81,8 +83,8 @@ public class Mantle implements ModInitializer {
 
   private void registerRecipeSerializers() {
     RegistryAdapter<RecipeSerializer<?>> adapter = new RegistryAdapter<>(Registry.RECIPE_SERIALIZER, Mantle.modId);
-    adapter.register(new ShapedFallbackRecipe.Serializer(), "crafting_shaped_fallback");
-    adapter.register(new ShapedRetexturedRecipe.Serializer(), "crafting_shaped_retextured");
+    MantleRecipeSerializers.CRAFTING_SHAPED_FALLBACK = adapter.register(new ShapedFallbackRecipe.Serializer(), "crafting_shaped_fallback");
+    MantleRecipeSerializers.CRAFTING_SHAPED_RETEXTURED = adapter.register(new ShapedRetexturedRecipe.Serializer(), "crafting_shaped_retextured");
 
 //    CraftingHelper.register(TagEmptyCondition.SERIALIZER);
     CraftingHelper.register(FluidContainerIngredient.ID, FluidContainerIngredient.SERIALIZER);
@@ -96,7 +98,7 @@ public class Mantle implements ModInitializer {
 
   private void registerBlockEntities() {
     BlockEntityTypeRegistryAdapter adapter = new BlockEntityTypeRegistryAdapter();
-    adapter.register(MantleSignBlockEntity::new, "sign", MantleSignBlockEntity::buildSignBlocks);
+    MantleRegistrations.SIGN = adapter.register(MantleSignBlockEntity::new, "sign", MantleSignBlockEntity::buildSignBlocks);
   }
 
   /**

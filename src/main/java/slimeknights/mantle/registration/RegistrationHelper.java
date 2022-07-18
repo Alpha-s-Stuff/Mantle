@@ -20,16 +20,6 @@ public class RegistrationHelper {
   private static final List<WoodType> WOOD_TYPES = new ArrayList<>();
 
   /**
-   * Used to mark injected registry objects, as despite being set to null they will be nonnull at runtime.
-   * @param <T>  Class type
-   * @return  Null, its a lie
-   */
-  @SuppressWarnings("ConstantConditions")
-  public static <T> T injected() {
-    return null;
-  }
-
-  /**
    * Creates a supplier for a specific registry entry instance based on the delegate to a general instance.
    * Note that this performs an unchecked cast, be certain that the right type is returned
    * @param delegate  Delegate instance

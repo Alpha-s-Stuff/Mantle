@@ -1,6 +1,8 @@
 package slimeknights.mantle.loot;
 
 import com.google.gson.JsonDeserializer;
+import io.github.fabricators_of_create.porting_lib.loot.GlobalLootModifierSerializer;
+import io.github.fabricators_of_create.porting_lib.loot.LootModifierManager;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import net.minecraft.core.Registry;
@@ -11,8 +13,6 @@ import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.minecraft.world.level.storage.loot.predicates.LootItemConditionType;
 import slimeknights.mantle.Mantle;
-import io.github.fabricators_of_create.porting_lib.loot.GlobalLootModifierSerializer;
-import io.github.fabricators_of_create.porting_lib.loot.LootModifierManager;
 import slimeknights.mantle.loot.condition.BlockTagLootCondition;
 import slimeknights.mantle.loot.condition.ContainsItemModifierLootCondition;
 import slimeknights.mantle.loot.condition.EmptyModifierLootCondition;
@@ -21,8 +21,6 @@ import slimeknights.mantle.loot.condition.InvertedModifierLootCondition;
 import slimeknights.mantle.loot.function.RetexturedLootFunction;
 import slimeknights.mantle.loot.function.SetFluidLootFunction;
 import slimeknights.mantle.registration.adapter.RegistryAdapter;
-
-import static slimeknights.mantle.registration.RegistrationHelper.injected;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 //@ObjectHolder(value = Mantle.modId)
@@ -35,17 +33,17 @@ public class MantleLoot {
   public static LootItemFunctionType SET_FLUID_FUNCTION;
 
   /** Loot modifier to get loot from an entry for generated loot */
-  public static final AddEntryLootModifier.Serializer ADD_ENTRY = injected();
+  public static AddEntryLootModifier.Serializer ADD_ENTRY;
   /** Loot modifier to replace all instances of one item with another */
-  public static final ReplaceItemLootModifier.Serializer REPLACE_ITEM = injected();
+  public static ReplaceItemLootModifier.Serializer REPLACE_ITEM;
 
   /**
    * Called during serializer registration to register any relevant loot logic
    */
   public static void registerGlobalLootModifiers() {
     RegistryAdapter<GlobalLootModifierSerializer> adapter = new RegistryAdapter<>(LootModifierManager.SERIALIZER, Mantle.modId);
-    adapter.register(new AddEntryLootModifier.Serializer(), "add_entry");
-    adapter.register(new ReplaceItemLootModifier.Serializer(), "replace_item");
+    ADD_ENTRY = adapter.register(new AddEntryLootModifier.Serializer(), "add_entry");
+    REPLACE_ITEM = adapter.register(new ReplaceItemLootModifier.Serializer(), "replace_item");
 
     // functions
     RETEXTURED_FUNCTION = registerFunction("fill_retextured_block", RetexturedLootFunction.SERIALIZER);
