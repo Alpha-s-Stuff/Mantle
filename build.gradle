@@ -154,7 +154,7 @@ dependencies {
     api(include("com.github.LlamaLad7:MixinExtras:0.0.6"))
     annotationProcessor(include("com.github.LlamaLad7:MixinExtras:0.0.6"))
 
-    modImplementation(include("me.alphamode:Star:1.0+1.18.2"))
+    modImplementation(include("me.alphamode:Star:${project.star_version}+${project.minecraft_version}"))
 }
 
 task buildOrPublish {
