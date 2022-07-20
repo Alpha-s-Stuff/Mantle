@@ -60,11 +60,6 @@ public class ItemNameIngredient extends AbstractIngredient {
   }
 
   @Override
-  public Value[] getValues() {
-    return values;
-  }
-
-  @Override
   public IngredientDeserializer getDeserializer() {
     return null; // vanilla deserialization
   }

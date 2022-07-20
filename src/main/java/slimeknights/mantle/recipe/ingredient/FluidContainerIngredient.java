@@ -29,7 +29,6 @@ public class FluidContainerIngredient extends AbstractIngredient {
 
   /** Ingredient to use for matching */
   private final FluidIngredient fluidIngredient;
-  private final Value[] values;
   /** Internal ingredient to display the ingredient recipe viewers */
   @Nullable
   private final Ingredient display;
@@ -38,7 +37,6 @@ public class FluidContainerIngredient extends AbstractIngredient {
     super(Stream.of());
     this.fluidIngredient = fluidIngredient;
     this.display = display;
-    this.values = new Value[] { new FluidIngredientValue(fluidIngredient) };
   }
 
   /** Creates an instance from a fluid ingredient with a display container */
@@ -57,18 +55,7 @@ public class FluidContainerIngredient extends AbstractIngredient {
   }
 
   @Override
-  public Value[] getValues() {
-    return values;
-  }
-
-  @Override
   public boolean test(@Nullable ItemStack stack) {
-    if (stack == null)
-      return false;
-    return testStack(stack, fluidIngredient);
-  }
-
-  public static boolean testStack(ItemStack stack, FluidIngredient fluidIngredient) {
     // first, must have a fluid capability
     return stack != null && !stack.isEmpty() && TransferUtil.getFluidHandlerItem(stack).resolve().flatMap(cap -> {
       // second, must contain enough fluid
