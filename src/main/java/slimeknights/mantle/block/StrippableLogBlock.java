@@ -13,6 +13,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RotatedPillarBlock;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 
 /** Log block that can be stripped */
@@ -24,14 +25,12 @@ public class StrippableLogBlock extends RotatedPillarBlock {
     UseBlockCallback.EVENT.register(this::getToolModifiedState);
   }
 
-
-  // todo: port?
   @Nullable
   public InteractionResult getToolModifiedState(Player player, Level world, InteractionHand hand, BlockHitResult hitResult) {
-    if (player.getItemInHand(hand).is(ToolTags.AXES)) {
-      if(world.isClientSide)
-        return InteractionResult.PASS;
-      world.setBlock(hitResult.getBlockPos(), stripped.get().defaultBlockState().setValue(AXIS, world.getBlockState(hitResult.getBlockPos()).getValue(AXIS)) , Constants.BlockFlags.BLOCK_UPDATE);
+    BlockState state = world.getBlockState(hitResult.getBlockPos());
+    if (player.getItemInHand(hand).is(ToolTags.AXES) && state.is(this)) {
+      world.setBlockAndUpdate(hitResult.getBlockPos(), stripped.get().defaultBlockState().setValue(AXIS, state.getValue(AXIS)));
+      return InteractionResult.SUCCESS;
     }
     return InteractionResult.PASS;
   }
