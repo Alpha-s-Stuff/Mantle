@@ -49,13 +49,13 @@ public abstract class AbstractFluidContainerTransferProvider extends GenericData
   }
 
   /** Adds generic fill and empty for a container */
-  protected void addFillEmpty(String prefix, ItemLike item, ItemLike container, Fluid fluid, TagKey<Fluid> tag, int amount, ConditionJsonProvider... conditions) {
+  protected void addFillEmpty(String prefix, ItemLike item, ItemLike container, Fluid fluid, TagKey<Fluid> tag, long amount, ConditionJsonProvider... conditions) {
     addTransfer(prefix + "empty",  new EmptyFluidContainerTransfer(Ingredient.of(item), ItemOutput.fromItem(container), new FluidStack(fluid, amount)), conditions);
     addTransfer(prefix + "fill", new FillFluidContainerTransfer(Ingredient.of(container), ItemOutput.fromItem(item), FluidIngredient.of(tag, amount)), conditions);
   }
 
   /** Adds generic fill and empty for a container */
-  protected void addFillEmptyNBT(String prefix, ItemLike item, ItemLike container, Fluid fluid, TagKey<Fluid> tag, int amount, ConditionJsonProvider... conditions) {
+  protected void addFillEmptyNBT(String prefix, ItemLike item, ItemLike container, Fluid fluid, TagKey<Fluid> tag, long amount, ConditionJsonProvider... conditions) {
     addTransfer(prefix + "empty",  new EmptyFluidWithNBTTransfer(Ingredient.of(item), ItemOutput.fromItem(container), new FluidStack(fluid, amount)), conditions);
     addTransfer(prefix + "fill", new FillFluidWithNBTTransfer(Ingredient.of(container), ItemOutput.fromItem(item), FluidIngredient.of(tag, amount)), conditions);
   }
