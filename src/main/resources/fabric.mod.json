@@ -29,6 +29,9 @@
     ],
     "cardinal-components": [
       "slimeknights.mantle.util.OffhandCooldownTracker"
+    ],
+    "jei_mod_plugin": [
+      "slimeknights.mantle.plugin.jei.JEIPlugin"
     ]
   },
   "accessWidener": "mantle.accesswidener",

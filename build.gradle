@@ -24,6 +24,7 @@ repositories {
     maven { url = "https://maven.terraformersmc.com/releases/" }
     maven { url = "https://ladysnake.jfrog.io/artifactory/mods" }
     maven { url = "https://maven.jamieswhiteshirt.com/libs-release" }
+    maven { url = "https://dvs1.progwml6.com/files/maven/" }
     maven { url = "https://maven.wispforest.io" }
     maven { url = "https://jitpack.io" }
 }
@@ -124,6 +125,8 @@ dependencies {
     modRuntimeOnly("me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}") { transitive = false }
     // api for REI
     modImplementation("dev.architectury:architectury-fabric:${project.architectury_version}")
+
+    modCompileOnly("mezz.jei:jei-${project.minecraft_version}-fabric:${project.jei_version}") { transitive = false }
 
     modImplementation(include("curse.maven:forge-config-api-port-fabric-547434:${forge_config_version}"))
     implementation(include('com.electronwill.night-config:core:3.6.0'))
