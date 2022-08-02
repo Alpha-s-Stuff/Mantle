@@ -8,6 +8,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Vector3f;
 import io.github.fabricators_of_create.porting_lib.mixin.client.accessor.ModelBakeryAccessor;
+import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.core.BlockPos;
@@ -15,6 +17,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.ReloadableResourceManager;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
@@ -39,7 +42,7 @@ import java.util.stream.Collectors;
 /**
  * Shared logic for fluids rendering in blocks below between Ceramics and Tinkers Construct
  */
-public class FaucetFluidLoader extends SimpleJsonResourceReloadListener {
+public class FaucetFluidLoader extends SimpleJsonResourceReloadListener implements IdentifiableResourceReloadListener {
   /** GSON instance for this */
   private static final Gson GSON = new GsonBuilder()
     .setPrettyPrinting()
@@ -61,12 +64,12 @@ public class FaucetFluidLoader extends SimpleJsonResourceReloadListener {
   /**
    * Call during the event to register the reload listener
    */
-  public static void initialize(ReloadableResourceManager reloadable) {
+  public static void initialize() {
     if (initialized) {
       return;
     }
     initialized = true;
-    reloadable.registerReloadListener(INSTANCE);
+    ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(INSTANCE);
   }
 
   /** Default fluid model for blocks with no model */
@@ -162,6 +165,11 @@ public class FaucetFluidLoader extends SimpleJsonResourceReloadListener {
       }
       matrices.popPose();
     } while (faucetFluid.isContinued());
+  }
+
+  @Override
+  public ResourceLocation getFabricId() {
+    return Mantle.getResource("faucet_fluid_loader");
   }
 
   /**
