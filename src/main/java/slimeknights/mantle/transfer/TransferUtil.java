@@ -216,11 +216,15 @@ public class TransferUtil {
 		return new Direction[] {direction};
 	}
 
-	public static void registerFluidStorage(BlockEntityType<?> type) {
-		FluidStorage.SIDED.registerForBlockEntities(TransferUtil::getFluidStorageForBE, type);
+	public static void registerFluidStorage() {
+    FluidStorage.SIDED.registerFallback((world, pos, state, blockEntity, context) -> {
+      return TransferUtil.getFluidStorageForBE(blockEntity, context);
+    });
 	}
 
-	public static void registerItemStorage(BlockEntityType<?> type) {
-		ItemStorage.SIDED.registerForBlockEntities(TransferUtil::getItemStorageForBE, type);
+	public static void registerItemStorage() {
+    ItemStorage.SIDED.registerFallback((world, pos, state, blockEntity, context) -> {
+      return TransferUtil.getItemStorageForBE(blockEntity, context);
+    });
 	}
 }
