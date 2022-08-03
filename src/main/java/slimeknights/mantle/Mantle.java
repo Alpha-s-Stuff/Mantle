@@ -1,10 +1,10 @@
 package slimeknights.mantle;
 
+import io.github.fabricators_of_create.porting_lib.crafting.CraftingHelper;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.minecraft.Util;
 import net.minecraft.core.Registry;
-import net.minecraft.data.DataGenerator;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -16,8 +16,6 @@ import org.apache.logging.log4j.Logger;
 import slimeknights.mantle.block.entity.MantleSignBlockEntity;
 import slimeknights.mantle.command.MantleCommand;
 import slimeknights.mantle.config.Config;
-import slimeknights.mantle.datagen.MantleFluidTagProvider;
-import slimeknights.mantle.datagen.MantleFluidTooltipProvider;
 import slimeknights.mantle.datagen.MantleTags;
 import slimeknights.mantle.fluid.transfer.EmptyFluidContainerTransfer;
 import slimeknights.mantle.fluid.transfer.EmptyFluidWithNBTTransfer;
@@ -25,7 +23,6 @@ import slimeknights.mantle.fluid.transfer.FillFluidContainerTransfer;
 import slimeknights.mantle.fluid.transfer.FillFluidWithNBTTransfer;
 import slimeknights.mantle.fluid.transfer.FluidContainerTransferManager;
 import slimeknights.mantle.item.LecternBookItem;
-import io.github.fabricators_of_create.porting_lib.crafting.CraftingHelper;
 import slimeknights.mantle.loot.MantleLoot;
 import slimeknights.mantle.network.MantleNetwork;
 import slimeknights.mantle.recipe.MantleRecipeSerializers;

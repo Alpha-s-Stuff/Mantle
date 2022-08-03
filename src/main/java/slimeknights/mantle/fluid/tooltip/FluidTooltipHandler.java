@@ -60,10 +60,11 @@ public class FluidTooltipHandler extends SimpleJsonResourceReloadListener implem
   public static final ResourceLocation DEFAULT_ID = Mantle.getResource("fallback");
 
   /* Base units */
-  private static final FluidUnit BUCKET = new FluidUnit(Mantle.makeDescriptionId("gui", "fluid.bucket"), 1000);
-  private static final FluidUnit MILLIBUCKET = new FluidUnit(Mantle.makeDescriptionId("gui", "fluid.millibucket"), 1);
+  private static final FluidUnit BUCKET = new FluidUnit(Mantle.makeDescriptionId("gui", "fluid.bucket"), 10000);
+  private static final FluidUnit MILLIBUCKET = new FluidUnit(Mantle.makeDescriptionId("gui", "fluid.millibucket"), 81);
+  private static final FluidUnit DROPLET = new FluidUnit(Mantle.makeDescriptionId("gui", "fluid.droplet"), 1);
   /** Default fallback in case resource pack has none */
-  private static final FluidUnitList DEFAULT_LIST = new FluidUnitList(null, Collections.singletonList(BUCKET));
+  private static final FluidUnitList DEFAULT_LIST = new FluidUnitList(null, List.of(BUCKET, DROPLET));
 
   /** Formatter as a biconsumer, shows up in a few places */
   public static final BiConsumer<Long,List<Component>> BUCKET_FORMATTER = FluidTooltipHandler::appendBuckets;
