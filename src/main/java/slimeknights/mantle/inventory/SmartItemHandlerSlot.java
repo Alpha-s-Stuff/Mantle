@@ -1,6 +1,5 @@
 package slimeknights.mantle.inventory;
 
-import io.github.fabricators_of_create.porting_lib.extensions.SlotExtensions;
 import net.minecraft.world.item.ItemStack;
 import slimeknights.mantle.transfer.item.IItemHandler;
 import slimeknights.mantle.transfer.item.SlotItemHandler;
@@ -13,6 +12,6 @@ public class SmartItemHandlerSlot extends SlotItemHandler {
 
   @Override
   public int getMaxStackSize(ItemStack stack) {
-    return getItemHandler().getSlotLimit(((SlotExtensions)this).getSlotIndex());
+    return getItemHandler().getSlotLimit(getSlotIndex());
   }
 }

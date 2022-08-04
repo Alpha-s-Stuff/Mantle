@@ -4,12 +4,15 @@
   "package": "slimeknights.mantle.mixin",
   "compatibilityLevel": "JAVA_17",
   "client": [
-    "client.SheetsMixin",
     "client.ModelLayersMixin",
+    "client.SheetsMixin",
     "client.rei.DisplayRegistryMixin"
   ],
   "injectors": {
     "defaultRequire": 1
   },
-  "plugin": "slimeknights.mantle.mixin.client.REIMixinPlugin"
+  "plugin": "slimeknights.mantle.mixin.client.REIMixinPlugin",
+  "mixins": [
+    "client.ItemStorageMixin"
+  ]
 }
