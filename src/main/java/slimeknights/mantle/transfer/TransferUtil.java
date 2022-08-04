@@ -59,10 +59,6 @@ public class TransferUtil {
 	public static LazyOptional<IItemHandler> getItemHandler(BlockEntity be, @Nullable Direction side) {
 		// lib handling
 		if (be instanceof ItemTransferable transferable) return transferable.getItemHandler(side);
-		// client handling
-		if (Objects.requireNonNull(be.getLevel()).isClientSide()) {
-			return LazyOptional.empty();
-		}
 		// external handling
 		List<Storage<ItemVariant>> itemStorages = new ArrayList<>();
 		Level l = be.getLevel();
