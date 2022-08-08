@@ -18,6 +18,8 @@ import slimeknights.mantle.config.Config;
 import slimeknights.mantle.datagen.MantleTags;
 import slimeknights.mantle.fabric.crafting.CompoundIngredient;
 import slimeknights.mantle.fabric.crafting.CraftingHelper;
+import slimeknights.mantle.fabric.crafting.DifferenceIngredient;
+import slimeknights.mantle.fabric.crafting.IntersectionIngredient;
 import slimeknights.mantle.fabric.crafting.NBTIngredient;
 import slimeknights.mantle.fabric.crafting.VanillaIngredientSerializer;
 import slimeknights.mantle.fluid.transfer.EmptyFluidContainerTransfer;
@@ -91,6 +93,8 @@ public class Mantle implements ModInitializer {
 
     CraftingHelper.register(new ResourceLocation("forge", "compound"), CompoundIngredient.Serializer.INSTANCE);
     CraftingHelper.register(new ResourceLocation("forge", "nbt"), NBTIngredient.Serializer.INSTANCE);
+    CraftingHelper.register(new ResourceLocation("forge", "difference"), DifferenceIngredient.Serializer.INSTANCE);
+    CraftingHelper.register(new ResourceLocation("forge", "intersection"), IntersectionIngredient.Serializer.INSTANCE);
     CraftingHelper.register(new ResourceLocation("minecraft", "item"), VanillaIngredientSerializer.INSTANCE);
 //    CraftingHelper.register(TagEmptyCondition.SERIALIZER);
     CraftingHelper.register(FluidContainerIngredient.ID, FluidContainerIngredient.SERIALIZER);
