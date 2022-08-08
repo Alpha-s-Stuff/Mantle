@@ -22,4 +22,9 @@ public abstract class DynamicBakedWrapper<T extends BakedModel> extends Forwardi
   protected DynamicBakedWrapper(T originalModel) {
     wrapped = originalModel;
   }
+
+  @Override
+  public boolean isVanillaAdapter() {
+    return false;
+  }
 }
