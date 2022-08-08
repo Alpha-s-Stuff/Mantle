@@ -1,6 +1,7 @@
 package slimeknights.mantle.mixin.common;
 
 import it.unimi.dsi.fastutil.ints.IntList;
+import net.fabricmc.fabric.impl.datagen.FabricDataGenHelper;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -41,26 +42,26 @@ public abstract class IngredientMixin implements IngredientExtensions {
   private Value[] values;
 
   @Unique
-  private boolean port_lib$simple;
+  private boolean mantle$simple;
   @Unique
-  private final boolean port_lib$vanilla = this.getClass().equals(Ingredient.class);
+  private final boolean mantle$vanilla = this.getClass().equals(Ingredient.class);
 
   @Inject(method = "<init>", at = @At("TAIL"))
-  private void port_lib$init(Stream<? extends Ingredient.Value> stream, CallbackInfo ci) {
-    port_lib$simple = Arrays.stream(values).noneMatch(list -> list.getItems().stream().anyMatch(stack -> stack.getItem().canBeDepleted()));
+  private void mantle$init(Stream<? extends Ingredient.Value> stream, CallbackInfo ci) {
+    mantle$simple = !FabricDataGenHelper.ENABLED && !Arrays.stream(values).anyMatch(list -> list.getItems().stream().anyMatch(stack -> stack.getItem().canBeDepleted()));
   }
 
   @Inject(method = "toNetwork", at = @At(value = "INVOKE", shift = Shift.AFTER, target = "Lnet/minecraft/world/item/crafting/Ingredient;dissolve()V"), cancellable = true)
-  private void port_lib$toNetwork(FriendlyByteBuf buffer, CallbackInfo ci) {
-    buffer.writeBoolean(port_lib$vanilla);
-    if (!port_lib$vanilla) {
+  private void mantle$toNetwork(FriendlyByteBuf buffer, CallbackInfo ci) {
+    buffer.writeBoolean(mantle$vanilla);
+    if (!mantle$vanilla) {
       CraftingHelper.write(buffer, (Ingredient) (Object) this);
       ci.cancel();
     }
   }
 
   @Inject(method = "fromNetwork", at = @At("HEAD"), cancellable = true)
-  private static void port_lib$fromNetwork(FriendlyByteBuf buffer, CallbackInfoReturnable<Ingredient> cir) {
+  private static void mantle$fromNetwork(FriendlyByteBuf buffer, CallbackInfoReturnable<Ingredient> cir) {
     boolean vanilla = buffer.readBoolean();
     if (!vanilla)
       cir.setReturnValue(CraftingHelper.getIngredient(buffer.readResourceLocation(), buffer));
@@ -68,13 +69,13 @@ public abstract class IngredientMixin implements IngredientExtensions {
 
   @Override
   public IIngredientSerializer<? extends Ingredient> getSerializer() {
-    if (!port_lib$vanilla) throw new IllegalStateException("Modders must implement Ingredient.getSerializer in their custom Ingredients: " + this);
+    if (!mantle$vanilla) throw new IllegalStateException("Modders must implement Ingredient.getSerializer in their custom Ingredients: " + this);
     return VanillaIngredientSerializer.INSTANCE;
   }
 
   @Override
   public boolean isSimple() {
-    return (Object) this == EMPTY || port_lib$simple;
+    return (Object) this == EMPTY || mantle$simple;
   }
 
   @Override
