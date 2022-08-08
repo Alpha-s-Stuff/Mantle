@@ -1,6 +1,5 @@
 package slimeknights.mantle;
 
-import io.github.fabricators_of_create.porting_lib.crafting.CraftingHelper;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.minecraft.Util;
@@ -17,6 +16,10 @@ import slimeknights.mantle.block.entity.MantleSignBlockEntity;
 import slimeknights.mantle.command.MantleCommand;
 import slimeknights.mantle.config.Config;
 import slimeknights.mantle.datagen.MantleTags;
+import slimeknights.mantle.fabric.crafting.CompoundIngredient;
+import slimeknights.mantle.fabric.crafting.CraftingHelper;
+import slimeknights.mantle.fabric.crafting.NBTIngredient;
+import slimeknights.mantle.fabric.crafting.VanillaIngredientSerializer;
 import slimeknights.mantle.fluid.transfer.EmptyFluidContainerTransfer;
 import slimeknights.mantle.fluid.transfer.EmptyFluidWithNBTTransfer;
 import slimeknights.mantle.fluid.transfer.FillFluidContainerTransfer;
@@ -86,6 +89,9 @@ public class Mantle implements ModInitializer {
     MantleRecipeSerializers.CRAFTING_SHAPED_FALLBACK = adapter.register(new ShapedFallbackRecipe.Serializer(), "crafting_shaped_fallback");
     MantleRecipeSerializers.CRAFTING_SHAPED_RETEXTURED = adapter.register(new ShapedRetexturedRecipe.Serializer(), "crafting_shaped_retextured");
 
+    CraftingHelper.register(new ResourceLocation("forge", "compound"), CompoundIngredient.Serializer.INSTANCE);
+    CraftingHelper.register(new ResourceLocation("forge", "nbt"), NBTIngredient.Serializer.INSTANCE);
+    CraftingHelper.register(new ResourceLocation("minecraft", "item"), VanillaIngredientSerializer.INSTANCE);
 //    CraftingHelper.register(TagEmptyCondition.SERIALIZER);
     CraftingHelper.register(FluidContainerIngredient.ID, FluidContainerIngredient.SERIALIZER);
 

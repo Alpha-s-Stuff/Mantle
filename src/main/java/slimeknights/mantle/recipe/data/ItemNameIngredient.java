@@ -3,17 +3,17 @@ package slimeknights.mantle.recipe.data;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import io.github.fabricators_of_create.porting_lib.crafting.AbstractIngredient;
-import io.github.tropheusj.serialization_hooks.ingredient.IngredientDeserializer;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
+import slimeknights.mantle.fabric.crafting.AbstractIngredient;
+import slimeknights.mantle.fabric.crafting.IIngredientSerializer;
+import slimeknights.mantle.fabric.crafting.VanillaIngredientSerializer;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -61,8 +61,13 @@ public class ItemNameIngredient extends AbstractIngredient {
   }
 
   @Override
-  public IngredientDeserializer getDeserializer() {
-    return null; // vanilla deserialization
+  public boolean isSimple() {
+    return false;
+  }
+
+  @Override
+  public IIngredientSerializer<? extends Ingredient> getSerializer() {
+    return VanillaIngredientSerializer.INSTANCE;
   }
 
   @RequiredArgsConstructor
@@ -71,7 +76,7 @@ public class ItemNameIngredient extends AbstractIngredient {
 
     @Override
     public Collection<ItemStack> getItems() {
-      return Collections.emptyList();
+      throw new UnsupportedOperationException();
     }
 
     @Override

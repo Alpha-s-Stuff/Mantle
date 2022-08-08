@@ -1,21 +1,19 @@
 package slimeknights.mantle.util;
 
-import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentRegistry;
 import dev.onyxstudios.cca.api.v3.entity.EntityComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.entity.EntityComponentInitializer;
 import dev.onyxstudios.cca.api.v3.entity.PlayerComponent;
+import io.github.fabricators_of_create.porting_lib.util.LazyOptional;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import slimeknights.mantle.Mantle;
-import io.github.fabricators_of_create.porting_lib.util.LazyOptional;
 import slimeknights.mantle.network.MantleNetwork;
 import slimeknights.mantle.network.packet.SwingArmPacket;
 

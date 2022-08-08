@@ -2,20 +2,19 @@ package slimeknights.mantle.recipe.ingredient;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import io.github.fabricators_of_create.porting_lib.crafting.AbstractIngredient;
+import io.github.fabricators_of_create.porting_lib.util.FluidAttributes;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
-import io.github.tropheusj.serialization_hooks.ingredient.IngredientDeserializer;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.material.Fluid;
-
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import slimeknights.mantle.Mantle;
+import slimeknights.mantle.fabric.crafting.AbstractIngredient;
+import slimeknights.mantle.fabric.crafting.IIngredientSerializer;
+import slimeknights.mantle.registration.object.FluidObject;
 import slimeknights.mantle.transfer.TransferUtil;
 import slimeknights.mantle.transfer.item.ItemHandlerHelper;
-import slimeknights.mantle.registration.object.FluidObject;
 import slimeknights.mantle.util.JsonHelper;
 
 import javax.annotation.Nullable;
@@ -51,7 +50,7 @@ public class FluidContainerIngredient extends AbstractIngredient {
 
   /** Creates an instance from a fluid ingredient with a display container */
   public static FluidContainerIngredient fromFluid(FluidObject<?> fluid, boolean forgeTag) {
-    return fromIngredient(FluidIngredient.of(forgeTag ? fluid.getForgeTag() : fluid.getLocalTag(), FluidConstants.BUCKET), Ingredient.of(fluid));
+    return fromIngredient(FluidIngredient.of(forgeTag ? fluid.getForgeTag() : fluid.getLocalTag(), FluidAttributes.BUCKET_VOLUME), Ingredient.of(fluid));
   }
 
   @Override
@@ -109,25 +108,25 @@ public class FluidContainerIngredient extends AbstractIngredient {
   }
 
   @Override
-  public IngredientDeserializer getDeserializer() {
-    return SERIALIZER;
+  public void invalidate() {
+    super.invalidate();
+    this.displayStacks = null;
   }
 
   @Override
-  public void toNetwork(FriendlyByteBuf buffer) {
-    this.fluidIngredient.write(buffer);
-    if (this.display != null) {
-      buffer.writeBoolean(true);
-      this.display.toNetwork(buffer);
-    } else {
-      buffer.writeBoolean(false);
-    }
+  public boolean isSimple() {
+    return false;
+  }
+
+  @Override
+  public IIngredientSerializer<? extends Ingredient> getSerializer() {
+    return SERIALIZER;
   }
 
   /** Serializer logic */
-  private static class Serializer implements IngredientDeserializer {
+  private static class Serializer implements IIngredientSerializer<FluidContainerIngredient> {
     @Override
-    public Ingredient fromJson(JsonObject json) {
+    public FluidContainerIngredient parse(JsonObject json) {
       FluidIngredient fluidIngredient;
       // if we have fluid, its a nested ingredient. Otherwise this object itself is the ingredient
       if (json.has("fluid")) {
@@ -143,13 +142,24 @@ public class FluidContainerIngredient extends AbstractIngredient {
     }
 
     @Override
-    public Ingredient fromNetwork(FriendlyByteBuf buffer) {
+    public FluidContainerIngredient parse(FriendlyByteBuf buffer) {
       FluidIngredient fluidIngredient = FluidIngredient.read(buffer);
       Ingredient display = null;
       if (buffer.readBoolean()) {
         display = Ingredient.fromNetwork(buffer);
       }
       return new FluidContainerIngredient(fluidIngredient, display);
+    }
+
+    @Override
+    public void write(FriendlyByteBuf buffer, FluidContainerIngredient ingredient) {
+      ingredient.fluidIngredient.write(buffer);
+      if (ingredient.display != null) {
+        buffer.writeBoolean(true);
+        ingredient.display.toNetwork(buffer);
+      } else {
+        buffer.writeBoolean(false);
+      }
     }
   }
 }
