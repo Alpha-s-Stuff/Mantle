@@ -1,13 +1,10 @@
 package slimeknights.mantle.transfer.fluid;
 
-import slimeknights.mantle.transfer.fluid.IFluidHandler;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
-import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +22,10 @@ public class FluidStorageHandler implements IFluidHandler {
 
 	public FluidStorageHandler(Storage<FluidVariant> storage) {
 		this.storage = storage;
-		this.version = storage.getVersion();
+    if (Transaction.isOpen())
+      Transaction.getCurrentUnsafe().addCloseCallback((transaction, result) -> this.version = storage.getVersion());
+    else
+		  this.version = storage.getVersion();
 		updateContents();
 	}
 
