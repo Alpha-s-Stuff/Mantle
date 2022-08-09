@@ -1,6 +1,5 @@
 package slimeknights.mantle.fabric.fluid;
 
-import io.github.fabricators_of_create.porting_lib.extensions.FluidExtensions;
 import io.github.fabricators_of_create.porting_lib.util.FluidAttributes;
 import me.alphamode.star.world.fluids.StarFluid;
 import net.minecraft.core.BlockPos;
@@ -23,7 +22,7 @@ import slimeknights.mantle.util.SimpleFlowableFluid;
 import javax.annotation.Nullable;
 import java.util.function.Supplier;
 
-public abstract class SimpleDirectionalFluid extends StarFluid implements FluidExtensions {
+public abstract class SimpleDirectionalFluid extends StarFluid {
 
   private final Supplier<? extends Fluid> flowing;
   private final Supplier<? extends Fluid> still;

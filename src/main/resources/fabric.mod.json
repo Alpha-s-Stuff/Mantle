@@ -41,10 +41,7 @@
   "custom": {
     "cardinal-components": [
       "mantle:offhand_cooldown"
-    ],
-    "loom:injected_interfaces": {
-      "net/minecraft/class_1856": ["slimeknights/mantle/fabric/crafting/IngredientExtensions"]
-    }
+    ]
   },
   "depends": {
     "fabricloader": ">=0.12.12",

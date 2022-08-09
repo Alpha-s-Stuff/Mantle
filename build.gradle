@@ -131,6 +131,8 @@ dependencies {
     modImplementation(include("curse.maven:forge-config-api-port-fabric-547434:${forge_config_version}"))
     implementation(include('com.electronwill.night-config:core:3.6.0'))
     implementation(include('com.electronwill.night-config:toml:3.6.0'))
+    modImplementation("com.github.AlphaMode:fakeconfig:master-SNAPSHOT") { exclude(group: "net.fabricmc.fabric-api") }
+    modImplementation("com.github.AlphaMode:fakeconfigtoml:master-SNAPSHOT") { exclude(group: "net.fabricmc.fabric-api") }
     implementation(include("com.google.code.findbugs:jsr305:3.0.2"))
 
     modApi "com.terraformersmc:modmenu:3.2.3"

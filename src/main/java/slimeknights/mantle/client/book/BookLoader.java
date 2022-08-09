@@ -17,6 +17,7 @@ import slimeknights.mantle.Mantle;
 import slimeknights.mantle.client.book.action.StringActionProcessor;
 import slimeknights.mantle.client.book.action.protocol.ProtocolGoToPage;
 import slimeknights.mantle.client.book.data.BookData;
+import slimeknights.mantle.client.book.data.JsonCondition;
 import slimeknights.mantle.client.book.data.content.ContentBlank;
 import slimeknights.mantle.client.book.data.content.ContentBlockInteraction;
 import slimeknights.mantle.client.book.data.content.ContentCrafting;
@@ -94,7 +95,7 @@ public class BookLoader implements SimpleSynchronousResourceReloadListener {
     // Register GSON type adapters
     registerGsonTypeAdapter(ResourceLocation.class, ResourceLocationSerializer.resourceLocation("mantle"));
     registerGsonTypeAdapter(int.class, new HexStringDeserializer());
-    registerGsonTypeAdapter(Predicate.class, new ConditionDeserializer());
+    registerGsonTypeAdapter(JsonCondition.class, ConditionDeserializer.DESERIALIZER);
     registerGsonTypeAdapter(IngredientData.class, new IngredientData.Deserializer());
 
     // Register page types that are implicitly hidden from indexes

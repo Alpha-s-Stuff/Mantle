@@ -5,9 +5,9 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.Dynamic2CommandExceptionType;
-import io.github.fabricators_of_create.porting_lib.extensions.ResourceLocationExtensions;
 import io.github.fabricators_of_create.porting_lib.mixin.common.accessor.ItemAccessor;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
+import io.github.fabricators_of_create.porting_lib.util.LazyOptional;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.ResourceLocationArgument;
@@ -45,7 +45,6 @@ import slimeknights.mantle.transfer.TransferUtil;
 import slimeknights.mantle.transfer.fluid.EmptyFluidHandler;
 import slimeknights.mantle.transfer.fluid.IFluidHandler;
 import slimeknights.mantle.transfer.fluid.IFluidHandlerItem;
-import io.github.fabricators_of_create.porting_lib.util.LazyOptional;
 
 import java.util.List;
 import java.util.Map;

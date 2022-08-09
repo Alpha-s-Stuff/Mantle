@@ -29,7 +29,7 @@ public class PageData implements IDataItem, IConditional {
   public ResourceLocation type = Mantle.getResource("blank");
   public String data = "";
   public float scale = 1.0F;
-  public Predicate<JsonObject> condition = ResourceConditions.get(TrueCondition.ID);
+  public JsonCondition condition = new JsonCondition(TrueCondition.ID, new JsonObject());
 
   /** Contains arbitrary data to be used by custom transformers and other things */
   public Map<ResourceLocation, JsonElement> extraData = Collections.emptyMap();
@@ -174,8 +174,7 @@ public class PageData implements IDataItem, IConditional {
 
   @Override
   public boolean isConditionMet() {
-    return true;
-    /*return condition.test();*/
+    return condition.test();
   }
 
   private static class PageTypeOverrider {

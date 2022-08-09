@@ -13,7 +13,6 @@
   },
   "plugin": "slimeknights.mantle.mixin.client.REIMixinPlugin",
   "mixins": [
-    "client.ItemStorageMixin",
-    "common.IngredientMixin"
+    "client.ItemStorageMixin"
   ]
 }

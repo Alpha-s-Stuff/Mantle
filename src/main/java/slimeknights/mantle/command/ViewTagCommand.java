@@ -58,7 +58,7 @@ public class ViewTagCommand {
       } else {
         values.stream()
               .map(registry::getKey)
-              .sorted((a, b) -> ((ResourceLocationExtensions)Objects.requireNonNull(a)).compareNamespaced(Objects.requireNonNull(b)))
+              .sorted((a, b) -> Objects.requireNonNull(a).compareNamespaced(Objects.requireNonNull(b)))
               .forEach(value -> output.append("\n* " + Objects.requireNonNull(value)));
       }
       context.getSource().sendSuccess(output, true);

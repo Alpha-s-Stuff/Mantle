@@ -11,7 +11,6 @@ import com.google.gson.JsonSyntaxException;
 import com.mojang.datafixers.util.Either;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.math.Transformation;
-import io.github.fabricators_of_create.porting_lib.extensions.TransformationExtensions;
 import io.github.fabricators_of_create.porting_lib.model.IModelConfiguration;
 import io.github.fabricators_of_create.porting_lib.model.IModelData;
 import io.github.fabricators_of_create.porting_lib.model.IModelGeometry;
@@ -22,7 +21,6 @@ import lombok.RequiredArgsConstructor;
 import net.fabricmc.fabric.api.renderer.v1.model.FabricBakedModel;
 import net.fabricmc.fabric.api.renderer.v1.render.RenderContext;
 import net.fabricmc.fabric.api.rendering.data.v1.RenderAttachedBlockView;
-import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockElement;
 import net.minecraft.client.renderer.block.model.BlockElementFace;
 import net.minecraft.client.renderer.block.model.BlockFaceUV;
@@ -51,7 +49,6 @@ import slimeknights.mantle.client.model.util.ModelTextureIteratable;
 import slimeknights.mantle.client.model.util.SimpleBlockModel;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.EnumMap;
 import java.util.EnumSet;
@@ -381,7 +378,7 @@ public class ConnectedModel implements IModelGeometry<ConnectedModel> {
 
       // gather connections data
       Transformation rotation = transforms.getRotation();
-      data.setData(CONNECTIONS, getConnections((dir) -> parent.sides.contains(dir) && parent.connectionPredicate.test(state, world.getBlockState(pos.relative(((TransformationExtensions)(Object)rotation).rotateTransform(dir))))));
+      data.setData(CONNECTIONS, getConnections((dir) -> parent.sides.contains(dir) && parent.connectionPredicate.test(state, world.getBlockState(pos.relative(rotation.rotateTransform(dir))))));
       return data;
     }
 
@@ -425,7 +422,7 @@ public class ConnectedModel implements IModelGeometry<ConnectedModel> {
             if (!parent.sides.contains(dir)) {
               return false;
             }
-            BooleanProperty prop = IMultipartConnectedBlock.CONNECTED_DIRECTIONS.get(((TransformationExtensions)(Object)rotation).rotateTransform(dir));
+            BooleanProperty prop = IMultipartConnectedBlock.CONNECTED_DIRECTIONS.get(rotation.rotateTransform(dir));
             return state.hasProperty(prop) && state.getValue(prop);
           });
         }

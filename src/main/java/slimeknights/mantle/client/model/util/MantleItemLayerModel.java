@@ -9,8 +9,6 @@ import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormatElement;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.math.Transformation;
-import io.github.fabricators_of_create.porting_lib.extensions.TextureAtlasSpriteExtensions;
-import io.github.fabricators_of_create.porting_lib.extensions.TransformationExtensions;
 import io.github.fabricators_of_create.porting_lib.model.BakedQuadBuilder;
 import io.github.fabricators_of_create.porting_lib.model.CompositeModelState;
 import io.github.fabricators_of_create.porting_lib.model.IModelConfiguration;
@@ -140,7 +138,7 @@ public class MantleItemLayerModel implements IModelGeometry<MantleItemLayerModel
       for(int v = 0; v < vMax; v++) {
         ptu = true;
         for(int u = 0; u < uMax; u++) {
-          int alpha = ((TextureAtlasSpriteExtensions)sprite).getPixelRGBA(f, u, vMax - v - 1) >> 24 & 0xFF;
+          int alpha = sprite.getPixelRGBA(f, u, vMax - v - 1) >> 24 & 0xFF;
           boolean t = alpha / 255f <= 0.1f;
 
           if (!t && alpha < 255) {
@@ -271,7 +269,7 @@ public class MantleItemLayerModel implements IModelGeometry<MantleItemLayerModel
       if (sprite.getFrameCount() > 0) {
         for(int v = 0; v < vMax; v++) {
           for(int u = 0; u < uMax; u++) {
-            int alpha = ((TextureAtlasSpriteExtensions)sprite).getPixelRGBA(0, u, vMax - v - 1) >> 24 & 0xFF;
+            int alpha = sprite.getPixelRGBA(0, u, vMax - v - 1) >> 24 & 0xFF;
             if (alpha / 255f > 0.1f) {
               pixels.set(u, v, uMax, vMax);
             }
@@ -359,7 +357,7 @@ public class MantleItemLayerModel implements IModelGeometry<MantleItemLayerModel
     builder.setQuadOrientation(side);
     builder.setApplyDiffuseLighting(false); // TODO: luminosity == 0?
 
-    boolean hasTransform = !((TransformationExtensions)(Object)transform).isIdentity();
+    boolean hasTransform = !transform.isIdentity();
     IVertexConsumer consumer = hasTransform ? new TRSRTransformer(builder, transform) : builder;
 
     putVertex(consumer, side, x0, y0, z0, u0, v0, color, luminosity);

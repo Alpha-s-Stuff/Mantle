@@ -3,6 +3,7 @@ package slimeknights.mantle.client.book.data;
 import com.google.common.collect.Sets;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import io.github.fabricators_of_create.porting_lib.util.TrueCondition;
 import net.minecraft.advancements.AdvancementProgress;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
@@ -29,7 +30,7 @@ public class SectionData implements IDataItem, IConditional {
   public Set<String> requirements = Sets.newHashSet();
   public boolean hideWhenLocked = false;
   public String data = "";
-  public Predicate<JsonObject> condition = (jsonObject -> true);
+  public JsonCondition condition = new JsonCondition(TrueCondition.ID, new JsonObject());
 
   /** Contains arbitrary data to be used by custom transformers and other things */
   public Map<ResourceLocation, JsonElement> extraData = Collections.emptyMap();
@@ -141,6 +142,6 @@ public class SectionData implements IDataItem, IConditional {
 
   @Override
   public boolean isConditionMet() {
-    return condition.test(null);
+    return condition.test();
   }
 }

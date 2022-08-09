@@ -1,15 +1,13 @@
 package slimeknights.mantle.block.entity;
 
-import io.github.fabricators_of_create.porting_lib.extensions.BlockEntityExtensions;
+import io.github.fabricators_of_create.porting_lib.model.IModelData;
+import io.github.fabricators_of_create.porting_lib.util.Lazy;
+import net.fabricmc.fabric.api.rendering.data.v1.RenderAttachmentBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-
-import net.fabricmc.fabric.api.rendering.data.v1.RenderAttachmentBlockEntity;
 import slimeknights.mantle.block.RetexturedBlock;
-import io.github.fabricators_of_create.porting_lib.model.IModelData;
-import io.github.fabricators_of_create.porting_lib.util.Lazy;
 import slimeknights.mantle.util.RetexturedHelper;
 
 import javax.annotation.Nonnull;
@@ -52,6 +50,6 @@ public class RetexturedBlockEntity extends MantleBlockEntity implements IRetextu
 
   @Override
   public CompoundTag getTileData() {
-    return ((BlockEntityExtensions)this).getExtraCustomData();
+    return this.getExtraCustomData();
   }
 }
