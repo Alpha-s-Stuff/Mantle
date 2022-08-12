@@ -21,17 +21,22 @@ public class FluidStorageHandler implements IFluidHandler {
 	protected FluidStack[] stacks;
 	protected Long[] capacities;
 
-	public FluidStorageHandler(Storage<FluidVariant> storage) {
-		this.storage = storage;
+  public long getVersion() {
     if (Transaction.isOpen())
       Transaction.getCurrentUnsafe().addCloseCallback((transaction, result) -> this.version = storage.getVersion());
     else
-		  this.version = storage.getVersion();
+      this.version = storage.getVersion();
+    return this.version;
+  }
+
+	public FluidStorageHandler(Storage<FluidVariant> storage) {
+		this.storage = storage;
+    getVersion();
 		updateContents();
 	}
 
 	public boolean shouldUpdate() {
-		return storage.getVersion() != version;
+		return getVersion() != version;
 	}
 
 	private void updateContents() {
@@ -47,7 +52,7 @@ public class FluidStorageHandler implements IFluidHandler {
 		this.stacks = stacks.toArray(FluidStack[]::new);
 		this.capacities = capacities.toArray(Long[]::new);
 		this.tanks = stacks.size();
-		this.version = storage.getVersion();
+		getVersion();
 	}
 
 	private boolean validIndex(int tank) {

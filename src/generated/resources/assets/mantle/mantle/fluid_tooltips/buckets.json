@@ -2,11 +2,15 @@
   "units": [
     {
       "key": "gui.mantle.fluid.kilobucket",
-      "needed": 1000000
+      "needed": 81000000
     },
     {
       "key": "gui.mantle.fluid.bucket",
-      "needed": 1000
+      "needed": 81000
+    },
+    {
+      "key": "gui.mantle.fluid.droplet",
+      "needed": 1
     }
   ]
 }

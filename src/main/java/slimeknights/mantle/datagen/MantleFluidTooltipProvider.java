@@ -16,7 +16,8 @@ public class MantleFluidTooltipProvider extends AbstractFluidTooltipProvider {
   protected void addFluids() {
     add("buckets")
       .addUnit("kilobucket", FluidAttributes.BUCKET_VOLUME * 1000)
-      .addUnit("bucket", FluidAttributes.BUCKET_VOLUME);
+      .addUnit("bucket", FluidAttributes.BUCKET_VOLUME)
+      .addUnit("droplet", 1);
     addRedirect(FluidTooltipHandler.DEFAULT_ID, id("buckets"));
   }
 
