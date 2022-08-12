@@ -40,7 +40,7 @@ public class FluidHandlerStorage implements Storage<FluidVariant> {
 		long remainder = handler.fill(new FluidStack(resource, maxAmount), true);
 		transaction.addCloseCallback((t, result) -> {
 			if (result.wasCommitted()) {
-				handler.fill(new FluidStack(resource, maxAmount), false);
+				handler.fill(new FluidStack(resource, maxAmount), false, t);
 			}
 		});
 		return remainder;

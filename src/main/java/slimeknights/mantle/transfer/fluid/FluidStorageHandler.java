@@ -6,6 +6,7 @@ import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,11 +23,7 @@ public class FluidStorageHandler implements IFluidHandler {
 	protected Long[] capacities;
 
   public long getVersion() {
-    if (Transaction.isOpen())
-      Transaction.getCurrentUnsafe().addCloseCallback((transaction, result) -> this.version = storage.getVersion());
-    else
-      this.version = storage.getVersion();
-    return this.version;
+    return 1;
   }
 
 	public FluidStorageHandler(Storage<FluidVariant> storage) {
@@ -103,6 +100,24 @@ public class FluidStorageHandler implements IFluidHandler {
 			return filled;
 		}
 	}
+
+  @Override
+  public long fill(FluidStack stack, boolean sim, TransactionContext transaction) {
+    if (stack.isEmpty())
+      return 0;
+    if (!storage.supportsInsertion())
+      return 0;
+
+    try (Transaction t = transaction.openNested()) {
+      long filled = storage.insert(stack.getType(), stack.getAmount(), t);
+      if (!sim) {
+        t.commit();
+        if (shouldUpdate())
+          updateContents();
+      }
+      return filled;
+    }
+  }
 
 	@Override
 	public FluidStack drain(FluidStack stack, boolean sim) {
