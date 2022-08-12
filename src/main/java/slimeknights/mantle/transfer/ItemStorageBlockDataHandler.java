@@ -24,8 +24,7 @@ public class ItemStorageBlockDataHandler {
   @Environment(EnvType.CLIENT)
   private static final Map<BlockPos, ItemStack[]> CACHED_DATA = new HashMap<>();
 
-  public static void sendDataToClients(BlockEntity be) {
-    IItemHandler handler = TransferUtil.getItemHandler(be).orElse(null);
+  public static void sendDataToClients(BlockEntity be, IItemHandler handler) {
     if (handler == null)
       return;
     ((ServerLevel)be.getLevel()).getPlayers(player -> {

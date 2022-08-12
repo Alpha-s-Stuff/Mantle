@@ -17,17 +17,21 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import slimeknights.mantle.transfer.ItemStorageBlockDataHandler;
+import slimeknights.mantle.transfer.item.ItemTransferable;
 
 @Mixin(BlockApiLookupImpl.class)
 public class BlockApiLookupImplMixin<A, C> {
   @Inject(method = "find", at = @At("RETURN"))
   public void mantle$syncItemStorage(Level world, BlockPos pos, @Nullable BlockState state, @Nullable BlockEntity blockEntity, C context, CallbackInfoReturnable<@Nullable A> cir) {
     A api = cir.getReturnValue();
-    if (blockEntity != null && context instanceof Direction && api instanceof Storage<?> storage) {
+    if (blockEntity != null && context instanceof Direction direction && api instanceof Storage<?> storage) {
       try (Transaction t = TransferUtil.getTransaction()) {
         for (StorageView<?> view : storage.iterable(t)) {
           if (view.getResource() instanceof ItemVariant) {
-            ItemStorageBlockDataHandler.sendDataToClients(blockEntity);
+            if (blockEntity instanceof ItemTransferable transferable)
+              ItemStorageBlockDataHandler.sendDataToClients(blockEntity, transferable.getItemHandler(direction).orElse(null));
+            else
+              ItemStorageBlockDataHandler.sendDataToClients(blockEntity, slimeknights.mantle.transfer.TransferUtil.simplifyItem((Storage<ItemVariant>) storage).orElse(null));
             break;
           }
         }
