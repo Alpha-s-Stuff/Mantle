@@ -61,6 +61,7 @@ public class TransferUtil {
 	public static LazyOptional<IItemHandler> getItemHandler(BlockEntity be, @Nullable Direction side) {
 		// lib handling
 		if (be instanceof ItemTransferable transferable) return transferable.getItemHandler(side);
+    if (be instanceof Container container) return LazyOptional.ofObject(new InvWrapper(container));
 		// external handling
 		List<Storage<ItemVariant>> itemStorages = new ArrayList<>();
 		Level l = be.getLevel();
@@ -68,8 +69,6 @@ public class TransferUtil {
 		BlockState state = be.getBlockState();
 
     if (be.getLevel().isClientSide()) {
-      if (be instanceof Container container)
-        return LazyOptional.ofObject(new InvWrapper(container));
       return LazyOptional.ofObject(ItemStorageBlockDataHandler.getCachedHandler(be));
     }
 
