@@ -1,12 +1,12 @@
 package slimeknights.mantle.transfer.fluid;
 
-import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
+import slimeknights.mantle.transfer.TransferUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -100,24 +100,6 @@ public class FluidStorageHandler implements IFluidHandler {
 			return filled;
 		}
 	}
-
-  @Override
-  public long fill(FluidStack stack, boolean sim, TransactionContext transaction) {
-    if (stack.isEmpty())
-      return 0;
-    if (!storage.supportsInsertion())
-      return 0;
-
-    try (Transaction t = transaction.openNested()) {
-      long filled = storage.insert(stack.getType(), stack.getAmount(), t);
-      if (!sim) {
-        t.commit();
-        if (shouldUpdate())
-          updateContents();
-      }
-      return filled;
-    }
-  }
 
 	@Override
 	public FluidStack drain(FluidStack stack, boolean sim) {

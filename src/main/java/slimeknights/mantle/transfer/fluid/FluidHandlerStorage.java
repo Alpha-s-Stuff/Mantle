@@ -4,12 +4,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import slimeknights.mantle.transfer.fluid.EmptyTank;
-import slimeknights.mantle.transfer.fluid.IFluidHandler;
+import slimeknights.mantle.transfer.TransferUtil;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import org.jetbrains.annotations.Nullable;
-
-import com.google.common.collect.Iterators;
 
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
@@ -38,9 +35,10 @@ public class FluidHandlerStorage implements Storage<FluidVariant> {
 	@Override
 	public long insert(FluidVariant resource, long maxAmount, TransactionContext transaction) {
 		long remainder = handler.fill(new FluidStack(resource, maxAmount), true);
-		transaction.addCloseCallback((t, result) -> {
+
+		transaction.addOuterCloseCallback((result) -> {
 			if (result.wasCommitted()) {
-				handler.fill(new FluidStack(resource, maxAmount), false, t);
+				handler.fill(new FluidStack(resource, maxAmount), false);
 			}
 		});
 		return remainder;
@@ -49,7 +47,7 @@ public class FluidHandlerStorage implements Storage<FluidVariant> {
 	@Override
 	public long extract(FluidVariant resource, long maxAmount, TransactionContext transaction) {
 		FluidStack extracted = handler.drain(new FluidStack(resource, maxAmount), true);
-		transaction.addCloseCallback((t, result) -> {
+		TransferUtil.addEndCallback(transaction, (result) -> {
 			if (result.wasCommitted()) {
 				handler.drain(new FluidStack(resource, maxAmount), false);
 			}

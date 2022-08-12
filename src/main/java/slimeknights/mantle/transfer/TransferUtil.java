@@ -1,10 +1,14 @@
 package slimeknights.mantle.transfer;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.minecraft.world.Container;
 import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.level.block.ChestBlock;
@@ -46,6 +50,9 @@ import javax.annotation.Nonnull;
 
 @SuppressWarnings("UnstableApiUsage")
 public class TransferUtil {
+
+  private static TransactionContext transactionContext;
+
 	public static LazyOptional<IItemHandler> getItemHandler(BlockEntity be) {
 		return getItemHandler(be, null);
 	}
@@ -238,4 +245,18 @@ public class TransferUtil {
       return TransferUtil.getItemStorageForBE(blockEntity, context);
     });
 	}
+
+  public static Transaction getTransaction() {
+    return io.github.fabricators_of_create.porting_lib.transfer.TransferUtil.getTransaction();
+  }
+
+  private static Map<TransactionContext, List<TransactionContext.OuterCloseCallback>> END_CLOSE_CALLBACKS = new HashMap<>();
+
+  public static List<TransactionContext.OuterCloseCallback> getEndCallbacks(TransactionContext context) {
+    return END_CLOSE_CALLBACKS.getOrDefault(context, new ArrayList<>());
+  }
+
+  public static void addEndCallback(TransactionContext tx, TransactionContext.OuterCloseCallback closeCallback) {
+    END_CLOSE_CALLBACKS.computeIfAbsent(tx, context -> new ArrayList<>()).add(closeCallback);
+  }
 }

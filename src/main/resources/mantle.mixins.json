@@ -15,6 +15,7 @@
   "mixins": [
     "client.FluidStorageMixin",
     "client.ItemStorageMixin",
-    "common.BlockApiLookupImplMixin"
+    "common.BlockApiLookupImplMixin",
+    "common.TransactionManagerImplMixin"
   ]
 }
