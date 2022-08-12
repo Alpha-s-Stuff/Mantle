@@ -25,12 +25,12 @@ public class ItemStorageHandler implements IItemHandlerModifiable {
 
 	public ItemStorageHandler(Storage<ItemVariant> storage) {
 		this.storage = storage;
-		this.version = storage.getVersion();
+		this.version = 0;
 		updateContents();
 	}
 
 	public boolean shouldUpdate() {
-		return storage.getVersion() != version;
+		return 1 != version;
 	}
 
 	private void updateContents() {
@@ -46,7 +46,7 @@ public class ItemStorageHandler implements IItemHandlerModifiable {
 		this.stacks = stacks.toArray(ItemStack[]::new);
 		this.capacities = capacities.toArray(Long[]::new);
 		this.slots = stacks.size();
-		this.version = storage.getVersion();
+		this.version = 0;
 	}
 
 	private boolean validIndex(int slot) {
