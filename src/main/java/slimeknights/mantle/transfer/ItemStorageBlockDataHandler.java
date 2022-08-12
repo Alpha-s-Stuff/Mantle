@@ -1,7 +1,6 @@
 package slimeknights.mantle.transfer;
 
 import io.github.fabricators_of_create.porting_lib.PortingLib;
-import io.github.fabricators_of_create.porting_lib.transfer.fluid.FluidTransferable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -26,8 +25,10 @@ public class ItemStorageBlockDataHandler {
   private static final Map<BlockPos, ItemStack[]> CACHED_DATA = new HashMap<>();
 
   public static void sendDataToClients(BlockEntity be) {
+    IItemHandler handler = TransferUtil.getItemHandler(be).orElse(null);
+    if (handler == null)
+      return;
     ((ServerLevel)be.getLevel()).getPlayers(player -> {
-      IItemHandler handler = TransferUtil.getItemHandler(be).orElse(null);
       ItemStack[] itemData = new ItemStack[handler.getSlots()];
       for (int i = 0; i < itemData.length; i++) {
         itemData[i] = handler.getStackInSlot(i);
