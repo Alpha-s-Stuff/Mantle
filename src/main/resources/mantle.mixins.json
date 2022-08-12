@@ -14,6 +14,7 @@
   "plugin": "slimeknights.mantle.mixin.client.REIMixinPlugin",
   "mixins": [
     "client.FluidStorageMixin",
-    "client.ItemStorageMixin"
+    "client.ItemStorageMixin",
+    "common.BlockApiLookupImplMixin"
   ]
 }

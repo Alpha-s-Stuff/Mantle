@@ -68,7 +68,6 @@ public class Mantle implements ModInitializer {
     UseBlockCallback.EVENT.register(LecternBookItem::interactWithBlock);
     TransferUtil.registerFluidStorage();
     TransferUtil.registerItemStorage();
-    ItemStorageBlockDataHandler.init();
   }
 
   private void registerCapabilities() {

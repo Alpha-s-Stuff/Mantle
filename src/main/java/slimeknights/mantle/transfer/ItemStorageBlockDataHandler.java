@@ -100,12 +100,4 @@ public class ItemStorageBlockDataHandler {
       client.execute(() -> CACHED_DATA.put(pos, data));
     });
   }
-
-  public static void init() {
-    ItemStorage.SIDED.registerFallback((world, pos, state, blockEntity, context) -> {
-      if (!blockEntity.getLevel().isClientSide())
-        sendDataToClients(blockEntity);
-      return null;
-    });
-  }
 }
