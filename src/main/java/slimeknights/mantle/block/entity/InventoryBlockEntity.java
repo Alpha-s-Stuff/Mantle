@@ -19,7 +19,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 import slimeknights.mantle.transfer.item.IItemHandler;
 import slimeknights.mantle.transfer.item.IItemHandlerModifiable;
-import slimeknights.mantle.transfer.item.InvWrapper;
+import slimeknights.mantle.transfer.item.wrapper.InvWrapper;
 import slimeknights.mantle.transfer.item.ItemTransferable;
 import io.github.fabricators_of_create.porting_lib.util.LazyOptional;
 import slimeknights.mantle.util.ItemStackList;

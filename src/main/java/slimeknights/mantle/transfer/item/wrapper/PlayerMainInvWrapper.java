@@ -2,8 +2,6 @@ package slimeknights.mantle.transfer.item.wrapper;
 
 import javax.annotation.Nonnull;
 
-import slimeknights.mantle.transfer.item.InvWrapper;
-import slimeknights.mantle.transfer.item.wrapper.RangedWrapper;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
