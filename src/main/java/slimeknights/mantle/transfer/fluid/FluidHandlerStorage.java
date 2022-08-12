@@ -36,7 +36,7 @@ public class FluidHandlerStorage implements Storage<FluidVariant> {
 	public long insert(FluidVariant resource, long maxAmount, TransactionContext transaction) {
 		long remainder = handler.fill(new FluidStack(resource, maxAmount), true);
 
-		transaction.addOuterCloseCallback((result) -> {
+    TransferUtil.addEndCallback(transaction, (result) -> {
 			if (result.wasCommitted()) {
 				handler.fill(new FluidStack(resource, maxAmount), false);
 			}

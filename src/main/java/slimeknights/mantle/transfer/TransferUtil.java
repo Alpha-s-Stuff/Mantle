@@ -256,6 +256,10 @@ public class TransferUtil {
     return END_CLOSE_CALLBACKS.getOrDefault(context, new ArrayList<>());
   }
 
+  public static Map<TransactionContext, List<TransactionContext.OuterCloseCallback>> getAllEndCallbacks() {
+    return END_CLOSE_CALLBACKS;
+  }
+
   public static void addEndCallback(TransactionContext tx, TransactionContext.OuterCloseCallback closeCallback) {
     END_CLOSE_CALLBACKS.computeIfAbsent(tx, context -> new ArrayList<>()).add(closeCallback);
   }

@@ -15,6 +15,6 @@ public class TransactionManagerImplMixin {
   public void mantle$onActualClose(TransactionContext.Result result, CallbackInfo ci) {
     List<TransactionContext.OuterCloseCallback> outerCloseCallbacks = TransferUtil.getEndCallbacks((TransactionContext) this);
     outerCloseCallbacks.forEach(closeCallback -> closeCallback.afterOuterClose(result));
-    outerCloseCallbacks.clear();
+    TransferUtil.getAllEndCallbacks().remove((TransactionContext) this);
   }
 }
