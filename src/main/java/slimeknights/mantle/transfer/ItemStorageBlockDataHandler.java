@@ -13,9 +13,9 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import slimeknights.mantle.inventory.EmptyItemHandler;
 import slimeknights.mantle.transfer.item.IItemHandler;
 import slimeknights.mantle.transfer.item.IItemHandlerModifiable;
-import slimeknights.mantle.transfer.item.wrapper.InvWrapper;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -58,8 +58,8 @@ public class ItemStorageBlockDataHandler {
   }
 
   public static IItemHandler getCachedHandler(BlockEntity be) {
-    if (be instanceof Container container)
-      return new InvWrapper(container);
+    if (be instanceof Container)
+      return TransferUtil.getItemHandler(be).orElse(EmptyItemHandler.INSTANCE);
     ItemStack[] data = CACHED_DATA.get(be.getBlockPos());
     return new IItemHandlerModifiable() {
 

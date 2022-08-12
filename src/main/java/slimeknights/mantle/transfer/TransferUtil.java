@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import net.minecraft.world.Container;
 import net.minecraft.world.WorldlyContainer;
+import net.minecraft.world.level.block.ChestBlock;
 import slimeknights.mantle.transfer.item.ItemHandlerHelper;
 
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
@@ -61,17 +62,19 @@ public class TransferUtil {
 
 	public static LazyOptional<IItemHandler> getItemHandler(BlockEntity be, @Nullable Direction side) {
 		// lib handling
+    Level l = be.getLevel();
+    BlockPos pos = be.getBlockPos();
+    BlockState state = be.getBlockState();
 		if (be instanceof ItemTransferable transferable) return transferable.getItemHandler(side);
     if (be instanceof Container container) {
       if (container instanceof WorldlyContainer worldlyContainer)
         return LazyOptional.ofObject(new SidedInvWrapper(worldlyContainer, side));
+      if (state.getBlock() instanceof ChestBlock)
+        return LazyOptional.ofObject(new InvWrapper(ChestBlock.getContainer((ChestBlock) state.getBlock(), state, l, pos, true)));
       return LazyOptional.ofObject(new InvWrapper(container));
     }
 		// external handling
 		List<Storage<ItemVariant>> itemStorages = new ArrayList<>();
-		Level l = be.getLevel();
-		BlockPos pos = be.getBlockPos();
-		BlockState state = be.getBlockState();
 
     if (be.getLevel().isClientSide()) {
       return LazyOptional.ofObject(ItemStorageBlockDataHandler.getCachedHandler(be));
