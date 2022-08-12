@@ -1,5 +1,6 @@
 package slimeknights.mantle.transfer.fluid;
 
+import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
@@ -36,7 +37,7 @@ public class FluidStorageHandler implements IFluidHandler {
 	private void updateContents() {
 		List<FluidStack> stacks = new ArrayList<>();
 		List<Long> capacities = new ArrayList<>();
-		try (Transaction t = Transaction.openOuter()) {
+		try (Transaction t = TransferUtil.getTransaction()) {
 			for (StorageView<FluidVariant> view : storage.iterable(t)) {
 				stacks.add(new FluidStack(view.getResource(), view.getAmount()));
 				capacities.add(view.getCapacity());
@@ -87,7 +88,7 @@ public class FluidStorageHandler implements IFluidHandler {
 		if (!storage.supportsInsertion())
 			return 0;
 
-		try (Transaction t = Transaction.openOuter()) {
+		try (Transaction t = TransferUtil.getTransaction()) {
 			long filled = storage.insert(stack.getType(), stack.getAmount(), t);
 			if (!sim) {
 				t.commit();
@@ -105,7 +106,7 @@ public class FluidStorageHandler implements IFluidHandler {
 		if (!storage.supportsExtraction())
 			return FluidStack.EMPTY;
 
-		try (Transaction t = Transaction.openOuter()) {
+		try (Transaction t = TransferUtil.getTransaction()) {
 			long extracted = storage.extract(stack.getType(), stack.getAmount(), t);
 			if (!sim) {
 				t.commit();
@@ -124,7 +125,7 @@ public class FluidStorageHandler implements IFluidHandler {
 			return FluidStack.EMPTY;
 
 		FluidStack extracted = FluidStack.EMPTY;
-		try (Transaction t = Transaction.openOuter()) {
+		try (Transaction t = TransferUtil.getTransaction()) {
 			for (StorageView<FluidVariant> view : storage.iterable(t)) {
 				FluidVariant var = view.getResource();
 				if (var.isBlank() || !extracted.canFill(var)) continue;
