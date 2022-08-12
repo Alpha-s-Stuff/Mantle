@@ -14,6 +14,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import slimeknights.mantle.transfer.item.IItemHandler;
+import slimeknights.mantle.transfer.item.IItemHandlerModifiable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -57,7 +58,10 @@ public class ItemStorageBlockDataHandler {
 
   public static IItemHandler getCachedHandler(BlockEntity be) {
     ItemStack[] data = CACHED_DATA.get(be.getBlockPos());
-    return new IItemHandler() {
+    return new IItemHandlerModifiable() {
+
+      @Override
+      public void setStackInSlot(int slot, ItemStack stack) {}
 
       @Override
       public int getSlots() {
