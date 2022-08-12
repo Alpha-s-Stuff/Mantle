@@ -33,6 +33,7 @@ import slimeknights.mantle.recipe.ingredient.FluidContainerIngredient;
 import slimeknights.mantle.registration.MantleRegistrations;
 import slimeknights.mantle.registration.adapter.BlockEntityTypeRegistryAdapter;
 import slimeknights.mantle.registration.adapter.RegistryAdapter;
+import slimeknights.mantle.transfer.ItemStorageBlockDataHandler;
 import slimeknights.mantle.transfer.TransferUtil;
 
 /**
@@ -67,6 +68,7 @@ public class Mantle implements ModInitializer {
     UseBlockCallback.EVENT.register(LecternBookItem::interactWithBlock);
     TransferUtil.registerFluidStorage();
     TransferUtil.registerItemStorage();
+    ItemStorageBlockDataHandler.init();
   }
 
   private void registerCapabilities() {

@@ -65,6 +65,10 @@ public class TransferUtil {
 		BlockPos pos = be.getBlockPos();
 		BlockState state = be.getBlockState();
 
+    if (be.getLevel().isClientSide()) {
+      return LazyOptional.ofObject(ItemStorageBlockDataHandler.getCachedHandler(be));
+    }
+
 		for (Direction direction : getDirections(side)) {
 			Storage<ItemVariant> itemStorage = ItemStorage.SIDED.find(l, pos, state, be, direction);
 

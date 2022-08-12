@@ -45,6 +45,7 @@ import slimeknights.mantle.client.render.MantleShaders;
 import slimeknights.mantle.network.MantleNetwork;
 import slimeknights.mantle.registration.MantleRegistrations;
 import slimeknights.mantle.registration.RegistrationHelper;
+import slimeknights.mantle.transfer.ItemStorageBlockDataHandler;
 import slimeknights.mantle.util.OffhandCooldownTracker;
 
 import java.util.function.Function;
@@ -81,6 +82,8 @@ public class ClientEvents implements ClientModInitializer {
     ModelLoadCallback.EVENT.register(ClientEvents::registerModelLoaders);
     commonSetup();
     MantleNetwork.INSTANCE.network.initClientListener();
+
+    ItemStorageBlockDataHandler.initClient();
   }
 
   static void registerModelLoaders(ResourceManager manager, BlockColors colors, ProfilerFiller profiler, int mipLevel) {
