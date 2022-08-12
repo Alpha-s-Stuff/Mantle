@@ -12,16 +12,11 @@ import javax.annotation.Nonnull;
 
 public class ItemHandlerHelper {
 	public static boolean canItemStacksStack(ItemStack first, ItemStack second) {
-		if (first.isEmpty() || !first.sameItem(second) || first.hasTag() != second.hasTag()) return false;
-
-		return !first.hasTag() || first.getTag().equals(second.getTag());
+		return io.github.fabricators_of_create.porting_lib.transfer.item.ItemHandlerHelper.canItemStacksStack(first, second);
 	}
 
 	public static ItemStack copyStackWithSize(ItemStack stack, int size) {
-		if (size == 0) return ItemStack.EMPTY;
-		ItemStack copy = stack.copy();
-		copy.setCount(size);
-		return copy;
+		return io.github.fabricators_of_create.porting_lib.transfer.item.ItemHandlerHelper.copyStackWithSize(stack, size);
 	}
 
 	public static ItemStack insertItemStacked(IItemHandler inv, ItemStack stack, boolean sim) {

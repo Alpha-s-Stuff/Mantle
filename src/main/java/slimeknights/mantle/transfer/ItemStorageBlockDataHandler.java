@@ -6,15 +6,16 @@ import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import slimeknights.mantle.transfer.item.IItemHandler;
 import slimeknights.mantle.transfer.item.IItemHandlerModifiable;
+import slimeknights.mantle.transfer.item.wrapper.InvWrapper;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,7 +27,7 @@ public class ItemStorageBlockDataHandler {
   private static final Map<BlockPos, ItemStack[]> CACHED_DATA = new HashMap<>();
 
   public static void sendDataToClients(BlockEntity be, IItemHandler handler) {
-    if (handler == null)
+    if (handler == null || be instanceof Container)
       return;
     ((ServerLevel)be.getLevel()).getPlayers(player -> {
       ItemStack[] itemData = new ItemStack[handler.getSlots()];
@@ -57,6 +58,8 @@ public class ItemStorageBlockDataHandler {
   }
 
   public static IItemHandler getCachedHandler(BlockEntity be) {
+    if (be instanceof Container container)
+      return new InvWrapper(container);
     ItemStack[] data = CACHED_DATA.get(be.getBlockPos());
     return new IItemHandlerModifiable() {
 
@@ -75,12 +78,12 @@ public class ItemStorageBlockDataHandler {
 
       @Override
       public ItemStack insertItem(int slot, ItemStack stack, boolean sim) {
-        return null;
+        return ItemStack.EMPTY;
       }
 
       @Override
       public ItemStack extractItem(int slot, int amount, boolean sim) {
-        return null;
+        return ItemStack.EMPTY;
       }
 
       @Override

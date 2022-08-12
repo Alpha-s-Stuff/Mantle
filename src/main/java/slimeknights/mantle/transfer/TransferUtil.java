@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import net.minecraft.world.Container;
 import slimeknights.mantle.transfer.item.ItemHandlerHelper;
 
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
@@ -37,6 +38,7 @@ import slimeknights.mantle.transfer.item.IItemHandler;
 import slimeknights.mantle.transfer.item.ItemHandlerStorage;
 import slimeknights.mantle.transfer.item.ItemStorageHandler;
 import slimeknights.mantle.transfer.item.ItemTransferable;
+import slimeknights.mantle.transfer.item.wrapper.InvWrapper;
 
 import javax.annotation.Nonnull;
 
@@ -66,6 +68,8 @@ public class TransferUtil {
 		BlockState state = be.getBlockState();
 
     if (be.getLevel().isClientSide()) {
+      if (be instanceof Container container)
+        return LazyOptional.ofObject(new InvWrapper(container));
       return LazyOptional.ofObject(ItemStorageBlockDataHandler.getCachedHandler(be));
     }
 
