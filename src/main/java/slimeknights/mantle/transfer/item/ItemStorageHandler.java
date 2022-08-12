@@ -1,5 +1,6 @@
 package slimeknights.mantle.transfer.item;
 
+import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
 import slimeknights.mantle.transfer.item.IItemHandlerModifiable;
 import slimeknights.mantle.transfer.item.ItemHandlerHelper;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
@@ -36,7 +37,7 @@ public class ItemStorageHandler implements IItemHandlerModifiable {
 	private void updateContents() {
 		List<ItemStack> stacks = new ArrayList<>();
 		List<Long> capacities = new ArrayList<>();
-		try (Transaction t = Transaction.openOuter()) {
+		try (Transaction t = TransferUtil.getTransaction()) {
 			for (StorageView<ItemVariant> view : storage.iterable(t)) {
 				stacks.add(view.getResource().toStack((int) view.getAmount()));
 				capacities.add(view.getCapacity());
@@ -86,7 +87,7 @@ public class ItemStorageHandler implements IItemHandlerModifiable {
 			return stack;
 		// finally insert
 		ItemStack finalVal = ItemStack.EMPTY;
-		try (Transaction t = Transaction.openOuter()) {
+		try (Transaction t = TransferUtil.getTransaction()) {
 			// this technically breaks spec and ignores 'slot' but thanks FAPI, we literally have no choice!
 			long remainder = stack.getCount() - storage.insert(ItemVariant.of(stack), stack.getCount(), t);
 			if (remainder != 0) {
@@ -113,7 +114,7 @@ public class ItemStorageHandler implements IItemHandlerModifiable {
 			return ItemStack.EMPTY;
 
 		ItemStack finalVal = ItemStack.EMPTY;
-		try (Transaction t = Transaction.openOuter()) {
+		try (Transaction t = TransferUtil.getTransaction()) {
 			int index = 0;
 			for (StorageView<ItemVariant> view : storage.iterable(t)) {
 				if (index == slot) {
