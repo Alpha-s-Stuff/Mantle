@@ -1,6 +1,5 @@
 package slimeknights.mantle.transfer;
 
-import io.github.fabricators_of_create.porting_lib.PortingLib;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -13,6 +12,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import slimeknights.mantle.Mantle;
 import slimeknights.mantle.inventory.EmptyItemHandler;
 import slimeknights.mantle.transfer.item.IItemHandler;
 import slimeknights.mantle.transfer.item.IItemHandlerModifiable;
@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ItemStorageBlockDataHandler {
-  public static final ResourceLocation PACKET_ID = PortingLib.id("fluid_tile_handler_data");
+  public static final ResourceLocation PACKET_ID = Mantle.getResource("fluid_tile_handler_data");
 
   @Environment(EnvType.CLIENT)
   private static final Map<BlockPos, ItemStack[]> CACHED_DATA = new HashMap<>();
