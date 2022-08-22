@@ -61,6 +61,9 @@ public class ItemStorageBlockDataHandler {
     if (be instanceof Container)
       return TransferUtil.getItemHandler(be).orElse(EmptyItemHandler.INSTANCE);
     ItemStack[] data = CACHED_DATA.get(be.getBlockPos());
+
+    if (data == null)
+      return EmptyItemHandler.INSTANCE;
     return new IItemHandlerModifiable() {
 
       @Override
