@@ -46,8 +46,8 @@ task buildInfo {
         ext.revision = "gitgud"
     }
 
-    if (System.getenv().BUILD_NUMBER != null) {
-        ext.buildNum = "${System.getenv().BUILD_NUMBER}"
+    if (System.getenv().GITHUB_RUN_NUMBER != null) {
+        ext.buildNum = "${System.getenv().GITHUB_RUN_NUMBER}"
     } else {
         ext.buildNum = "DEV.${project.buildInfo.revision}"
     }
