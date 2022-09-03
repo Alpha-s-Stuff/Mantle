@@ -10,7 +10,6 @@ import io.github.fabricators_of_create.porting_lib.event.client.OverlayRenderCal
 import io.github.fabricators_of_create.porting_lib.event.client.RegisterShadersCallback;
 import io.github.fabricators_of_create.porting_lib.model.ModelLoaderRegistry;
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.client.AttackIndicatorStatus;
 import net.minecraft.client.Minecraft;
@@ -45,7 +44,6 @@ import slimeknights.mantle.client.render.MantleShaders;
 import slimeknights.mantle.network.MantleNetwork;
 import slimeknights.mantle.registration.MantleRegistrations;
 import slimeknights.mantle.registration.RegistrationHelper;
-import slimeknights.mantle.transfer.ItemStorageBlockDataHandler;
 import slimeknights.mantle.util.OffhandCooldownTracker;
 
 import java.util.function.Function;
@@ -82,8 +80,6 @@ public class ClientEvents implements ClientModInitializer {
     ModelLoadCallback.EVENT.register(ClientEvents::registerModelLoaders);
     commonSetup();
     MantleNetwork.INSTANCE.network.initClientListener();
-
-    ItemStorageBlockDataHandler.initClient();
   }
 
   static void registerModelLoaders(ResourceManager manager, BlockColors colors, ProfilerFiller profiler, int mipLevel) {

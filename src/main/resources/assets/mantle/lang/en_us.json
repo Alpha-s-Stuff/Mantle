@@ -1,6 +1,7 @@
 {
   "mantle:tooltip.cooktime": "Cook Time: %ds",
   "config.mantle.extraHeartRenderer": "Enable Extra Heart Renderer",
+  "config.mantle.fabric.fluidUnit": "Fluid Unit",
 
   "command.mantle.view_tag.success": "Values for %s tag '%s':",
 
@@ -46,5 +47,7 @@
   "gui.mantle.fluid.droplet": "%s droplet",
 
   "block.mantle.tank.drained": "Drained %s mb %s",
-  "block.mantle.tank.filled": "Filled %s mb %s"
+  "block.mantle.tank.filled": "Filled %s mb %s",
+  "block.mantle.tank.drained.droplets": "Drained %s droplets %s",
+  "block.mantle.tank.filled.droplets": "Filled %s droplets %s"
 }

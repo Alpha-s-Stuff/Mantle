@@ -83,10 +83,6 @@ public class TransferUtil {
 		// external handling
 		List<Storage<ItemVariant>> itemStorages = new ArrayList<>();
 
-    if (be.getLevel().isClientSide()) {
-      return LazyOptional.ofObject(ItemStorageBlockDataHandler.getCachedHandler(be));
-    }
-
 		for (Direction direction : getDirections(side)) {
 			Storage<ItemVariant> itemStorage = ItemStorage.SIDED.find(l, pos, state, be, direction);
 

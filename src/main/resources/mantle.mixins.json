@@ -6,6 +6,8 @@
   "client": [
     "client.ModelLayersMixin",
     "client.SheetsMixin",
+    "client.FluidStorageMixin",
+    "client.ItemStorageMixin",
     "client.rei.DisplayRegistryMixin"
   ],
   "injectors": {
@@ -13,9 +15,6 @@
   },
   "plugin": "slimeknights.mantle.mixin.client.REIMixinPlugin",
   "mixins": [
-    "client.FluidStorageMixin",
-    "client.ItemStorageMixin",
-    "common.BlockApiLookupImplMixin",
     "common.TransactionManagerImplMixin"
   ]
 }

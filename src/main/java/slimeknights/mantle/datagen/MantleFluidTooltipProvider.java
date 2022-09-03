@@ -1,6 +1,7 @@
 package slimeknights.mantle.datagen;
 
 import io.github.fabricators_of_create.porting_lib.util.FluidAttributes;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.minecraft.data.DataGenerator;
 import slimeknights.mantle.Mantle;
 import slimeknights.mantle.fluid.tooltip.AbstractFluidTooltipProvider;
@@ -15,8 +16,8 @@ public class MantleFluidTooltipProvider extends AbstractFluidTooltipProvider {
   @Override
   protected void addFluids() {
     add("buckets")
-      .addUnit("kilobucket", FluidAttributes.BUCKET_VOLUME * 1000)
-      .addUnit("bucket", FluidAttributes.BUCKET_VOLUME)
+      .addUnit("kilobucket", FluidConstants.BUCKET * 1000)
+      .addUnit("bucket", FluidConstants.BUCKET)
       .addUnit("droplet", 1);
     addRedirect(FluidTooltipHandler.DEFAULT_ID, id("buckets"));
   }
