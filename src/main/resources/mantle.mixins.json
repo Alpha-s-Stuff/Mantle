@@ -4,10 +4,11 @@
   "package": "slimeknights.mantle.mixin",
   "compatibilityLevel": "JAVA_17",
   "client": [
-    "client.ModelLayersMixin",
-    "client.SheetsMixin",
     "client.FluidStorageMixin",
     "client.ItemStorageMixin",
+    "client.MinecraftMixin",
+    "client.ModelLayersMixin",
+    "client.SheetsMixin",
     "client.rei.DisplayRegistryMixin"
   ],
   "injectors": {
