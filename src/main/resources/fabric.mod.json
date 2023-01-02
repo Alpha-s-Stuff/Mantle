@@ -30,6 +30,9 @@
     "cardinal-components": [
       "slimeknights.mantle.util.OffhandCooldownTracker"
     ],
+    "rei_client": [
+      "slimeknights.mantle.plugin.rei.REIPlugin"
+    ],
     "jei_mod_plugin": [
       "slimeknights.mantle.plugin.jei.JEIPlugin"
     ]
