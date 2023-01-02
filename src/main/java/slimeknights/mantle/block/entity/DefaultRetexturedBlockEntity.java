@@ -1,5 +1,7 @@
 package slimeknights.mantle.block.entity;
 
+import io.github.fabricators_of_create.porting_lib.model.IModelData;
+import io.github.fabricators_of_create.porting_lib.util.Lazy;
 import lombok.Getter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -8,8 +10,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.client.model.data.IModelData;
-import net.minecraftforge.common.util.Lazy;
 import slimeknights.mantle.block.RetexturedBlock;
 import slimeknights.mantle.util.RetexturedHelper;
 
@@ -31,7 +31,7 @@ public class DefaultRetexturedBlockEntity extends MantleBlockEntity implements I
 
   @Nonnull
   @Override
-  public IModelData getModelData() {
+  public IModelData getRenderAttachmentData() {
     return this.data.get();
   }
 
@@ -70,5 +70,10 @@ public class DefaultRetexturedBlockEntity extends MantleBlockEntity implements I
       texture = RetexturedHelper.getBlock(tags.getString(TAG_TEXTURE));
       RetexturedHelper.onTextureUpdated(this);
     }
+  }
+
+  @Override
+  public CompoundTag getTileData() {
+    return this.getExtraCustomData();
   }
 }

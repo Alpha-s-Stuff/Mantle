@@ -1,5 +1,6 @@
 package slimeknights.mantle.util;
 
+import io.github.fabricators_of_create.porting_lib.model.IModelData;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -10,6 +11,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import io.github.fabricators_of_create.porting_lib.model.ModelProperty;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import slimeknights.mantle.block.entity.IRetexturedBlockEntity;
 
 import javax.annotation.Nullable;
 import java.util.Objects;
@@ -91,10 +95,9 @@ public final class RetexturedHelper {
     if (level != null && level.isClientSide) {
       Block texture = self.getTexture();
       texture = texture == Blocks.AIR ? null : texture;
-      IModelData data = self.getModelData();
+      IModelData data = self.getRenderAttachmentData();
       if (data.getData(BLOCK_PROPERTY) != texture) {
         data.setData(BLOCK_PROPERTY, texture);
-        self.requestModelDataUpdate();
         BlockState state = self.getBlockState();
         level.sendBlockUpdated(self.getBlockPos(), state, state, 0);
       }

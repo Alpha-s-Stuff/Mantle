@@ -1,8 +1,10 @@
 package slimeknights.mantle.block.entity;
 
+import net.fabricmc.fabric.api.rendering.data.v1.RenderAttachmentBlockEntity;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import org.jetbrains.annotations.Nullable;
 import slimeknights.mantle.block.RetexturedBlock;
 import slimeknights.mantle.client.model.data.SinglePropertyData;
 import io.github.fabricators_of_create.porting_lib.model.IModelData;
@@ -14,7 +16,7 @@ import slimeknights.mantle.util.RetexturedHelper;
  *
  * Use alongside {@link RetexturedBlock} and {@link slimeknights.mantle.item.RetexturedBlockItem}. See {@link DefaultRetexturedBlockEntity} for implementation.
  */
-public interface IRetexturedBlockEntity {
+public interface IRetexturedBlockEntity extends RenderAttachmentBlockEntity {
   /* Gets the Forge tile data for the tile entity */
   CompoundTag getTileData();
 
@@ -55,4 +57,7 @@ public interface IRetexturedBlockEntity {
     }
     return new SinglePropertyData<>(RetexturedHelper.BLOCK_PROPERTY, block);
   }
+
+  @Override
+  @Nullable IModelData getRenderAttachmentData();
 }

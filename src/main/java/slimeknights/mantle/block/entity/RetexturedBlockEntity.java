@@ -19,7 +19,7 @@ import static slimeknights.mantle.util.RetexturedHelper.TAG_TEXTURE;
  * @deprecated use {@link DefaultRetexturedBlockEntity}
  */
 @Deprecated
-public class RetexturedBlockEntity extends MantleBlockEntity implements IRetexturedBlockEntity, RenderAttachmentBlockEntity {
+public class RetexturedBlockEntity extends MantleBlockEntity implements IRetexturedBlockEntity {
   /** Lazy value of model data as it will not change after first fetch */
   private final Lazy<IModelData> data = Lazy.of(this::getRetexturedModelData);
   public RetexturedBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
@@ -28,7 +28,7 @@ public class RetexturedBlockEntity extends MantleBlockEntity implements IRetextu
 
   @Nonnull
   @Override
-  public Object getRenderAttachmentData() {
+  public IModelData getRenderAttachmentData() {
     return data.get();
   }
 

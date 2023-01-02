@@ -10,7 +10,6 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.registries.ForgeRegistries;
 import slimeknights.mantle.data.GenericLoaderRegistry.IGenericLoader;
 import slimeknights.mantle.util.JsonHelper;
 
@@ -52,7 +51,7 @@ class SetBlockPredicate implements BlockPredicate {
       ImmutableSet.Builder<Block> blocks = ImmutableSet.builder();
       int max = buffer.readVarInt();
       for (int i = 0; i < max; i++) {
-        blocks.add(buffer.readRegistryIdUnsafe(ForgeRegistries.BLOCKS));
+        blocks.add(Registry.BLOCK.get(buffer.readResourceLocation()));
       }
       return new SetBlockPredicate(blocks.build());
     }
@@ -70,7 +69,7 @@ class SetBlockPredicate implements BlockPredicate {
     public void toNetwork(SetBlockPredicate object, FriendlyByteBuf buffer) {
       buffer.writeVarInt(object.blocks.size());
       for (Block block : object.blocks) {
-        buffer.writeRegistryIdUnsafe(ForgeRegistries.BLOCKS, block);
+        buffer.writeResourceLocation(Registry.BLOCK.getKey(block));
       }
     }
   };
