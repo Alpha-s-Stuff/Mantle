@@ -3,16 +3,17 @@ package slimeknights.mantle.data;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.JsonOps;
+import io.github.fabricators_of_create.porting_lib.PortingLibRegistries;
+import io.github.fabricators_of_create.porting_lib.loot.IGlobalLootModifier;
+import io.github.fabricators_of_create.porting_lib.loot.LootModifier;
+import io.github.fabricators_of_create.porting_lib.util.LamdbaExceptionUtils;
+import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataGenerator;
-import net.minecraft.data.HashCache;
 import net.minecraft.data.DataProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Tuple;
-import io.github.fabricators_of_create.porting_lib.loot.GlobalLootModifierSerializer;
-import io.github.fabricators_of_create.porting_lib.loot.IGlobalLootModifier;
-import io.github.fabricators_of_create.porting_lib.loot.LootModifier;
-import io.github.fabricators_of_create.porting_lib.loot.LootModifierManager;
-import io.github.fabricators_of_create.porting_lib.util.LamdbaExceptionUtils;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -32,7 +33,7 @@ public abstract class GlobalLootModifierProvider implements DataProvider
   private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
   private final DataGenerator gen;
   private final String modid;
-  private final Map<String, Tuple<GlobalLootModifierSerializer<?>, JsonObject>> toSerialize = new HashMap<>();
+  private final Map<String, Tuple<Codec<? extends IGlobalLootModifier>, JsonObject>> toSerialize = new HashMap<>();
   private boolean replace = false;
 
   public GlobalLootModifierProvider(DataGenerator gen, String modid)
@@ -55,7 +56,7 @@ public abstract class GlobalLootModifierProvider implements DataProvider
   protected abstract void start();
 
   @Override
-  public void run(HashCache cache) throws IOException
+  public void run(CachedOutput cache) throws IOException
   {
     start();
 
@@ -69,16 +70,16 @@ public abstract class GlobalLootModifierProvider implements DataProvider
       Path modifierPath = gen.getOutputFolder().resolve(modPath + name + ".json");
 
       JsonObject json = pair.getB();
-      json.addProperty("type", LootModifierManager.SERIALIZER.getKey(pair.getA()).toString());
+      json.addProperty("type", PortingLibRegistries.GLOBAL_LOOT_MODIFIER_SERIALIZERS.get().getKey(pair.getA()).toString());
 
-      DataProvider.save(GSON, cache, json, modifierPath);
+      DataProvider.saveStable(cache, json, modifierPath);
     }));
 
     JsonObject forgeJson = new JsonObject();
     forgeJson.addProperty("replace", this.replace);
     forgeJson.add("entries", GSON.toJsonTree(entries.stream().map(ResourceLocation::toString).collect(Collectors.toList())));
 
-    DataProvider.save(GSON, cache, forgeJson, forgePath);
+    DataProvider.saveStable(cache, forgeJson, forgePath);
   }
 
   /**
@@ -87,9 +88,9 @@ public abstract class GlobalLootModifierProvider implements DataProvider
    * @param modifier      The name of the modifier, which will be the file name.
    * @param serializer    The serializer of this modifier.
    */
-  public <T extends IGlobalLootModifier> void add(String modifier, GlobalLootModifierSerializer<T> serializer, T instance)
+  public <T extends IGlobalLootModifier> void add(String modifier, Codec<T> serializer, T instance)
   {
-    this.toSerialize.put(modifier, new Tuple<>(serializer, serializer.write(instance)));
+    this.toSerialize.put(modifier, new Tuple<>(serializer, serializer.encodeStart(JsonOps.INSTANCE, instance).getOrThrow(false, System.out::println).getAsJsonObject()));
   }
 
   @Override

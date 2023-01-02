@@ -1,9 +1,9 @@
 package slimeknights.mantle.loot.builder;
 
+import com.mojang.serialization.Codec;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import slimeknights.mantle.data.GlobalLootModifierProvider;
-import io.github.fabricators_of_create.porting_lib.loot.GlobalLootModifierSerializer;
 import io.github.fabricators_of_create.porting_lib.loot.LootModifier;
 
 import java.util.function.Function;
@@ -12,7 +12,7 @@ import java.util.function.Function;
 @RequiredArgsConstructor(staticName = "builder")
 public class GenericLootModifierBuilder<T extends LootModifier> extends AbstractLootModifierBuilder<GenericLootModifierBuilder<T>> {
   /** Serializer instance for this loot modifier */
-  private final GlobalLootModifierSerializer<T> serializer;
+  private final Codec<T> serializer;
   /** Constructor for the loot modifier */
   private final Function<LootItemCondition[],T> constructor;
 

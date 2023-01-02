@@ -12,11 +12,9 @@ import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.ResourceLocationArgument;
 import net.minecraft.core.Registry;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.tags.Tag;
 import net.minecraft.tags.TagKey;
 import net.minecraft.tags.TagManager;
 import net.minecraft.util.GsonHelper;
@@ -39,8 +37,8 @@ import java.util.List;
 /** Command that dumps a tag into a JSON object */
 public class DumpTagCommand {
   protected static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-  private static final Dynamic2CommandExceptionType ERROR_READING_TAG = new Dynamic2CommandExceptionType((type, name) -> new TranslatableComponent("command.mantle.dump_tag.read_error", type, name));
-  private static final Component SUCCESS_LOG = new TranslatableComponent("command.mantle.dump_tag.success_log");
+  private static final Dynamic2CommandExceptionType ERROR_READING_TAG = new Dynamic2CommandExceptionType((type, name) -> Component.translatable("command.mantle.dump_tag.read_error", type, name));
+  private static final Component SUCCESS_LOG = Component.translatable("command.mantle.dump_tag.success_log");
 
   /**
    * Registers this sub command with the root command
@@ -134,10 +132,10 @@ public class DumpTagCommand {
       } catch (IOException ex) {
         Mantle.logger.error("Couldn't save {} tag {} to {}", regName, name, outputPath, ex);
       }
-      context.getSource().sendSuccess(new TranslatableComponent("command.mantle.dump_tag.success_log", regName, name, DumpAllTagsCommand.getOutputComponent(output)), true);
+      context.getSource().sendSuccess(Component.translatable("command.mantle.dump_tag.success_log", regName, name, DumpAllTagsCommand.getOutputComponent(output)), true);
     } else {
       // print to console
-      Component message = new TranslatableComponent("command.mantle.dump_tag.success", regName, name);
+      Component message = Component.translatable("command.mantle.dump_tag.success", regName, name);
       context.getSource().sendSuccess(message, true);
       Mantle.logger.info("Tag dump of {} tag '{}':\n{}", regName, name, GSON.toJson(builder.serializeToJson()));
     }

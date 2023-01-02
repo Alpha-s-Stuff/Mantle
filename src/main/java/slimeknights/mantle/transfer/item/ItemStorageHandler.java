@@ -11,6 +11,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -38,10 +39,11 @@ public class ItemStorageHandler implements IItemHandlerModifiable {
 		List<ItemStack> stacks = new ArrayList<>();
 		List<Long> capacities = new ArrayList<>();
 		try (Transaction t = TransferUtil.getTransaction()) {
-			for (StorageView<ItemVariant> view : storage.iterable(t)) {
-				stacks.add(view.getResource().toStack((int) view.getAmount()));
-				capacities.add(view.getCapacity());
-			}
+      for (Iterator<StorageView<ItemVariant>> it = storage.iterator(); it.hasNext(); ) {
+        StorageView<ItemVariant> view = it.next();
+        stacks.add(view.getResource().toStack((int) view.getAmount()));
+        capacities.add(view.getCapacity());
+      }
 			t.abort();
 		}
 		this.stacks = stacks.toArray(ItemStack[]::new);
@@ -116,17 +118,18 @@ public class ItemStorageHandler implements IItemHandlerModifiable {
 		ItemStack finalVal = ItemStack.EMPTY;
 		try (Transaction t = TransferUtil.getTransaction()) {
 			int index = 0;
-			for (StorageView<ItemVariant> view : storage.iterable(t)) {
-				if (index == slot) {
-					ItemVariant variant = view.getResource();
-					long extracted = view.isResourceBlank() ? 0 : view.extract(variant, amount, t);
-					if (extracted != 0) {
-						finalVal = variant.toStack((int) extracted);
-					}
-					break;
-				}
-				index++;
-			}
+      for (Iterator<StorageView<ItemVariant>> it = storage.iterator(); it.hasNext(); ) {
+        StorageView<ItemVariant> view = it.next();
+        if (index == slot) {
+          ItemVariant variant = view.getResource();
+          long extracted = view.isResourceBlank() ? 0 : view.extract(variant, amount, t);
+          if (extracted != 0) {
+            finalVal = variant.toStack((int) extracted);
+          }
+          break;
+        }
+        index++;
+      }
 			if (sim) t.abort();
 			else {
 				t.commit();

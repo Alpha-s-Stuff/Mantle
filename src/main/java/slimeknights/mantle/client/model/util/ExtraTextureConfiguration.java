@@ -1,10 +1,10 @@
 package slimeknights.mantle.client.model.util;
 
 import com.google.common.collect.ImmutableMap;
+import io.github.fabricators_of_create.porting_lib.model.geometry.IGeometryBakingContext;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.resources.ResourceLocation;
-import io.github.fabricators_of_create.porting_lib.model.IModelConfiguration;
 
 import java.util.Map;
 
@@ -19,7 +19,7 @@ public class ExtraTextureConfiguration extends ModelConfigurationWrapper {
    * @param base      Base configuration
    * @param textures  Textures map, any textures in this map will take precedence over those in the base configuration
    */
-  public ExtraTextureConfiguration(IModelConfiguration base, Map<String,Material> textures) {
+  public ExtraTextureConfiguration(IGeometryBakingContext base, Map<String,Material> textures) {
     super(base);
     this.textures = textures;
   }
@@ -30,22 +30,22 @@ public class ExtraTextureConfiguration extends ModelConfigurationWrapper {
    * @param name     Texture name, if it matches texture is returned
    * @param texture  Texture path
    */
-  public ExtraTextureConfiguration(IModelConfiguration base, String name, ResourceLocation texture) {
+  public ExtraTextureConfiguration(IGeometryBakingContext base, String name, ResourceLocation texture) {
     super(base);
     this.textures = ImmutableMap.of(name, new Material(TextureAtlas.LOCATION_BLOCKS, texture));
   }
 
   @Override
-  public Material resolveTexture(String name) {
+  public Material getMaterial(String name) {
     Material connected = textures.get(name);
     if (connected != null) {
       return connected;
     }
-    return super.resolveTexture(name);
+    return super.getMaterial(name);
   }
 
   @Override
-  public boolean isTexturePresent(String name) {
-    return textures.containsKey(name) || super.isTexturePresent(name);
+  public boolean hasMaterial(String name) {
+    return textures.containsKey(name) || super.hasMaterial(name);
   }
 }

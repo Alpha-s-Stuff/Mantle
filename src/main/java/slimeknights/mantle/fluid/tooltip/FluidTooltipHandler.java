@@ -14,7 +14,6 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Registry;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -192,9 +191,9 @@ public class FluidTooltipHandler extends SimpleJsonResourceReloadListener implem
     // material
     appendMaterial(fluid.getFluid(), amount, tooltip);
     // add mod display name
-    FabricLoader.getInstance().getModContainer(Objects.requireNonNull(fluid.getFluid().getRegistryName()).getNamespace())
+    FabricLoader.getInstance().getModContainer(Objects.requireNonNull(Registry.FLUID.getKey(fluid.getFluid())).getNamespace())
            .map(container -> container.getMetadata().getName())
-           .ifPresent(name -> tooltip.add(new TextComponent(name).withStyle(ChatFormatting.BLUE, ChatFormatting.ITALIC)));
+           .ifPresent(name -> tooltip.add(Component.literal(name).withStyle(ChatFormatting.BLUE, ChatFormatting.ITALIC)));
     return tooltip;
   }
 
@@ -246,7 +245,7 @@ public class FluidTooltipHandler extends SimpleJsonResourceReloadListener implem
    */
   public static void appendShift(List<Component> tooltip) {
     if(!SafeClientAccess.getTooltipKey().isShiftOrUnknown()) {
-      tooltip.add(TextComponent.EMPTY);
+      tooltip.add(Component.empty());
       tooltip.add(HOLD_SHIFT);
     }
   }

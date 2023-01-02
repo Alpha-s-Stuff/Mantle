@@ -3,13 +3,13 @@ package slimeknights.mantle.client.model.util;
 import javax.annotation.Nullable;
 
 import java.util.List;
-import java.util.Random;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.fabric.api.renderer.v1.model.ForwardingBakedModel;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.state.BlockState;
 import com.mojang.math.Transformation;
 import net.minecraft.client.renderer.block.model.BakedQuad;
@@ -21,20 +21,20 @@ import net.minecraft.core.Direction;
 import io.github.fabricators_of_create.porting_lib.render.TransformTypeDependentItemBakedModel;
 
 public class BakedItemModel implements BakedModel, TransformTypeDependentItemBakedModel {
-  protected final ImmutableList<BakedQuad> quads;
+  protected final List<BakedQuad> quads;
   protected final TextureAtlasSprite particle;
   protected final ImmutableMap<TransformType, Transformation> transforms;
   protected final ItemOverrides overrides;
   protected final BakedModel guiModel;
-  protected final boolean isSideLit;
+  protected final boolean useBlockLight;
 
-  public BakedItemModel(ImmutableList<BakedQuad> quads, TextureAtlasSprite particle, ImmutableMap<TransformType, Transformation> transforms, ItemOverrides overrides, boolean untransformed, boolean isSideLit)
+  public BakedItemModel(List<BakedQuad> quads, TextureAtlasSprite particle, ImmutableMap<TransformType, Transformation> transforms, ItemOverrides overrides, boolean untransformed, boolean useBlockLight)
   {
     this.quads = quads;
     this.particle = particle;
     this.transforms = transforms;
     this.overrides = overrides;
-    this.isSideLit = isSideLit;
+    this.useBlockLight = useBlockLight;
     this.guiModel = untransformed && hasGuiIdentity(transforms) ? new BakedGuiItemModel<>(this) : null;
   }
 
@@ -46,7 +46,7 @@ public class BakedItemModel implements BakedModel, TransformTypeDependentItemBak
 
   @Override public boolean useAmbientOcclusion() { return true; }
   @Override public boolean isGui3d() { return false; }
-  @Override public boolean usesBlockLight() { return isSideLit; }
+  @Override public boolean usesBlockLight() { return useBlockLight; }
   @Override public boolean isCustomRenderer() { return false; }
   @Override public TextureAtlasSprite getParticleIcon() { return particle; }
 
@@ -58,7 +58,7 @@ public class BakedItemModel implements BakedModel, TransformTypeDependentItemBak
   @Override public ItemOverrides getOverrides() { return overrides; }
 
   @Override
-  public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, Random rand)
+  public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, RandomSource rand)
   {
     if (side == null)
     {
@@ -96,7 +96,7 @@ public class BakedItemModel implements BakedModel, TransformTypeDependentItemBak
     }
 
     @Override
-    public List<BakedQuad> getQuads (@Nullable BlockState state, @Nullable Direction side, Random rand)
+    public List<BakedQuad> getQuads (@Nullable BlockState state, @Nullable Direction side, RandomSource rand)
     {
       if(side == null)
       {

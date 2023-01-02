@@ -58,15 +58,14 @@ public abstract class MergingJsonDataLoader<B> implements ResourceManagerReloadL
   @Override
   public void onResourceManagerReload(ResourceManager manager) {
     Map<ResourceLocation,B> map = new HashMap<>();
-    for (ResourceLocation filePath : manager.listResources(folder, fileName -> fileName.endsWith(".json"))) {
+    for (ResourceLocation filePath : manager.listResources(folder, fileName -> fileName.getPath().endsWith(".json"))) {
       String path = filePath.getPath();
       ResourceLocation id = new ResourceLocation(filePath.getNamespace(), path.substring(folder.length() + 1, path.length() - JSON_LENGTH));
 
       try {
         for (Resource resource : manager.getResources(filePath)) {
           try (
-            InputStream inputstream = resource.getInputStream();
-            Reader reader = new BufferedReader(new InputStreamReader(inputstream, StandardCharsets.UTF_8))
+            Reader reader = resource.openAsReader()
           ) {
             JsonElement json = GsonHelper.fromJson(gson, reader, JsonElement.class);
             if (json == null) {

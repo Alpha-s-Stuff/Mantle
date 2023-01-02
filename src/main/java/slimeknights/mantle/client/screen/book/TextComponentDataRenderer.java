@@ -9,7 +9,6 @@ import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
-import net.minecraft.network.chat.TextComponent;
 import slimeknights.mantle.client.book.data.element.TextComponentData;
 
 import java.util.ArrayList;
@@ -142,8 +141,8 @@ public class TextComponentDataRenderer {
     }
 
     if (BookScreen.debug && !action.isEmpty()) {
-      tooltip.add(TextComponent.EMPTY);
-      tooltip.add(new TextComponent("Action: " + action).withStyle(ChatFormatting.GRAY));
+      tooltip.add(Component.empty());
+      tooltip.add(Component.literal("Action: " + action).withStyle(ChatFormatting.GRAY));
     }
 
     return action;

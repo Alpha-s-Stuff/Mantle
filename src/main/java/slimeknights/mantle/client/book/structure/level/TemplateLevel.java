@@ -21,12 +21,14 @@ import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkSource;
+import net.minecraft.world.level.dimension.BuiltinDimensionTypes;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.entity.LevelEntityGetter;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.StructureBlockInfo;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.scores.Scoreboard;
 import net.minecraft.world.ticks.BlackholeTickAccess;
 import net.minecraft.world.ticks.LevelTickAccess;
@@ -52,8 +54,8 @@ public class TemplateLevel extends Level {
 
   public TemplateLevel(List<StructureBlockInfo> blocks, Predicate<BlockPos> shouldShow) {
     super(
-      new FakeLevelData(), Level.OVERWORLD, Objects.requireNonNull(Minecraft.getInstance().level).registryAccess().registryOrThrow(Registry.DIMENSION_TYPE_REGISTRY).getHolderOrThrow(DimensionType.OVERWORLD_LOCATION),
-      () -> InactiveProfiler.INSTANCE, true, false, 0
+      new FakeLevelData(), Level.OVERWORLD, Objects.requireNonNull(Minecraft.getInstance().level).registryAccess().registryOrThrow(Registry.DIMENSION_TYPE_REGISTRY).getHolderOrThrow(BuiltinDimensionTypes.OVERWORLD),
+      () -> InactiveProfiler.INSTANCE, true, false, 0, 0
     );
 
     this.chunkSource = new TemplateChunkSource(blocks, this, shouldShow);
@@ -61,6 +63,16 @@ public class TemplateLevel extends Level {
 
   @Override
   public void sendBlockUpdated(@Nonnull BlockPos pos, @Nonnull BlockState oldState, @Nonnull BlockState newState, int flags) {
+  }
+
+  @Override
+  public void playSeededSound(@org.jetbrains.annotations.Nullable Player player, double d, double e, double f, SoundEvent soundEvent, SoundSource soundSource, float g, float h, long l) {
+
+  }
+
+  @Override
+  public void playSeededSound(@org.jetbrains.annotations.Nullable Player player, Entity entity, SoundEvent soundEvent, SoundSource soundSource, float f, float g, long l) {
+
   }
 
   @Override
@@ -138,12 +150,13 @@ public class TemplateLevel extends Level {
   }
 
   @Override
-  public void levelEvent(@Nullable Player player, int type, @Nonnull BlockPos pos, int data) {
-  }
+  public void levelEvent(@Nullable Player player, int type, @Nonnull BlockPos pos, int data) {}
 
   @Override
-  public void gameEvent(@Nullable Entity pEntity, GameEvent pEvent, BlockPos pPos) {
-  }
+  public void gameEvent(GameEvent gameEvent, Vec3 vec3, GameEvent.Context context) {}
+
+  @Override
+  public void gameEvent(@Nullable Entity pEntity, GameEvent pEvent, BlockPos pPos) {}
 
   @Nonnull
   @Override

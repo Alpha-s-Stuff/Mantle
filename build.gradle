@@ -8,13 +8,14 @@
 
 //file:noinspection GroovyAssignabilityCheck
 plugins {
-    id 'fabric-loom' version '0.12-SNAPSHOT'
+    id 'fabric-loom' version '1.0-SNAPSHOT'
     id 'maven-publish'
     id 'io.github.juuxel.loom-quiltflower' version '1.+'
     id 'org.quiltmc.quilt-mappings-on-loom' version '4.+'
 }
 
 repositories {
+    mavenLocal()
     mavenCentral()
     maven { url = "https://maven.parchmentmc.org" }
     maven { url = "https://maven.shedaniel.me/" }
@@ -115,7 +116,7 @@ dependencies {
     modImplementation(include("io.github.ladysnake:satin:${project.satin_version}"))
 
     modImplementation(include("me.alphamode:ForgeTags:2.1"))
-    modImplementation(include("io.github.fabricators_of_create:Porting-Lib:${project.port_lib_version}+1.18.2-dev.${project.port_lib_hash}"))
+    modImplementation(include("io.github.fabricators_of_create.Porting-Lib:porting-lib:${project.port_lib_version}+1.19.2"))
 
     // compile against the REI API but do not include it at runtime
     modCompileOnly("me.shedaniel:RoughlyEnoughItems-api-fabric:${project.rei_version}") { transitive = false }

@@ -32,7 +32,7 @@ public class JEIPlugin implements IModPlugin {
 
   @Override
   public void registerVanillaCategoryExtensions(IVanillaCategoryExtensionRegistration registry) {
-    registry.getCraftingCategory().addCategoryExtension(ShapedRetexturedRecipe.class, RetexturableRecipeExtension::new);
+//    registry.getCraftingCategory().addCategoryExtension(ShapedRetexturedRecipe.class, RetexturableRecipeExtension::new);
   }
 
   @SuppressWarnings({"unchecked", "rawtypes"})
@@ -43,7 +43,7 @@ public class JEIPlugin implements IModPlugin {
 
   @Override
   public void registerRecipes(IRecipeRegistration registry) {
-    vanillaCraftingHelper = registry.getJeiHelpers().getGuiHelper().createCraftingGridHelper(1);
+    vanillaCraftingHelper = registry.getJeiHelpers().getGuiHelper().createCraftingGridHelper();
     modIdHelper = registry.getJeiHelpers().getModIdHelper();
   }
 

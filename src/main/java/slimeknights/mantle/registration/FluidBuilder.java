@@ -1,6 +1,5 @@
 package slimeknights.mantle.registration;
 
-import io.github.fabricators_of_create.porting_lib.util.FluidAttributes;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -20,7 +19,7 @@ import java.util.function.Supplier;
 @Setter
 @RequiredArgsConstructor
 public class FluidBuilder {
-  private final FluidAttributes.Builder attributes;
+  private final FluidAttributeBuilder attributes;
   private boolean canMultiply = false;
   private Supplier<? extends Item> bucket;
   private Supplier<? extends LiquidBlock> block;

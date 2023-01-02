@@ -4,9 +4,14 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import com.mojang.datafixers.util.Pair;
+import io.github.fabricators_of_create.porting_lib.model.geometry.IGeometryBakingContext;
+import io.github.fabricators_of_create.porting_lib.model.geometry.IGeometryLoader;
+import io.github.fabricators_of_create.porting_lib.model.geometry.IUnbakedGeometry;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.fabricmc.fabric.api.renderer.v1.model.ForwardingBakedModel;
+import net.fabricmc.fabric.api.resource.SimpleResourceReloadListener;
+import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -20,10 +25,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.level.material.Fluid;
+import slimeknights.mantle.Mantle;
 import slimeknights.mantle.client.model.util.ModelHelper;
-import io.github.fabricators_of_create.porting_lib.model.IModelConfiguration;
-import io.github.fabricators_of_create.porting_lib.model.IModelGeometry;
-import io.github.fabricators_of_create.porting_lib.model.IModelLoader;
 import slimeknights.mantle.registration.ModelFluidAttributes;
 import slimeknights.mantle.registration.ModelFluidAttributes.IFluidModelProvider;
 
@@ -37,7 +40,7 @@ import java.util.function.Function;
 
 /** Fluid model that allows a resource pack to control the textures of a block. Use alongside {@link ModelFluidAttributes} */
 @RequiredArgsConstructor
-public class FluidTextureModel implements IModelGeometry<FluidTextureModel> {
+public class FluidTextureModel implements IUnbakedGeometry<FluidTextureModel> {
   public static Loader LOADER = new Loader();
 
   private final int color;
@@ -48,8 +51,8 @@ public class FluidTextureModel implements IModelGeometry<FluidTextureModel> {
   }
 
   /** Gets the texture, or null if missing */
-  private static void getTexture(IModelConfiguration owner, String name, Collection<Material> textures, Set<Pair<String,String>> missingTextureErrors) {
-    Material material = owner.resolveTexture(name);
+  private static void getTexture(IGeometryBakingContext owner, String name, Collection<Material> textures, Set<Pair<String,String>> missingTextureErrors) {
+    Material material = owner.getMaterial(name);
     if (isMissing(material)) {
       missingTextureErrors.add(Pair.of(name, owner.getModelName()));
     }
@@ -57,11 +60,11 @@ public class FluidTextureModel implements IModelGeometry<FluidTextureModel> {
   }
 
   @Override
-  public Collection<Material> getTextures(IModelConfiguration owner, Function<ResourceLocation,UnbakedModel> modelGetter, Set<Pair<String,String>> missingTextureErrors) {
+  public Collection<Material> getMaterials(IGeometryBakingContext owner, Function<ResourceLocation,UnbakedModel> modelGetter, Set<Pair<String,String>> missingTextureErrors) {
     Set<Material> textures = new HashSet<>();
     getTexture(owner, "still", textures, missingTextureErrors);
     getTexture(owner, "flowing", textures, missingTextureErrors);
-    Material overlay = owner.resolveTexture("overlay");
+    Material overlay = owner.getMaterial("overlay");
     if (!isMissing(overlay)) {
       textures.add(overlay);
     }
@@ -69,12 +72,12 @@ public class FluidTextureModel implements IModelGeometry<FluidTextureModel> {
   }
 
   @Override
-  public BakedModel bake(IModelConfiguration owner, ModelBakery bakery, Function<Material,TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides, ResourceLocation modelLocation) {
-    Material still = owner.resolveTexture("still");
-    Material flowing = owner.resolveTexture("flowing");
-    Material overlay = owner.resolveTexture("overlay");
+  public BakedModel bake(IGeometryBakingContext owner, ModelBakery bakery, Function<Material,TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides, ResourceLocation modelLocation) {
+    Material still = owner.getMaterial("still");
+    Material flowing = owner.getMaterial("flowing");
+    Material overlay = owner.getMaterial("overlay");
     ResourceLocation overlayLocation = isMissing(overlay) ? null : overlay.texture();
-    BakedModel baked = new SimpleBakedModel.Builder(owner.useSmoothLighting(), owner.isSideLit(), owner.isShadedInGui(), owner.getCameraTransforms(), overrides).particle(spriteGetter.apply(still)).build();
+    BakedModel baked = new SimpleBakedModel.Builder(owner.useAmbientOcclusion(), owner.useBlockLight(), owner.isGui3d(), owner.getTransforms(), overrides).particle(spriteGetter.apply(still)).build();
     return new Baked(baked, still.texture(), flowing.texture(), overlayLocation, color);
   }
 
@@ -98,7 +101,7 @@ public class FluidTextureModel implements IModelGeometry<FluidTextureModel> {
   }
 
   /** Model loader, also doubles as the fluid model provider */
-  private static class Loader implements IModelLoader<FluidTextureModel>, IFluidModelProvider {
+  private static class Loader implements IGeometryLoader<FluidTextureModel>, IFluidModelProvider, SimpleSynchronousResourceReloadListener {
     private final Map<Fluid,Baked> modelCache = new ConcurrentHashMap<>();
 
     /** Gets a model for a fluid */
@@ -146,7 +149,7 @@ public class FluidTextureModel implements IModelGeometry<FluidTextureModel> {
     }
 
     @Override
-    public FluidTextureModel read(JsonDeserializationContext deserializationContext, JsonObject modelContents) {
+    public FluidTextureModel read(JsonObject modelContents, JsonDeserializationContext deserializationContext) {
       int color = -1;
       if (modelContents.has("color")) {
         String colorString = GsonHelper.getAsString(modelContents, "color");
@@ -166,6 +169,11 @@ public class FluidTextureModel implements IModelGeometry<FluidTextureModel> {
         }
       }
       return new FluidTextureModel(color);
+    }
+
+    @Override
+    public ResourceLocation getFabricId() {
+      return Mantle.getResource("fluid_texture_model_loader");
     }
   }
 }

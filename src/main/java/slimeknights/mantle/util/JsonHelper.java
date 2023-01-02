@@ -229,7 +229,7 @@ public class JsonHelper {
    */
   @Nullable
   public static JsonObject getJson(Resource resource) {
-    try (BufferedReader reader = new BufferedReader(new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8))) {
+    try (BufferedReader reader = resource.openAsReader()) {
       return GsonHelper.parse(reader);
     } catch (JsonParseException | IOException e) {
       Mantle.logger.error("Failed to load JSON from resource " + resource.getLocation(), e);

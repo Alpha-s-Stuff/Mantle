@@ -1,6 +1,5 @@
 package slimeknights.mantle.fluid;
 
-import io.github.fabricators_of_create.porting_lib.util.FluidAttributes;
 import lombok.AllArgsConstructor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -14,16 +13,18 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import slimeknights.mantle.registration.FluidAttributeBuilder;
+import slimeknights.mantle.registration.FluidAttributeSupplier;
 
 import java.util.function.Supplier;
 
 /** Fluid with a bucket form, but no block form (hence no flowing) */
 @AllArgsConstructor
-public class UnplaceableFluid extends Fluid {
+public class UnplaceableFluid extends Fluid implements FluidAttributeSupplier {
   /** Bucket form of the liquid, use a supplier to air if no bucket form */
   private final Supplier<? extends Item> bucket;
   /** Forge fluid attributes builder */
-  private final FluidAttributes.Builder builder;
+  private final FluidAttributeBuilder builder;
 
   @Override
   public Item getBucket() {
@@ -51,9 +52,9 @@ public class UnplaceableFluid extends Fluid {
   }
 
   @Override
-  public FluidAttributes createAttributes()
+  public FluidAttributeBuilder getAttributeBuilder()
   {
-    return builder.build(this);
+    return builder;
   }
 
   /* Required methods */

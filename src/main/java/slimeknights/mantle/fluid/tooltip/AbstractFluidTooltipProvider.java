@@ -5,8 +5,8 @@ import com.google.gson.JsonObject;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.Util;
+import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataGenerator;
-import net.minecraft.data.HashCache;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.tags.TagKey;
@@ -34,7 +34,7 @@ public abstract class AbstractFluidTooltipProvider extends GenericDataProvider {
   protected abstract void addFluids();
 
   @Override
-  public final void run(HashCache cache) throws IOException {
+  public final void run(CachedOutput cache) throws IOException {
     addFluids();
     builders.forEach((key, builder) -> saveThing(cache, key, builder.build()));
     redirects.forEach((key, target) -> {

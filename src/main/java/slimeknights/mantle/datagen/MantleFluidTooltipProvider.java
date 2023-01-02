@@ -1,6 +1,5 @@
 package slimeknights.mantle.datagen;
 
-import io.github.fabricators_of_create.porting_lib.util.FluidAttributes;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.minecraft.data.DataGenerator;
 import slimeknights.mantle.Mantle;

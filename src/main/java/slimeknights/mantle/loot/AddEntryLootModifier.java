@@ -2,28 +2,30 @@ package slimeknights.mantle.loot;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.Dynamic;
+import com.mojang.serialization.JsonOps;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import io.github.fabricators_of_create.porting_lib.loot.IGlobalLootModifier;
+import io.github.fabricators_of_create.porting_lib.loot.LootModifier;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.storage.loot.Deserializers;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.entries.LootPoolEntryContainer;
-import net.minecraft.world.level.storage.loot.Deserializers;
-import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunction;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunctions;
-import net.minecraft.util.GsonHelper;
-import net.minecraft.resources.ResourceLocation;
-import slimeknights.mantle.Mantle;
+import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import slimeknights.mantle.data.GlobalLootModifierProvider;
-import io.github.fabricators_of_create.porting_lib.loot.GlobalLootModifierSerializer;
-import io.github.fabricators_of_create.porting_lib.loot.LootModifier;
 import slimeknights.mantle.loot.builder.AbstractLootModifierBuilder;
-import slimeknights.mantle.loot.condition.EmptyModifierLootCondition;
 import slimeknights.mantle.loot.condition.ILootModifierCondition;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -31,6 +33,41 @@ import java.util.function.Consumer;
 /** Loot modifier to inject an additional loot entry into an existing table */
 public class AddEntryLootModifier extends LootModifier {
 	static final Gson GSON = Deserializers.createFunctionSerializer().registerTypeHierarchyAdapter(ILootModifierCondition.class, ILootModifierCondition.MODIFIER_CONDITIONS).create();
+
+  public static final Codec<AddEntryLootModifier> CODEC = RecordCodecBuilder.create(inst -> {
+    Codec<ILootModifierCondition[]> modifierConditionsCodec = Codec.PASSTHROUGH.flatXmap(dynamic -> {
+      JsonObject object = IGlobalLootModifier.getJson(dynamic).getAsJsonObject();
+      ILootModifierCondition[] modifierConditions;
+      if (object.has("post_conditions")) {
+        modifierConditions = GSON.fromJson(GsonHelper.getAsJsonArray(object, "modifier_conditions"), ILootModifierCondition[].class);
+      } else {
+        modifierConditions = new ILootModifierCondition[0];
+      }
+      return DataResult.success(modifierConditions);
+    }, modifierConditions -> DataResult.success(new Dynamic<>(JsonOps.INSTANCE, GSON.toJsonTree(modifierConditions, ILootModifierCondition[].class))));
+    Codec<LootPoolEntryContainer> entryCodec = Codec.PASSTHROUGH.flatXmap(dynamic -> {
+      JsonObject object = IGlobalLootModifier.getJson(dynamic).getAsJsonObject();
+
+      return DataResult.success(GSON.fromJson(GsonHelper.getAsJsonObject(object, "entry"), LootPoolEntryContainer.class));
+    }, entry -> {
+      return DataResult.success(new Dynamic<>(JsonOps.INSTANCE, GSON.toJsonTree(entry, LootPoolEntryContainer.class)));
+    });
+    Codec<LootItemFunction[]> functionsCodec = Codec.PASSTHROUGH.flatXmap(dynamic -> {
+      JsonObject object = IGlobalLootModifier.getJson(dynamic).getAsJsonObject();
+      LootItemFunction[] functions;
+      if (object.has("functions")) {
+        functions = GSON.fromJson(GsonHelper.getAsJsonArray(object, "functions"), LootItemFunction[].class);
+      } else {
+        functions = new LootItemFunction[0];
+      }
+      return DataResult.success(functions);
+    }, functions -> {
+
+      return DataResult.success(new Dynamic<>(JsonOps.INSTANCE, GSON.toJsonTree(functions, LootItemFunction[].class)));
+    });
+    return codecStart(inst).and(modifierConditionsCodec.fieldOf("modifier_conditions").forGetter(o -> o.modifierConditions)).and(entryCodec.fieldOf("entry").forGetter(o -> o.entry)).and(functionsCodec.fieldOf("functions").forGetter(o -> o.functions))
+      .apply(inst, AddEntryLootModifier::new);
+  });
 
   /** Additional conditions that can consider the previously generated loot */
   private final ILootModifierCondition[] modifierConditions;
@@ -61,7 +98,7 @@ public class AddEntryLootModifier extends LootModifier {
 
   @Nonnull
 	@Override
-	protected List<ItemStack> doApply(List<ItemStack> generatedLoot, LootContext context) {
+	protected ObjectArrayList<ItemStack> doApply(ObjectArrayList<ItemStack> generatedLoot, LootContext context) {
     // if any condition fails, exit immediately
     for (ILootModifierCondition modifierCondition : modifierConditions) {
       if (!modifierCondition.test(generatedLoot, context)) {
@@ -74,42 +111,10 @@ public class AddEntryLootModifier extends LootModifier {
 		return generatedLoot;
 	}
 
-	public static class Serializer extends GlobalLootModifierSerializer<AddEntryLootModifier> {
-		@Override
-		public AddEntryLootModifier read(ResourceLocation location, JsonObject object, LootItemCondition[] conditions) {
-			LootPoolEntryContainer entry = GSON.fromJson(GsonHelper.getAsJsonObject(object, "entry"), LootPoolEntryContainer.class);
-
-      // loot modifier conditions
-      ILootModifierCondition[] modifierConditions;
-      if (object.has("post_conditions")) {
-        modifierConditions = GSON.fromJson(GsonHelper.getAsJsonArray(object, "modifier_conditions"), ILootModifierCondition[].class);
-      } else {
-        modifierConditions = new ILootModifierCondition[0];
-      }
-
-      // functions
-      LootItemFunction[] functions;
-			if (object.has("functions")) {
-				functions = GSON.fromJson(GsonHelper.getAsJsonArray(object, "functions"), LootItemFunction[].class);
-			} else {
-				functions = new LootItemFunction[0];
-			}
-			return new AddEntryLootModifier(conditions, modifierConditions, entry, functions);
-		}
-
-		@Override
-		public JsonObject write(AddEntryLootModifier instance) {
-			JsonObject object = makeConditions(instance.conditions);
-      if (instance.modifierConditions.length > 0) {
-        object.add("modifier_conditions", GSON.toJsonTree(instance.modifierConditions, ILootModifierCondition[].class));
-      }
-			object.add("entry", GSON.toJsonTree(instance.entry, LootPoolEntryContainer.class));
-      if (instance.functions.length > 0) {
-        object.add("functions", GSON.toJsonTree(instance.functions, LootItemFunction[].class));
-      }
-			return object;
-		}
-	}
+  @Override
+  public Codec<AddEntryLootModifier> codec() {
+    return CODEC;
+  }
 
   /** Builder for a conditional loot entry */
   @RequiredArgsConstructor(access = AccessLevel.PRIVATE)

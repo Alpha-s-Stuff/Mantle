@@ -1,17 +1,26 @@
 package slimeknights.mantle.data;
 
+import com.google.common.hash.Hashing;
+import com.google.common.hash.HashingOutputStream;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.stream.JsonWriter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.HashCache;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
+import net.minecraft.util.GsonHelper;
 
 import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -46,20 +55,16 @@ public abstract class GenericDataProvider implements DataProvider {
     this(generator, folder, GSON);
   }
 
-  protected void saveThing(HashCache cache, ResourceLocation location, Object materialJson) {
+  protected void saveThing(CachedOutput cache, ResourceLocation location, Object materialJson) {
     try {
       String json = gson.toJson(materialJson);
       Path path = this.generator.getOutputFolder().resolve(Paths.get(type.getDirectory(), location.getNamespace(), folder, location.getPath() + ".json"));
-      String hash = SHA1.hashUnencodedChars(json).toString();
-      if (!Objects.equals(cache.getHash(path), hash) || !Files.exists(path)) {
-        Files.createDirectories(path.getParent());
-
-        try (BufferedWriter bufferedwriter = Files.newBufferedWriter(path)) {
-          bufferedwriter.write(json);
-        }
-      }
-
-      cache.putNew(path, hash);
+      ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+      HashingOutputStream hashingOutputStream = new HashingOutputStream(Hashing.sha1(), byteArrayOutputStream);
+      Writer writer = new OutputStreamWriter(hashingOutputStream, StandardCharsets.UTF_8);
+      writer.write(json);
+      writer.close();
+      cache.writeIfNeeded(path, byteArrayOutputStream.toByteArray(), hashingOutputStream.hash());
     } catch (IOException e) {
       log.error("Couldn't create data for {}", location, e);
     }

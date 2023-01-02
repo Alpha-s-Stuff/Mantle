@@ -59,8 +59,7 @@ public class ItemHandlerStorage implements Storage<ItemVariant> {
 		return extracted.getCount();
 	}
 
-	@Override
-	public Iterable<StorageView<ItemVariant>> iterable(TransactionContext transaction) {
+	public Iterable<StorageView<ItemVariant>> iterable() {
 		int slots = handler.getSlots();
 		List<StorageView<ItemVariant>> views = new ArrayList<>();
 		for (int i = 0; i < slots; i++) {
@@ -70,14 +69,14 @@ public class ItemHandlerStorage implements Storage<ItemVariant> {
 	}
 
 	@Override
-	public Iterator<StorageView<ItemVariant>> iterator(TransactionContext transaction) {
-		return iterable(transaction).iterator();
+	public Iterator<StorageView<ItemVariant>> iterator() {
+		return iterable().iterator();
 	}
 
 	@Override
 	@Nullable
-	public StorageView<ItemVariant> exactView(TransactionContext transaction, ItemVariant resource) {
-		for (StorageView<ItemVariant> view : iterable(transaction)) {
+	public StorageView<ItemVariant> exactView(ItemVariant resource) {
+		for (StorageView<ItemVariant> view : iterable()) {
 			if (view.getResource().equals(resource)) {
 				return view;
 			}

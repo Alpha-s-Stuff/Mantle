@@ -35,11 +35,9 @@ public class SlotItemHandlerFabric extends Slot {
 	@Override
 	@Nonnull
 	public ItemStack getItem() {
-    try (Transaction t = TransferUtil.getTransaction()) {
-      if (Iterators.size(getItemHandler().iterator(t)) <= index) return ItemStack.EMPTY;
-      StorageView<ItemVariant> view = Iterators.get(this.getItemHandler().iterator(t), index);
-      return view.getResource().toStack((int) view.getAmount());
-    }
+    if (Iterators.size(getItemHandler().iterator()) <= index) return ItemStack.EMPTY;
+    StorageView<ItemVariant> view = Iterators.get(this.getItemHandler().iterator(), index);
+    return view.getResource().toStack((int) view.getAmount());
 	}
 
 	@Override
@@ -67,29 +65,27 @@ public class SlotItemHandlerFabric extends Slot {
 		ItemStack maxAdd = stack.copy();
 		int maxInput = stack.getMaxStackSize();
 		maxAdd.setCount(maxInput);
-    try (Transaction t = TransferUtil.getTransaction()) {
-      Storage<ItemVariant> handler = this.getItemHandler();
-      StorageView<ItemVariant> slot = Iterators.get(handler.iterator(t), index);
-      ItemStack currentStack = slot.getResource().toStack((int) slot.getAmount());
-      if (handler instanceof InventoryStorage inventoryStorage) {
-        SingleSlotStorage<ItemVariant> slotStorage = inventoryStorage.getSlot(index);
-        TransferUtil.clearStorage(slotStorage);
+    Storage<ItemVariant> handler = this.getItemHandler();
+    StorageView<ItemVariant> slot = Iterators.get(handler.iterator(), index);
+    ItemStack currentStack = slot.getResource().toStack((int) slot.getAmount());
+    if (handler instanceof InventoryStorage inventoryStorage) {
+      SingleSlotStorage<ItemVariant> slotStorage = inventoryStorage.getSlot(index);
+      TransferUtil.clearStorage(slotStorage);
 
-        long remainder = 0;
-        try (Transaction emulate = TransferUtil.getTransaction()) {
-          remainder = TransferUtil.insertItem(inventoryStorage.getSlot(index), maxAdd);
-        }
-        TransferUtil.insertItem(slotStorage, currentStack);
+      long remainder = 0;
+      try (Transaction emulate = TransferUtil.getTransaction()) {
+        remainder = TransferUtil.insertItem(inventoryStorage.getSlot(index), maxAdd);
+      }
+      TransferUtil.insertItem(slotStorage, currentStack);
 
-        return (int) (maxInput - remainder);
-      } else {
-        try (Transaction emulate = TransferUtil.getTransaction()) {
-          long remainder = TransferUtil.insertItem(handler, maxAdd);
+      return (int) (maxInput - remainder);
+    } else {
+      try (Transaction emulate = TransferUtil.getTransaction()) {
+        long remainder = TransferUtil.insertItem(handler, maxAdd);
 
-          int current = currentStack.getCount();
-          long added = maxInput - remainder;
-          return (int) (current + added);
-        }
+        int current = currentStack.getCount();
+        long added = maxInput - remainder;
+        return (int) (current + added);
       }
     }
 	}

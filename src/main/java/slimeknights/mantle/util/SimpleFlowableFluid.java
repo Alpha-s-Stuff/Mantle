@@ -1,6 +1,5 @@
 package slimeknights.mantle.util;
 
-import io.github.fabricators_of_create.porting_lib.util.FluidAttributes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.Item;
@@ -17,6 +16,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
+import slimeknights.mantle.registration.FluidAttributeBuilder;
 
 import javax.annotation.Nullable;
 import java.util.function.Supplier;
@@ -29,7 +29,7 @@ public abstract class SimpleFlowableFluid extends FlowingFluid {
   private final Supplier<? extends Item> bucket;
   @Nullable
   private final Supplier<? extends LiquidBlock> block;
-  private final FluidAttributes.Builder builder;
+  private final FluidAttributeBuilder builder;
   private final boolean infinite;
   private final int flowSpeed;
   private final int levelDecreasePerBlock;
@@ -107,10 +107,9 @@ public abstract class SimpleFlowableFluid extends FlowingFluid {
     }
     return Blocks.AIR.defaultBlockState();
   }
-  
-  @Override
-  public FluidAttributes createAttributes() {
-    return builder.build(this);
+
+  public FluidAttributeBuilder getAttributes() {
+    return builder;
   }
   
   @Override
@@ -160,7 +159,7 @@ public abstract class SimpleFlowableFluid extends FlowingFluid {
   public static class Properties {
     private Supplier<? extends Fluid> still;
     private Supplier<? extends Fluid> flowing;
-    private FluidAttributes.Builder attributes;
+    private FluidAttributeBuilder attributes;
     private boolean infinite;
     private Supplier<? extends Item> bucket;
     private Supplier<? extends LiquidBlock> block;
@@ -169,7 +168,7 @@ public abstract class SimpleFlowableFluid extends FlowingFluid {
     private float blastResistance = 1;
     private int tickRate = 5;
     
-    public Properties(Supplier<? extends Fluid> still, Supplier<? extends Fluid> flowing, FluidAttributes.Builder attributes) {
+    public Properties(Supplier<? extends Fluid> still, Supplier<? extends Fluid> flowing, FluidAttributeBuilder attributes) {
       this.still = still;
       this.flowing = flowing;
       this.attributes = attributes;

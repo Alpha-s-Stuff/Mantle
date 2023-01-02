@@ -11,12 +11,13 @@ import com.mojang.datafixers.util.Pair;
 import com.mojang.math.Transformation;
 import io.github.fabricators_of_create.porting_lib.model.BakedQuadBuilder;
 import io.github.fabricators_of_create.porting_lib.model.CompositeModelState;
-import io.github.fabricators_of_create.porting_lib.model.IModelConfiguration;
-import io.github.fabricators_of_create.porting_lib.model.IModelGeometry;
-import io.github.fabricators_of_create.porting_lib.model.IModelLoader;
 import io.github.fabricators_of_create.porting_lib.model.IVertexConsumer;
+import io.github.fabricators_of_create.porting_lib.model.ItemLayerModel;
 import io.github.fabricators_of_create.porting_lib.model.PerspectiveMapWrapper;
 import io.github.fabricators_of_create.porting_lib.model.TRSRTransformer;
+import io.github.fabricators_of_create.porting_lib.model.geometry.IGeometryBakingContext;
+import io.github.fabricators_of_create.porting_lib.model.geometry.IGeometryLoader;
+import io.github.fabricators_of_create.porting_lib.model.geometry.IUnbakedGeometry;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
@@ -51,7 +52,7 @@ import java.util.function.Function;
  * Also supports luminosity, and when used as a model loader supports telling a layer to not use a tint index
  */
 @RequiredArgsConstructor
-public class MantleItemLayerModel implements IModelGeometry<MantleItemLayerModel> {
+public class MantleItemLayerModel implements IUnbakedGeometry<MantleItemLayerModel> {
   /** Model loader instance */
   public static final Loader LOADER = new Loader();
 
@@ -72,19 +73,19 @@ public class MantleItemLayerModel implements IModelGeometry<MantleItemLayerModel
   }
 
   @Override
-  public Collection<Material> getTextures(IModelConfiguration owner, Function<ResourceLocation,UnbakedModel> modelGetter, Set<Pair<String,String>> missingTextureErrors) {
+  public Collection<Material> getMaterials(IGeometryBakingContext owner, Function<ResourceLocation,UnbakedModel> modelGetter, Set<Pair<String,String>> missingTextureErrors) {
     ImmutableList.Builder<Material> builder = ImmutableList.builder();
-    for (int i = 0; owner.isTexturePresent("layer" + i); i++) {
-      builder.add(owner.resolveTexture("layer" + i));
+    for (int i = 0; owner.hasMaterial("layer" + i); i++) {
+      builder.add(owner.getMaterial("layer" + i));
     }
     textures = builder.build();
     return textures;
   }
 
   @Override
-  public BakedModel bake(IModelConfiguration owner, ModelBakery bakery, Function<Material,TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides, ResourceLocation modelLocation) {
+  public BakedModel bake(IGeometryBakingContext owner, ModelBakery bakery, Function<Material,TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides, ResourceLocation modelLocation) {
     // determine particle texture
-    TextureAtlasSprite particle = spriteGetter.apply(owner.isTexturePresent("particle") ? owner.resolveTexture("particle") : textures.get(0));
+    TextureAtlasSprite particle = spriteGetter.apply(owner.hasMaterial("particle") ? owner.getMaterial("particle") : textures.get(0));
     // bake in special properties
     ReversedListBuilder<BakedQuad> builder = new ReversedListBuilder<>();
     // skip the pixel tracking if using a single texture only
@@ -96,8 +97,8 @@ public class MantleItemLayerModel implements IModelGeometry<MantleItemLayerModel
       builder.addAll(getQuadsForSprite(data.color(), data.noTint() ? -1 : i, sprite, transform, data.luminosity(), pixels));
     }
     // transform data
-    ImmutableMap<ItemTransforms.TransformType,Transformation> transformMap = PerspectiveMapWrapper.getTransforms(new CompositeModelState(owner.getCombinedTransform(), modelTransform));
-    return new BakedItemModel(builder.build(), particle, Maps.immutableEnumMap(transformMap), overrides, true, owner.isSideLit());
+    ImmutableMap<ItemTransforms.TransformType,Transformation> transformMap = PerspectiveMapWrapper.getTransforms(owner.getTransforms()/*new CompositeModelState(owner.getCombinedTransform(), modelTransform)*/);
+    return new BakedItemModel(builder.build(), particle, Maps.immutableEnumMap(transformMap), overrides, true, owner.useBlockLight());
   }
 
   /**
@@ -465,12 +466,9 @@ public class MantleItemLayerModel implements IModelGeometry<MantleItemLayerModel
     }
   }
 
-  private static class Loader implements IModelLoader<MantleItemLayerModel> {
+  private static class Loader implements IGeometryLoader<MantleItemLayerModel> {
     @Override
-    public void onResourceManagerReload(ResourceManager resourceManager) {}
-
-    @Override
-    public MantleItemLayerModel read(JsonDeserializationContext deserializationContext, JsonObject modelContents) {
+    public MantleItemLayerModel read(JsonObject modelContents, JsonDeserializationContext deserializationContext) {
       List<LayerData> layers = JsonHelper.parseList(modelContents, "layers", LayerData::fromJson);
       return new MantleItemLayerModel(layers);
     }

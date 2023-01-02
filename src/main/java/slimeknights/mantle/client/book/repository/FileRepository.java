@@ -77,11 +77,7 @@ public class FileRepository extends BookRepository {
       return null;
     }
 
-    try {
-      return Minecraft.getInstance().getResourceManager().getResource(loc);
-    } catch (IOException e) {
-      return null;
-    }
+    return Minecraft.getInstance().getResourceManager().getResource(loc).orElse(null);
   }
 
   @Override
@@ -89,7 +85,7 @@ public class FileRepository extends BookRepository {
     if (location == null) {
       return false;
     }
-    return Minecraft.getInstance().getResourceManager().hasResource(location);
+    return Minecraft.getInstance().getResourceManager().getResource(location).isPresent();
   }
 
   @Override
@@ -99,7 +95,7 @@ public class FileRepository extends BookRepository {
     }
 
     try {
-      Iterator<String> iterator = IOUtils.readLines(resource.getInputStream(), StandardCharsets.UTF_8).iterator();
+      Iterator<String> iterator = IOUtils.readLines(resource.open(), StandardCharsets.UTF_8).iterator();
       StringBuilder builder = new StringBuilder();
 
       boolean isLongComment = false;

@@ -5,7 +5,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import slimeknights.mantle.block.RetexturedBlock;
 import slimeknights.mantle.client.model.data.SinglePropertyData;
-import io.github.fabricators_of_create.porting_lib.model.IModelData;
 import slimeknights.mantle.util.RetexturedHelper;
 
 /**
@@ -45,7 +44,7 @@ public interface IRetexturedBlockEntity {
    * Gets the model data instance with the relevant texture block
    * @return  Model data for the TE
    */
-  default IModelData getRetexturedModelData() {
+  default SinglePropertyData getRetexturedModelData() {
     // texture not loaded
     Block block = getTexture();
     // cannot support air, saves a conditional on usage

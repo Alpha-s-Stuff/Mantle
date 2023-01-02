@@ -1,8 +1,9 @@
 package slimeknights.mantle.loot;
 
 import com.google.gson.JsonDeserializer;
-import io.github.fabricators_of_create.porting_lib.loot.GlobalLootModifierSerializer;
-import io.github.fabricators_of_create.porting_lib.loot.LootModifierManager;
+import com.mojang.serialization.Codec;
+import io.github.fabricators_of_create.porting_lib.PortingLibRegistries;
+import io.github.fabricators_of_create.porting_lib.loot.IGlobalLootModifier;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import net.minecraft.core.Registry;
@@ -33,17 +34,17 @@ public class MantleLoot {
   public static LootItemFunctionType SET_FLUID_FUNCTION;
 
   /** Loot modifier to get loot from an entry for generated loot */
-  public static AddEntryLootModifier.Serializer ADD_ENTRY;
+  public static Codec<AddEntryLootModifier> ADD_ENTRY;
   /** Loot modifier to replace all instances of one item with another */
-  public static ReplaceItemLootModifier.Serializer REPLACE_ITEM;
+  public static Codec<ReplaceItemLootModifier> REPLACE_ITEM;
 
   /**
    * Called during serializer registration to register any relevant loot logic
    */
   public static void registerGlobalLootModifiers() {
-    RegistryAdapter<GlobalLootModifierSerializer> adapter = new RegistryAdapter<>(LootModifierManager.SERIALIZER, Mantle.modId);
-    ADD_ENTRY = adapter.register(new AddEntryLootModifier.Serializer(), "add_entry");
-    REPLACE_ITEM = adapter.register(new ReplaceItemLootModifier.Serializer(), "replace_item");
+    RegistryAdapter<Codec<? extends IGlobalLootModifier>> adapter = new RegistryAdapter<>(PortingLibRegistries.GLOBAL_LOOT_MODIFIER_SERIALIZERS.get(), Mantle.modId);
+    ADD_ENTRY = adapter.register(AddEntryLootModifier.CODEC, "add_entry");
+    REPLACE_ITEM = adapter.register(ReplaceItemLootModifier.CODEC, "replace_item");
 
     // functions
     RETEXTURED_FUNCTION = registerFunction("fill_retextured_block", RetexturedLootFunction.SERIALIZER);

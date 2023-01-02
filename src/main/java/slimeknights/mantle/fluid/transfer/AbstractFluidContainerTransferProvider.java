@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import net.fabricmc.fabric.api.resource.conditions.v1.ConditionJsonProvider;
 import net.fabricmc.fabric.api.resource.conditions.v1.ResourceConditions;
+import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.HashCache;
 import net.minecraft.resources.ResourceLocation;
@@ -61,7 +62,7 @@ public abstract class AbstractFluidContainerTransferProvider extends GenericData
   }
 
   @Override
-  public void run(HashCache cache) throws IOException {
+  public void run(CachedOutput cache) throws IOException {
     addTransfers();
     allTransfers.forEach((id, data) -> saveThing(cache, id, data.toJson()));
   }

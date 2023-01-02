@@ -1,9 +1,9 @@
 package slimeknights.mantle.client.model.data;
 
 import com.google.common.base.Preconditions;
+import io.github.fabricators_of_create.porting_lib.model.data.ModelData;
+import io.github.fabricators_of_create.porting_lib.model.data.ModelProperty;
 import lombok.RequiredArgsConstructor;
-import io.github.fabricators_of_create.porting_lib.model.IModelData;
-import io.github.fabricators_of_create.porting_lib.model.ModelProperty;
 
 import javax.annotation.Nullable;
 
@@ -13,7 +13,7 @@ import javax.annotation.Nullable;
  * @param <D>  Property type, for data validation
  */
 @RequiredArgsConstructor
-public class SinglePropertyData<D> implements IModelData {
+public class SinglePropertyData<D> {
   private final ModelProperty<D> property;
   private D data = null;
 
@@ -28,14 +28,12 @@ public class SinglePropertyData<D> implements IModelData {
     this.data = data;
   }
 
-  @Override
   public boolean hasProperty(ModelProperty<?> prop) {
     return prop == this.property;
   }
 
   @SuppressWarnings("unchecked")
   @Nullable
-  @Override
   public <T> T getData(ModelProperty<T> prop) {
     if (prop == this.property) {
       return (T) data;
@@ -45,7 +43,6 @@ public class SinglePropertyData<D> implements IModelData {
 
   @SuppressWarnings("unchecked")
   @Nullable
-  @Override
   public <T> T setData(ModelProperty<T> prop, T data) {
     Preconditions.checkArgument(prop.test(data), "Value is invalid for this property");
     if (prop == this.property) {
