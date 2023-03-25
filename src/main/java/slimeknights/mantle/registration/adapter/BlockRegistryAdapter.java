@@ -1,8 +1,12 @@
 package slimeknights.mantle.registration.adapter;
 
+import net.fabricmc.fabric.api.object.builder.v1.block.type.BlockSetTypeRegistry;
+import net.fabricmc.fabric.api.object.builder.v1.block.type.WoodTypeRegistry;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.ButtonBlock;
 import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.FenceBlock;
 import net.minecraft.world.level.block.FenceGateBlock;
@@ -16,9 +20,9 @@ import net.minecraft.world.level.block.StandingSignBlock;
 import net.minecraft.world.level.block.TrapDoorBlock;
 import net.minecraft.world.level.block.WallBlock;
 import net.minecraft.world.level.block.WallSignBlock;
-import net.minecraft.world.level.block.WoodButtonBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
+import net.minecraft.world.level.block.state.properties.BlockSetType;
 import net.minecraft.world.level.block.state.properties.WoodType;
 import slimeknights.mantle.block.MantleStandingSignBlock;
 import slimeknights.mantle.block.MantleWallSignBlock;
@@ -43,12 +47,12 @@ public class BlockRegistryAdapter extends EnumRegistryAdapter<Block> {
 
   /** @inheritDoc */
   public BlockRegistryAdapter() {
-    super(Registry.BLOCK);
+    super(BuiltInRegistries.BLOCK);
   }
 
   /** @inheritDoc */
   public BlockRegistryAdapter(String modid) {
-    super(Registry.BLOCK, modid);
+    super(BuiltInRegistries.BLOCK, modid);
   }
 
   /**
@@ -117,7 +121,8 @@ public class BlockRegistryAdapter extends EnumRegistryAdapter<Block> {
    * @return Wood object
    */
   public WoodBlockObject registerWood(String name, Function<WoodVariant,BlockBehaviour.Properties> behaviorCreator) {
-    WoodType woodType = WoodType.register(new WoodType(resourceName(name)));
+    BlockSetType setType = BlockSetTypeRegistry.registerWood(getResource(name));
+    WoodType woodType = WoodTypeRegistry.register(getResource(name), setType);
     RegistrationHelper.registerWoodType(woodType);
 
     // planks
@@ -132,13 +137,13 @@ public class BlockRegistryAdapter extends EnumRegistryAdapter<Block> {
     RotatedPillarBlock wood = register(new StrippableLogBlock(() -> strippedWood, behaviorCreator.apply(WoodVariant.WOOD).strength(2.0f)), name + "_wood");
 
     // doors
-    DoorBlock door = register(new WoodenDoorBlock(behaviorCreator.apply(WoodVariant.PLANKS).strength(3.0F).noOcclusion()), name + "_door");
-    TrapDoorBlock trapdoor = register(new TrapDoorBlock(behaviorCreator.apply(WoodVariant.PLANKS).strength(3.0F).noOcclusion().isValidSpawn(Blocks::never)), name + "_trapdoor");
-    FenceGateBlock fenceGate = register(new FenceGateBlock(planksProps), name + "_fence_gate");
+    DoorBlock door = register(new WoodenDoorBlock(behaviorCreator.apply(WoodVariant.PLANKS).strength(3.0F).noOcclusion(), setType), name + "_door");
+    TrapDoorBlock trapdoor = register(new TrapDoorBlock(behaviorCreator.apply(WoodVariant.PLANKS).strength(3.0F).noOcclusion().isValidSpawn(Blocks::never), setType), name + "_trapdoor");
+    FenceGateBlock fenceGate = register(new FenceGateBlock(planksProps, woodType), name + "_fence_gate");
     // redstone
     BlockBehaviour.Properties redstoneProps = behaviorCreator.apply(WoodVariant.PLANKS).noCollission().strength(0.5F);
-    PressurePlateBlock pressurePlate = register(new PressurePlateBlock(Sensitivity.EVERYTHING, redstoneProps), name + "_pressure_plate");
-    WoodButtonBlock button = register(new WoodButtonBlock(redstoneProps), name + "_button");
+    PressurePlateBlock pressurePlate = register(new PressurePlateBlock(Sensitivity.EVERYTHING, redstoneProps, setType), name + "_pressure_plate");
+    ButtonBlock button = register(new ButtonBlock(redstoneProps, setType, 30, true), name + "_button");
     // signs
     StandingSignBlock standingSign = register(new MantleStandingSignBlock(behaviorCreator.apply(WoodVariant.PLANKS).noCollission().strength(1.0F), woodType), name + "_sign");
     WallSignBlock wallSign = register(new MantleWallSignBlock(behaviorCreator.apply(WoodVariant.PLANKS).noCollission().strength(1.0F)/*.lootFrom(standingSign.delegate)*/, woodType), name + "_wall_sign");

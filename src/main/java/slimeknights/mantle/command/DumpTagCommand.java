@@ -80,17 +80,8 @@ public class DumpTagCommand {
     ResourceLocation path = new ResourceLocation(name.getNamespace(), TagManager.getTagDir(registry.key()) + "/" + name.getPath() + ".json");
 
     // if the tag file does not exist, only error if the tag is unknown
-    List<Resource> resources = Collections.emptyList();
-    if (manager.hasResource(path)) {
-      try {
-        resources = manager.getResources(path);
-      } catch (IOException ex) {
-        // tag exists and we still could not read it? something went wrong
-        Mantle.logger.error("Couldn't read {} tag list {} from {}", regName, name, path, ex);
-        throw ERROR_READING_TAG.create(regName, name);
-      }
-    // if the tag does not exist in the collect, probably an invalid tag name
-    } else if (registry.getTag(TagKey.create(registry.key(), name)).isEmpty()) {
+    List<Resource> resources = manager.getResourceStack(path);
+    if (registry.getTag(TagKey.create(registry.key(), name)).isEmpty()) {
       throw ViewTagCommand.TAG_NOT_FOUND.create(regName, name);
     }
 
@@ -99,20 +90,19 @@ public class DumpTagCommand {
     int tagsProcessed = 0;
     for (Resource resource : resources) {
       try (
-        InputStream inputstream = resource.getInputStream();
-        Reader reader = new BufferedReader(new InputStreamReader(inputstream, StandardCharsets.UTF_8))
+        Reader reader = resource.openAsReader()
       ) {
         JsonObject json = GsonHelper.fromJson(GSON, reader, JsonObject.class);
         if (json == null) {
           // no json
-          Mantle.logger.error("Couldn't load {} tag list {} from {} in data pack {} as it is empty or null", regName, name, path, resource.getSourceName());
+          Mantle.logger.error("Couldn't load {} tag list {} from {} in data pack {} as it is empty or null", regName, name, path, resource.sourcePackId());
         } else {
           builder.addFromJson(json, resource.getSourceName());
           tagsProcessed++;
         }
       } catch (RuntimeException | IOException ex) {
         // failed to parse
-        Mantle.logger.error("Couldn't read {} tag list {} from {} in data pack {}", regName, name, path, resource.getSourceName(), ex);
+        Mantle.logger.error("Couldn't read {} tag list {} from {} in data pack {}", regName, name, path, resource.sourcePackId(), ex);
       } finally {
         IOUtils.closeQuietly(resource);
       }

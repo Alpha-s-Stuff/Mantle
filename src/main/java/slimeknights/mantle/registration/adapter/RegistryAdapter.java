@@ -3,6 +3,7 @@ package slimeknights.mantle.registration.adapter;
 import lombok.RequiredArgsConstructor;
 
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
@@ -70,13 +71,13 @@ public class RegistryAdapter<T> {
 
   public static ResourceLocation getRegistryName(Object obj) {
     if(obj instanceof Block block)
-      return Registry.BLOCK.getKey(block);
+      return BuiltInRegistries.BLOCK.getKey(block);
     if(obj instanceof Item item)
-      return Registry.ITEM.getKey(item);
+      return BuiltInRegistries.ITEM.getKey(item);
     if(obj instanceof Fluid fluid)
-      return Registry.FLUID.getKey(fluid);
+      return BuiltInRegistries.FLUID.getKey(fluid);
     if(obj instanceof EntityType<?> entityType)
-      return Registry.ENTITY_TYPE.getKey(entityType);
+      return BuiltInRegistries.ENTITY_TYPE.getKey(entityType);
     return null;
   }
 

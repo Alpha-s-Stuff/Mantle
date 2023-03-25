@@ -1,11 +1,8 @@
 package slimeknights.mantle.client.model.util;
 
 import com.mojang.datafixers.util.Either;
-import io.github.fabricators_of_create.porting_lib.mixin.client.accessor.BlockModelAccessor;
-import io.github.fabricators_of_create.porting_lib.model.geometry.IGeometryBakingContext;
 import lombok.AllArgsConstructor;
 import net.minecraft.client.renderer.block.model.BlockModel;
-import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.client.resources.model.Material;
 
 import javax.annotation.Nullable;
@@ -36,12 +33,9 @@ public class ModelTextureIteratable implements Iterable<Map<String,Either<Materi
    * @param fallback  Fallback in case the owner does not contain a block model
    * @return  Iteratable over block model texture maps
    */
-  public static ModelTextureIteratable of(IGeometryBakingContext owner, SimpleBlockModel fallback) {
-//    UnbakedModel unbaked = owner.getOwnerModel();
-//    if (unbaked instanceof BlockModel) {
-//      return new ModelTextureIteratable(null, (BlockModel)unbaked);
-//    }
-    return new ModelTextureIteratable(fallback.getTextures(), fallback.getParent());
+  public static ModelTextureIteratable of(BlockModel owner, SimpleBlockModel fallback) {
+    return new ModelTextureIteratable(null, owner);
+//    return new ModelTextureIteratable(fallback.getTextures(), fallback.getParent());
   }
 
   @Override

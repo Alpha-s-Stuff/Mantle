@@ -1,5 +1,6 @@
 package slimeknights.mantle.datagen;
 
+import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.minecraft.data.DataGenerator;
 import slimeknights.mantle.Mantle;
@@ -8,7 +9,7 @@ import slimeknights.mantle.fluid.tooltip.FluidTooltipHandler;
 
 /** Mantle datagen for fluid tooltips. For mods, don't use this, use {@link AbstractFluidTooltipProvider} */
 public class MantleFluidTooltipProvider extends AbstractFluidTooltipProvider {
-  public MantleFluidTooltipProvider(DataGenerator generator) {
+  public MantleFluidTooltipProvider(FabricDataOutput generator) {
     super(generator, Mantle.modId);
   }
 

@@ -7,7 +7,6 @@ import com.google.gson.JsonParseException;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexFormatElement;
 import com.mojang.math.Transformation;
-import com.mojang.math.Vector3f;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
@@ -21,9 +20,11 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraft.util.GsonHelper;
+import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import org.joml.Vector3f;
 import slimeknights.mantle.Mantle;
 
 import javax.annotation.Nullable;
@@ -217,7 +218,7 @@ public class ModelHelper {
 //    }
 //  }
 
-  public static BakedModel handlePerspective(BakedModel model, ImmutableMap<ItemTransforms.TransformType, Transformation> transforms, ItemTransforms.TransformType cameraTransformType, PoseStack mat)
+  public static BakedModel handlePerspective(BakedModel model, ImmutableMap<ItemDisplayContext, Transformation> transforms, ItemDisplayContext cameraTransformType, PoseStack mat)
   {
     Transformation tr = transforms.getOrDefault(cameraTransformType, Transformation.identity());
     if (!(tr.equals(Transformation.identity())))

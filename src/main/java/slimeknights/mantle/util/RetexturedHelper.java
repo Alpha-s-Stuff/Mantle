@@ -1,14 +1,15 @@
 package slimeknights.mantle.util;
 
-import io.github.fabricators_of_create.porting_lib.model.data.ModelProperty;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import slimeknights.mantle.client.model.ModelProperty;
 
 import javax.annotation.Nullable;
 
@@ -32,7 +33,7 @@ public final class RetexturedHelper {
    */
   public static Block getBlock(String name) {
     if (!name.isEmpty()) {
-      Block block = Registry.BLOCK.get(new ResourceLocation(name));
+      Block block = BuiltInRegistries.BLOCK.get(new ResourceLocation(name));
       if (block != null) {
         return block;
       }

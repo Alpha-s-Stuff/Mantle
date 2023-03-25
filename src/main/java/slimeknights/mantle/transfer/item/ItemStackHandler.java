@@ -1,15 +1,12 @@
 package slimeknights.mantle.transfer.item;
 
-import java.util.Arrays;
-
-import slimeknights.mantle.transfer.item.IItemHandlerModifiable;
-import slimeknights.mantle.transfer.item.ItemHandlerHelper;
-import io.github.fabricators_of_create.porting_lib.util.INBTSerializable;
-
+import io.github.fabricators_of_create.porting_lib.extensions.extensions.INBTSerializable;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.item.ItemStack;
+
+import java.util.Arrays;
 
 public class ItemStackHandler implements IItemHandlerModifiable, INBTSerializable<CompoundTag> {
 	protected ItemStack[] stacks;

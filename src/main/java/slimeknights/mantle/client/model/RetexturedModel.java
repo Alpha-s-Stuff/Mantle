@@ -9,21 +9,22 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import com.mojang.datafixers.util.Either;
 import com.mojang.datafixers.util.Pair;
-import io.github.fabricators_of_create.porting_lib.model.geometry.IGeometryBakingContext;
-import io.github.fabricators_of_create.porting_lib.model.geometry.IGeometryLoader;
-import io.github.fabricators_of_create.porting_lib.model.geometry.IUnbakedGeometry;
+import io.github.fabricators_of_create.porting_lib.models.geometry.IGeometryLoader;
+import io.github.fabricators_of_create.porting_lib.models.geometry.IUnbakedGeometry;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import net.fabricmc.fabric.api.renderer.v1.model.FabricBakedModel;
 import net.fabricmc.fabric.api.renderer.v1.render.RenderContext;
 import net.fabricmc.fabric.api.rendering.data.v1.RenderAttachedBlockView;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.Material;
+import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.model.ModelState;
 import net.minecraft.client.resources.model.UnbakedModel;
@@ -65,13 +66,13 @@ public class RetexturedModel implements IUnbakedGeometry<RetexturedModel> {
   private final SimpleBlockModel model;
   private final Set<String> retextured;
 
-  @Override
-  public Collection<Material> getMaterials(IGeometryBakingContext owner, Function<ResourceLocation,UnbakedModel> modelGetter, Set<Pair<String,String>> missingTextureErrors) {
-    return model.getMaterials(owner, modelGetter, missingTextureErrors);
-  }
+//  @Override
+//  public Collection<Material> getMaterials(IGeometryBakingContext owner, Function<ResourceLocation,UnbakedModel> modelGetter, Set<Pair<String,String>> missingTextureErrors) {
+//    return model.getMaterials(owner, modelGetter, missingTextureErrors);
+//  }
 
   @Override
-  public BakedModel bake(IGeometryBakingContext owner, ModelBakery bakery, Function<Material,TextureAtlasSprite> spriteGetter, ModelState transform, ItemOverrides overrides, ResourceLocation location) {
+  public BakedModel bake(BlockModel owner, ModelBaker baker, Function<Material,TextureAtlasSprite> spriteGetter, ModelState transform, ItemOverrides overrides, ResourceLocation location) {
     // bake the model and return
     BakedModel baked = model.bakeModel(owner, transform, overrides, spriteGetter, location);
     return new Baked(baked, owner, model, transform, getAllRetextured(owner, this.model, retextured));
@@ -84,7 +85,7 @@ public class RetexturedModel implements IUnbakedGeometry<RetexturedModel> {
    * @param originalSet  Original list of names to retexture
    * @return  Set of textures including parent textures
    */
-  public static Set<String> getAllRetextured(IGeometryBakingContext owner, SimpleBlockModel model, Set<String> originalSet) {
+  public static Set<String> getAllRetextured(BlockModel owner, SimpleBlockModel model, Set<String> originalSet) {
     Set<String> retextured = Sets.newHashSet(originalSet);
     for (Map<String,Either<Material, String>> textures : ModelTextureIteratable.of(owner, model)) {
       textures.forEach((name, either) ->
@@ -151,13 +152,13 @@ public class RetexturedModel implements IUnbakedGeometry<RetexturedModel> {
     /** Cache of texture name to baked model */
     private final Map<ResourceLocation,BakedModel> cache = new ConcurrentHashMap<>();
     /* Properties for rebaking */
-    private final IGeometryBakingContext owner;
+    private final BlockModel owner;
     private final SimpleBlockModel model;
     private final ModelState transform;
     /** List of texture names that are retextured */
     private final Set<String> retextured;
 
-    public Baked(BakedModel baked, IGeometryBakingContext owner, SimpleBlockModel model, ModelState transform, Set<String> retextured) {
+    public Baked(BakedModel baked, BlockModel owner, SimpleBlockModel model, ModelState transform, Set<String> retextured) {
       super(baked);
       this.model = model;
       this.owner = owner;
@@ -229,18 +230,18 @@ public class RetexturedModel implements IUnbakedGeometry<RetexturedModel> {
      * @param retextured  Set of textures that should be retextured
      * @param texture     New texture to replace those in the set
      */
-    public RetexturedConfiguration(IGeometryBakingContext base, Set<String> retextured, ResourceLocation texture) {
+    public RetexturedConfiguration(BlockModel base, Set<String> retextured, ResourceLocation texture) {
       super(base);
       this.retextured = retextured;
       this.texture = new Material(TextureAtlas.LOCATION_BLOCKS, texture);
     }
 
     @Override
-    public boolean hasMaterial(String name) {
+    public boolean hasTexture(String name) {
       if (retextured.contains(name)) {
         return !MissingTextureAtlasSprite.getLocation().equals(texture.texture());
       }
-      return super.hasMaterial(name);
+      return super.hasTexture(name);
     }
 
     @Override

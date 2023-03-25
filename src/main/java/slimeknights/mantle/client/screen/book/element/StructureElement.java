@@ -2,10 +2,7 @@ package slimeknights.mantle.client.screen.book.element;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
-import com.mojang.math.Quaternion;
 import com.mojang.math.Transformation;
-import com.mojang.math.Vector3f;
-import io.github.fabricators_of_create.porting_lib.model.data.ModelData;
 import net.fabricmc.fabric.api.rendering.data.v1.RenderAttachmentBlockEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -16,6 +13,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import slimeknights.mantle.client.book.structure.StructureInfo;
 import slimeknights.mantle.client.book.structure.level.TemplateLevel;
 import slimeknights.mantle.client.render.MantleRenderTypes;
@@ -57,7 +56,7 @@ public class StructureElement extends SizedBookElement {
     this.transX = x + width / 2F;
     this.transY = y + height / 2F;
 
-    this.additionalTransform = new Transformation(null, new Quaternion(25, 0, 0, true), null, new Quaternion(0, -45, 0, true));
+    this.additionalTransform = new Transformation(null, new Quaternionf(25, 0, 0, true), null, new Quaternionf(0, -45, 0, true));
   }
 
   @Override
@@ -171,6 +170,6 @@ public class StructureElement extends SizedBookElement {
     if (!axis.normalize())
       return Transformation.identity();
 
-    return new Transformation(null, new Quaternion(axis, angle, true), null, null);
+    return new Transformation(null, new Quaternionf(axis, angle, true), null, null);
   }
 }

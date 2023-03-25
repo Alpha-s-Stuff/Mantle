@@ -10,25 +10,24 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.fabric.api.renderer.v1.model.ForwardingBakedModel;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.level.block.state.BlockState;
 import com.mojang.math.Transformation;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.renderer.block.model.ItemTransforms.TransformType;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.Direction;
-import io.github.fabricators_of_create.porting_lib.render.TransformTypeDependentItemBakedModel;
 
 public class BakedItemModel implements BakedModel, TransformTypeDependentItemBakedModel {
   protected final List<BakedQuad> quads;
   protected final TextureAtlasSprite particle;
-  protected final ImmutableMap<TransformType, Transformation> transforms;
+  protected final ImmutableMap<ItemDisplayContext, Transformation> transforms;
   protected final ItemOverrides overrides;
   protected final BakedModel guiModel;
   protected final boolean useBlockLight;
 
-  public BakedItemModel(List<BakedQuad> quads, TextureAtlasSprite particle, ImmutableMap<TransformType, Transformation> transforms, ItemOverrides overrides, boolean untransformed, boolean useBlockLight)
+  public BakedItemModel(List<BakedQuad> quads, TextureAtlasSprite particle, ImmutableMap<ItemDisplayContext, Transformation> transforms, ItemOverrides overrides, boolean untransformed, boolean useBlockLight)
   {
     this.quads = quads;
     this.particle = particle;
@@ -38,9 +37,9 @@ public class BakedItemModel implements BakedModel, TransformTypeDependentItemBak
     this.guiModel = untransformed && hasGuiIdentity(transforms) ? new BakedGuiItemModel<>(this) : null;
   }
 
-  private static boolean hasGuiIdentity(ImmutableMap<TransformType, Transformation> transforms)
+  private static boolean hasGuiIdentity(ImmutableMap<ItemDisplayContext, Transformation> transforms)
   {
-    Transformation guiTransform = transforms.get(TransformType.GUI);
+    Transformation guiTransform = transforms.get(ItemDisplayContext.GUI);
     return guiTransform == null || guiTransform.equals(Transformation.identity());
   }
 
@@ -68,9 +67,9 @@ public class BakedItemModel implements BakedModel, TransformTypeDependentItemBak
   }
 
   @Override
-  public BakedModel handlePerspective(TransformType type, PoseStack poseStack)
+  public BakedModel handlePerspective(ItemDisplayContext type, PoseStack poseStack)
   {
-    if (type == TransformType.GUI && this.guiModel != null)
+    if (type == ItemDisplayContext.GUI && this.guiModel != null)
     {
       return ((TransformTypeDependentItemBakedModel)this.guiModel).handlePerspective(type, poseStack);
     }
@@ -106,9 +105,9 @@ public class BakedItemModel implements BakedModel, TransformTypeDependentItemBak
     }
 
     @Override
-    public BakedModel handlePerspective(TransformType type, PoseStack poseStack)
+    public BakedModel handlePerspective(ItemDisplayContext type, PoseStack poseStack)
     {
-      if (type == TransformType.GUI)
+      if (type == ItemDisplayContext.GUI)
       {
         return ModelHelper.handlePerspective(this, ((BakedItemModel)wrapped).transforms, type, poseStack);
       }

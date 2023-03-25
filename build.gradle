@@ -113,10 +113,7 @@ dependencies {
     modImplementation("net.fabricmc:fabric-loader:${project.loader_version}")
     modImplementation("net.fabricmc.fabric-api:fabric-api:${project.fabric_version}")
 
-    modImplementation(include("io.github.ladysnake:satin:${project.satin_version}"))
-
-    modImplementation(include("me.alphamode:ForgeTags:2.1"))
-    modImplementation(include("io.github.fabricators_of_create.Porting-Lib:porting-lib:${project.port_lib_version}+1.19.2"))
+    modApi(include("io.github.fabricators_of_create.Porting-Lib:porting-lib:${project.port_lib_version}+${project.minecraft_version}"))
 
     // compile against the REI API but do not include it at runtime
     modCompileOnly("me.shedaniel:RoughlyEnoughItems-api-fabric:${project.rei_version}") { transitive = false }
@@ -125,13 +122,11 @@ dependencies {
     // api for REI
     modImplementation("dev.architectury:architectury-fabric:${project.architectury_version}")
 
-    modCompileOnly("mezz.jei:jei-${project.minecraft_version}-fabric:${project.jei_version}") { transitive = false }
+    modCompileOnly("mezz.jei:jei-1.19.2-fabric:${project.jei_version}") { transitive = false }
 
-    modImplementation(include("curse.maven:forge-config-api-port-fabric-547434:${forge_config_version}"))
-    implementation(include('com.electronwill.night-config:core:3.6.0'))
-    implementation(include('com.electronwill.night-config:toml:3.6.0'))
-    modImplementation("com.github.AlphaMode:fakeconfig:master-SNAPSHOT") { exclude(group: "net.fabricmc.fabric-api") }
-    modImplementation("com.github.AlphaMode:fakeconfigtoml:master-SNAPSHOT") { exclude(group: "net.fabricmc.fabric-api") }
+    modApi(include("curse.maven:forge-config-api-port-fabric-547434:${forge_config_version}"))
+    api(include('com.electronwill.night-config:core:3.6.0'))
+    api(include('com.electronwill.night-config:toml:3.6.0'))
     implementation(include("com.google.code.findbugs:jsr305:3.0.2"))
 
     modApi "com.terraformersmc:modmenu:3.2.3"
@@ -140,12 +135,12 @@ dependencies {
     }
 
     // cca
-    modImplementation "dev.onyxstudios.cardinal-components-api:cardinal-components-base:4.1.3"
-    modImplementation "dev.onyxstudios.cardinal-components-api:cardinal-components-entity:4.1.3"
+    modApi "dev.onyxstudios.cardinal-components-api:cardinal-components-base:4.1.3"
+    modApi "dev.onyxstudios.cardinal-components-api:cardinal-components-entity:4.1.3"
     include "dev.onyxstudios.cardinal-components-api:cardinal-components-base:4.1.3"
     include "dev.onyxstudios.cardinal-components-api:cardinal-components-entity:4.1.3"
     // reach attributes
-    modImplementation(include("com.jamieswhiteshirt:reach-entity-attributes:${project.reach_entity_attributes_version}"))
+    modApi(include("com.jamieswhiteshirt:reach-entity-attributes:${project.reach_entity_attributes_version}"))
 
     compileOnly "org.projectlombok:lombok:1.18.22"
     annotationProcessor "org.projectlombok:lombok:1.18.22"

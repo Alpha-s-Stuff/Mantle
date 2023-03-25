@@ -9,22 +9,17 @@ import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormatElement;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.math.Transformation;
-import io.github.fabricators_of_create.porting_lib.model.BakedQuadBuilder;
-import io.github.fabricators_of_create.porting_lib.model.CompositeModelState;
-import io.github.fabricators_of_create.porting_lib.model.IVertexConsumer;
-import io.github.fabricators_of_create.porting_lib.model.ItemLayerModel;
-import io.github.fabricators_of_create.porting_lib.model.PerspectiveMapWrapper;
-import io.github.fabricators_of_create.porting_lib.model.TRSRTransformer;
-import io.github.fabricators_of_create.porting_lib.model.geometry.IGeometryBakingContext;
-import io.github.fabricators_of_create.porting_lib.model.geometry.IGeometryLoader;
-import io.github.fabricators_of_create.porting_lib.model.geometry.IUnbakedGeometry;
+import io.github.fabricators_of_create.porting_lib.models.geometry.IGeometryLoader;
+import io.github.fabricators_of_create.porting_lib.models.geometry.IUnbakedGeometry;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.Material;
+import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.model.ModelState;
 import net.minecraft.client.resources.model.UnbakedModel;
@@ -33,6 +28,7 @@ import net.minecraft.core.Direction.Axis;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.GsonHelper;
+import net.minecraft.world.item.ItemDisplayContext;
 import slimeknights.mantle.util.ItemLayerPixels;
 import slimeknights.mantle.util.JsonHelper;
 import slimeknights.mantle.util.ReversedListBuilder;
@@ -72,20 +68,20 @@ public class MantleItemLayerModel implements IUnbakedGeometry<MantleItemLayerMod
     return layers.get(index);
   }
 
-  @Override
-  public Collection<Material> getMaterials(IGeometryBakingContext owner, Function<ResourceLocation,UnbakedModel> modelGetter, Set<Pair<String,String>> missingTextureErrors) {
-    ImmutableList.Builder<Material> builder = ImmutableList.builder();
-    for (int i = 0; owner.hasMaterial("layer" + i); i++) {
-      builder.add(owner.getMaterial("layer" + i));
-    }
-    textures = builder.build();
-    return textures;
-  }
+//  @Override
+//  public Collection<Material> getMaterials(IGeometryBakingContext owner, Function<ResourceLocation,UnbakedModel> modelGetter, Set<Pair<String,String>> missingTextureErrors) {
+//    ImmutableList.Builder<Material> builder = ImmutableList.builder();
+//    for (int i = 0; owner.hasMaterial("layer" + i); i++) {
+//      builder.add(owner.getMaterial("layer" + i));
+//    }
+//    textures = builder.build();
+//    return textures;
+//  }
 
   @Override
-  public BakedModel bake(IGeometryBakingContext owner, ModelBakery bakery, Function<Material,TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides, ResourceLocation modelLocation) {
+  public BakedModel bake(BlockModel owner, ModelBaker baker, Function<Material,TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides, ResourceLocation modelLocation) {
     // determine particle texture
-    TextureAtlasSprite particle = spriteGetter.apply(owner.hasMaterial("particle") ? owner.getMaterial("particle") : textures.get(0));
+    TextureAtlasSprite particle = spriteGetter.apply(owner.hasTexture("particle") ? owner.getMaterial("particle") : textures.get(0));
     // bake in special properties
     ReversedListBuilder<BakedQuad> builder = new ReversedListBuilder<>();
     // skip the pixel tracking if using a single texture only
@@ -97,8 +93,8 @@ public class MantleItemLayerModel implements IUnbakedGeometry<MantleItemLayerMod
       builder.addAll(getQuadsForSprite(data.color(), data.noTint() ? -1 : i, sprite, transform, data.luminosity(), pixels));
     }
     // transform data
-    ImmutableMap<ItemTransforms.TransformType,Transformation> transformMap = PerspectiveMapWrapper.getTransforms(owner.getTransforms()/*new CompositeModelState(owner.getCombinedTransform(), modelTransform)*/);
-    return new BakedItemModel(builder.build(), particle, Maps.immutableEnumMap(transformMap), overrides, true, owner.useBlockLight());
+    ImmutableMap<ItemDisplayContext,Transformation> transformMap = PerspectiveMapWrapper.getTransforms(owner.getTransforms()/*new CompositeModelState(owner.getCombinedTransform(), modelTransform)*/);
+    return new BakedItemModel(builder.build(), particle, Maps.immutableEnumMap(transformMap), overrides, true, owner.getGuiLight().lightLikeBlock());
   }
 
   /**
@@ -127,19 +123,19 @@ public class MantleItemLayerModel implements IUnbakedGeometry<MantleItemLayerMod
   public static ImmutableList<BakedQuad> getQuadsForSprite(int color, int tint, TextureAtlasSprite sprite, Transformation transform, int luminosity, @Nullable ItemLayerPixels pixels) {
     ImmutableList.Builder<BakedQuad> builder = ImmutableList.builder();
 
-    int uMax = sprite.getWidth();
-    int vMax = sprite.getHeight();
+    int uMax = sprite.contents().width();
+    int vMax = sprite.contents().height();
     FaceData faceData = new FaceData(uMax, vMax);
     boolean translucent = false;
 
-    for(int f = 0; f < sprite.getFrameCount(); f++) {
+    for(int f = 0; f < sprite.contents().getFrameCount(); f++) {
       boolean ptu;
       boolean[] ptv = new boolean[uMax];
       Arrays.fill(ptv, true);
       for(int v = 0; v < vMax; v++) {
         ptu = true;
         for(int u = 0; u < uMax; u++) {
-          int alpha = sprite.getPixelRGBA(f, u, vMax - v - 1) >> 24 & 0xFF;
+          int alpha = sprite.contents().getPixelRGBA(f, u, vMax - v - 1) >> 24 & 0xFF;
           boolean t = alpha / 255f <= 0.1f;
 
           if (!t && alpha < 255) {
@@ -267,10 +263,10 @@ public class MantleItemLayerModel implements IUnbakedGeometry<MantleItemLayerMod
       //  3. only use the first frame
       // of these, 2 would give the most accurate result. However, its also the hardest to calculate
       // of the remaining methods, 3 is both more accurate and easier to calculate than 1, so I opted for that approach
-      if (sprite.getFrameCount() > 0) {
+      if (sprite.contents().getFrameCount() > 0) {
         for(int v = 0; v < vMax; v++) {
           for(int u = 0; u < uMax; u++) {
-            int alpha = sprite.getPixelRGBA(0, u, vMax - v - 1) >> 24 & 0xFF;
+            int alpha = sprite.contents().getPixelRGBA(0, u, vMax - v - 1) >> 24 & 0xFF;
             if (alpha / 255f > 0.1f) {
               pixels.set(u, v, uMax, vMax);
             }
@@ -297,8 +293,8 @@ public class MantleItemLayerModel implements IUnbakedGeometry<MantleItemLayerMod
    */
   private static BakedQuad buildSideQuad(Transformation transform, Direction side, int color, int tint, TextureAtlasSprite sprite, int u, int v, int size, int luminosity) {
     final float eps = 1e-2f;
-    int width = sprite.getWidth();
-    int height = sprite.getHeight();
+    int width = sprite.contents().width();
+    int height = sprite.contents().height();
     float x0 = (float) u / width;
     float y0 = (float) v / height;
     float x1 = x0, y1 = y0;

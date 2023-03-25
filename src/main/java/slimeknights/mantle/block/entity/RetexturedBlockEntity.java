@@ -1,7 +1,6 @@
 package slimeknights.mantle.block.entity;
 
-import io.github.fabricators_of_create.porting_lib.model.data.ModelData;
-import io.github.fabricators_of_create.porting_lib.util.Lazy;
+import io.github.fabricators_of_create.porting_lib.common.util.Lazy;
 import net.fabricmc.fabric.api.rendering.data.v1.RenderAttachmentBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;

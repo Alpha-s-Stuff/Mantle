@@ -2,11 +2,12 @@ package slimeknights.mantle.recipe.helper;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
-import io.github.fabricators_of_create.porting_lib.mixin.common.accessor.RecipeManagerAccessor;
+import io.github.fabricators_of_create.porting_lib.mixin.accessors.common.accessor.RecipeManagerAccessor;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import io.netty.handler.codec.DecoderException;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import net.minecraft.core.registries.BuiltInRegistries;
 import slimeknights.mantle.recipe.IMultiRecipe;
 import java.util.Comparator;
 import java.util.List;
@@ -139,7 +140,7 @@ public class RecipeHelper {
    */
   public static JsonObject serializeFluidStack(FluidStack stack) {
     JsonObject json = new JsonObject();
-    json.addProperty("fluid", Objects.requireNonNull(Registry.FLUID.getKey(stack.getFluid())).toString());
+    json.addProperty("fluid", Objects.requireNonNull(BuiltInRegistries.FLUID.getKey(stack.getFluid())).toString());
     json.addProperty("amount", stack.getAmount());
     return json;
   }
@@ -152,7 +153,7 @@ public class RecipeHelper {
    */
   public static FluidStack deserializeFluidStack(JsonObject json) {
     String fluidName = GsonHelper.getAsString(json, "fluid");
-    Fluid fluid = Registry.FLUID.get(new ResourceLocation(fluidName));
+    Fluid fluid = BuiltInRegistries.FLUID.get(new ResourceLocation(fluidName));
     if (fluid == null || fluid == Fluids.EMPTY) {
       throw new JsonSyntaxException("Unknown fluid " + fluidName);
     }
@@ -170,7 +171,7 @@ public class RecipeHelper {
    * @throws JsonSyntaxException  If the key is missing, or the value is not the right class
    */
   public static <C> C deserializeItem(String name, String key, Class<C> clazz) {
-    Item item = Registry.ITEM.get(new ResourceLocation(name));
+    Item item = BuiltInRegistries.ITEM.get(new ResourceLocation(name));
     if (item == null) {
       throw new JsonSyntaxException("Invalid " + key + ": Unknown item " + name + "'");
     }
@@ -203,7 +204,7 @@ public class RecipeHelper {
   public static <T> T readItem(FriendlyByteBuf buffer, Class<T> clazz) {
     Item item = readItem(buffer);
     if (!clazz.isInstance(item)) {
-      throw new DecoderException("Invalid item '" + Registry.ITEM.getKey(item) + "', must be " + clazz.getSimpleName());
+      throw new DecoderException("Invalid item '" + BuiltInRegistries.ITEM.getKey(item) + "', must be " + clazz.getSimpleName());
     }
     return clazz.cast(item);
   }

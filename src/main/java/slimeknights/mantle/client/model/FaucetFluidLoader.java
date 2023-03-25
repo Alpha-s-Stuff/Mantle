@@ -6,8 +6,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.math.Vector3f;
-import io.github.fabricators_of_create.porting_lib.mixin.client.accessor.ModelBakeryAccessor;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -16,6 +14,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.ReloadableResourceManager;
@@ -28,6 +27,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
+import org.joml.Vector3f;
 import slimeknights.mantle.Mantle;
 import slimeknights.mantle.client.model.fluid.FluidCuboid;
 import slimeknights.mantle.client.render.FluidRenderer;
@@ -111,7 +111,7 @@ public class FaucetFluidLoader extends SimpleJsonResourceReloadListener implemen
         // all others are block
         JsonObject json = GsonHelper.convertToJsonObject(entry.getValue(), "");
         JsonObject variants = GsonHelper.getAsJsonObject(json, "variants");
-        Block block = Registry.BLOCK.get(location);
+        Block block = BuiltInRegistries.BLOCK.get(location);
         if(block != null && block != Blocks.AIR) {
           StateDefinition<Block,BlockState> container = block.getStateDefinition();
           List<BlockState> validStates = container.getPossibleStates();
@@ -255,7 +255,7 @@ public class FaucetFluidLoader extends SimpleJsonResourceReloadListener implemen
       if (element.isJsonPrimitive()) {
         int value = element.getAsInt();
         return def.stream().map(cuboid -> {
-          Vector3f from = cuboid.getFrom().copy();
+          Vector3f from = cuboid.getFrom();
          from.y = value;
           return new FluidCuboid(from, cuboid.getTo(), cuboid.getFaces());
         }).collect(Collectors.toList());

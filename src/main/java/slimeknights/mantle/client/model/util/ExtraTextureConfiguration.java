@@ -1,7 +1,7 @@
 package slimeknights.mantle.client.model.util;
 
 import com.google.common.collect.ImmutableMap;
-import io.github.fabricators_of_create.porting_lib.model.geometry.IGeometryBakingContext;
+import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.resources.ResourceLocation;
@@ -19,7 +19,7 @@ public class ExtraTextureConfiguration extends ModelConfigurationWrapper {
    * @param base      Base configuration
    * @param textures  Textures map, any textures in this map will take precedence over those in the base configuration
    */
-  public ExtraTextureConfiguration(IGeometryBakingContext base, Map<String,Material> textures) {
+  public ExtraTextureConfiguration(BlockModel base, Map<String,Material> textures) {
     super(base);
     this.textures = textures;
   }
@@ -30,7 +30,7 @@ public class ExtraTextureConfiguration extends ModelConfigurationWrapper {
    * @param name     Texture name, if it matches texture is returned
    * @param texture  Texture path
    */
-  public ExtraTextureConfiguration(IGeometryBakingContext base, String name, ResourceLocation texture) {
+  public ExtraTextureConfiguration(BlockModel base, String name, ResourceLocation texture) {
     super(base);
     this.textures = ImmutableMap.of(name, new Material(TextureAtlas.LOCATION_BLOCKS, texture));
   }
@@ -45,7 +45,7 @@ public class ExtraTextureConfiguration extends ModelConfigurationWrapper {
   }
 
   @Override
-  public boolean hasMaterial(String name) {
-    return textures.containsKey(name) || super.hasMaterial(name);
+  public boolean hasTexture(String name) {
+    return textures.containsKey(name) || super.hasTexture(name);
   }
 }

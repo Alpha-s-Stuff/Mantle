@@ -4,9 +4,9 @@ import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonObject;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.minecraft.Util;
 import net.minecraft.data.CachedOutput;
-import net.minecraft.data.DataGenerator;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.tags.TagKey;
@@ -15,8 +15,11 @@ import slimeknights.mantle.data.GenericDataProvider;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 /** Provider for fluid tooltip information */
 @SuppressWarnings("unused")
@@ -25,7 +28,7 @@ public abstract class AbstractFluidTooltipProvider extends GenericDataProvider {
   private final Map<ResourceLocation,FluidUnitListBuilder> builders = new HashMap<>();
   private final String modId;
 
-  public AbstractFluidTooltipProvider(DataGenerator generator, String modId) {
+  public AbstractFluidTooltipProvider(FabricDataOutput generator, String modId) {
     super(generator, PackType.CLIENT_RESOURCES, FluidTooltipHandler.FOLDER, FluidTooltipHandler.GSON);
     this.modId = modId;
   }
@@ -34,14 +37,16 @@ public abstract class AbstractFluidTooltipProvider extends GenericDataProvider {
   protected abstract void addFluids();
 
   @Override
-  public final void run(CachedOutput cache) throws IOException {
+  public final CompletableFuture<?> run(CachedOutput cache) {
     addFluids();
-    builders.forEach((key, builder) -> saveThing(cache, key, builder.build()));
+    final List<CompletableFuture<?>> futures = new ArrayList<>();
+    builders.forEach((key, builder) -> futures.add(saveThing(cache, key, builder.build())));
     redirects.forEach((key, target) -> {
       JsonObject json = new JsonObject();
       json.addProperty("redirect", target.toString());
-      saveThing(cache, key, json);
+      futures.add(saveThing(cache, key, json));
     });
+    return CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new));
   }
 
 

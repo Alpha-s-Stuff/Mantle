@@ -4,19 +4,20 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import com.mojang.datafixers.util.Pair;
-import io.github.fabricators_of_create.porting_lib.model.geometry.IGeometryBakingContext;
-import io.github.fabricators_of_create.porting_lib.model.geometry.IGeometryLoader;
-import io.github.fabricators_of_create.porting_lib.model.geometry.IUnbakedGeometry;
+import io.github.fabricators_of_create.porting_lib.models.geometry.IGeometryLoader;
+import io.github.fabricators_of_create.porting_lib.models.geometry.IUnbakedGeometry;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.fabricmc.fabric.api.renderer.v1.model.ForwardingBakedModel;
 import net.fabricmc.fabric.api.resource.SimpleResourceReloadListener;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
+import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.Material;
+import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.model.ModelState;
 import net.minecraft.client.resources.model.SimpleBakedModel;
@@ -51,33 +52,33 @@ public class FluidTextureModel implements IUnbakedGeometry<FluidTextureModel> {
   }
 
   /** Gets the texture, or null if missing */
-  private static void getTexture(IGeometryBakingContext owner, String name, Collection<Material> textures, Set<Pair<String,String>> missingTextureErrors) {
+  private static void getTexture(BlockModel owner, String name, Collection<Material> textures, Set<Pair<String,String>> missingTextureErrors) {
     Material material = owner.getMaterial(name);
     if (isMissing(material)) {
-      missingTextureErrors.add(Pair.of(name, owner.getModelName()));
+      missingTextureErrors.add(Pair.of(name, owner.name));
     }
     textures.add(material);
   }
 
-  @Override
-  public Collection<Material> getMaterials(IGeometryBakingContext owner, Function<ResourceLocation,UnbakedModel> modelGetter, Set<Pair<String,String>> missingTextureErrors) {
-    Set<Material> textures = new HashSet<>();
-    getTexture(owner, "still", textures, missingTextureErrors);
-    getTexture(owner, "flowing", textures, missingTextureErrors);
-    Material overlay = owner.getMaterial("overlay");
-    if (!isMissing(overlay)) {
-      textures.add(overlay);
-    }
-    return textures;
-  }
+//  @Override
+//  public Collection<Material> getMaterials(IGeometryBakingContext owner, Function<ResourceLocation,UnbakedModel> modelGetter, Set<Pair<String,String>> missingTextureErrors) {
+//    Set<Material> textures = new HashSet<>();
+//    getTexture(owner, "still", textures, missingTextureErrors);
+//    getTexture(owner, "flowing", textures, missingTextureErrors);
+//    Material overlay = owner.getMaterial("overlay");
+//    if (!isMissing(overlay)) {
+//      textures.add(overlay);
+//    }
+//    return textures;
+//  }
 
   @Override
-  public BakedModel bake(IGeometryBakingContext owner, ModelBakery bakery, Function<Material,TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides, ResourceLocation modelLocation) {
+  public BakedModel bake(BlockModel owner, ModelBaker baker, Function<Material,TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides, ResourceLocation modelLocation) {
     Material still = owner.getMaterial("still");
     Material flowing = owner.getMaterial("flowing");
     Material overlay = owner.getMaterial("overlay");
     ResourceLocation overlayLocation = isMissing(overlay) ? null : overlay.texture();
-    BakedModel baked = new SimpleBakedModel.Builder(owner.useAmbientOcclusion(), owner.useBlockLight(), owner.isGui3d(), owner.getTransforms(), overrides).particle(spriteGetter.apply(still)).build();
+    BakedModel baked = new SimpleBakedModel.Builder(owner.hasAmbientOcclusion(), owner.getGuiLight().lightLikeBlock(), true, owner.getTransforms(), overrides).particle(spriteGetter.apply(still)).build();
     return new Baked(baked, still.texture(), flowing.texture(), overlayLocation, color);
   }
 

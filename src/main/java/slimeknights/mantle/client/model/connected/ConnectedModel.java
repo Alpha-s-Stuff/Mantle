@@ -11,11 +11,8 @@ import com.google.gson.JsonSyntaxException;
 import com.mojang.datafixers.util.Either;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.math.Transformation;
-import io.github.fabricators_of_create.porting_lib.model.data.ModelData;
-import io.github.fabricators_of_create.porting_lib.model.data.ModelProperty;
-import io.github.fabricators_of_create.porting_lib.model.geometry.IGeometryBakingContext;
-import io.github.fabricators_of_create.porting_lib.model.geometry.IGeometryLoader;
-import io.github.fabricators_of_create.porting_lib.model.geometry.IUnbakedGeometry;
+import io.github.fabricators_of_create.porting_lib.models.geometry.IGeometryLoader;
+import io.github.fabricators_of_create.porting_lib.models.geometry.IUnbakedGeometry;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import net.fabricmc.fabric.api.renderer.v1.model.FabricBakedModel;
@@ -24,10 +21,12 @@ import net.fabricmc.fabric.api.rendering.data.v1.RenderAttachedBlockView;
 import net.minecraft.client.renderer.block.model.BlockElement;
 import net.minecraft.client.renderer.block.model.BlockElementFace;
 import net.minecraft.client.renderer.block.model.BlockFaceUV;
+import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.Material;
+import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.model.ModelState;
 import net.minecraft.client.resources.model.UnbakedModel;
@@ -43,6 +42,7 @@ import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import slimeknights.mantle.block.IMultipartConnectedBlock;
+import slimeknights.mantle.client.model.ModelProperty;
 import slimeknights.mantle.client.model.data.SinglePropertyData;
 import slimeknights.mantle.client.model.util.DynamicBakedWrapper;
 import slimeknights.mantle.client.model.util.ExtraTextureConfiguration;
@@ -84,58 +84,58 @@ public class ConnectedModel implements IUnbakedGeometry<ConnectedModel> {
   /** List of sides to check when getting block directions */
   private final Set<Direction> sides;
 
-  /** Map of full texture name to the resulting material, filled during {@link #getMaterials(IGeometryBakingContext, Function, Set)} */
+  /** Map of full texture name to the resulting material, filled during {@link #getMaterials(BlockModel, Function, Set)} */
   private Map<String,Material> extraTextures;
 
+//  @Override
+//  public Collection<Material> getMaterials(IGeometryBakingContext owner, Function<ResourceLocation,UnbakedModel> modelGetter, Set<Pair<String,String>> missingTextureErrors) {
+//    Collection<Material> textures = model.getMaterials(owner, modelGetter, missingTextureErrors);
+//    // for all connected textures, add suffix textures
+//    Map<String, Material> extraTextures = new HashMap<>();
+//    for (Entry<String,String[]> entry : connectedTextures.entrySet()) {
+//      // fetch data from the base texture
+//      String name = entry.getKey();
+//      // skip if missing
+//      if (!owner.hasMaterial(name)) {
+//        continue;
+//      }
+//      Material base = owner.getMaterial(name);
+//      ResourceLocation atlas = base.atlasLocation();
+//      ResourceLocation texture = base.texture();
+//      String namespace = texture.getNamespace();
+//      String path = texture.getPath();
+//
+//      // use base atlas and texture, but suffix the name
+//      String[] suffixes = entry.getValue();
+//      for (String suffix : suffixes) {
+//        if (suffix.isEmpty()) {
+//          continue;
+//        }
+//        // skip running if we have seen it before
+//        String suffixedName = name + "_" + suffix;
+//        if (!extraTextures.containsKey(suffixedName)) {
+//          Material mat;
+//          // allow overriding a specific texture
+//          if (owner.hasMaterial(suffixedName)) {
+//            mat = owner.getMaterial(suffixedName);
+//          } else {
+//            mat = new Material(atlas, new ResourceLocation(namespace, path + "/" + suffix));
+//          }
+//          textures.add(mat);
+//          // cache the texture name, we use it a lot in rebaking
+//          extraTextures.put(suffixedName, mat);
+//        }
+//      }
+//    }
+//    // copy into immutable for better performance
+//    this.extraTextures = ImmutableMap.copyOf(extraTextures);
+//
+//    // return textures list
+//    return textures;
+//  }
+
   @Override
-  public Collection<Material> getMaterials(IGeometryBakingContext owner, Function<ResourceLocation,UnbakedModel> modelGetter, Set<Pair<String,String>> missingTextureErrors) {
-    Collection<Material> textures = model.getMaterials(owner, modelGetter, missingTextureErrors);
-    // for all connected textures, add suffix textures
-    Map<String, Material> extraTextures = new HashMap<>();
-    for (Entry<String,String[]> entry : connectedTextures.entrySet()) {
-      // fetch data from the base texture
-      String name = entry.getKey();
-      // skip if missing
-      if (!owner.hasMaterial(name)) {
-        continue;
-      }
-      Material base = owner.getMaterial(name);
-      ResourceLocation atlas = base.atlasLocation();
-      ResourceLocation texture = base.texture();
-      String namespace = texture.getNamespace();
-      String path = texture.getPath();
-
-      // use base atlas and texture, but suffix the name
-      String[] suffixes = entry.getValue();
-      for (String suffix : suffixes) {
-        if (suffix.isEmpty()) {
-          continue;
-        }
-        // skip running if we have seen it before
-        String suffixedName = name + "_" + suffix;
-        if (!extraTextures.containsKey(suffixedName)) {
-          Material mat;
-          // allow overriding a specific texture
-          if (owner.hasMaterial(suffixedName)) {
-            mat = owner.getMaterial(suffixedName);
-          } else {
-            mat = new Material(atlas, new ResourceLocation(namespace, path + "/" + suffix));
-          }
-          textures.add(mat);
-          // cache the texture name, we use it a lot in rebaking
-          extraTextures.put(suffixedName, mat);
-        }
-      }
-    }
-    // copy into immutable for better performance
-    this.extraTextures = ImmutableMap.copyOf(extraTextures);
-
-    // return textures list
-    return textures;
-  }
-
-  @Override
-  public BakedModel bake(IGeometryBakingContext owner, ModelBakery bakery, Function<Material,TextureAtlasSprite> spriteGetter, ModelState transform, ItemOverrides overrides, ResourceLocation location) {
+  public BakedModel bake(BlockModel owner, ModelBaker baker, Function<Material,TextureAtlasSprite> spriteGetter, ModelState transform, ItemOverrides overrides, ResourceLocation location) {
     BakedModel baked = model.bakeModel(owner, transform, overrides, spriteGetter, location);
     return new Baked(this, new ExtraTextureConfiguration(owner, extraTextures), transform, baked);
   }
@@ -144,13 +144,13 @@ public class ConnectedModel implements IUnbakedGeometry<ConnectedModel> {
   protected static class Baked extends DynamicBakedWrapper<BakedModel> {
 
     private final ConnectedModel parent;
-    private final IGeometryBakingContext owner;
+    private final BlockModel owner;
     private final ModelState transforms;
     private final BakedModel[] cache = new BakedModel[64];
     private final Map<String, String> nameMappingCache = new ConcurrentHashMap<>();
     private final ModelTextureIteratable modelTextures;
 
-    public Baked(ConnectedModel parent, IGeometryBakingContext owner, ModelState transforms, BakedModel baked) {
+    public Baked(ConnectedModel parent, BlockModel owner, ModelState transforms, BakedModel baked) {
       super(baked);
       this.parent = parent;
       this.owner = owner;

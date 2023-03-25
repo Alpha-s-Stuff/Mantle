@@ -8,7 +8,8 @@ import slimeknights.mantle.datagen.MantleFluidTooltipProvider;
 public class MantleData implements DataGeneratorEntrypoint {
   @Override
   public void onInitializeDataGenerator(FabricDataGenerator generator) {
-      generator.addProvider(new MantleFluidTagProvider(generator));
-      generator.addProvider(new MantleFluidTooltipProvider(generator));
+    FabricDataGenerator.Pack pack = generator.createPack();
+    pack.addProvider(MantleFluidTagProvider::new);
+    pack.addProvider(new MantleFluidTooltipProvider(generator));
   }
 }
