@@ -32,6 +32,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import slimeknights.mantle.client.model.util.BakedItemModel;
 import slimeknights.mantle.client.model.util.ModelTextureIteratable;
@@ -110,23 +111,22 @@ public class NBTKeyModel implements IUnbakedGeometry<NBTKeyModel> {
 //  }
 
   /** Bakes a model for the given texture */
-  private static BakedModel bakeModel(BlockModel owner, Material texture, Function<Material,TextureAtlasSprite> spriteGetter, ImmutableMap<TransformType,Transformation> transformMap, ItemOverrides overrides) {
+  private static BakedModel bakeModel(BlockModel owner, Material texture, Function<Material,TextureAtlasSprite> spriteGetter, ItemOverrides overrides) {
     TextureAtlasSprite sprite = spriteGetter.apply(texture);
-    List<BakedQuad> quads = UnbakedGeometryHelper.bakeElements(UnbakedGeometryHelper.createUnbakedItemElements(-1, sprite), spriteGetter, new SimpleModelState(Transformation.identity()), sprite.getName());
-    return new BakedItemModel(quads, sprite, transformMap, overrides, true, owner.getGuiLight().lightLikeBlock());
+    List<BakedQuad> quads = UnbakedGeometryHelper.bakeElements(UnbakedGeometryHelper.createUnbakedItemElements(-1, sprite.contents()), spriteGetter, new SimpleModelState(Transformation.identity()), sprite.contents().name());
+    return new BakedItemModel(quads, sprite, null, overrides, true, owner.getGuiLight().lightLikeBlock());
   }
 
   @Override
   public BakedModel bake(BlockModel owner, ModelBaker bakery, Function<Material,TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides, ResourceLocation modelLocation) {
     ImmutableMap.Builder<String, BakedModel> variants = ImmutableMap.builder();
-    ImmutableMap<TransformType,Transformation> transformMap = Maps.immutableEnumMap(PerspectiveMapWrapper.getTransforms(owner.getTransforms()));
     for (Entry<String,Material> entry : textures.entrySet()) {
       String key = entry.getKey();
       if (!key.equals("default")) {
-        variants.put(key, bakeModel(owner, entry.getValue(), spriteGetter, transformMap, ItemOverrides.EMPTY));
+        variants.put(key, bakeModel(owner, entry.getValue(), spriteGetter, ItemOverrides.EMPTY));
       }
     }
-    return bakeModel(owner, textures.get("default"), spriteGetter, transformMap, new Overrides(nbtKey, textures, variants.build()));
+    return bakeModel(owner, textures.get("default"), spriteGetter, new Overrides(nbtKey, textures, variants.build()));
   }
 
   /** Overrides list for a tool slot item model */

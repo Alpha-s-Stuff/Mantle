@@ -9,6 +9,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import com.mojang.datafixers.util.Either;
 import com.mojang.datafixers.util.Pair;
+import io.github.fabricators_of_create.porting_lib.mixin.accessors.client.accessor.BlockModel$DeserializerAccessor;
 import io.github.fabricators_of_create.porting_lib.models.geometry.IGeometryLoader;
 import io.github.fabricators_of_create.porting_lib.models.geometry.IUnbakedGeometry;
 import lombok.Getter;
@@ -106,7 +107,7 @@ public class SimpleBlockModel implements IUnbakedGeometry<SimpleBlockModel> {
     Set<UnbakedModel> chain = Sets.newLinkedHashSet();
 
     // load the first model directly
-    parent = getParent(modelGetter, chain, parentLocation, owner.getModelName());
+    parent = getParent(modelGetter, chain, parentLocation, owner.name);
     // null means no model, so set missing
     if (parent == null) {
       parent = getMissing(modelGetter);
@@ -185,7 +186,7 @@ public class SimpleBlockModel implements IUnbakedGeometry<SimpleBlockModel> {
       for(BlockElementFace face : part.faces.values()) {
         Material material = owner.getMaterial(face.texture);
         if (Objects.equals(material.texture(), MissingTextureAtlasSprite.getLocation())) {
-          missingTextureErrors.add(Pair.of(face.texture, owner.getModelName()));
+          missingTextureErrors.add(Pair.of(face.texture, owner.name));
         }
         textures.add(material);
       }

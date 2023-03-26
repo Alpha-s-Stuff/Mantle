@@ -2,6 +2,7 @@ package slimeknights.mantle.recipe.data;
 
 import net.fabricmc.fabric.api.resource.conditions.v1.ConditionJsonProvider;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.resources.ResourceLocation;
@@ -60,7 +61,7 @@ public interface IRecipeBuilderUtils {
    * @return Prefixed resource location
    */
   default ResourceLocation prefix(ItemLike item, String prefix) {
-    return resource(prefix + Objects.requireNonNull(Registry.ITEM.getKey(item.asItem())).getPath());
+    return resource(prefix + Objects.requireNonNull(BuiltInRegistries.ITEM.getKey(item.asItem())).getPath());
   }
 
   /**
@@ -71,7 +72,7 @@ public interface IRecipeBuilderUtils {
    * @return Prefixed resource location
    */
   default ResourceLocation wrap(ItemLike item, String prefix, String suffix) {
-    return resource(prefix + Objects.requireNonNull(Registry.ITEM.getKey(item.asItem())).getPath() + suffix);
+    return resource(prefix + Objects.requireNonNull(BuiltInRegistries.ITEM.getKey(item.asItem())).getPath() + suffix);
   }
 
   /**

@@ -1,11 +1,11 @@
 package slimeknights.mantle.registration.object;
 
+import io.github.fabricators_of_create.porting_lib.util.RegistryObject;
 import lombok.AllArgsConstructor;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
-import io.github.fabricators_of_create.porting_lib.util.RegistryObject;
 
 import javax.annotation.Nullable;
 import java.util.Objects;
@@ -29,7 +29,7 @@ public class ItemObject<I extends ItemLike> implements Supplier<I>, ItemLike {
    */
   public ItemObject(I entry) {
     this.entry = () -> entry;
-    this.name = Objects.requireNonNull(Registry.ITEM.getKey(entry.asItem()), () -> "Attempted to create an Item Object with an unregistered entry");
+    this.name = Objects.requireNonNull(BuiltInRegistries.ITEM.getKey(entry.asItem()), () -> "Attempted to create an Item Object with an unregistered entry");
   }
 
   /**

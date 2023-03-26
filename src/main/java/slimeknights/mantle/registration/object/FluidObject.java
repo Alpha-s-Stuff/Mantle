@@ -1,9 +1,8 @@
 package slimeknights.mantle.registration.object;
 
 import lombok.Getter;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.FluidTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
@@ -39,8 +38,8 @@ public class FluidObject<F extends FlowingFluid> implements Supplier<F>, ItemLik
   /** Main constructor */
   public FluidObject(ResourceLocation id, String tagName, Supplier<? extends F> still, Supplier<? extends F> flowing, @Nullable Supplier<? extends LiquidBlock> block) {
     this.id = id;
-    this.localTag = TagKey.create(Registry.FLUID_REGISTRY, id);
-    this.forgeTag = TagKey.create(Registry.FLUID_REGISTRY, new ResourceLocation("c", tagName));
+    this.localTag = TagKey.create(Registries.FLUID, id);
+    this.forgeTag = TagKey.create(Registries.FLUID, new ResourceLocation("c", tagName));
     this.still = still;
     this.flowing = flowing;
     this.block = block;

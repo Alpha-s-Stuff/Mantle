@@ -2,13 +2,15 @@ package slimeknights.mantle.registration.deferred;
 
 import io.github.fabricators_of_create.porting_lib.util.LazyRegistrar;
 import io.github.fabricators_of_create.porting_lib.util.LazySpawnEggItem;
+import io.github.fabricators_of_create.porting_lib.util.RegistryObject;
+import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
-import io.github.fabricators_of_create.porting_lib.util.RegistryObject;
 import slimeknights.mantle.registration.ItemProperties;
 
 import java.util.function.Supplier;
@@ -21,8 +23,8 @@ public class EntityTypeDeferredRegister extends DeferredRegisterWrapper<EntityTy
 
   private final LazyRegistrar<Item> itemRegistry;
   public EntityTypeDeferredRegister(String modID) {
-    super(Registry.ENTITY_TYPE, modID);
-    itemRegistry = LazyRegistrar.create(Registry.ITEM, modID);
+    super(BuiltInRegistries.ENTITY_TYPE, modID);
+    itemRegistry = LazyRegistrar.create(BuiltInRegistries.ITEM, modID);
   }
 
   @Override
@@ -53,7 +55,8 @@ public class EntityTypeDeferredRegister extends DeferredRegisterWrapper<EntityTy
    */
   public <T extends Mob> RegistryObject<EntityType<T>> registerWithEgg(String name, Supplier<FabricEntityTypeBuilder<T>> sup, int primary, int secondary) {
     RegistryObject<EntityType<T>> object = register(name, sup);
-    itemRegistry.register(name + "_spawn_egg", () -> new LazySpawnEggItem(object, primary, secondary, ItemProperties.EGG_PROPS));
+    var spawnEgg = itemRegistry.register(name + "_spawn_egg", () -> new LazySpawnEggItem(object, primary, secondary, new Item.Properties()));
+    ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.SPAWN_EGGS).register(entries -> entries.prepend(spawnEgg.get()));
     return object;
   }
 }

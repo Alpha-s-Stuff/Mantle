@@ -56,37 +56,33 @@ public class DumpLootModifiers {
   private static int run(CommandContext<CommandSourceStack> context, boolean saveFile) throws CommandSyntaxException {
     List<ResourceLocation> finalLocations = new ArrayList<>();
     ResourceManager manager = context.getSource().getServer().getResourceManager();
-    try {
-      // logic based on forge logic for reading loot managers
-      for (Resource resource : manager.getResourceStack(GLOBAL_LOOT_MODIFIERS)) {
-        try (Reader reader = resource.openAsReader()) {
-          JsonObject json = GsonHelper.fromJson(DumpTagCommand.GSON, reader, JsonObject.class);
-          if (json == null) {
-            // no json
-            Mantle.logger.error("Couldn't load global loot modifiers from {} in data pack {} as it is empty or null", GLOBAL_LOOT_MODIFIERS, resource.sourcePackId());
-          } else {
-            // replace: remove all lower
-            if (GsonHelper.getAsBoolean(json, "replace", false)) {
-              finalLocations.clear();
-            }
-            JsonArray entryList = GsonHelper.getAsJsonArray(json, "entries");
-            for (JsonElement entry : entryList) {
-              ResourceLocation res = ResourceLocation.tryParse(GsonHelper.convertToString(entry, "entry"));
-              if (res != null) {
-                finalLocations.remove(res);
-                finalLocations.add(res);
-              }
+    // logic based on forge logic for reading loot managers
+    for (Resource resource : manager.getResourceStack(GLOBAL_LOOT_MODIFIERS)) {
+      try (Reader reader = resource.openAsReader()) {
+        JsonObject json = GsonHelper.fromJson(DumpTagCommand.GSON, reader, JsonObject.class);
+        if (json == null) {
+          // no json
+          Mantle.logger.error("Couldn't load global loot modifiers from {} in data pack {} as it is empty or null", GLOBAL_LOOT_MODIFIERS, resource.sourcePackId());
+        } else {
+          // replace: remove all lower
+          if (GsonHelper.getAsBoolean(json, "replace", false)) {
+            finalLocations.clear();
+          }
+          JsonArray entryList = GsonHelper.getAsJsonArray(json, "entries");
+          for (JsonElement entry : entryList) {
+            ResourceLocation res = ResourceLocation.tryParse(GsonHelper.convertToString(entry, "entry"));
+            if (res != null) {
+              finalLocations.remove(res);
+              finalLocations.add(res);
             }
           }
         }
-        catch (RuntimeException | IOException ex) {
-          Mantle.logger.error("Couldn't read global loot modifier list {} in data pack {}", GLOBAL_LOOT_MODIFIERS, resource.sourcePackId(), ex);
-        } finally {
-          IOUtils.closeQuietly(resource);
-        }
       }
-    } catch (IOException ex) {
-      throw ERROR_READING_LOOT_MODIFIERS.create();
+      catch (RuntimeException | IOException ex) {
+        Mantle.logger.error("Couldn't read global loot modifier list {} in data pack {}", GLOBAL_LOOT_MODIFIERS, resource.sourcePackId(), ex);
+      } finally {
+//          IOUtils.closeQuietly(resource);
+      }
     }
 
     // save the list as JSON

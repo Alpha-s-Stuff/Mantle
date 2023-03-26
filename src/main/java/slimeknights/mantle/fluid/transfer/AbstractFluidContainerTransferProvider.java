@@ -3,11 +3,10 @@ package slimeknights.mantle.fluid.transfer;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
+import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.resource.conditions.v1.ConditionJsonProvider;
 import net.fabricmc.fabric.api.resource.conditions.v1.ResourceConditions;
 import net.minecraft.data.CachedOutput;
-import net.minecraft.data.DataGenerator;
-import net.minecraft.data.HashCache;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.tags.TagKey;
@@ -18,9 +17,11 @@ import slimeknights.mantle.data.GenericDataProvider;
 import slimeknights.mantle.recipe.helper.ItemOutput;
 import slimeknights.mantle.recipe.ingredient.FluidIngredient;
 
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 /** Data gen for fluid transfer logic */
 @SuppressWarnings("unused")
@@ -28,7 +29,7 @@ public abstract class AbstractFluidContainerTransferProvider extends GenericData
   private final Map<ResourceLocation,TransferJson> allTransfers = new HashMap<>();
   private final String modId;
 
-  public AbstractFluidContainerTransferProvider(DataGenerator generator, String modId) {
+  public AbstractFluidContainerTransferProvider(FabricDataOutput generator, String modId) {
     super(generator, PackType.SERVER_DATA, FluidContainerTransferManager.FOLDER, FluidContainerTransferManager.GSON);
     this.modId = modId;
   }
@@ -62,9 +63,11 @@ public abstract class AbstractFluidContainerTransferProvider extends GenericData
   }
 
   @Override
-  public void run(CachedOutput cache) throws IOException {
+  public CompletableFuture<?> run(CachedOutput cache) {
     addTransfers();
-    allTransfers.forEach((id, data) -> saveThing(cache, id, data.toJson()));
+    final List<CompletableFuture<?>> futures = new ArrayList<>();
+    allTransfers.forEach((id, data) -> futures.add(saveThing(cache, id, data.toJson())));
+    return CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new));
   }
 
   /** Json with transfer and condition */

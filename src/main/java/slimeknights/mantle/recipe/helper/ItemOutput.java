@@ -6,6 +6,8 @@ import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSyntaxException;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.tags.TagKey;
@@ -88,7 +90,7 @@ public abstract class ItemOutput implements Supplier<ItemStack> {
     // if it has a tag, parse as tag
     JsonObject json = element.getAsJsonObject();
     if (json.has("tag")) {
-      TagKey<Item> tag = TagKey.create(Registry.ITEM_REGISTRY, JsonHelper.getResourceLocation(json, "tag"));
+      TagKey<Item> tag = TagKey.create(Registries.ITEM, JsonHelper.getResourceLocation(json, "tag"));
       int count = GsonHelper.getAsInt(json, "count", 1);
       return fromTag(tag, count);
     }
@@ -131,7 +133,7 @@ public abstract class ItemOutput implements Supplier<ItemStack> {
 
     @Override
     public JsonElement serialize() {
-      String itemName = Objects.requireNonNull(Registry.ITEM.getKey(item)).toString();
+      String itemName = Objects.requireNonNull(BuiltInRegistries.ITEM.getKey(item)).toString();
       if (count > 1) {
         JsonObject json = new JsonObject();
         json.addProperty("item", itemName);
@@ -155,7 +157,7 @@ public abstract class ItemOutput implements Supplier<ItemStack> {
 
     @Override
     public JsonElement serialize() {
-      String itemName = Objects.requireNonNull(Registry.ITEM.getKey(stack.getItem())).toString();
+      String itemName = Objects.requireNonNull(BuiltInRegistries.ITEM.getKey(stack.getItem())).toString();
       int count = stack.getCount();
       // if the item has NBT or a count, write as object
       if (stack.hasTag() || count > 1) {

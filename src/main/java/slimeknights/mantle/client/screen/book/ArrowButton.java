@@ -23,8 +23,8 @@ public class ArrowButton extends Button {
   public int color;
   public int hoverColor;
 
-  public ArrowButton(@Nullable BookData bookData, int x, int y, ArrowType arrowType, int color, int hoverColor, OnPress iPressable) {
-    super(x, y, arrowType.w, arrowType.h, Component.empty(), iPressable);
+  public ArrowButton(@Nullable BookData bookData, int x, int y, ArrowType arrowType, int color, int hoverColor, OnPress iPressable, CreateNarration createNarration) {
+    super(x, y, arrowType.w, arrowType.h, Component.empty(), iPressable, createNarration);
 
     this.arrowType = arrowType;
     this.color = color;
@@ -32,8 +32,12 @@ public class ArrowButton extends Button {
     this.bookData = bookData;
   }
 
-  public ArrowButton(int x, int y, ArrowType arrowType, int color, int hoverColor, OnPress iPressable) {
-    this(null, x, y, arrowType, color, hoverColor, iPressable);
+  public ArrowButton(@Nullable BookData bookData, int x, int y, ArrowType arrowType, int color, int hoverColor, OnPress iPressable) {
+    this(bookData, x, y, arrowType, color, hoverColor, iPressable, Button.DEFAULT_NARRATION);
+  }
+
+  public ArrowButton(int x, int y, ArrowType arrowType, int color, int hoverColor, OnPress iPressable, CreateNarration createNarration) {
+    this(null, x, y, arrowType, color, hoverColor, iPressable, createNarration);
   }
 
   public void renderButton(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks, @Nullable BookData bookData) {
@@ -44,7 +48,7 @@ public class ArrowButton extends Button {
       RenderSystem.setShaderTexture(0, TEX_BOOK);
     }
 
-    this.isHovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
+    this.isHovered = mouseX >= this.getX() && mouseY >= this.getY() && mouseX < this.getX() + this.width && mouseY < this.getY() + this.height;
 
     int color = this.isHovered ? this.hoverColor : this.color;
 
@@ -53,12 +57,11 @@ public class ArrowButton extends Button {
     float b = (color & 0xff) / 255.F;
 
     RenderSystem.setShaderColor(r, g, b, 1f);
-    blit(matrixStack, this.x, this.y, this.width, this.height, this.arrowType.x, this.arrowType.y, this.width, this.height, 512, 512);
-    this.renderBg(matrixStack, minecraft, mouseX, mouseY);
+    blit(matrixStack, this.getX(), this.getY(), this.width, this.height, this.arrowType.x, this.arrowType.y, this.width, this.height, 512, 512);
   }
 
   @Override
-  public void renderButton(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+  public void renderWidget(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
     renderButton(matrixStack, mouseX, mouseY, partialTicks, bookData);
   }
 

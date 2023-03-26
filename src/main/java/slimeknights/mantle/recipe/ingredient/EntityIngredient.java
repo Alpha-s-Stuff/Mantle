@@ -8,7 +8,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.core.Holder;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -51,7 +52,7 @@ public abstract class EntityIngredient implements Predicate<EntityType<?>> {
     Collection<EntityType<?>> collection = getTypes();
     buffer.writeVarInt(collection.size());
     for (EntityType<?> type : collection) {
-      buffer.writeResourceLocation(Registry.ENTITY_TYPE.getKey(type));
+      buffer.writeResourceLocation(BuiltInRegistries.ENTITY_TYPE.getKey(type));
     }
   }
 
@@ -98,11 +99,11 @@ public abstract class EntityIngredient implements Predicate<EntityType<?>> {
   public static EntityIngredient read(FriendlyByteBuf buffer) {
     int count = buffer.readVarInt();
     if (count == 1) {
-      return new Single(Registry.ENTITY_TYPE.get(buffer.readResourceLocation()));
+      return new Single(BuiltInRegistries.ENTITY_TYPE.get(buffer.readResourceLocation()));
     }
     List<EntityType<?>> list = new ArrayList<>(count);
     for (int i = 0; i < count; i++) {
-      list.add(Registry.ENTITY_TYPE.get(buffer.readResourceLocation()));
+      list.add(BuiltInRegistries.ENTITY_TYPE.get(buffer.readResourceLocation()));
     }
     return new SetMatch(ImmutableSet.copyOf(list));
   }
@@ -113,8 +114,8 @@ public abstract class EntityIngredient implements Predicate<EntityType<?>> {
    * @return  Entity type
    */
   private static EntityType<?> findEntityType(ResourceLocation name) {
-    if (Registry.ENTITY_TYPE.containsKey(name)) {
-      EntityType<?> type = Registry.ENTITY_TYPE.get(name);
+    if (BuiltInRegistries.ENTITY_TYPE.containsKey(name)) {
+      EntityType<?> type = BuiltInRegistries.ENTITY_TYPE.get(name);
       if (type != null) {
         return type;
       }
@@ -148,7 +149,7 @@ public abstract class EntityIngredient implements Predicate<EntityType<?>> {
     }
     // tag is also a name
     if (json.has("tag")) {
-      return new TagMatch(TagKey.create(Registry.ENTITY_TYPE_REGISTRY, JsonHelper.getResourceLocation(json, "tag")));
+      return new TagMatch(TagKey.create(Registries.ENTITY_TYPE, JsonHelper.getResourceLocation(json, "tag")));
     }
     // types is a list
     if (json.has("types")) {
@@ -178,7 +179,7 @@ public abstract class EntityIngredient implements Predicate<EntityType<?>> {
     @Override
     public JsonElement serialize() {
       JsonObject object = new JsonObject();
-      object.addProperty("type", Objects.requireNonNull(Registry.ENTITY_TYPE.getKey(type)).toString());
+      object.addProperty("type", Objects.requireNonNull(BuiltInRegistries.ENTITY_TYPE.getKey(type)).toString());
       return object;
     }
   }
@@ -203,7 +204,7 @@ public abstract class EntityIngredient implements Predicate<EntityType<?>> {
       JsonObject object = new JsonObject();
       JsonArray array = new JsonArray();
       for (EntityType<?> type : getTypes()) {
-        array.add(Objects.requireNonNull(Registry.ENTITY_TYPE.getKey(type)).toString());
+        array.add(Objects.requireNonNull(BuiltInRegistries.ENTITY_TYPE.getKey(type)).toString());
       }
       object.add("types", array);
       return object;
@@ -224,7 +225,7 @@ public abstract class EntityIngredient implements Predicate<EntityType<?>> {
     @Override
     public List<EntityType<?>> getTypes() {
       if (types == null) {
-        types = StreamSupport.stream(Registry.ENTITY_TYPE.getTagOrEmpty(tag).spliterator(), false)
+        types = StreamSupport.stream(BuiltInRegistries.ENTITY_TYPE.getTagOrEmpty(tag).spliterator(), false)
                              .filter(Holder::isBound)
                              .map(Holder::value)
                              .collect(Collectors.toList());

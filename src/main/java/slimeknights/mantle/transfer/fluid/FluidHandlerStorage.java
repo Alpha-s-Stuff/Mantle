@@ -56,7 +56,7 @@ public class FluidHandlerStorage implements Storage<FluidVariant> {
 	}
 
 	@Override
-	public Iterator<StorageView<FluidVariant>> iterator(TransactionContext transaction) {
+	public Iterator<StorageView<FluidVariant>> iterator() {
 		int tanks = handler.getTanks();
 		List<StorageView<FluidVariant>> views = new ArrayList<>();
 		for (int i = 0; i < tanks; i++) {
@@ -66,19 +66,9 @@ public class FluidHandlerStorage implements Storage<FluidVariant> {
 	}
 
 	@Override
-	public Iterable<StorageView<FluidVariant>> iterable(TransactionContext transaction) {
-		int tanks = handler.getTanks();
-		List<StorageView<FluidVariant>> views = new ArrayList<>();
-		for (int i = 0; i < tanks; i++) {
-			views.add(new TankStorageView(i, handler));
-		}
-		return views;
-	}
-
-	@Override
 	@Nullable
-	public StorageView<FluidVariant> exactView(TransactionContext transaction, FluidVariant resource) {
-		for (StorageView<FluidVariant> view : iterable(transaction)) {
+	public StorageView<FluidVariant> exactView(FluidVariant resource) {
+		for (StorageView<FluidVariant> view : this) {
 			if (view.getResource().equals(resource)) {
 				return view;
 			}

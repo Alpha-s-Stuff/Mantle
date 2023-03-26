@@ -72,7 +72,6 @@ public class ExtraHeartRenderHandler {
     RenderSystem.enableBlend();
     RenderSystem.defaultBlendFunc();
     RenderSystem.disableDepthTest();
-    RenderSystem.enableTexture();
     RenderSystem.setShaderTexture(0, Gui.GUI_ICONS_LOCATION);
 
     RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);

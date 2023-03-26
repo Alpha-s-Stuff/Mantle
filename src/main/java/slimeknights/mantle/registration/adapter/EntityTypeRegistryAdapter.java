@@ -1,7 +1,7 @@
 package slimeknights.mantle.registration.adapter;
 
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import slimeknights.mantle.Mantle;
@@ -13,12 +13,12 @@ import slimeknights.mantle.Mantle;
 public class EntityTypeRegistryAdapter extends RegistryAdapter<EntityType<?>> {
   /** @inheritDoc */
   public EntityTypeRegistryAdapter(String modId) {
-    super(Registry.ENTITY_TYPE, modId);
+    super(BuiltInRegistries.ENTITY_TYPE, modId);
   }
 
   /** @inheritDoc */
   public EntityTypeRegistryAdapter() {
-    super(Registry.ENTITY_TYPE, Mantle.modId);
+    super(BuiltInRegistries.ENTITY_TYPE, Mantle.modId);
   }
 
   /**

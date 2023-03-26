@@ -2,7 +2,7 @@ package slimeknights.mantle.fluid.transfer;
 
 import com.google.common.collect.ImmutableSet;
 import lombok.RequiredArgsConstructor;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.item.Item;
 import slimeknights.mantle.network.packet.IThreadsafePacket;
@@ -18,7 +18,7 @@ public class FluidContainerTransferPacket implements IThreadsafePacket {
     ImmutableSet.Builder<Item> builder = ImmutableSet.builder();
     int size = buffer.readVarInt();
     for (int i = 0; i < size; i++) {
-      builder.add(Registry.ITEM.get(buffer.readResourceLocation()));
+      builder.add(BuiltInRegistries.ITEM.get(buffer.readResourceLocation()));
     }
     this.items = builder.build();
   }
@@ -27,7 +27,7 @@ public class FluidContainerTransferPacket implements IThreadsafePacket {
   public void encode(FriendlyByteBuf buffer) {
     buffer.writeVarInt(items.size());
     for (Item item : items) {
-      buffer.writeResourceLocation(Registry.ITEM.getKey(item));
+      buffer.writeResourceLocation(BuiltInRegistries.ITEM.getKey(item));
     }
   }
 

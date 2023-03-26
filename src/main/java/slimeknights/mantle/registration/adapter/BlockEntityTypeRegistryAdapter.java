@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSet.Builder;
 import com.mojang.datafixers.types.Type;
 import net.minecraft.Util;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.util.datafix.fixes.References;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -23,12 +23,12 @@ import java.util.function.Consumer;
 public class BlockEntityTypeRegistryAdapter extends RegistryAdapter<BlockEntityType<?>> {
   /** @inheritDoc */
   public BlockEntityTypeRegistryAdapter(String modId) {
-    super(Registry.BLOCK_ENTITY_TYPE, modId);
+    super(BuiltInRegistries.BLOCK_ENTITY_TYPE, modId);
   }
 
   /** @inheritDoc */
   public BlockEntityTypeRegistryAdapter() {
-    super(Registry.BLOCK_ENTITY_TYPE, Mantle.modId);
+    super(BuiltInRegistries.BLOCK_ENTITY_TYPE, Mantle.modId);
   }
 
   /**

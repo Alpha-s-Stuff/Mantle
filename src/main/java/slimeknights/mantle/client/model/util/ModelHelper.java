@@ -110,7 +110,7 @@ public class ModelHelper {
    */
   @SuppressWarnings("deprecation")
   private static ResourceLocation getParticleTextureInternal(Block block) {
-    return Minecraft.getInstance().getModelManager().getBlockModelShaper().getBlockModel(block.defaultBlockState()).getParticleIcon().getName();
+    return Minecraft.getInstance().getModelManager().getBlockModelShaper().getBlockModel(block.defaultBlockState()).getParticleIcon().contents().name();
   }
 
   /**

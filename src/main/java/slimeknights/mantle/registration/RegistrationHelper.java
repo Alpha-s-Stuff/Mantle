@@ -4,6 +4,7 @@ import com.mojang.datafixers.DataFixerBuilder;
 import com.mojang.datafixers.schemas.Schema;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import net.fabricmc.fabric.api.object.builder.v1.block.type.WoodTypeRegistry;
 import net.minecraft.util.datafix.DataFixers;
 import net.minecraft.util.datafix.fixes.BlockRenameFix;
 import net.minecraft.world.level.block.state.properties.WoodType;
@@ -54,7 +55,6 @@ public class RegistrationHelper {
   public static void registerWoodType(WoodType type) {
     synchronized (WOOD_TYPES) {
       WOOD_TYPES.add(type);
-      WoodType.register(type);
     }
   }
 

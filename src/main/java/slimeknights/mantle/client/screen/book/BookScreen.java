@@ -334,18 +334,18 @@ public class BookScreen extends Screen {
     this.backArrow.visible = this.oldPage >= -1;
 
     if (this.page == -1) {
-      this.nextArrow.x = this.width / 2 + 80;
+      this.nextArrow.setX(this.width / 2 + 80);
       this.indexArrow.visible = false;
     } else {
-      this.previousArrow.x = this.width / 2 - 184;
-      this.nextArrow.x = this.width / 2 + 165;
+      this.previousArrow.setX(this.width / 2 - 184);
+      this.nextArrow.setX(this.width / 2 + 165);
 
       SectionData index = this.book.findSection("index", this.advancementCache);
       this.indexArrow.visible = index != null && (this.page - 1) * 2 + 2 > index.getPageCount();
     }
 
-    this.previousArrow.y = this.height / 2 + 75;
-    this.nextArrow.y = this.height / 2 + 75;
+    this.previousArrow.setY(this.height / 2 + 75);
+    this.nextArrow.setY(this.height / 2 + 75);
   }
 
   /** Goes to the previous page */

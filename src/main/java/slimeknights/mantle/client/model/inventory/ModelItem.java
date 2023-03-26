@@ -53,7 +53,7 @@ public class ModelItem {
    */
   public Vector3f getCenterScaled() {
     if (centerScaled == null) {
-      centerScaled = center.copy();
+      centerScaled = new Vector3f(center);
       centerScaled.mul(1f / 16f);
     }
     return centerScaled;

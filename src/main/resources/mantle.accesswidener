@@ -43,3 +43,4 @@ transitive-accessible field net/minecraft/util/datafix/DataFixers SAME_NAMESPACE
 transitive-mutable field net/minecraft/world/inventory/Slot x I
 transitive-mutable field net/minecraft/world/inventory/Slot y I
 accessible field net/minecraft/client/renderer/block/model/BlockModel textureMap Ljava/util/Map;
+accessible method net/minecraft/client/gui/GuiComponent innerBlit (Lorg/joml/Matrix4f;IIIIIFFFF)V

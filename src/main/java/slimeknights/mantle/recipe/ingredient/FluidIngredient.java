@@ -15,6 +15,8 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -100,7 +102,7 @@ public abstract class FluidIngredient {
     Collection<FluidStack> fluids = getAllFluids();
     buffer.writeInt(fluids.size());
     for (FluidStack stack : fluids) {
-      buffer.writeUtf(Objects.requireNonNull(Registry.FLUID.getKey(stack.getFluid())).toString());
+      buffer.writeUtf(Objects.requireNonNull(BuiltInRegistries.FLUID.getKey(stack.getFluid())).toString());
       buffer.writeLong(stack.getAmount());
     }
   }
@@ -229,7 +231,7 @@ public abstract class FluidIngredient {
     int count = buffer.readInt();
     FluidIngredient[] ingredients = new FluidIngredient[count];
     for (int i = 0; i < count; i++) {
-      Fluid fluid = Registry.FLUID.get(new ResourceLocation(buffer.readUtf(32767)));
+      Fluid fluid = BuiltInRegistries.FLUID.get(new ResourceLocation(buffer.readUtf(32767)));
       if (fluid == null) {
         fluid = Fluids.EMPTY;
       }
@@ -300,7 +302,7 @@ public abstract class FluidIngredient {
     @Override
     public JsonElement serialize() {
       JsonObject object = new JsonObject();
-      object.addProperty("name", Objects.requireNonNull(Registry.FLUID.getKey(fluid)).toString());
+      object.addProperty("name", Objects.requireNonNull(BuiltInRegistries.FLUID.getKey(fluid)).toString());
       object.addProperty("amount", amount);
       return object;
     }
@@ -310,7 +312,7 @@ public abstract class FluidIngredient {
       // count
       buffer.writeInt(1);
       // single fluid
-      buffer.writeUtf(Objects.requireNonNull(Registry.FLUID.getKey(fluid)).toString());
+      buffer.writeUtf(Objects.requireNonNull(BuiltInRegistries.FLUID.getKey(fluid)).toString());
       buffer.writeLong(amount);
     }
 
@@ -321,7 +323,7 @@ public abstract class FluidIngredient {
      */
     private static FluidMatch deserialize(JsonObject json) {
       String fluidName = GsonHelper.getAsString(json, "name");
-      Fluid fluid = Registry.FLUID.get(new ResourceLocation(fluidName));
+      Fluid fluid = BuiltInRegistries.FLUID.get(new ResourceLocation(fluidName));
       if (fluid == null || fluid == Fluids.EMPTY) {
         throw new JsonSyntaxException("Unknown fluid '" + fluidName + "'");
       }
@@ -350,7 +352,7 @@ public abstract class FluidIngredient {
 
     @Override
     public List<FluidStack> getAllFluids() {
-      return StreamSupport.stream(Registry.FLUID.getTagOrEmpty(tag).spliterator(), false)
+      return StreamSupport.stream(BuiltInRegistries.FLUID.getTagOrEmpty(tag).spliterator(), false)
                           .filter(Holder::isBound)
                           .map(fluid -> new FluidStack(fluid.value(), amount))
                           .toList();
@@ -370,7 +372,7 @@ public abstract class FluidIngredient {
      * @return Fluid ingredient instance
      */
     private static TagMatch deserialize(JsonObject json) {
-      TagKey<Fluid> tag = TagKey.create(Registry.FLUID_REGISTRY, JsonHelper.getResourceLocation(json, "tag"));
+      TagKey<Fluid> tag = TagKey.create(Registries.FLUID, JsonHelper.getResourceLocation(json, "tag"));
       long amount = GsonHelper.getAsLong(json, "amount");
       return new TagMatch(tag, amount);
     }

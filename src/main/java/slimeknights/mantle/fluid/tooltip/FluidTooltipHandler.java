@@ -12,7 +12,8 @@ import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.ChatFormatting;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
@@ -50,7 +51,7 @@ public class FluidTooltipHandler extends SimpleJsonResourceReloadListener implem
   public static final Gson GSON = (new GsonBuilder())
     .registerTypeAdapter(ResourceLocation.class, new ResourceLocation.Serializer())
     .registerTypeAdapter(FluidIngredient.class, FluidIngredient.SERIALIZER)
-    .registerTypeAdapter(TagKey.class, new TagKeySerializer<>(Registry.FLUID_REGISTRY))
+    .registerTypeAdapter(TagKey.class, new TagKeySerializer<>(Registries.FLUID))
     .setPrettyPrinting()
     .disableHtmlEscaping()
     .create();
@@ -191,7 +192,7 @@ public class FluidTooltipHandler extends SimpleJsonResourceReloadListener implem
     // material
     appendMaterial(fluid.getFluid(), amount, tooltip);
     // add mod display name
-    FabricLoader.getInstance().getModContainer(Objects.requireNonNull(Registry.FLUID.getKey(fluid.getFluid())).getNamespace())
+    FabricLoader.getInstance().getModContainer(Objects.requireNonNull(BuiltInRegistries.FLUID.getKey(fluid.getFluid())).getNamespace())
            .map(container -> container.getMetadata().getName())
            .ifPresent(name -> tooltip.add(Component.literal(name).withStyle(ChatFormatting.BLUE, ChatFormatting.ITALIC)));
     return tooltip;

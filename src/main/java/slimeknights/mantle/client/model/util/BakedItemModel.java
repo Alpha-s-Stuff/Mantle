@@ -19,7 +19,7 @@ import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.Direction;
 
-public class BakedItemModel implements BakedModel, TransformTypeDependentItemBakedModel {
+public class BakedItemModel implements BakedModel/*, TransformTypeDependentItemBakedModel*/ {
   protected final List<BakedQuad> quads;
   protected final TextureAtlasSprite particle;
   protected final ImmutableMap<ItemDisplayContext, Transformation> transforms;
@@ -34,7 +34,7 @@ public class BakedItemModel implements BakedModel, TransformTypeDependentItemBak
     this.transforms = transforms;
     this.overrides = overrides;
     this.useBlockLight = useBlockLight;
-    this.guiModel = untransformed && hasGuiIdentity(transforms) ? new BakedGuiItemModel<>(this) : null;
+    this.guiModel = null;
   }
 
   private static boolean hasGuiIdentity(ImmutableMap<ItemDisplayContext, Transformation> transforms)
@@ -66,17 +66,17 @@ public class BakedItemModel implements BakedModel, TransformTypeDependentItemBak
     return ImmutableList.of();
   }
 
-  @Override
-  public BakedModel handlePerspective(ItemDisplayContext type, PoseStack poseStack)
-  {
-    if (type == ItemDisplayContext.GUI && this.guiModel != null)
-    {
-      return ((TransformTypeDependentItemBakedModel)this.guiModel).handlePerspective(type, poseStack);
-    }
-    return ModelHelper.handlePerspective(this, transforms, type, poseStack);
-  }
+//  @Override
+//  public BakedModel handlePerspective(ItemDisplayContext type, PoseStack poseStack)
+//  {
+//    if (type == ItemDisplayContext.GUI && this.guiModel != null)
+//    {
+//      return ((TransformTypeDependentItemBakedModel)this.guiModel).handlePerspective(type, poseStack);
+//    }
+//    return ModelHelper.handlePerspective(this, transforms, type, poseStack);
+//  }
 
-  public static class BakedGuiItemModel<T extends BakedItemModel> extends ForwardingBakedModel implements TransformTypeDependentItemBakedModel
+  public static class BakedGuiItemModel<T extends BakedItemModel> extends ForwardingBakedModel/* implements TransformTypeDependentItemBakedModel*/
   {
     private final ImmutableList<BakedQuad> quads;
 
@@ -104,17 +104,17 @@ public class BakedItemModel implements BakedModel, TransformTypeDependentItemBak
       return ImmutableList.of();
     }
 
-    @Override
-    public BakedModel handlePerspective(ItemDisplayContext type, PoseStack poseStack)
-    {
-      if (type == ItemDisplayContext.GUI)
-      {
-        return ModelHelper.handlePerspective(this, ((BakedItemModel)wrapped).transforms, type, poseStack);
-      }
-
-      if(this.wrapped instanceof TransformTypeDependentItemBakedModel model)
-        return model.handlePerspective(type, poseStack);
-      return this;
-    }
+//    @Override
+//    public BakedModel handlePerspective(ItemDisplayContext type, PoseStack poseStack)
+//    {
+//      if (type == ItemDisplayContext.GUI)
+//      {
+//        return ModelHelper.handlePerspective(this, ((BakedItemModel)wrapped).transforms, type, poseStack);
+//      }
+//
+//      if(this.wrapped instanceof TransformTypeDependentItemBakedModel model)
+//        return model.handlePerspective(type, poseStack);
+//      return this;
+//    }
   }
 }

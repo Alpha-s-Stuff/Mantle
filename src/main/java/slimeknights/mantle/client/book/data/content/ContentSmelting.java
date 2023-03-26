@@ -103,7 +103,7 @@ public class ContentSmelting extends PageContent {
       if (recipe instanceof AbstractCookingRecipe) {
         this.input = IngredientData.getItemStackData(NonNullList.of(ItemStack.EMPTY, recipe.getIngredients().get(0).getItems()));
         this.cookTime = ((AbstractCookingRecipe) recipe).getCookingTime();
-        this.result = IngredientData.getItemStackData(recipe.getResultItem());
+        this.result = IngredientData.getItemStackData(recipe.getResultItem(Minecraft.getInstance().level.registryAccess()));
       }
     }
   }

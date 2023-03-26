@@ -1,7 +1,6 @@
 package slimeknights.mantle.registration.adapter;
 
-import net.minecraft.core.Registry;
-import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.inventory.MenuType;
 import slimeknights.mantle.Mantle;
 
@@ -9,12 +8,12 @@ import slimeknights.mantle.Mantle;
 public class ContainerTypeRegistryAdapter extends RegistryAdapter<MenuType<?>> {
   /** @inheritDoc */
   public ContainerTypeRegistryAdapter(String modId) {
-    super(Registry.MENU, modId);
+    super(BuiltInRegistries.MENU, modId);
   }
 
   /** @inheritDoc */
   public ContainerTypeRegistryAdapter() {
-    super(Registry.MENU, Mantle.modId);
+    super(BuiltInRegistries.MENU, Mantle.modId);
   }
 
 //  /**

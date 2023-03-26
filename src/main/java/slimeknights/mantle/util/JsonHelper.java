@@ -232,7 +232,7 @@ public class JsonHelper {
     try (BufferedReader reader = resource.openAsReader()) {
       return GsonHelper.parse(reader);
     } catch (JsonParseException | IOException e) {
-      Mantle.logger.error("Failed to load JSON from resource " + resource.getLocation(), e);
+      Mantle.logger.error("Failed to load JSON from resource " + resource.sourcePackId(), e);
       return null;
     }
   }
@@ -244,18 +244,11 @@ public class JsonHelper {
       .filter(ResourceLocation::isValidNamespace)
       .flatMap(namespace -> {
         ResourceLocation location = new ResourceLocation(namespace, path);
-        try {
-          return manager.getResources(location).stream();
-        } catch (FileNotFoundException e) {
-          // suppress, the above method throws instead of returning empty
-        } catch (IOException e) {
-          Mantle.logger.error("Failed to load JSON files from {}", location, e);
-        }
-        return Stream.empty();
+        return manager.getResourceStack(location).stream();
       })
       .map(preferredPath != null ? resource -> {
-        ResourceLocation loaded = resource.getLocation();
-        Mantle.logger.warn("Using deprecated path {} in pack {} - use {}:{} instead", loaded, resource.getSourceName(), loaded.getNamespace(), preferredPath);
+        String loaded = resource.source().packId();
+        Mantle.logger.warn("Using deprecated path {} in pack {} - use {}:{} instead", loaded, resource.sourcePackId(), loaded, preferredPath);
         return getJson(resource);
       } : JsonHelper::getJson)
       .filter(Objects::nonNull).toList();
@@ -269,7 +262,7 @@ public class JsonHelper {
 
     // on a dedicated server, the client is running a separate game instance, this is where we send packets, plus fully loaded should already be true
     // this event is not fired when connecting to a server
-    if (!player.connection.getConnection().isMemoryConnection()) {
+    if (!player.connection.connection.isMemoryConnection()) {
       for (ISimplePacket packet : packets) {
         network.sendTo(packet, player);
       }

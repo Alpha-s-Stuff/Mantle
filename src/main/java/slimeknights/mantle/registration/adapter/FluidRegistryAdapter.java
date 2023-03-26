@@ -1,12 +1,8 @@
 package slimeknights.mantle.registration.adapter;
 
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.material.Fluid;
 import slimeknights.mantle.Mantle;
-import slimeknights.mantle.registration.DelayedSupplier;
-import slimeknights.mantle.registration.FluidBuilder;
-
-import java.util.function.Function;
 
 /**
  * Registry adapter for registering fluids
@@ -15,12 +11,12 @@ import java.util.function.Function;
 public class FluidRegistryAdapter extends RegistryAdapter<Fluid> {
   /** @inheritDoc */
   public FluidRegistryAdapter() {
-    super(Registry.FLUID, Mantle.modId);
+    super(BuiltInRegistries.FLUID, Mantle.modId);
   }
 
   /** @inheritDoc */
   public FluidRegistryAdapter(String modId) {
-    super(Registry.FLUID, modId);
+    super(BuiltInRegistries.FLUID, modId);
   }
 
 //  /**

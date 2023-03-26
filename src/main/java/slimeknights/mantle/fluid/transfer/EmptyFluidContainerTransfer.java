@@ -6,10 +6,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
-import net.minecraft.core.Registry;
-import slimeknights.mantle.transfer.fluid.IFluidHandler;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import lombok.RequiredArgsConstructor;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.Item;
@@ -19,6 +18,7 @@ import org.apache.commons.lang3.function.TriFunction;
 import slimeknights.mantle.Mantle;
 import slimeknights.mantle.recipe.helper.ItemOutput;
 import slimeknights.mantle.recipe.helper.RecipeHelper;
+import slimeknights.mantle.transfer.fluid.IFluidHandler;
 import slimeknights.mantle.util.JsonHelper;
 
 import java.lang.reflect.Type;
@@ -58,7 +58,7 @@ public class EmptyFluidContainerTransfer implements IFluidContainerTransfer {
       long actual = handler.fill(contained.copy(), false);
       if (actual > 0) {
         if (actual != this.fluid.getAmount()) {
-          Mantle.logger.error("Wrong amount filled from {}, expected {}, filled {}", Registry.ITEM.getKey(stack.getItem()), this.fluid.getAmount(), actual);
+          Mantle.logger.error("Wrong amount filled from {}, expected {}, filled {}", BuiltInRegistries.ITEM.getKey(stack.getItem()), this.fluid.getAmount(), actual);
         }
         return new TransferResult(filled.get().copy(), contained, false);
       }

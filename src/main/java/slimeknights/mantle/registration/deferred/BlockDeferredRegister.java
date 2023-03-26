@@ -1,6 +1,7 @@
 package slimeknights.mantle.registration.deferred;
 
 import io.github.fabricators_of_create.porting_lib.util.LazyRegistrar;
+import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.object.builder.v1.block.type.BlockSetTypeRegistry;
 import net.fabricmc.fabric.api.object.builder.v1.block.type.WoodTypeRegistry;
 import net.minecraft.core.Registry;
@@ -82,7 +83,7 @@ public class BlockDeferredRegister extends DeferredRegisterWrapper<Block> {
    * @return  Block registry object
    */
   public <B extends Block> RegistryObject<B> registerNoItem(String name, Supplier<? extends B> block) {
-    return register.register(name, block.get());
+    return (RegistryObject<B>) register.register(name, block.get());
   }
 
   /**
@@ -220,13 +221,13 @@ public class BlockDeferredRegister extends DeferredRegisterWrapper<Block> {
     BlockSetType setType = BlockSetTypeRegistry.registerWood(resource(name));
     WoodType woodType = WoodTypeRegistry.register(resource(name), setType);
     RegistrationHelper.registerWoodType(woodType);
-    Item.Properties itemProps = new Item.Properties().tab(group);
+    Item.Properties itemProps = new Item.Properties();
 
     // many of these are already burnable via tags, but simplier to set them all here
     Function<Integer, Function<? super Block, ? extends BlockItem>> burnableItem;
     Function<? super Block, ? extends BlockItem> burnableTallItem;
     BiFunction<? super Block, ? super Block, ? extends BlockItem> burnableSignItem;
-    Item.Properties signProps = new Item.Properties().stacksTo(16).tab(group);
+    Item.Properties signProps = new Item.Properties().stacksTo(16);
     if (flammable) {
       burnableItem     = burnTime -> block -> new BurnableBlockItem(block, itemProps, burnTime);
       burnableTallItem = block -> new BurnableTallBlockItem(block, itemProps, 200);
@@ -251,7 +252,7 @@ public class BlockDeferredRegister extends DeferredRegisterWrapper<Block> {
     ItemObject<RotatedPillarBlock> wood = register(name + "_wood", () -> new StrippableLogBlock(strippedWood, behaviorCreator.apply(WoodBlockObject.WoodVariant.WOOD).strength(2.0f)), burnable300);
 
     // doors
-    ItemObject<DoorBlock> door = register(name + "_door", () -> new WoodenDoorBlock(behaviorCreator.apply(WoodBlockObject.WoodVariant.PLANKS).strength(3.0F).noOcclusion()), burnableTallItem);
+    ItemObject<DoorBlock> door = register(name + "_door", () -> new WoodenDoorBlock(behaviorCreator.apply(WoodBlockObject.WoodVariant.PLANKS).strength(3.0F).noOcclusion(), setType), burnableTallItem);
     ItemObject<TrapDoorBlock> trapdoor = register(name + "_trapdoor", () -> new TrapDoorBlock(behaviorCreator.apply(WoodBlockObject.WoodVariant.PLANKS).strength(3.0F).noOcclusion().isValidSpawn(Blocks::never), woodType.setType()), burnable300);
     ItemObject<FenceGateBlock> fenceGate = register(name + "_fence_gate", () -> new FenceGateBlock(planksProps, woodType), burnable300);
     // redstone
@@ -260,12 +261,28 @@ public class BlockDeferredRegister extends DeferredRegisterWrapper<Block> {
     ItemObject<ButtonBlock> button = register(name + "_button", () -> new ButtonBlock(redstoneProps, woodType.setType(), 30, true), burnableItem.apply(100));
     // signs
     RegistryObject<StandingSignBlock> standingSign = registerNoItem(name + "_sign", () -> new MantleStandingSignBlock(behaviorCreator.apply(WoodBlockObject.WoodVariant.PLANKS).noCollission().strength(1.0F), woodType));
-    RegistryObject<WallSignBlock> wallSign = registerNoItem(name + "_wall_sign", () -> new MantleWallSignBlock(behaviorCreator.apply(WoodBlockObject.WoodVariant.PLANKS).noCollission().strength(1.0F)/*.lootFrom(standingSign)*/, woodType));
+    RegistryObject<WallSignBlock> wallSign = registerNoItem(name + "_wall_sign", () -> new MantleWallSignBlock(behaviorCreator.apply(WoodBlockObject.WoodVariant.PLANKS).noCollission().strength(1.0F).dropsLike(standingSign.get()), woodType));
     // tell mantle to inject these into the TE
     MantleSignBlockEntity.registerSignBlock(standingSign);
     MantleSignBlockEntity.registerSignBlock(wallSign);
     // sign is included automatically in asItem of the standing sign
     this.itemRegister.register(name + "_sign", () -> burnableSignItem.apply(standingSign.get(), wallSign.get()));
+
+    // Add entries to tab
+    ItemGroupEvents.modifyEntriesEvent(group).register(entries -> {
+      entries.prepend(planks.asItem());
+      entries.prepend(fence.asItem());
+      entries.prepend(strippedLog.asItem());
+      entries.prepend(strippedWood.asItem());
+      entries.prepend(log.asItem());
+      entries.prepend(wood.asItem());
+      entries.prepend(door.asItem());
+      entries.prepend(trapdoor.asItem());
+      entries.prepend(fenceGate.asItem());
+      entries.prepend(pressurePlate.asItem());
+      entries.prepend(button.asItem());
+      entries.prepend(standingSign.get());
+    });
     // finally, return
     return new WoodBlockObject(resource(name), woodType, planks, log, strippedLog, wood, strippedWood, fence, fenceGate, door, trapdoor, pressurePlate, button, standingSign, wallSign);
   }

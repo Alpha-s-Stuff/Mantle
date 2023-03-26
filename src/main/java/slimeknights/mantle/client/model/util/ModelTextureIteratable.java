@@ -64,7 +64,7 @@ public class ModelTextureIteratable implements Iterable<Map<String,Either<Materi
         map = initial;
         initial = null;
       } else if (model != null) {
-        map = ((BlockModelAccessor)model).port_lib$textureMap();
+        map = model.textureMap;
         model = model.parent;
       } else {
         throw new NoSuchElementException();

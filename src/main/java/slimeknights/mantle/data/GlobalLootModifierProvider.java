@@ -1,5 +1,6 @@
 package slimeknights.mantle.data;
 
+import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
@@ -9,6 +10,7 @@ import io.github.fabricators_of_create.porting_lib.PortingLibRegistries;
 import io.github.fabricators_of_create.porting_lib.loot.IGlobalLootModifier;
 import io.github.fabricators_of_create.porting_lib.loot.LootModifier;
 import io.github.fabricators_of_create.porting_lib.util.LamdbaExceptionUtils;
+import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.DataProvider;
@@ -21,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 /**
@@ -31,12 +34,12 @@ import java.util.stream.Collectors;
 public abstract class GlobalLootModifierProvider implements DataProvider
 {
   private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-  private final DataGenerator gen;
+  private final FabricDataOutput gen;
   private final String modid;
   private final Map<String, Tuple<Codec<? extends IGlobalLootModifier>, JsonObject>> toSerialize = new HashMap<>();
   private boolean replace = false;
 
-  public GlobalLootModifierProvider(DataGenerator gen, String modid)
+  public GlobalLootModifierProvider(FabricDataOutput gen, String modid)
   {
     this.gen = gen;
     this.modid = modid;
@@ -56,13 +59,13 @@ public abstract class GlobalLootModifierProvider implements DataProvider
   protected abstract void start();
 
   @Override
-  public void run(CachedOutput cache) throws IOException
-  {
+  public CompletableFuture<?> run(CachedOutput cache) {
     start();
 
     Path forgePath = gen.getOutputFolder().resolve("data/forge/loot_modifiers/global_loot_modifiers.json");
     String modPath = "data/" + modid + "/loot_modifiers/";
     List<ResourceLocation> entries = new ArrayList<>();
+    ImmutableList.Builder<CompletableFuture<?>> futuresBuilder = new ImmutableList.Builder<>();
 
     toSerialize.forEach(LamdbaExceptionUtils.rethrowBiConsumer((name, pair) ->
     {
@@ -72,14 +75,15 @@ public abstract class GlobalLootModifierProvider implements DataProvider
       JsonObject json = pair.getB();
       json.addProperty("type", PortingLibRegistries.GLOBAL_LOOT_MODIFIER_SERIALIZERS.get().getKey(pair.getA()).toString());
 
-      DataProvider.saveStable(cache, json, modifierPath);
+      futuresBuilder.add(DataProvider.saveStable(cache, json, modifierPath));
     }));
 
     JsonObject forgeJson = new JsonObject();
     forgeJson.addProperty("replace", this.replace);
     forgeJson.add("entries", GSON.toJsonTree(entries.stream().map(ResourceLocation::toString).collect(Collectors.toList())));
 
-    DataProvider.saveStable(cache, forgeJson, forgePath);
+    futuresBuilder.add(DataProvider.saveStable(cache, forgeJson, forgePath));
+    return CompletableFuture.allOf(futuresBuilder.build().toArray(CompletableFuture[]::new));
   }
 
   /**

@@ -148,20 +148,18 @@ public class TabsWidget extends Widget {
 
       ItemStack icon = this.icons.get(i);
       if (icon != null) {
-        this.drawItemStack(icon, x + (actualTab.w - 16) / 2, y + (actualTab.h - 16) / 2);
+        this.drawItemStack(matrixStack, icon, x + (actualTab.w - 16) / 2, y + (actualTab.h - 16) / 2);
         // Lighting.turnOff(); TODO: still needed?
       }
     }
   }
 
-  /** Based on {@link net.minecraft.client.gui.screens.inventory.AbstractContainerScreen#renderFloatingItem(net.minecraft.world.item.ItemStack, int, int, java.lang.String)} */
-  private void drawItemStack(ItemStack stack, int x, int y) {
-    PoseStack poses = RenderSystem.getModelViewStack();
-    poses.translate(0, 0, 32f);
-    RenderSystem.applyModelViewMatrix();
+  /** Based on {@link net.minecraft.client.gui.screens.inventory.AbstractContainerScreen#renderFloatingItem(PoseStack, net.minecraft.world.item.ItemStack, int, int, java.lang.String)} */
+  private void drawItemStack(PoseStack poseStack, ItemStack stack, int x, int y) {
+    poseStack.pushPose();
+    poseStack.translate(0, 0, 232f);
     ItemRenderer itemRender = Minecraft.getInstance().getItemRenderer();
-    itemRender.blitOffset = 200.0F;
-    itemRender.renderAndDecorateItem(stack, x, y);
-    itemRender.blitOffset = 0.0F;
+    itemRender.renderAndDecorateItem(poseStack, stack, x, y);
+    poseStack.popPose();
   }
 }

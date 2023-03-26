@@ -69,7 +69,7 @@ public class ReplaceItemLootModifier extends LootModifier {
       if (lootItemFunctions.length > 0) {
         DataResult.success(new Dynamic<>(JsonOps.INSTANCE, AddEntryLootModifier.GSON.toJsonTree(lootItemFunctions, LootItemFunction[].class)));
       }
-      return DataResult.error("None");
+      return DataResult.error(() -> "None");
     });
     return codecStart(inst).and(ingredientCodec.fieldOf("original").forGetter(modifier -> modifier.original)).and(itemOutputCodec.fieldOf("replacement").forGetter(modifier -> modifier.replacement)).and(lootItemFunctionCodec.fieldOf("functions").forGetter(modifier -> modifier.functions))
       .apply(inst, ReplaceItemLootModifier::new);

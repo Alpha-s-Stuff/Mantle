@@ -1,15 +1,15 @@
 package slimeknights.mantle;
 
+import fuzs.forgeconfigapiport.api.config.v2.ForgeConfigRegistry;
 import io.github.fabricators_of_create.porting_lib.crafting.CraftingHelper;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.minecraft.Util;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraftforge.api.ModLoadingContext;
 import net.minecraftforge.fml.config.ModConfig.Type;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -52,8 +52,8 @@ public class Mantle implements ModInitializer {
   /* Proxies for sides, used for graphics processing */
   @Override
   public void onInitialize() {
-    ModLoadingContext.registerConfig(modId, Type.CLIENT, Config.CLIENT_SPEC);
-    ModLoadingContext.registerConfig(modId, Type.SERVER, Config.SERVER_SPEC);
+    ForgeConfigRegistry.INSTANCE.register(modId, Type.CLIENT, Config.CLIENT_SPEC);
+    ForgeConfigRegistry.INSTANCE.register(modId, Type.SERVER, Config.SERVER_SPEC);
 
     FluidContainerTransferManager.INSTANCE.init();
     MantleTags.init();
@@ -82,7 +82,7 @@ public class Mantle implements ModInitializer {
   }
 
   private void registerRecipeSerializers() {
-    RegistryAdapter<RecipeSerializer<?>> adapter = new RegistryAdapter<>(Registry.RECIPE_SERIALIZER, Mantle.modId);
+    RegistryAdapter<RecipeSerializer<?>> adapter = new RegistryAdapter<>(BuiltInRegistries.RECIPE_SERIALIZER, Mantle.modId);
     MantleRecipeSerializers.CRAFTING_SHAPED_FALLBACK = adapter.register(new ShapedFallbackRecipe.Serializer(), "crafting_shaped_fallback");
     MantleRecipeSerializers.CRAFTING_SHAPED_RETEXTURED = adapter.register(new ShapedRetexturedRecipe.Serializer(), "crafting_shaped_retextured");
 

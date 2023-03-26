@@ -321,10 +321,8 @@ public class FluidRenderer {
     float maxY = to.y();
     float height = (fluid.getAmount() - offset) / capacity;
     if (isGas && flipGas) {
-      from = from.copy();
       from.y = maxY + (height * (minY - maxY));
     } else {
-      to = to.copy();
       to.y = minY + (height * (maxY - minY));
     }
 

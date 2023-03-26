@@ -86,49 +86,49 @@ public class DumpTagCommand {
     }
 
     // simply create a tag builder
-    Tag.Builder builder = Tag.Builder.tag();
+//    Tag.Builder builder = Tag.Builder.tag();
     int tagsProcessed = 0;
-    for (Resource resource : resources) {
-      try (
-        Reader reader = resource.openAsReader()
-      ) {
-        JsonObject json = GsonHelper.fromJson(GSON, reader, JsonObject.class);
-        if (json == null) {
-          // no json
-          Mantle.logger.error("Couldn't load {} tag list {} from {} in data pack {} as it is empty or null", regName, name, path, resource.sourcePackId());
-        } else {
-          builder.addFromJson(json, resource.getSourceName());
-          tagsProcessed++;
-        }
-      } catch (RuntimeException | IOException ex) {
-        // failed to parse
-        Mantle.logger.error("Couldn't read {} tag list {} from {} in data pack {}", regName, name, path, resource.sourcePackId(), ex);
-      } finally {
-        IOUtils.closeQuietly(resource);
-      }
-    }
-
-    // builder done, ready to dump
-    // if requested, save
-    if (saveFile) {
-      // save file
-      File output = new File(DumpAllTagsCommand.getOutputFile(context), path.getNamespace() + "/" + path.getPath());
-      Path outputPath = output.toPath();
-      try {
-        Files.createDirectories(outputPath.getParent());
-        try (BufferedWriter writer = Files.newBufferedWriter(outputPath)) {
-          writer.write(DumpTagCommand.GSON.toJson(builder.serializeToJson()));
-        }
-      } catch (IOException ex) {
-        Mantle.logger.error("Couldn't save {} tag {} to {}", regName, name, outputPath, ex);
-      }
-      context.getSource().sendSuccess(Component.translatable("command.mantle.dump_tag.success_log", regName, name, DumpAllTagsCommand.getOutputComponent(output)), true);
-    } else {
-      // print to console
-      Component message = Component.translatable("command.mantle.dump_tag.success", regName, name);
-      context.getSource().sendSuccess(message, true);
-      Mantle.logger.info("Tag dump of {} tag '{}':\n{}", regName, name, GSON.toJson(builder.serializeToJson()));
-    }
+//    for (Resource resource : resources) {
+//      try (
+//        Reader reader = resource.openAsReader()
+//      ) {
+//        JsonObject json = GsonHelper.fromJson(GSON, reader, JsonObject.class);
+//        if (json == null) {
+//          // no json
+//          Mantle.logger.error("Couldn't load {} tag list {} from {} in data pack {} as it is empty or null", regName, name, path, resource.sourcePackId());
+//        } else {
+//          builder.addFromJson(json, resource.getSourceName());
+//          tagsProcessed++;
+//        }
+//      } catch (RuntimeException | IOException ex) {
+//        // failed to parse
+//        Mantle.logger.error("Couldn't read {} tag list {} from {} in data pack {}", regName, name, path, resource.sourcePackId(), ex);
+//      } finally {
+//        IOUtils.closeQuietly(resource);
+//      }
+//    }
+//
+//    // builder done, ready to dump
+//    // if requested, save
+//    if (saveFile) {
+//      // save file
+//      File output = new File(DumpAllTagsCommand.getOutputFile(context), path.getNamespace() + "/" + path.getPath());
+//      Path outputPath = output.toPath();
+//      try {
+//        Files.createDirectories(outputPath.getParent());
+//        try (BufferedWriter writer = Files.newBufferedWriter(outputPath)) {
+//          writer.write(DumpTagCommand.GSON.toJson(builder.serializeToJson()));
+//        }
+//      } catch (IOException ex) {
+//        Mantle.logger.error("Couldn't save {} tag {} to {}", regName, name, outputPath, ex);
+//      }
+//      context.getSource().sendSuccess(Component.translatable("command.mantle.dump_tag.success_log", regName, name, DumpAllTagsCommand.getOutputComponent(output)), true);
+//    } else {
+//      // print to console
+//      Component message = Component.translatable("command.mantle.dump_tag.success", regName, name);
+//      context.getSource().sendSuccess(message, true);
+//      Mantle.logger.info("Tag dump of {} tag '{}':\n{}", regName, name, GSON.toJson(builder.serializeToJson()));
+//    }
 
     return tagsProcessed;
   }

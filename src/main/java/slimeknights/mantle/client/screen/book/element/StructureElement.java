@@ -56,7 +56,7 @@ public class StructureElement extends SizedBookElement {
     this.transX = x + width / 2F;
     this.transY = y + height / 2F;
 
-    this.additionalTransform = new Transformation(null, new Quaternionf(25, 0, 0, true), null, new Quaternionf(0, -45, 0, true));
+    this.additionalTransform = new Transformation(null, new Quaternionf().rotationXYZ(25 * (float) (Math.PI / 180.0), 0, 0), null, new Quaternionf().rotationXYZ(0, -45 * (float) (Math.PI / 180.0), 0));
   }
 
   @Override
@@ -89,7 +89,7 @@ public class StructureElement extends SizedBookElement {
       transform.translate(this.transX, this.transY, Math.max(structureHeight, Math.max(structureWidth, structureLength)));
       transform.scale(this.scale, -this.scale, 1);
       this.additionalTransform.push(transform);
-      transform.mulPose(new Quaternion(0, 0, 0, true));
+      transform.mulPose(new Quaternionf());
 
       transform.translate(structureLength / -2f, structureHeight / -2f, structureWidth / -2f);
 
@@ -109,12 +109,6 @@ public class StructureElement extends SizedBookElement {
                 overlay = OverlayTexture.pack(0, true);
               else
                 overlay = OverlayTexture.NO_OVERLAY;
-
-              ModelData modelData = ModelData.EMPTY;
-              BlockEntity te = structureWorld.getBlockEntity(pos);
-
-              if (te != null)
-                modelData = (ModelData) ((RenderAttachmentBlockEntity)te).getRenderAttachmentData();
 
               blockRender.getModelRenderer().tesselateBlock(
                 structureWorld, blockRender.getBlockModel(state), state, pos, transform,
@@ -167,9 +161,8 @@ public class StructureElement extends SizedBookElement {
     Vector3f axis = new Vector3f((float) rY, (float) rX, 0);
     float angle = (float) Math.sqrt(axis.dot(axis));
 
-    if (!axis.normalize())
-      return Transformation.identity();
+    axis.normalize();
 
-    return new Transformation(null, new Quaternionf(axis, angle, true), null, null);
+    return new Transformation(null, new Quaternionf().setAngleAxis(angle, axis.x(), axis.y(), axis.z()), null, null);
   }
 }

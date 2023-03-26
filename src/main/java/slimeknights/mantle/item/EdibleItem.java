@@ -1,6 +1,7 @@
 package slimeknights.mantle.item;
 
 import com.mojang.datafixers.util.Pair;
+import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
@@ -26,8 +27,11 @@ public class EdibleItem extends Item {
   }
 
   public EdibleItem(FoodProperties foodIn, CreativeModeTab itemGroup, boolean displayEffectsTooltip) {
-    super(new Properties().food(foodIn).tab(itemGroup));
+    super(new Properties().food(foodIn));
     this.displayEffectsTooltip = displayEffectsTooltip;
+    ItemGroupEvents.modifyEntriesEvent(itemGroup).register(entries -> {
+      entries.prepend(this);
+    });
   }
 
   @Override

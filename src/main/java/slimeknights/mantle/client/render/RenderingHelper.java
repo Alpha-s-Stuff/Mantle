@@ -76,15 +76,15 @@ public class RenderingHelper {
     // rotate X, then Y
     float x = modelItem.getX();
     if (x != 0) {
-      matrices.mulPose(Vector3f.XP.rotationDegrees(x));
+      matrices.mulPose(Axis.XP.rotationDegrees(x));
     }
     float y = modelItem.getY();
     if (y != 0) {
-      matrices.mulPose(Vector3f.YP.rotationDegrees(y));
+      matrices.mulPose(Axis.YP.rotationDegrees(y));
     }
 
     // render the actual item
-    Minecraft.getInstance().getItemRenderer().renderStatic(item, modelItem.getTransform(), light, OverlayTexture.NO_OVERLAY, matrices, buffer, 0);
+    Minecraft.getInstance().getItemRenderer().renderStatic(item, modelItem.getTransform(), light, OverlayTexture.NO_OVERLAY, matrices, buffer, Minecraft.getInstance().level, 0);
     matrices.popPose();
   }
 }

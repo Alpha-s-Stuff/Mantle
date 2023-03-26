@@ -2,6 +2,7 @@ package slimeknights.mantle.recipe.crafting;
 
 import com.google.gson.JsonObject;
 import lombok.Getter;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.inventory.CraftingContainer;
@@ -33,7 +34,7 @@ public class ShapedRetexturedRecipe extends ShapedRecipe {
    * @param matchAll   If true, all inputs must match for the recipe to match
    */
   protected ShapedRetexturedRecipe(ShapedRecipe orig, Ingredient texture, boolean matchAll) {
-    super(orig.getId(), orig.getGroup(), orig.getWidth(), orig.getHeight(), orig.getIngredients(), orig.getResultItem());
+    super(orig.getId(), orig.getGroup(), orig.category(), orig.getWidth(), orig.getHeight(), orig.getIngredients(), orig.getResultItem(RegistryAccess.EMPTY));
     this.texture = texture;
     this.matchAll = matchAll;
   }
@@ -44,12 +45,12 @@ public class ShapedRetexturedRecipe extends ShapedRecipe {
    * @return  Output with texture. Will be blank if the input is not a block
    */
   public ItemStack getRecipeOutput(Item texture) {
-    return RetexturedBlockItem.setTexture(getResultItem().copy(), Block.byItem(texture));
+    return RetexturedBlockItem.setTexture(getResultItem(RegistryAccess.EMPTY).copy(), Block.byItem(texture));
   }
 
   @Override
-  public ItemStack assemble(CraftingContainer craftMatrix) {
-    ItemStack result = super.assemble(craftMatrix);
+  public ItemStack assemble(CraftingContainer craftMatrix, RegistryAccess registryAccess) {
+    ItemStack result = super.assemble(craftMatrix, registryAccess);
     Block currentTexture = null;
     for (int i = 0; i < craftMatrix.getContainerSize(); i++) {
       ItemStack stack = craftMatrix.getItem(i);

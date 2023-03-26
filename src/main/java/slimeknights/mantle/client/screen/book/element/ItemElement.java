@@ -99,10 +99,10 @@ public class ItemElement extends SizedBookElement {
       poses.mulPoseMatrix(matrixStack.last().pose());
 
       ItemStack stack = this.itemCycle.get(this.currentItem);
-      this.mc.getItemRenderer().renderAndDecorateItem(stack, 0, 0);
+      this.mc.getItemRenderer().renderAndDecorateItem(poses, stack, 0, 0);
       Font font = fontRenderer;//net.minecraftforge.client.RenderProperties.get(stack).getFont(stack);
       if (font == null) font = mc.font;
-      this.mc.getItemRenderer().renderGuiItemDecorations(font, stack, 0, 0, null);
+      this.mc.getItemRenderer().renderGuiItemDecorations(poses, font, stack, 0, 0, null);
 
       matrixStack.popPose();
       poses.popPose();

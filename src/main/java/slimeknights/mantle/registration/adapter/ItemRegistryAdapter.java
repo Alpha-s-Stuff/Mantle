@@ -1,12 +1,15 @@
 package slimeknights.mantle.registration.adapter;
 
 import io.github.fabricators_of_create.porting_lib.util.LazySpawnEggItem;
+import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.models.blockstates.PropertyDispatch.TriFunction;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.BucketItem;
+import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.DoubleHighBlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Item.Properties;
@@ -53,7 +56,7 @@ public class ItemRegistryAdapter extends EnumRegistryAdapter<Item> {
    * @param defaultProps  Default item properties
    */
   public ItemRegistryAdapter(@Nullable Item.Properties defaultProps) {
-    super(Registry.ITEM);
+    super(BuiltInRegistries.ITEM);
     this.defaultProps = Objects.requireNonNullElseGet(defaultProps, Properties::new);
   }
 
@@ -64,7 +67,7 @@ public class ItemRegistryAdapter extends EnumRegistryAdapter<Item> {
    * @param defaultProps  Default item properties
    */
   public ItemRegistryAdapter(String modid, @Nullable Item.Properties defaultProps) {
-    super(Registry.ITEM, modid);
+    super(BuiltInRegistries.ITEM, modid);
     this.defaultProps = Objects.requireNonNullElseGet(defaultProps, Properties::new);
   }
 
@@ -214,7 +217,7 @@ public class ItemRegistryAdapter extends EnumRegistryAdapter<Item> {
     registerBlockItem(burnableItem.apply(object.getPressurePlate(), 300));
     registerBlockItem(burnableItem.apply(object.getButton(), 100));
     // sign
-    registerBlockItem(burnableSignItem.apply(new Item.Properties().stacksTo(16).tab(planks.getItemCategory()), object.getSign(), object.getWallSign()));
+    registerBlockItem(burnableSignItem.apply(new Item.Properties().stacksTo(16), object.getSign(), object.getWallSign()));
   }
 
   /**
@@ -265,6 +268,8 @@ public class ItemRegistryAdapter extends EnumRegistryAdapter<Item> {
    * @return  Spawn egg item instance
    */
   public SpawnEggItem registerSpawnEgg(Supplier<? extends EntityType<? extends Mob>> type, int primary, int secondary, String baseName) {
-    return register(new LazySpawnEggItem(type, primary, secondary, ItemProperties.EGG_PROPS), baseName + "_spawn_egg");
+    SpawnEggItem spawnEgg = register(new LazySpawnEggItem(type, primary, secondary, new Properties()), baseName + "_spawn_egg");
+    ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.SPAWN_EGGS).register(entries -> entries.prepend(spawnEgg));
+    return spawnEgg;
   }
 }

@@ -129,7 +129,7 @@ public class ContentCrafting extends PageContent {
           throw new BookLoadException("Recipe " + this.recipe + " cannot fit in a " + w + "x" + h + " crafting grid");
         }
 
-        result = IngredientData.getItemStackData(recipe.getResultItem());
+        result = IngredientData.getItemStackData(recipe.getResultItem(Minecraft.getInstance().level.registryAccess()));
 
         NonNullList<Ingredient> ingredients = recipe.getIngredients();
 

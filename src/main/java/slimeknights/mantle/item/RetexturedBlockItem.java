@@ -3,6 +3,7 @@ package slimeknights.mantle.item;
 import net.minecraft.core.Holder;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.BlockItem;
@@ -37,12 +38,12 @@ public class RetexturedBlockItem extends BlockTooltipItem {
     this.textureTag = textureTag;
   }
 
-  @Override
-  public void fillItemCategory(CreativeModeTab group, NonNullList<ItemStack> items) {
-    if (this.allowdedIn(group)) {
-      addTagVariants(this.getBlock(), textureTag, items, true);
-    }
-  }
+//  @Override TODO: PORT
+//  public void fillItemCategory(CreativeModeTab group, NonNullList<ItemStack> items) {
+//    if (this.allowdedIn(group)) {
+//      addTagVariants(this.getBlock(), textureTag, items, true);
+//    }
+//  }
 
   @Override
   public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
@@ -107,7 +108,7 @@ public class RetexturedBlockItem extends BlockTooltipItem {
     if (block == null || block == Blocks.AIR) {
       return setTexture(stack, "");
     }
-    return setTexture(stack, Objects.requireNonNull(Registry.BLOCK.getKey(block).toString()));
+    return setTexture(stack, Objects.requireNonNull(BuiltInRegistries.BLOCK.getKey(block).toString()));
   }
 
   /**
@@ -121,7 +122,7 @@ public class RetexturedBlockItem extends BlockTooltipItem {
     boolean added = false;
     // using item tags as that is what will be present in the recipe
     Class<?> clazz = block.getClass();
-    for (Holder<Item> candidate : Registry.ITEM.getTagOrEmpty(tag)) {
+    for (Holder<Item> candidate : BuiltInRegistries.ITEM.getTagOrEmpty(tag)) {
       if (!candidate.isBound()) {
         continue;
       }

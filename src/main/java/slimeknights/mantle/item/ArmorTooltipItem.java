@@ -14,7 +14,7 @@ import java.util.List;
 
 public class ArmorTooltipItem extends ArmorItem {
 
-  public ArmorTooltipItem(ArmorMaterial armorMaterial, EquipmentSlot equipmentSlot, Properties builder) {
+  public ArmorTooltipItem(ArmorMaterial armorMaterial, ArmorItem.Type equipmentSlot, Properties builder) {
     super(armorMaterial, equipmentSlot, builder);
   }
 
