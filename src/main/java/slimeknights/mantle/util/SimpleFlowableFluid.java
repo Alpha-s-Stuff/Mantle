@@ -17,7 +17,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
-import slimeknights.mantle.registration.FluidAttributeBuilder;
+import slimeknights.mantle.fluid.attributes.FluidAttributes;
 
 import javax.annotation.Nullable;
 import java.util.function.Supplier;
@@ -30,7 +30,7 @@ public abstract class SimpleFlowableFluid extends FlowingFluid {
   private final Supplier<? extends Item> bucket;
   @Nullable
   private final Supplier<? extends LiquidBlock> block;
-  private final FluidAttributeBuilder builder;
+  private final FluidAttributes.Builder builder;
   private final boolean infinite;
   private final int flowSpeed;
   private final int levelDecreasePerBlock;
@@ -109,8 +109,8 @@ public abstract class SimpleFlowableFluid extends FlowingFluid {
     return Blocks.AIR.defaultBlockState();
   }
 
-  public FluidAttributeBuilder getAttributes() {
-    return builder;
+  public FluidAttributes getAttributes() {
+    return builder.build(this);
   }
   
   @Override
@@ -160,7 +160,7 @@ public abstract class SimpleFlowableFluid extends FlowingFluid {
   public static class Properties {
     private Supplier<? extends Fluid> still;
     private Supplier<? extends Fluid> flowing;
-    private FluidAttributeBuilder attributes;
+    private FluidAttributes.Builder attributes;
     private boolean infinite;
     private Supplier<? extends Item> bucket;
     private Supplier<? extends LiquidBlock> block;
@@ -169,7 +169,7 @@ public abstract class SimpleFlowableFluid extends FlowingFluid {
     private float blastResistance = 1;
     private int tickRate = 5;
     
-    public Properties(Supplier<? extends Fluid> still, Supplier<? extends Fluid> flowing, FluidAttributeBuilder attributes) {
+    public Properties(Supplier<? extends Fluid> still, Supplier<? extends Fluid> flowing, FluidAttributes.Builder attributes) {
       this.still = still;
       this.flowing = flowing;
       this.attributes = attributes;

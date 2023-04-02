@@ -8,6 +8,7 @@ import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.item.Item;
 import slimeknights.mantle.fabric.fluid.SimpleDirectionalFluid;
+import slimeknights.mantle.fluid.attributes.FluidAttributes;
 import slimeknights.mantle.util.SimpleFlowableFluid;
 
 import java.util.function.Supplier;
@@ -19,7 +20,7 @@ import java.util.function.Supplier;
 @Setter
 @RequiredArgsConstructor
 public class FluidBuilder {
-  private final FluidAttributeBuilder attributes;
+  private final FluidAttributes.Builder attributes;
   private boolean canMultiply = false;
   private Supplier<? extends Item> bucket;
   private Supplier<? extends LiquidBlock> block;

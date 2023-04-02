@@ -13,7 +13,7 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import slimeknights.mantle.registration.FluidAttributeBuilder;
+import slimeknights.mantle.fluid.attributes.FluidAttributes;
 import slimeknights.mantle.registration.FluidAttributeSupplier;
 
 import java.util.function.Supplier;
@@ -24,7 +24,7 @@ public class UnplaceableFluid extends Fluid implements FluidAttributeSupplier {
   /** Bucket form of the liquid, use a supplier to air if no bucket form */
   private final Supplier<? extends Item> bucket;
   /** Forge fluid attributes builder */
-  private final FluidAttributeBuilder builder;
+  private final FluidAttributes.Builder builder;
 
   @Override
   public Item getBucket() {
@@ -52,9 +52,9 @@ public class UnplaceableFluid extends Fluid implements FluidAttributeSupplier {
   }
 
   @Override
-  public FluidAttributeBuilder getAttributeBuilder()
+  public FluidAttributes createAttributes()
   {
-    return builder;
+    return builder.build(this);
   }
 
   /* Required methods */

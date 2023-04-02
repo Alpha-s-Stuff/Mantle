@@ -1,24 +1,26 @@
 package slimeknights.mantle.registration;
 
 import io.github.fabricators_of_create.porting_lib.util.EnvExecutor;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.material.Fluid;
+import net.minecraft.resources.ResourceLocation;
 import slimeknights.mantle.client.model.fluid.FluidTextureModel;
+import slimeknights.mantle.fluid.attributes.FluidAttributes;
 
 import javax.annotation.Nullable;
+import java.util.function.BiFunction;
 
 /** Extension of fluid attributes that moves the fluid textures and color to the resource pack via {@link FluidTextureModel} (registered as loader <code>mantle:fluid_texture</code> for the fluid block ) */
-public class ModelFluidAttributes extends FluidAttributeBuilder {
+public class ModelFluidAttributes extends FluidAttributes {
   public static final IFluidModelProvider MODEL_PROVIDER = EnvExecutor.unsafeRunForDist(() -> () -> FluidTextureModel.LOADER, () -> () -> IFluidModelProvider.EMPTY);
 
   /** Creates a new builder */
-//  public static FluidAttributeBuilder builder() {
-//    return new Builder(ModelFluidAttributes::new);
-//  }
+  public static FluidAttributes.Builder builder() {
+    return new Builder(ModelFluidAttributes::new);
+  }
 
   private final Fluid fluid;
-  protected ModelFluidAttributes(FluidAttributeBuilder builder, Fluid fluid) {
-//    super(builder, fluid);
+  protected ModelFluidAttributes(FluidAttributes.Builder builder, Fluid fluid) {
+    super(builder, fluid);
     this.fluid = fluid;
   }
 
@@ -51,15 +53,15 @@ public class ModelFluidAttributes extends FluidAttributeBuilder {
     return MODEL_PROVIDER.getColor(fluid);
   }
 
-//  /** Extension of {@link FluidAttributes.Builder} redirecting fluid textures and colors to the resource pack */
-//  public static class Builder extends FluidAttributeBuilder {
-//    private static final ResourceLocation FALLBACK_STILL = new ResourceLocation("block/water_still");
-//    private static final ResourceLocation FALLBACK_FLOWING = new ResourceLocation("block/water_flow");
-//
-//    protected Builder(BiFunction<FluidAttributes.Builder,Fluid,FluidAttributes> factory) {
-//      super(FALLBACK_STILL, FALLBACK_FLOWING, factory);
-//    }
-//  }
+  /** Extension of {@link FluidAttributes.Builder} redirecting fluid textures and colors to the resource pack */
+  public static class Builder extends FluidAttributes.Builder {
+    private static final ResourceLocation FALLBACK_STILL = new ResourceLocation("block/water_still");
+    private static final ResourceLocation FALLBACK_FLOWING = new ResourceLocation("block/water_flow");
+
+    protected Builder(BiFunction<FluidAttributes.Builder,Fluid,FluidAttributes> factory) {
+      super(FALLBACK_STILL, FALLBACK_FLOWING, factory);
+    }
+  }
 
   /** Interface to proxy the fluid model provider */
   public interface IFluidModelProvider {

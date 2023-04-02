@@ -17,7 +17,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
-import slimeknights.mantle.registration.FluidAttributeBuilder;
+import slimeknights.mantle.fluid.attributes.FluidAttributes;
 import slimeknights.mantle.registration.FluidAttributeSupplier;
 import slimeknights.mantle.util.SimpleFlowableFluid;
 
@@ -32,7 +32,7 @@ public abstract class SimpleDirectionalFluid extends StarFluid implements FluidA
   private final Supplier<? extends Item> bucket;
   @Nullable
   private final Supplier<? extends LiquidBlock> block;
-  private final FluidAttributeBuilder builder;
+  private final FluidAttributes.Builder builder;
   private final boolean infinite;
   private final int flowSpeed;
   private final int levelDecreasePerBlock;
@@ -113,8 +113,8 @@ public abstract class SimpleDirectionalFluid extends StarFluid implements FluidA
   }
 
   @Override
-  public FluidAttributeBuilder getAttributeBuilder() {
-    return builder;
+  public FluidAttributes createAttributes() {
+    return builder.build(this);
   }
 
   @Override
@@ -164,7 +164,7 @@ public abstract class SimpleDirectionalFluid extends StarFluid implements FluidA
   public static class Properties {
     private Supplier<? extends Fluid> still;
     private Supplier<? extends Fluid> flowing;
-    private FluidAttributeBuilder attributes;
+    private FluidAttributes.Builder attributes;
     private boolean infinite;
     private Supplier<? extends Item> bucket;
     private Supplier<? extends LiquidBlock> block;
@@ -174,7 +174,7 @@ public abstract class SimpleDirectionalFluid extends StarFluid implements FluidA
     private int tickRate = 5;
     private Direction flowDirection = Direction.DOWN;
 
-    public Properties(Supplier<? extends Fluid> still, Supplier<? extends Fluid> flowing, FluidAttributeBuilder attributes) {
+    public Properties(Supplier<? extends Fluid> still, Supplier<? extends Fluid> flowing, FluidAttributes.Builder attributes) {
       this.still = still;
       this.flowing = flowing;
       this.attributes = attributes;
