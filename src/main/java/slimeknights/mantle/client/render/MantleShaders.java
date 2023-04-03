@@ -1,9 +1,8 @@
 package slimeknights.mantle.client.render;
 
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import io.github.fabricators_of_create.porting_lib.client_events.event.client.RegisterShadersCallback;
+import net.fabricmc.fabric.api.client.rendering.v1.CoreShaderRegistrationCallback;
 import net.minecraft.client.renderer.ShaderInstance;
-import net.minecraft.server.packs.resources.ResourceProvider;
 import slimeknights.mantle.Mantle;
 
 import java.io.IOException;
@@ -12,9 +11,9 @@ public class MantleShaders {
 
   private static ShaderInstance blockFullBrightShader;
 
-  public static void registerShaders(ResourceProvider resourceProvider, RegisterShadersCallback.ShaderRegistry registry) throws IOException {
-    registry.registerShader(
-      new ShaderInstance(resourceProvider, Mantle.getResource("block_fullbright").toString(), DefaultVertexFormat.BLOCK),
+  public static void registerShaders(CoreShaderRegistrationCallback.RegistrationContext registry) throws IOException {
+    registry.register(
+      Mantle.getResource("block_fullbright"), DefaultVertexFormat.BLOCK,
       shader -> blockFullBrightShader = shader
     );
   }
