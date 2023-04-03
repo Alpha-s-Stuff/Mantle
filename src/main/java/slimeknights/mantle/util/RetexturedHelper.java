@@ -10,7 +10,11 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import slimeknights.mantle.block.entity.IRetexturedBlockEntity;
 import slimeknights.mantle.client.model.ModelProperty;
+import slimeknights.mantle.client.model.data.SinglePropertyData;
 
 import javax.annotation.Nullable;
 import java.util.Objects;
@@ -64,7 +68,7 @@ public final class RetexturedHelper {
     if (block == Blocks.AIR) {
       return "";
     }
-    return Objects.requireNonNull(block.getRegistryName()).toString();
+    return Objects.requireNonNull(BuiltInRegistries.BLOCK.getKey(block)).toString();
   }
 
 
@@ -92,10 +96,9 @@ public final class RetexturedHelper {
     if (level != null && level.isClientSide) {
       Block texture = self.getTexture();
       texture = texture == Blocks.AIR ? null : texture;
-      IModelData data = self.getModelData();
+      SinglePropertyData data = self.getRetexturedModelData();
       if (data.getData(BLOCK_PROPERTY) != texture) {
         data.setData(BLOCK_PROPERTY, texture);
-        self.requestModelDataUpdate();
         BlockState state = self.getBlockState();
         level.sendBlockUpdated(self.getBlockPos(), state, state, 0);
       }

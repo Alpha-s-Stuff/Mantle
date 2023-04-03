@@ -174,7 +174,7 @@ public class RetexturedModel implements IUnbakedGeometry<RetexturedModel> {
       this.retextured = retextured;
     }
 
-    public Baked(BakedModel baked, IModelConfiguration owner, SimpleBlockModel model, ModelState transform, Set<String> retextured) {
+    public Baked(BakedModel baked, BlockModel owner, SimpleBlockModel model, ModelState transform, Set<String> retextured) {
       this(baked, owner, new ColoredBlockModel(model, Collections.emptyList()), transform, retextured);
     }
 

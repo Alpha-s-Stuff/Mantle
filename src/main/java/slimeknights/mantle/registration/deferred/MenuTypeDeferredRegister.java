@@ -2,7 +2,7 @@ package slimeknights.mantle.registration.deferred;
 
 import io.github.fabricators_of_create.porting_lib.util.RegistryObject;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
-import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 
@@ -13,7 +13,7 @@ import net.minecraft.world.inventory.MenuType;
 public class MenuTypeDeferredRegister extends DeferredRegisterWrapper<MenuType<?>> {
 
   public MenuTypeDeferredRegister(String modID) {
-    super(BuiltInRegistries.MENU, modID);
+    super(Registries.MENU, modID);
   }
 
   /**

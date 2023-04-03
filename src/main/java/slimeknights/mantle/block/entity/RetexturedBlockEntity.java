@@ -6,7 +6,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import slimeknights.mantle.block.RetexturedBlock;
+import org.jetbrains.annotations.Nullable;
 import slimeknights.mantle.client.model.data.SinglePropertyData;
 import slimeknights.mantle.util.RetexturedHelper;
 
@@ -28,7 +28,7 @@ public class RetexturedBlockEntity extends MantleBlockEntity implements IRetextu
 
   @Nonnull
   @Override
-  public Object getRenderAttachmentData() {
+  public SinglePropertyData getRenderAttachmentData() {
     return data.get();
   }
 

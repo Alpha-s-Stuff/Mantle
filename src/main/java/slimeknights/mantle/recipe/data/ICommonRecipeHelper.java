@@ -1,8 +1,11 @@
 package slimeknights.mantle.recipe.data;
 
+import me.alphamode.forgetags.Tags;
 import net.minecraft.advancements.critereon.InventoryChangeTrigger.TriggerInstance;
 import net.minecraft.advancements.critereon.ItemPredicate;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
@@ -12,7 +15,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
-import net.minecraftforge.common.Tags;
 import slimeknights.mantle.registration.object.BuildingBlockObject;
 import slimeknights.mantle.registration.object.MetalItemObject;
 import slimeknights.mantle.registration.object.WallBuildingBlockObject;
@@ -35,19 +37,19 @@ public interface ICommonRecipeHelper extends IRecipeHelper {
    */
   default void packingRecipe(Consumer<FinishedRecipe> consumer, String largeName, ItemLike large, String smallName, ItemLike small, String folder) {
     // ingot to block
-    ShapedRecipeBuilder.shaped(large)
+    ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, large)
                        .define('#', small)
                        .pattern("###")
                        .pattern("###")
                        .pattern("###")
                        .unlockedBy("has_item", RecipeProvider.has(small))
-                       .group(Objects.requireNonNull(large.asItem().getRegistryName()).toString())
+                       .group(Objects.requireNonNull(BuiltInRegistries.ITEM.getKey(large.asItem())).toString())
                        .save(consumer, wrap(large.asItem(), folder, String.format("_from_%ss", smallName)));
     // block to ingot
-    ShapelessRecipeBuilder.shapeless(small, 9)
+    ShapelessRecipeBuilder.shapeless(RecipeCategory.BUILDING_BLOCKS, small, 9)
                           .requires(large)
                           .unlockedBy("has_item", RecipeProvider.has(large))
-                          .group(Objects.requireNonNull(small.asItem().getRegistryName()).toString())
+                          .group(Objects.requireNonNull(BuiltInRegistries.ITEM.getKey(small.asItem())).toString())
                           .save(consumer, wrap(small.asItem(), folder, String.format("_from_%s", largeName)));
   }
 
@@ -64,20 +66,20 @@ public interface ICommonRecipeHelper extends IRecipeHelper {
   default void packingRecipe(Consumer<FinishedRecipe> consumer, String largeName, ItemLike largeItem, String smallName, ItemLike smallItem, TagKey<Item> smallTag, String folder) {
     // ingot to block
     // note our item is in the center, any mod allowed around the edges
-    ShapedRecipeBuilder.shaped(largeItem)
+    ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, largeItem)
                        .define('#', smallTag)
                        .define('*', smallItem)
                        .pattern("###")
                        .pattern("#*#")
                        .pattern("###")
                        .unlockedBy("has_item", RecipeProvider.has(smallItem))
-                       .group(Objects.requireNonNull(largeItem.asItem().getRegistryName()).toString())
+                       .group(Objects.requireNonNull(BuiltInRegistries.ITEM.getKey(largeItem.asItem())).toString())
                        .save(consumer, wrap(largeItem.asItem(), folder, String.format("_from_%ss", smallName)));
     // block to ingot
-    ShapelessRecipeBuilder.shapeless(smallItem, 9)
+    ShapelessRecipeBuilder.shapeless(RecipeCategory.BUILDING_BLOCKS, smallItem, 9)
                           .requires(largeItem)
                           .unlockedBy("has_item", RecipeProvider.has(largeItem))
-                          .group(Objects.requireNonNull(smallItem.asItem().getRegistryName()).toString())
+                          .group(Objects.requireNonNull(BuiltInRegistries.ITEM.getKey(smallItem.asItem())).toString())
                           .save(consumer, wrap(smallItem.asItem(), folder, String.format("_from_%s", largeName)));
   }
 
@@ -106,30 +108,30 @@ public interface ICommonRecipeHelper extends IRecipeHelper {
     TriggerInstance hasBlock = RecipeProvider.has(item);
     // slab
     ItemLike slab = saveing.getSlab();
-    ShapedRecipeBuilder.shaped(slab, 6)
+    ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, slab, 6)
                        .define('B', item)
                        .pattern("BBB")
                        .unlockedBy("has_item", hasBlock)
-                       .group(Objects.requireNonNull(slab.asItem().getRegistryName()).toString())
+                       .group(Objects.requireNonNull(BuiltInRegistries.ITEM.getKey(slab.asItem())).toString())
                        .save(consumer, wrap(item, folder, "_slab"));
     // stairs
     ItemLike stairs = saveing.getStairs();
-    ShapedRecipeBuilder.shaped(stairs, 4)
+    ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, stairs, 4)
                        .define('B', item)
                        .pattern("B  ")
                        .pattern("BB ")
                        .pattern("BBB")
                        .unlockedBy("has_item", hasBlock)
-                       .group(Objects.requireNonNull(stairs.asItem().getRegistryName()).toString())
+                       .group(Objects.requireNonNull(BuiltInRegistries.ITEM.getKey(stairs.asItem())).toString())
                        .save(consumer, wrap(item, folder, "_stairs"));
 
     // only add stonecutter if relevant
     if (addStonecutter) {
       Ingredient ingredient = Ingredient.of(item);
-      SingleItemRecipeBuilder.stonecutting(ingredient, slab, 2)
+      SingleItemRecipeBuilder.stonecutting(ingredient, RecipeCategory.BUILDING_BLOCKS, slab, 2)
                              .unlockedBy("has_item", hasBlock)
                              .save(consumer, wrap(item, folder, "_slab_stonecutter"));
-      SingleItemRecipeBuilder.stonecutting(ingredient, stairs)
+      SingleItemRecipeBuilder.stonecutting(ingredient, RecipeCategory.BUILDING_BLOCKS, stairs)
                              .unlockedBy("has_item", hasBlock)
                              .save(consumer, wrap(item, folder, "_stairs_stonecutter"));
     }
@@ -146,17 +148,17 @@ public interface ICommonRecipeHelper extends IRecipeHelper {
     Item item = saveing.asItem();
     TriggerInstance hasBlock = RecipeProvider.has(item);
     ItemLike wall = saveing.getWall();
-    ShapedRecipeBuilder.shaped(wall, 6)
+    ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, wall, 6)
                        .define('B', item)
                        .pattern("BBB")
                        .pattern("BBB")
                        .unlockedBy("has_item", hasBlock)
-                       .group(Objects.requireNonNull(wall.asItem().getRegistryName()).toString())
+                       .group(Objects.requireNonNull(BuiltInRegistries.ITEM.getKey(wall.asItem())).toString())
                        .save(consumer, wrap(item, folder, "_wall"));
     // only add stonecutter if relevant
     if (addStonecutter) {
       Ingredient ingredient = Ingredient.of(item);
-      SingleItemRecipeBuilder.stonecutting(ingredient, wall)
+      SingleItemRecipeBuilder.stonecutting(ingredient, RecipeCategory.BUILDING_BLOCKS, wall)
                              .unlockedBy("has_item", hasBlock)
                              .save(consumer, wrap(item, folder, "_wall_stonecutter"));
     }
@@ -172,13 +174,13 @@ public interface ICommonRecipeHelper extends IRecipeHelper {
     TriggerInstance hasPlanks = RecipeProvider.has(wood);
 
     // planks
-    ShapelessRecipeBuilder.shapeless(wood, 4).requires(wood.getLogItemTag())
+    ShapelessRecipeBuilder.shapeless(RecipeCategory.BUILDING_BLOCKS, wood, 4).requires(wood.getLogItemTag())
                           .group("planks")
                           .unlockedBy("has_log", RecipeProvider.inventoryTrigger(ItemPredicate.Builder.item().of(wood.getLogItemTag()).build()))
                           .save(consumer, modResource(folder + "planks"));
     // slab
     ItemLike slab = wood.getSlab();
-    ShapedRecipeBuilder.shaped(slab, 6)
+    ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, slab, 6)
                        .define('#', wood)
                        .pattern("###")
                        .unlockedBy("has_planks", hasPlanks)
@@ -186,7 +188,7 @@ public interface ICommonRecipeHelper extends IRecipeHelper {
                        .save(consumer, modResource(folder + "slab"));
     // stairs
     ItemLike stairs = wood.getStairs();
-    ShapedRecipeBuilder.shaped(stairs, 4)
+    ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, stairs, 4)
                        .define('#', wood)
                        .pattern("#  ")
                        .pattern("## ")
@@ -196,57 +198,57 @@ public interface ICommonRecipeHelper extends IRecipeHelper {
                        .save(consumer, modResource(folder + "stairs"));
 
     // log to stripped
-    ShapedRecipeBuilder.shaped(wood.getWood(), 3)
+    ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, wood.getWood(), 3)
                        .define('#', wood.getLog())
                        .pattern("##").pattern("##")
                        .group("bark")
                        .unlockedBy("has_log", RecipeProvider.has(wood.getLog()))
                        .save(consumer, modResource(folder + "log_to_wood"));
-    ShapedRecipeBuilder.shaped(wood.getStrippedWood(), 3)
+    ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, wood.getStrippedWood(), 3)
                        .define('#', wood.getStrippedLog())
                        .pattern("##").pattern("##")
                        .group("bark")
                        .unlockedBy("has_log", RecipeProvider.has(wood.getStrippedLog()))
                        .save(consumer, modResource(folder + "stripped_log_to_wood"));
     // doors
-    ShapedRecipeBuilder.shaped(wood.getFence(), 3)
+    ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, wood.getFence(), 3)
                        .define('#', Tags.Items.RODS_WOODEN).define('W', wood)
                        .pattern("W#W").pattern("W#W")
                        .group("wooden_fence")
                        .unlockedBy("has_planks", hasPlanks)
                        .save(consumer, modResource(folder + "fence"));
-    ShapedRecipeBuilder.shaped(wood.getFenceGate())
+    ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, wood.getFenceGate())
                        .define('#', Items.STICK).define('W', wood)
                        .pattern("#W#").pattern("#W#")
                        .group("wooden_fence_gate")
                        .unlockedBy("has_planks", hasPlanks)
                        .save(consumer, modResource(folder + "fence_gate"));
-    ShapedRecipeBuilder.shaped(wood.getDoor(), 3)
+    ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, wood.getDoor(), 3)
                        .define('#', wood)
                        .pattern("##").pattern("##").pattern("##")
                        .group("wooden_door")
                        .unlockedBy("has_planks", hasPlanks)
                        .save(consumer, modResource(folder + "door"));
-    ShapedRecipeBuilder.shaped(wood.getTrapdoor(), 2)
+    ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, wood.getTrapdoor(), 2)
                        .define('#', wood)
                        .pattern("###").pattern("###")
                        .group("wooden_trapdoor")
                        .unlockedBy("has_planks", hasPlanks)
                        .save(consumer, modResource(folder + "trapdoor"));
     // buttons
-    ShapelessRecipeBuilder.shapeless(wood.getButton())
+    ShapelessRecipeBuilder.shapeless(RecipeCategory.REDSTONE, wood.getButton())
                           .requires(wood)
                           .group("wooden_button")
                           .unlockedBy("has_planks", hasPlanks)
                           .save(consumer, modResource(folder + "button"));
-    ShapedRecipeBuilder.shaped(wood.getPressurePlate())
+    ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, wood.getPressurePlate())
                        .define('#', wood)
                        .pattern("##")
                        .group("wooden_pressure_plate")
                        .unlockedBy("has_planks", hasPlanks)
                        .save(consumer, modResource(folder + "pressure_plate"));
     // signs
-    ShapedRecipeBuilder.shaped(wood.getSign(), 3)
+    ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, wood.getSign(), 3)
                        .group("sign")
                        .define('#', wood).define('X', Tags.Items.RODS_WOODEN)
                        .pattern("###").pattern("###").pattern(" X ")

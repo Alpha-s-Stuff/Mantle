@@ -1,7 +1,7 @@
 package slimeknights.mantle.data.predicate.entity;
 
 import lombok.RequiredArgsConstructor;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -13,7 +13,7 @@ import slimeknights.mantle.data.predicate.TagPredicateLoader;
  */
 @RequiredArgsConstructor
 public class TagEntityPredicate implements LivingEntityPredicate {
-  public static final TagPredicateLoader<EntityType<?>,TagEntityPredicate> LOADER = new TagPredicateLoader<>(Registry.ENTITY_TYPE_REGISTRY, TagEntityPredicate::new, c -> c.tag);
+  public static final TagPredicateLoader<EntityType<?>,TagEntityPredicate> LOADER = new TagPredicateLoader<>(Registries.ENTITY_TYPE, TagEntityPredicate::new, c -> c.tag);
 
   private final TagKey<EntityType<?>> tag;
 

@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableSet;
 import com.mojang.datafixers.types.Type;
 import io.github.fabricators_of_create.porting_lib.util.RegistryObject;
 import net.minecraft.Util;
-import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.util.datafix.fixes.References;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -21,7 +21,7 @@ import java.util.function.Supplier;
  */
 public class BlockEntityTypeDeferredRegister extends DeferredRegisterWrapper<BlockEntityType<?>> {
   public BlockEntityTypeDeferredRegister(String modID) {
-    super(BuiltInRegistries.BLOCK_ENTITY_TYPE, modID);
+    super(Registries.BLOCK_ENTITY_TYPE, modID);
   }
 
   /**

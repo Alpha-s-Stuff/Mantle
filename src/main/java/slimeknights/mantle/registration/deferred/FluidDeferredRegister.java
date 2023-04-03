@@ -1,9 +1,8 @@
 package slimeknights.mantle.registration.deferred;
 
-import io.github.fabricators_of_create.porting_lib.util.LazyRegistrar;
 import io.github.fabricators_of_create.porting_lib.util.RegistryObject;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
-import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -28,9 +27,9 @@ public class FluidDeferredRegister extends DeferredRegisterWrapper<Fluid> {
   private final SynchronizedDeferredRegister<Block> blockRegister;
   private final SynchronizedDeferredRegister<Item> itemRegister;
   public FluidDeferredRegister(String modID) {
-    super(BuiltInRegistries.FLUID, modID);
-    this.blockRegister = SynchronizedDeferredRegister.create(Registry.BLOCK_REGISTRY, modID);
-    this.itemRegister = SynchronizedDeferredRegister.create(Registry.ITEM_REGISTRY, modID);
+    super(Registries.FLUID, modID);
+    this.blockRegister = SynchronizedDeferredRegister.create(Registries.BLOCK, modID);
+    this.itemRegister = SynchronizedDeferredRegister.create(Registries.ITEM, modID);
   }
 
   @Override
@@ -38,10 +37,6 @@ public class FluidDeferredRegister extends DeferredRegisterWrapper<Fluid> {
     super.register();
     blockRegister.register();
     itemRegister.register();
-
-    blockRegister.getEntries().forEach(blockRegistryObject -> {
-
-    });
   }
 
   /**
@@ -52,7 +47,7 @@ public class FluidDeferredRegister extends DeferredRegisterWrapper<Fluid> {
    * @return  Fluid to supply
    */
   public <I extends Fluid> RegistryObject<I> registerFluid(final String name, final Supplier<? extends I> sup) {
-    return (RegistryObject<I>) register.register(name, sup.get());
+    return register.register(name, sup);
   }
 
   /**

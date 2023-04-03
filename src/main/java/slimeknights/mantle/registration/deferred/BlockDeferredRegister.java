@@ -1,11 +1,11 @@
 package slimeknights.mantle.registration.deferred;
 
-import io.github.fabricators_of_create.porting_lib.util.LazyRegistrar;
+import io.github.fabricators_of_create.porting_lib.util.RegistryObject;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.object.builder.v1.block.type.BlockSetTypeRegistry;
 import net.fabricmc.fabric.api.object.builder.v1.block.type.WoodTypeRegistry;
-import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
@@ -39,7 +39,6 @@ import slimeknights.mantle.block.entity.MantleSignBlockEntity;
 import slimeknights.mantle.item.BurnableBlockItem;
 import slimeknights.mantle.item.BurnableSignItem;
 import slimeknights.mantle.item.BurnableTallBlockItem;
-import io.github.fabricators_of_create.porting_lib.util.RegistryObject;
 import slimeknights.mantle.registration.RegistrationHelper;
 import slimeknights.mantle.registration.object.BuildingBlockObject;
 import slimeknights.mantle.registration.object.EnumObject;
@@ -62,7 +61,7 @@ public class BlockDeferredRegister extends DeferredRegisterWrapper<Block> {
 
   protected final SynchronizedDeferredRegister<Item> itemRegister;
   public BlockDeferredRegister(String modID) {
-    super(BuiltInRegistries.BLOCK, modID);
+    super(Registries.BLOCK, modID);
     this.itemRegister = SynchronizedDeferredRegister.create(BuiltInRegistries.ITEM, modID);
   }
 
@@ -83,7 +82,7 @@ public class BlockDeferredRegister extends DeferredRegisterWrapper<Block> {
    * @return  Block registry object
    */
   public <B extends Block> RegistryObject<B> registerNoItem(String name, Supplier<? extends B> block) {
-    return (RegistryObject<B>) register.register(name, block.get());
+    return register.register(name, block);
   }
 
   /**

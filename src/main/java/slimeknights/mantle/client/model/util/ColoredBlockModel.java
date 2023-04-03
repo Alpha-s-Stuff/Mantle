@@ -94,7 +94,7 @@ public class ColoredBlockModel implements IUnbakedGeometry<ColoredBlockModel> {
    * @param spriteGetter  Sprite getter
    * @param location      Model location
    */
-  public static void bakePart(SimpleBakedModel.Builder builder, IModelConfiguration owner, BlockElement part, int color, int luminosity, Transformation transform, boolean uvlock, Function<Material,TextureAtlasSprite> spriteGetter, ResourceLocation location) {
+  public static void bakePart(SimpleBakedModel.Builder builder, BlockModel owner, BlockElement part, int color, int luminosity, Transformation transform, boolean uvlock, Function<Material,TextureAtlasSprite> spriteGetter, ResourceLocation location) {
     for (Direction direction : part.faces.keySet()) {
       BlockElementFace face = part.faces.get(direction);
       // ensure the name is not prefixed (it always is)
@@ -146,8 +146,8 @@ public class ColoredBlockModel implements IUnbakedGeometry<ColoredBlockModel> {
   }
 
   /** Bakes the model inside a dynamic model */
-  public BakedModel bakeDynamic(IModelConfiguration owner, ModelState transform) {
-    return bakeModel(owner, getElements(), colorData, transform, ItemOverrides.EMPTY, ForgeModelBakery.defaultTextureGetter(), BAKE_LOCATION);
+  public BakedModel bakeDynamic(BlockModel owner, ModelState transform) {
+    return bakeModel(owner, getElements(), colorData, transform, ItemOverrides.EMPTY, Material::sprite, BAKE_LOCATION);
   }
 
   /**
