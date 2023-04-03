@@ -25,12 +25,12 @@ import java.util.function.Supplier;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class FluidDeferredRegister extends DeferredRegisterWrapper<Fluid> {
-  private final LazyRegistrar<Block> blockRegister;
-  private final LazyRegistrar<Item> itemRegister;
+  private final SynchronizedDeferredRegister<Block> blockRegister;
+  private final SynchronizedDeferredRegister<Item> itemRegister;
   public FluidDeferredRegister(String modID) {
     super(BuiltInRegistries.FLUID, modID);
-    this.blockRegister = LazyRegistrar.create(BuiltInRegistries.BLOCK, modID);
-    this.itemRegister = LazyRegistrar.create(BuiltInRegistries.ITEM, modID);
+    this.blockRegister = SynchronizedDeferredRegister.create(Registry.BLOCK_REGISTRY, modID);
+    this.itemRegister = SynchronizedDeferredRegister.create(Registry.ITEM_REGISTRY, modID);
   }
 
   @Override

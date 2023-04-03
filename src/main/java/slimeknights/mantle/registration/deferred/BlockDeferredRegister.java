@@ -60,10 +60,10 @@ import java.util.function.Supplier;
 @SuppressWarnings({"WeakerAccess", "unused"})
 public class BlockDeferredRegister extends DeferredRegisterWrapper<Block> {
 
-  protected final LazyRegistrar<Item> itemRegister;
+  protected final SynchronizedDeferredRegister<Item> itemRegister;
   public BlockDeferredRegister(String modID) {
     super(BuiltInRegistries.BLOCK, modID);
-    this.itemRegister = LazyRegistrar.create(BuiltInRegistries.ITEM, modID);
+    this.itemRegister = SynchronizedDeferredRegister.create(BuiltInRegistries.ITEM, modID);
   }
 
   @Override

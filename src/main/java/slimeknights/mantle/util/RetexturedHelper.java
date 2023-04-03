@@ -7,11 +7,13 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import slimeknights.mantle.client.model.ModelProperty;
 
 import javax.annotation.Nullable;
+import java.util.Objects;
 
 /**
  * This utility contains helpers to handle the NBT for retexturable blocks
@@ -19,7 +21,7 @@ import javax.annotation.Nullable;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class RetexturedHelper {
   /** Tag name for texture blocks. Should not be used directly, use the utils to interact */
-  private static final String TAG_TEXTURE = "texture";
+  public static final String TAG_TEXTURE = "texture";
   /** Property for tile entities containing a texture block */
   public static final ModelProperty<Block> BLOCK_PROPERTY = new ModelProperty<>(block -> block != Blocks.AIR);
 
@@ -53,6 +55,18 @@ public final class RetexturedHelper {
     return nbt.getString(TAG_TEXTURE);
   }
 
+  /**
+   * Gets the name of the texture from the block
+   * @param block  Block
+   * @return  Name of the texture, or empty if the block is air
+   */
+  public static String getTextureName(Block block) {
+    if (block == Blocks.AIR) {
+      return "";
+    }
+    return Objects.requireNonNull(block.getRegistryName()).toString();
+  }
+
 
   /* Setting */
 
@@ -67,6 +81,23 @@ public final class RetexturedHelper {
         nbt.remove(TAG_TEXTURE);
       } else {
         nbt.putString(TAG_TEXTURE, texture);
+      }
+    }
+  }
+
+  /** Helper to call client side when the texture changes to refresh model data */
+  public static <T extends BlockEntity & IRetexturedBlockEntity> void onTextureUpdated(T self) {
+    // update the texture in BE data
+    Level level = self.getLevel();
+    if (level != null && level.isClientSide) {
+      Block texture = self.getTexture();
+      texture = texture == Blocks.AIR ? null : texture;
+      IModelData data = self.getModelData();
+      if (data.getData(BLOCK_PROPERTY) != texture) {
+        data.setData(BLOCK_PROPERTY, texture);
+        self.requestModelDataUpdate();
+        BlockState state = self.getBlockState();
+        level.sendBlockUpdated(self.getBlockPos(), state, state, 0);
       }
     }
   }

@@ -40,6 +40,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import slimeknights.mantle.client.model.data.SinglePropertyData;
+import slimeknights.mantle.client.model.util.ColoredBlockModel;
 import slimeknights.mantle.client.model.util.DynamicBakedWrapper;
 import slimeknights.mantle.client.model.util.ModelConfigurationWrapper;
 import slimeknights.mantle.client.model.util.ModelHelper;
@@ -50,6 +51,8 @@ import slimeknights.mantle.util.RetexturedHelper;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
@@ -63,19 +66,24 @@ import java.util.function.Supplier;
 @SuppressWarnings("WeakerAccess")
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public class RetexturedModel implements IUnbakedGeometry<RetexturedModel> {
-  private final SimpleBlockModel model;
+  private final ColoredBlockModel model;
   private final Set<String> retextured;
 
+  /** Fallback constructor for people extending this model */
+  protected RetexturedModel(SimpleBlockModel model, Set<String> retextured) {
+    this(new ColoredBlockModel(model, Collections.emptyList()), retextured);
+  }
+
 //  @Override
-//  public Collection<Material> getMaterials(IGeometryBakingContext owner, Function<ResourceLocation,UnbakedModel> modelGetter, Set<Pair<String,String>> missingTextureErrors) {
-//    return model.getMaterials(owner, modelGetter, missingTextureErrors);
+//  public Collection<Material> getTextures(IModelConfiguration owner, Function<ResourceLocation,UnbakedModel> modelGetter, Set<Pair<String,String>> missingTextureErrors) {
+//    return model.getTextures(owner, modelGetter, missingTextureErrors);
 //  }
 
   @Override
   public BakedModel bake(BlockModel owner, ModelBaker baker, Function<Material,TextureAtlasSprite> spriteGetter, ModelState transform, ItemOverrides overrides, ResourceLocation location) {
     // bake the model and return
-    BakedModel baked = model.bakeModel(owner, transform, overrides, spriteGetter, location);
-    return new Baked(baked, owner, model, transform, getAllRetextured(owner, this.model, retextured));
+    BakedModel baked = model.bake(owner, baker, spriteGetter, transform, overrides, location);
+    return new Baked(baked, owner, model, transform, getAllRetextured(owner, this.model.getModel(), retextured));
   }
 
   /**
@@ -108,7 +116,7 @@ public class RetexturedModel implements IUnbakedGeometry<RetexturedModel> {
     @Override
     public RetexturedModel read(JsonObject json, JsonDeserializationContext context) {
       // get base model
-      SimpleBlockModel model = SimpleBlockModel.deserialize(context, json);
+      ColoredBlockModel model = ColoredBlockModel.deserialize(context, json);
 
       // get list of textures to retexture
       Set<String> retextured = getRetextured(json);
@@ -153,17 +161,21 @@ public class RetexturedModel implements IUnbakedGeometry<RetexturedModel> {
     private final Map<ResourceLocation,BakedModel> cache = new ConcurrentHashMap<>();
     /* Properties for rebaking */
     private final BlockModel owner;
-    private final SimpleBlockModel model;
+    private final ColoredBlockModel model;
     private final ModelState transform;
     /** List of texture names that are retextured */
     private final Set<String> retextured;
 
-    public Baked(BakedModel baked, BlockModel owner, SimpleBlockModel model, ModelState transform, Set<String> retextured) {
+    public Baked(BakedModel baked, BlockModel owner, ColoredBlockModel model, ModelState transform, Set<String> retextured) {
       super(baked);
       this.model = model;
       this.owner = owner;
       this.transform = transform;
       this.retextured = retextured;
+    }
+
+    public Baked(BakedModel baked, IModelConfiguration owner, SimpleBlockModel model, ModelState transform, Set<String> retextured) {
+      this(baked, owner, new ColoredBlockModel(model, Collections.emptyList()), transform, retextured);
     }
 
     /**

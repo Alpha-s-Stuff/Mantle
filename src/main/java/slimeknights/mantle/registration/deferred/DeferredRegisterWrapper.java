@@ -18,7 +18,7 @@ import java.util.function.Supplier;
 @SuppressWarnings("WeakerAccess")
 public abstract class DeferredRegisterWrapper<T> {
   /** Registry instance, use this to provide register methods */
-  protected final LazyRegistrar<T> register;
+  protected final SynchronizedDeferredRegister<T> register;
   /** Mod ID for registration */
   private final String modID;
 
@@ -27,7 +27,7 @@ public abstract class DeferredRegisterWrapper<T> {
   }
 
   protected DeferredRegisterWrapper(LazyRegistrar<T> register, String modID) {
-    this.register = register;
+    this.register = SynchronizedDeferredRegister.create(register);
     this.modID = modID;
   }
 

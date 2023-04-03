@@ -21,10 +21,10 @@ import java.util.function.Supplier;
 @SuppressWarnings("unused")
 public class EntityTypeDeferredRegister extends DeferredRegisterWrapper<EntityType<?>> {
 
-  private final LazyRegistrar<Item> itemRegistry;
+  private final SynchronizedDeferredRegister<Item> itemRegistry;
   public EntityTypeDeferredRegister(String modID) {
-    super(BuiltInRegistries.ENTITY_TYPE, modID);
-    itemRegistry = LazyRegistrar.create(BuiltInRegistries.ITEM, modID);
+    super(Registry.ENTITY_TYPE_REGISTRY, modID);
+    itemRegistry = SynchronizedDeferredRegister.create(Registry.ITEM_REGISTRY, modID);
   }
 
   @Override
