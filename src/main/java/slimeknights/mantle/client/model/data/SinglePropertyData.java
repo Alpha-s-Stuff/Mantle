@@ -8,7 +8,7 @@ import javax.annotation.Nullable;
 
 /**
  * IModelData instance that holds a single model data property. Will be more efficient than the map implementation in cases without more properties.
- * If you need more than one model property, use {@link net.minecraftforge.client.model.data.ModelDataMap} instead.
+ * If you need more than one model property, use {@link ModelDataMap} instead.
  * @param <D>  Property type, for data validation
  */
 @RequiredArgsConstructor
