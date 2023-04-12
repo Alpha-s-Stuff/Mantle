@@ -24,6 +24,7 @@ import slimeknights.mantle.registration.FluidAttributeClientHandler;
 import slimeknights.mantle.registration.FluidAttributeHandler;
 import slimeknights.mantle.registration.FluidBuilder;
 import slimeknights.mantle.registration.ItemProperties;
+import slimeknights.mantle.registration.UpsideDownFluidAttributeClientHandler;
 import slimeknights.mantle.registration.object.FluidObject;
 import slimeknights.mantle.util.SimpleFlowableFluid;
 import slimeknights.mantle.util.SimpleFlowableFluid.Properties;
@@ -166,7 +167,7 @@ public class FluidDeferredRegister extends DeferredRegisterWrapper<Fluid> {
     FluidVariantAttributes.register(stillFluid, new FluidAttributeHandler(attributes));
     F flowingFluid = Registry.register(BuiltInRegistries.FLUID, new ResourceLocation(this.modID, "flowing_" + name), flowing.apply(props));
     FluidVariantAttributes.register(flowingFluid, new FluidAttributeHandler(attributes));
-    EnvExecutor.runWhenOn(EnvType.CLIENT, () -> () -> FluidRenderHandlerRegistry.INSTANCE.register(stillFluid, flowingFluid, new FluidAttributeClientHandler(attributes)));
+    EnvExecutor.runWhenOn(EnvType.CLIENT, () -> () -> FluidRenderHandlerRegistry.INSTANCE.register(stillFluid, flowingFluid, new UpsideDownFluidAttributeClientHandler(attributes)));
     Supplier<F> stillSup = () -> stillFluid;
     Supplier<F> flowingSup = () -> flowingFluid;
     stillDelayed.setSupplier(stillSup);
