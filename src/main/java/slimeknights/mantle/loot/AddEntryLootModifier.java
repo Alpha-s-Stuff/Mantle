@@ -1,6 +1,7 @@
 package slimeknights.mantle.loot;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
@@ -36,7 +37,7 @@ public class AddEntryLootModifier extends LootModifier {
 
   public static final Codec<AddEntryLootModifier> CODEC = RecordCodecBuilder.create(inst -> {
     Codec<ILootModifierCondition[]> modifierConditionsCodec = Codec.PASSTHROUGH.flatXmap(dynamic -> {
-      JsonObject object = IGlobalLootModifier.getJson(dynamic).getAsJsonObject();
+      JsonObject object = IGlobalLootModifier.getJson(dynamic).getAsJsonArray().get(0).getAsJsonObject();
       ILootModifierCondition[] modifierConditions;
       if (object.has("post_conditions")) {
         modifierConditions = GSON.fromJson(GsonHelper.getAsJsonArray(object, "modifier_conditions"), ILootModifierCondition[].class);

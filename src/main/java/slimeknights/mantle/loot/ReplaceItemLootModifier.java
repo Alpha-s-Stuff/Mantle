@@ -37,7 +37,7 @@ import java.util.stream.Collectors;
 public class ReplaceItemLootModifier extends LootModifier {
   public static final Codec<ReplaceItemLootModifier> CODEC = RecordCodecBuilder.create(inst -> {
     Codec<Ingredient> ingredientCodec = Codec.PASSTHROUGH.flatXmap(dynamic -> {
-      JsonElement obj = IGlobalLootModifier.getJson(dynamic);
+      JsonElement obj = IGlobalLootModifier.getJson(dynamic).getAsJsonArray().get(0);
       Ingredient original;
       JsonElement element = JsonHelper.getElement(obj.getAsJsonObject(), "original");
       if (element.isJsonPrimitive()) {
