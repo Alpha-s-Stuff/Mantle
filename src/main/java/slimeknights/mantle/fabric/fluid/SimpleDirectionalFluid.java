@@ -18,13 +18,12 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import slimeknights.mantle.fluid.attributes.FluidAttributes;
-import slimeknights.mantle.registration.FluidAttributeSupplier;
 import slimeknights.mantle.util.SimpleFlowableFluid;
 
 import javax.annotation.Nullable;
 import java.util.function.Supplier;
 
-public abstract class SimpleDirectionalFluid extends StarFluid implements FluidAttributeSupplier {
+public abstract class SimpleDirectionalFluid extends StarFluid {
 
   private final Supplier<? extends Fluid> flowing;
   private final Supplier<? extends Fluid> still;
@@ -32,7 +31,6 @@ public abstract class SimpleDirectionalFluid extends StarFluid implements FluidA
   private final Supplier<? extends Item> bucket;
   @Nullable
   private final Supplier<? extends LiquidBlock> block;
-  private final FluidAttributes.Builder builder;
   private final boolean infinite;
   private final int flowSpeed;
   private final int levelDecreasePerBlock;
@@ -43,7 +41,6 @@ public abstract class SimpleDirectionalFluid extends StarFluid implements FluidA
     super(properties.flowDirection);
     this.flowing = properties.flowing;
     this.still = properties.still;
-    this.builder = properties.attributes;
     this.infinite = properties.infinite;
     this.bucket = properties.bucket;
     this.block = properties.block;
@@ -113,11 +110,6 @@ public abstract class SimpleDirectionalFluid extends StarFluid implements FluidA
   }
 
   @Override
-  public FluidAttributes createAttributes() {
-    return builder.build(this);
-  }
-
-  @Override
   public boolean isSame(Fluid fluid) {
     return fluid == still.get() || fluid == flowing.get();
   }
@@ -164,7 +156,7 @@ public abstract class SimpleDirectionalFluid extends StarFluid implements FluidA
   public static class Properties {
     private Supplier<? extends Fluid> still;
     private Supplier<? extends Fluid> flowing;
-    private FluidAttributes.Builder attributes;
+    public FluidAttributes.Builder attributes;
     private boolean infinite;
     private Supplier<? extends Item> bucket;
     private Supplier<? extends LiquidBlock> block;

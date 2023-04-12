@@ -30,7 +30,6 @@ public abstract class SimpleFlowableFluid extends FlowingFluid {
   private final Supplier<? extends Item> bucket;
   @Nullable
   private final Supplier<? extends LiquidBlock> block;
-  private final FluidAttributes.Builder builder;
   private final boolean infinite;
   private final int flowSpeed;
   private final int levelDecreasePerBlock;
@@ -40,7 +39,6 @@ public abstract class SimpleFlowableFluid extends FlowingFluid {
   protected SimpleFlowableFluid(Properties properties) {
     this.flowing = properties.flowing;
     this.still = properties.still;
-    this.builder = properties.attributes;
     this.infinite = properties.infinite;
     this.bucket = properties.bucket;
     this.block = properties.block;
@@ -108,10 +106,6 @@ public abstract class SimpleFlowableFluid extends FlowingFluid {
     }
     return Blocks.AIR.defaultBlockState();
   }
-
-  public FluidAttributes getAttributes() {
-    return builder.build(this);
-  }
   
   @Override
   public boolean isSame(Fluid fluid) {
@@ -160,7 +154,7 @@ public abstract class SimpleFlowableFluid extends FlowingFluid {
   public static class Properties {
     private Supplier<? extends Fluid> still;
     private Supplier<? extends Fluid> flowing;
-    private FluidAttributes.Builder attributes;
+    public FluidAttributes.Builder attributes;
     private boolean infinite;
     private Supplier<? extends Item> bucket;
     private Supplier<? extends LiquidBlock> block;

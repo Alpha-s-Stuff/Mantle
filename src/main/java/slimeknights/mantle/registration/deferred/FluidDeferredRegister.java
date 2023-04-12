@@ -1,7 +1,11 @@
 package slimeknights.mantle.registration.deferred;
 
+import io.github.fabricators_of_create.porting_lib.util.EnvExecutor;
 import io.github.fabricators_of_create.porting_lib.util.RegistryObject;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandlerRegistry;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.Item;
@@ -13,6 +17,8 @@ import net.minecraft.world.level.material.Material;
 import slimeknights.mantle.fabric.fluid.SimpleDirectionalFluid;
 import slimeknights.mantle.fluid.attributes.FluidAttributes;
 import slimeknights.mantle.registration.DelayedSupplier;
+import slimeknights.mantle.registration.FluidAttributeClientHandler;
+import slimeknights.mantle.registration.FluidAttributeHandler;
 import slimeknights.mantle.registration.FluidBuilder;
 import slimeknights.mantle.registration.ItemProperties;
 import slimeknights.mantle.registration.object.FluidObject;
@@ -76,9 +82,21 @@ public class FluidDeferredRegister extends DeferredRegisterWrapper<Fluid> {
     Properties props = builder.block(blockObj).build(stillDelayed, flowingDelayed);
 
     // create fluids now that we have props
-    Supplier<F> stillSup = registerFluid(name, () -> still.apply(props));
+    Supplier<F> stillSup = registerFluid(name, () -> {
+      F fluid = still.apply(props);
+      FluidAttributes attributes = props.attributes.build(fluid);
+      FluidVariantAttributes.register(fluid, new FluidAttributeHandler(attributes));
+      EnvExecutor.runWhenOn(EnvType.CLIENT, () -> () -> FluidRenderHandlerRegistry.INSTANCE.register(fluid, new FluidAttributeClientHandler(attributes)));
+      return fluid;
+    });
     stillDelayed.setSupplier(stillSup);
-    Supplier<F> flowingSup = registerFluid("flowing_" + name, () -> flowing.apply(props));
+    Supplier<F> flowingSup = registerFluid("flowing_" + name, () -> {
+      F fluid = flowing.apply(props);
+      FluidAttributes attributes = props.attributes.build(fluid);
+      FluidVariantAttributes.register(fluid, new FluidAttributeHandler(attributes));
+      EnvExecutor.runWhenOn(EnvType.CLIENT, () -> () -> FluidRenderHandlerRegistry.INSTANCE.register(fluid, new FluidAttributeClientHandler(attributes)));
+      return fluid;
+    });
     flowingDelayed.setSupplier(flowingSup);
 
     // return the final nice object
@@ -146,9 +164,21 @@ public class FluidDeferredRegister extends DeferredRegisterWrapper<Fluid> {
     SimpleDirectionalFluid.Properties props = builder.block(blockObj).buildUpsideDownFluid(stillDelayed, flowingDelayed);
 
     // create fluids now that we have props
-    Supplier<F> stillSup = registerFluid(name, () -> still.apply(props));
+    Supplier<F> stillSup = registerFluid(name, () -> {
+      F fluid = still.apply(props);
+      FluidAttributes attributes = props.attributes.build(fluid);
+      FluidVariantAttributes.register(fluid, new FluidAttributeHandler(attributes));
+      EnvExecutor.runWhenOn(EnvType.CLIENT, () -> () -> FluidRenderHandlerRegistry.INSTANCE.register(fluid, new FluidAttributeClientHandler(attributes)));
+      return fluid;
+    });
     stillDelayed.setSupplier(stillSup);
-    Supplier<F> flowingSup = registerFluid("flowing_" + name, () -> flowing.apply(props));
+    Supplier<F> flowingSup = registerFluid("flowing_" + name, () -> {
+      F fluid = flowing.apply(props);
+      FluidAttributes attributes = props.attributes.build(fluid);
+      FluidVariantAttributes.register(fluid, new FluidAttributeHandler(attributes));
+      EnvExecutor.runWhenOn(EnvType.CLIENT, () -> () -> FluidRenderHandlerRegistry.INSTANCE.register(fluid, new FluidAttributeClientHandler(attributes)));
+      return fluid;
+    });
     flowingDelayed.setSupplier(flowingSup);
 
     // return the final nice object
