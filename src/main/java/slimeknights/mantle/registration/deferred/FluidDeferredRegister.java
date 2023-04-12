@@ -187,7 +187,7 @@ public class FluidDeferredRegister extends DeferredRegisterWrapper<Fluid> {
                                                                               Function<SimpleDirectionalFluid.Properties,? extends F> still, Function<SimpleDirectionalFluid.Properties,? extends F> flowing, Material material, int lightLevel) {
     return registerUpsideDown(
       name, tagName, new FluidBuilder(builder.luminosity(lightLevel)).explosionResistance(100f), still, flowing,
-      fluid -> new LiquidBlock(fluid.get(), Block.Properties.of(material).noCollission().strength(100.0F)/*.noDrops()*/.lightLevel(state -> lightLevel))
+      fluid -> new LiquidBlock(fluid.get(), Block.Properties.of(material).noCollission().strength(100.0F).noLootTable().lightLevel(state -> lightLevel))
     );
   }
 
