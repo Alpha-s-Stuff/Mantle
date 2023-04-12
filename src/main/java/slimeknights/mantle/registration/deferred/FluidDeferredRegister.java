@@ -84,21 +84,16 @@ public class FluidDeferredRegister extends DeferredRegisterWrapper<Fluid> {
     Properties props = builder.block(blockObj).build(stillDelayed, flowingDelayed);
 
     // create fluids now that we have props
-    Supplier<F> stillSup = () -> {
-      F fluid = Registry.register(BuiltInRegistries.FLUID, new ResourceLocation(this.modID, name), still.apply(props));
-      FluidAttributes attributes = props.attributes.build(fluid);
-      FluidVariantAttributes.register(fluid, new FluidAttributeHandler(attributes));
-      EnvExecutor.runWhenOn(EnvType.CLIENT, () -> () -> FluidRenderHandlerRegistry.INSTANCE.register(fluid, new FluidAttributeClientHandler(attributes)));
-      return fluid;
-    };
+    F stillFluid = Registry.register(BuiltInRegistries.FLUID, new ResourceLocation(this.modID, name), still.apply(props));
+    FluidAttributes attributes = props.attributes.build(stillFluid);
+    FluidVariantAttributes.register(stillFluid, new FluidAttributeHandler(attributes));
+    EnvExecutor.runWhenOn(EnvType.CLIENT, () -> () -> FluidRenderHandlerRegistry.INSTANCE.register(stillFluid, new FluidAttributeClientHandler(attributes)));
+    F flowingFluid = Registry.register(BuiltInRegistries.FLUID, new ResourceLocation(this.modID, "flowing_" + name), flowing.apply(props));
+    FluidVariantAttributes.register(flowingFluid, new FluidAttributeHandler(attributes));
+    EnvExecutor.runWhenOn(EnvType.CLIENT, () -> () -> FluidRenderHandlerRegistry.INSTANCE.register(flowingFluid, new FluidAttributeClientHandler(attributes)));
+    Supplier<F> stillSup = () -> stillFluid;
+    Supplier<F> flowingSup = () -> flowingFluid;
     stillDelayed.setSupplier(stillSup);
-    Supplier<F> flowingSup = () -> {
-      F fluid = Registry.register(BuiltInRegistries.FLUID, new ResourceLocation(this.modID, "flowing_" + name), flowing.apply(props));
-      FluidAttributes attributes = props.attributes.build(fluid);
-      FluidVariantAttributes.register(fluid, new FluidAttributeHandler(attributes));
-      EnvExecutor.runWhenOn(EnvType.CLIENT, () -> () -> FluidRenderHandlerRegistry.INSTANCE.register(fluid, new FluidAttributeClientHandler(attributes)));
-      return fluid;
-    };
     flowingDelayed.setSupplier(flowingSup);
 
     // return the final nice object
