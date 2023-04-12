@@ -49,7 +49,7 @@ public class AddEntryLootModifier extends LootModifier {
     Codec<LootPoolEntryContainer> entryCodec = Codec.PASSTHROUGH.flatXmap(dynamic -> {
       JsonObject object = IGlobalLootModifier.getJson(dynamic).getAsJsonObject();
 
-      return DataResult.success(GSON.fromJson(GsonHelper.getAsJsonObject(object, "entry"), LootPoolEntryContainer.class));
+      return DataResult.success(GSON.fromJson(object, LootPoolEntryContainer.class));
     }, entry -> {
       return DataResult.success(new Dynamic<>(JsonOps.INSTANCE, GSON.toJsonTree(entry, LootPoolEntryContainer.class)));
     });
