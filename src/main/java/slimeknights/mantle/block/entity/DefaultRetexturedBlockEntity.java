@@ -10,6 +10,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import slimeknights.mantle.block.RetexturedBlock;
+import slimeknights.mantle.client.model.data.IModelData;
 import slimeknights.mantle.client.model.data.SinglePropertyData;
 import slimeknights.mantle.util.RetexturedHelper;
 
@@ -21,7 +22,7 @@ import static slimeknights.mantle.util.RetexturedHelper.TAG_TEXTURE;
  * Standard implementation for {@link IRetexturedBlockEntity}, use alongside {@link RetexturedBlock} and {@link slimeknights.mantle.item.RetexturedBlockItem}
  */
 public class DefaultRetexturedBlockEntity extends MantleBlockEntity implements IRetexturedBlockEntity {
-  private final Lazy<SinglePropertyData> data = Lazy.of(this::getRetexturedModelData);
+  private final Lazy<IModelData> data = Lazy.of(this::getRetexturedModelData);
   @Nonnull
   @Getter
   private Block texture = Blocks.AIR;
@@ -31,7 +32,7 @@ public class DefaultRetexturedBlockEntity extends MantleBlockEntity implements I
 
   @Nonnull
   @Override
-  public SinglePropertyData getRenderAttachmentData() {
+  public IModelData getRenderAttachmentData() {
     return this.data.get();
   }
 

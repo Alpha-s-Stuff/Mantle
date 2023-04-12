@@ -27,6 +27,11 @@ repositories {
     maven { url = "https://dvs1.progwml6.com/files/maven/" }
     maven { url = "https://maven.wispforest.io" }
     maven { url = "https://jitpack.io" }
+    maven {
+        // location of a maven mirror for JEI files, as a fallback
+        name = "ModMaven"
+        url = "https://modmaven.dev"
+    }
 }
 
 group = 'slimeknights.mantle'
@@ -115,13 +120,13 @@ dependencies {
     modApi(include("io.github.fabricators_of_create.Porting-Lib:porting-lib:${project.port_lib_version}+${project.minecraft_version}"))
 
     // compile against the REI API but do not include it at runtime
-    modCompileOnly("me.shedaniel:RoughlyEnoughItems-api-fabric:${project.rei_version}") { transitive = false }
+    modCompileOnly("me.shedaniel:RoughlyEnoughItems-api-fabric:${project.rei_version}")
     // at runtime, use the full REI jar
     modRuntimeOnly("me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}")
     // api for REI
     modImplementation("dev.architectury:architectury-fabric:${project.architectury_version}")
 
-    modCompileOnly("mezz.jei:jei-1.19.2-fabric:${project.jei_version}") { transitive = false }
+    modCompileOnly("mezz.jei:jei-${minecraft_version}-fabric:${jei_version}")
 
     modApi(include("curse.maven:forge-config-api-port-fabric-547434:${forge_config_version}"))
     api(include('com.electronwill.night-config:core:3.6.0'))

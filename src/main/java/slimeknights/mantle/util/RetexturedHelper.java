@@ -14,6 +14,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import slimeknights.mantle.block.entity.IRetexturedBlockEntity;
 import slimeknights.mantle.client.model.ModelProperty;
+import slimeknights.mantle.client.model.data.IModelData;
 import slimeknights.mantle.client.model.data.SinglePropertyData;
 
 import javax.annotation.Nullable;
@@ -96,7 +97,7 @@ public final class RetexturedHelper {
     if (level != null && level.isClientSide) {
       Block texture = self.getTexture();
       texture = texture == Blocks.AIR ? null : texture;
-      SinglePropertyData data = self.getRetexturedModelData();
+      IModelData data = self.getRetexturedModelData();
       if (data.getData(BLOCK_PROPERTY) != texture) {
         data.setData(BLOCK_PROPERTY, texture);
         BlockState state = self.getBlockState();

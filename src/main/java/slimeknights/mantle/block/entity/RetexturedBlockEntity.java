@@ -7,6 +7,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
+import slimeknights.mantle.client.model.data.IModelData;
 import slimeknights.mantle.client.model.data.SinglePropertyData;
 import slimeknights.mantle.util.RetexturedHelper;
 
@@ -21,14 +22,14 @@ import static slimeknights.mantle.util.RetexturedHelper.TAG_TEXTURE;
 @Deprecated
 public class RetexturedBlockEntity extends MantleBlockEntity implements IRetexturedBlockEntity, RenderAttachmentBlockEntity {
   /** Lazy value of model data as it will not change after first fetch */
-  private final Lazy<SinglePropertyData> data = Lazy.of(this::getRetexturedModelData);
+  private final Lazy<IModelData> data = Lazy.of(this::getRetexturedModelData);
   public RetexturedBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
     super(type, pos, state);
   }
 
   @Nonnull
   @Override
-  public SinglePropertyData getRenderAttachmentData() {
+  public IModelData getRenderAttachmentData() {
     return data.get();
   }
 
