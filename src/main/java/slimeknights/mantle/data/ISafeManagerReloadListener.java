@@ -7,6 +7,8 @@ import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import slimeknights.mantle.Mantle;
 import slimeknights.mantle.data.fabric.IdentifiableISafeManagerReloadListener;
 
+import java.util.function.Consumer;
+
 /**
  * Same as {@link ResourceManagerReloadListener}, but only runs if the mod loader state is valid, used as client resource listeners can cause a misleading crash report if something else throws
  */
@@ -24,11 +26,11 @@ public interface ISafeManagerReloadListener extends ResourceManagerReloadListene
    */
   void onReloadSafe(ResourceManager resourceManager);
 
-  static ISafeManagerReloadListener create(ResourceLocation id, ISafeManagerReloadListener managerReloadListener) {
+  static ISafeManagerReloadListener create(ResourceLocation id, Consumer<ResourceManager> managerReloadListener) {
     return new IdentifiableISafeManagerReloadListener(id) {
       @Override
       public void onReloadSafe(ResourceManager resourceManager) {
-        managerReloadListener.onReloadSafe(resourceManager);
+        managerReloadListener.accept(resourceManager);
       }
     };
   }
