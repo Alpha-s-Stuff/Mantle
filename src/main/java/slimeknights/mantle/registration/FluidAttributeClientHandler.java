@@ -13,18 +13,10 @@ import slimeknights.mantle.fluid.attributes.FluidAttributes;
 public class FluidAttributeClientHandler implements FluidRenderHandler {
   protected final FluidAttributes attributes;
 
-  protected final ResourceLocation stillTexture;
-  protected final ResourceLocation flowingTexture;
-  protected final ResourceLocation overlayTexture;
-
-  protected final TextureAtlasSprite[] sprites;
+  protected TextureAtlasSprite[] sprites;
 
   public FluidAttributeClientHandler(FluidAttributes attributes) {
     this.attributes = attributes;
-    this.stillTexture = attributes.getStillTexture();
-    this.flowingTexture = attributes.getFlowingTexture();
-    this.overlayTexture = attributes.getOverlayTexture();
-    this.sprites = new TextureAtlasSprite[overlayTexture == null ? 2 : 3];
   }
 
   @Override
@@ -39,8 +31,11 @@ public class FluidAttributeClientHandler implements FluidRenderHandler {
 
   @Override
   public void reloadTextures(TextureAtlas textureAtlas) {
-    sprites[0] = textureAtlas.getSprite(stillTexture);
-    sprites[1] = textureAtlas.getSprite(flowingTexture);
+    ResourceLocation overlayTexture = attributes.getOverlayTexture();
+    this.sprites = new TextureAtlasSprite[overlayTexture == null ? 2 : 3];
+    sprites[0] = textureAtlas.getSprite(attributes.getStillTexture());
+    sprites[1] = textureAtlas.getSprite(attributes.getFlowingTexture());
+
 
     if (overlayTexture != null) {
       sprites[2] = textureAtlas.getSprite(overlayTexture);
