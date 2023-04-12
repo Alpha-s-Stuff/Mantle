@@ -44,6 +44,7 @@ public class FluidDeferredRegister extends DeferredRegisterWrapper<Fluid> {
 
   @Override
   public void register() {
+    super.register();
     blockRegister.register();
     itemRegister.register();
   }
