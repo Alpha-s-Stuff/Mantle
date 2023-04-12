@@ -20,7 +20,7 @@ public abstract class DeferredRegisterWrapper<T> {
   /** Registry instance, use this to provide register methods */
   protected final SynchronizedDeferredRegister<T> register;
   /** Mod ID for registration */
-  private final String modID;
+  protected final String modID;
 
   protected DeferredRegisterWrapper(ResourceKey<Registry<T>> reg, String modID) {
     this(LazyRegistrar.create(reg, modID), modID);
