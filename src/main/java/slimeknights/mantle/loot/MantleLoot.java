@@ -2,6 +2,9 @@ package slimeknights.mantle.loot;
 
 import com.google.gson.JsonDeserializer;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.Dynamic;
+import com.mojang.serialization.JsonOps;
 import io.github.fabricators_of_create.porting_lib.PortingLibRegistries;
 import io.github.fabricators_of_create.porting_lib.loot.IGlobalLootModifier;
 import lombok.AccessLevel;
@@ -27,6 +30,11 @@ import slimeknights.mantle.registration.adapter.RegistryAdapter;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 //@ObjectHolder(value = Mantle.modId)
 public class MantleLoot {
+  public static final Codec<LootItemFunction[]> LOOT_ITEM_FUNCTION_CODEC = Codec.PASSTHROUGH.flatXmap(dynamic -> {
+    LootItemFunction[] functions = AddEntryLootModifier.GSON.fromJson(IGlobalLootModifier.getJson(dynamic), LootItemFunction[].class);
+    return DataResult.success(functions);
+  }, lootItemFunctions -> DataResult.success(new Dynamic<>(JsonOps.INSTANCE, AddEntryLootModifier.GSON.toJsonTree(lootItemFunctions, LootItemFunction[].class))));
+
   /** Condition to match a block tag and property predicate */
   public static LootItemConditionType BLOCK_TAG_CONDITION;
   /** Function to add block entity texture to a dropped item */

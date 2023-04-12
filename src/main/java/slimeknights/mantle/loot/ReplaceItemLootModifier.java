@@ -51,12 +51,7 @@ public class ReplaceItemLootModifier extends LootModifier {
       JsonElement obj = IGlobalLootModifier.getJson(dynamic);
       return DataResult.success(ItemOutput.fromJson(JsonHelper.getElement(obj.getAsJsonObject(), "replacement")));
     }, itemOutput -> DataResult.success(new Dynamic<>(JsonOps.INSTANCE, itemOutput.serialize())));
-
-    Codec<LootItemFunction[]> lootItemFunctionCodec = Codec.PASSTHROUGH.flatXmap(dynamic -> {
-      LootItemFunction[] functions = AddEntryLootModifier.GSON.fromJson(IGlobalLootModifier.getJson(dynamic), LootItemFunction[].class);
-      return DataResult.success(functions);
-    }, lootItemFunctions -> DataResult.success(new Dynamic<>(JsonOps.INSTANCE, AddEntryLootModifier.GSON.toJsonTree(lootItemFunctions, LootItemFunction[].class))));
-    return codecStart(inst).and(ingredientCodec.fieldOf("original").forGetter(modifier -> modifier.original)).and(itemOutputCodec.fieldOf("replacement").forGetter(modifier -> modifier.replacement)).and(lootItemFunctionCodec.fieldOf("functions").forGetter(modifier -> modifier.functions))
+    return codecStart(inst).and(ingredientCodec.fieldOf("original").forGetter(modifier -> modifier.original)).and(itemOutputCodec.fieldOf("replacement").forGetter(modifier -> modifier.replacement)).and(MantleLoot.LOOT_ITEM_FUNCTION_CODEC.fieldOf("functions").forGetter(modifier -> modifier.functions))
       .apply(inst, ReplaceItemLootModifier::new);
   });
 

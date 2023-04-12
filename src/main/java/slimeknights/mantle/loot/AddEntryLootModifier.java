@@ -50,23 +50,8 @@ public class AddEntryLootModifier extends LootModifier {
       JsonObject object = IGlobalLootModifier.getJson(dynamic).getAsJsonObject();
 
       return DataResult.success(GSON.fromJson(object, LootPoolEntryContainer.class));
-    }, entry -> {
-      return DataResult.success(new Dynamic<>(JsonOps.INSTANCE, GSON.toJsonTree(entry, LootPoolEntryContainer.class)));
-    });
-    Codec<LootItemFunction[]> functionsCodec = Codec.PASSTHROUGH.flatXmap(dynamic -> {
-      JsonObject object = IGlobalLootModifier.getJson(dynamic).getAsJsonObject();
-      LootItemFunction[] functions;
-      if (object.has("functions")) {
-        functions = GSON.fromJson(GsonHelper.getAsJsonArray(object, "functions"), LootItemFunction[].class);
-      } else {
-        functions = new LootItemFunction[0];
-      }
-      return DataResult.success(functions);
-    }, functions -> {
-
-      return DataResult.success(new Dynamic<>(JsonOps.INSTANCE, GSON.toJsonTree(functions, LootItemFunction[].class)));
-    });
-    return codecStart(inst).and(modifierConditionsCodec.fieldOf("modifier_conditions").forGetter(o -> o.modifierConditions)).and(entryCodec.fieldOf("entry").forGetter(o -> o.entry)).and(functionsCodec.fieldOf("functions").forGetter(o -> o.functions))
+    }, entry -> DataResult.success(new Dynamic<>(JsonOps.INSTANCE, GSON.toJsonTree(entry, LootPoolEntryContainer.class))));
+    return codecStart(inst).and(modifierConditionsCodec.fieldOf("modifier_conditions").forGetter(o -> o.modifierConditions)).and(entryCodec.fieldOf("entry").forGetter(o -> o.entry)).and(MantleLoot.LOOT_ITEM_FUNCTION_CODEC.fieldOf("functions").forGetter(o -> o.functions))
       .apply(inst, AddEntryLootModifier::new);
   });
 
