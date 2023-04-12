@@ -57,17 +57,11 @@ public class ReplaceItemLootModifier extends LootModifier {
     });
 
     Codec<LootItemFunction[]> lootItemFunctionCodec = Codec.PASSTHROUGH.flatXmap(dynamic -> {
-      JsonObject obj = IGlobalLootModifier.getJson(dynamic).getAsJsonObject();
-      LootItemFunction[] functions;
-      if (obj.has("functions")) {
-        functions = AddEntryLootModifier.GSON.fromJson(GsonHelper.getAsJsonArray(obj, "functions"), LootItemFunction[].class);
-      } else {
-        functions = new LootItemFunction[0];
-      }
+      LootItemFunction[] functions = AddEntryLootModifier.GSON.fromJson(IGlobalLootModifier.getJson(dynamic), LootItemFunction[].class);
       return DataResult.success(functions);
     }, lootItemFunctions -> {
       if (lootItemFunctions.length > 0) {
-        DataResult.success(new Dynamic<>(JsonOps.INSTANCE, AddEntryLootModifier.GSON.toJsonTree(lootItemFunctions, LootItemFunction[].class)));
+        return DataResult.success(new Dynamic<>(JsonOps.INSTANCE, AddEntryLootModifier.GSON.toJsonTree(lootItemFunctions, LootItemFunction[].class)));
       }
       return DataResult.error(() -> "None");
     });
