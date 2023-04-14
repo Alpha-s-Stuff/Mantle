@@ -7,7 +7,9 @@ import java.util.List;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.mojang.blaze3d.vertex.PoseStack;
+import io.github.fabricators_of_create.porting_lib.models.TransformTypeDependentItemBakedModel;
 import net.fabricmc.fabric.api.renderer.v1.model.ForwardingBakedModel;
+import net.minecraft.client.renderer.block.model.ItemTransform;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -19,15 +21,15 @@ import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.Direction;
 
-public class BakedItemModel implements BakedModel/*, TransformTypeDependentItemBakedModel*/ {
+public class BakedItemModel implements BakedModel, TransformTypeDependentItemBakedModel {
   protected final List<BakedQuad> quads;
   protected final TextureAtlasSprite particle;
-  protected final ImmutableMap<ItemDisplayContext, Transformation> transforms;
+  protected final ItemTransforms transforms;
   protected final ItemOverrides overrides;
   protected final BakedModel guiModel;
   protected final boolean useBlockLight;
 
-  public BakedItemModel(List<BakedQuad> quads, TextureAtlasSprite particle, ImmutableMap<ItemDisplayContext, Transformation> transforms, ItemOverrides overrides, boolean untransformed, boolean useBlockLight)
+  public BakedItemModel(List<BakedQuad> quads, TextureAtlasSprite particle, ItemTransforms transforms, ItemOverrides overrides, boolean untransformed, boolean useBlockLight)
   {
     this.quads = quads;
     this.particle = particle;
@@ -66,17 +68,18 @@ public class BakedItemModel implements BakedModel/*, TransformTypeDependentItemB
     return ImmutableList.of();
   }
 
-//  @Override
-//  public BakedModel handlePerspective(ItemDisplayContext type, PoseStack poseStack)
-//  {
-//    if (type == ItemDisplayContext.GUI && this.guiModel != null)
-//    {
-//      return ((TransformTypeDependentItemBakedModel)this.guiModel).handlePerspective(type, poseStack);
-//    }
-//    return ModelHelper.handlePerspective(this, transforms, type, poseStack);
-//  }
+  @Override
+  public BakedModel applyTransform(ItemDisplayContext type, PoseStack poseStack, boolean applyLeftHandTransform)
+  {
+    if (type == ItemDisplayContext.GUI && this.guiModel != null)
+    {
+      return ((TransformTypeDependentItemBakedModel)this.guiModel).applyTransform(type, poseStack, applyLeftHandTransform);
+    }
+    transforms.getTransform(type).apply(applyLeftHandTransform, poseStack);
+    return this;
+  }
 
-  public static class BakedGuiItemModel<T extends BakedItemModel> extends ForwardingBakedModel/* implements TransformTypeDependentItemBakedModel*/
+  public static class BakedGuiItemModel<T extends BakedItemModel> extends ForwardingBakedModel implements TransformTypeDependentItemBakedModel
   {
     private final ImmutableList<BakedQuad> quads;
 
@@ -104,17 +107,18 @@ public class BakedItemModel implements BakedModel/*, TransformTypeDependentItemB
       return ImmutableList.of();
     }
 
-//    @Override
-//    public BakedModel handlePerspective(ItemDisplayContext type, PoseStack poseStack)
-//    {
-//      if (type == ItemDisplayContext.GUI)
-//      {
-//        return ModelHelper.handlePerspective(this, ((BakedItemModel)wrapped).transforms, type, poseStack);
-//      }
-//
-//      if(this.wrapped instanceof TransformTypeDependentItemBakedModel model)
-//        return model.handlePerspective(type, poseStack);
-//      return this;
-//    }
+    @Override
+    public BakedModel applyTransform(ItemDisplayContext type, PoseStack poseStack, boolean leftHanded)
+    {
+      if (type == ItemDisplayContext.GUI)
+      {
+        ((BakedItemModel)wrapped).transforms.getTransform(type).apply(leftHanded, poseStack);
+        return this;
+      }
+
+      if(this.wrapped instanceof TransformTypeDependentItemBakedModel model)
+        return model.applyTransform(type, poseStack, leftHanded);
+      return this;
+    }
   }
 }

@@ -24,6 +24,7 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import slimeknights.mantle.Mantle;
 
@@ -217,24 +218,4 @@ public class ModelHelper {
 //      return ((BakedQuadBuilder) this.parent).build();
 //    }
 //  }
-
-  public static BakedModel handlePerspective(BakedModel model, ImmutableMap<ItemDisplayContext, Transformation> transforms, ItemDisplayContext cameraTransformType, PoseStack mat)
-  {
-    Transformation tr = transforms.getOrDefault(cameraTransformType, Transformation.identity());
-    if (!(tr.equals(Transformation.identity())))
-    {
-      mat.pushPose();
-
-      Vector3f trans = tr.getTranslation();
-      mat.translate(trans.x(), trans.y(), trans.z());
-
-      mat.mulPose(tr.getLeftRotation());
-
-      Vector3f scale = tr.getScale();
-      mat.scale(scale.x(), scale.y(), scale.z());
-
-      mat.mulPose(tr.getRightRotation());
-    }
-    return model;
-  }
 }

@@ -86,7 +86,7 @@ public class MantleItemLayerModel implements IUnbakedGeometry<MantleItemLayerMod
     }
     // transform data
 //    ImmutableMap<ItemDisplayContext,Transformation> transformMap = PerspectiveMapWrapper.getTransforms(owner.getTransforms()/*new CompositeModelState(owner.getCombinedTransform(), modelTransform)*/);
-    return new BakedItemModel(builder.build(), particle, null, overrides, true, owner.getGuiLight().lightLikeBlock());
+    return new BakedItemModel(builder.build(), particle, owner.getTransforms(), overrides, true, owner.getGuiLight().lightLikeBlock());
   }
 
   /**
