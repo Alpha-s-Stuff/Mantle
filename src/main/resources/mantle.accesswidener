@@ -42,5 +42,8 @@ transitive-accessible field com/mojang/blaze3d/vertex/VertexFormatElement count 
 transitive-accessible field net/minecraft/util/datafix/DataFixers SAME_NAMESPACED Ljava/util/function/BiFunction;
 transitive-mutable field net/minecraft/world/inventory/Slot x I
 transitive-mutable field net/minecraft/world/inventory/Slot y I
+
+mutable field net/minecraft/client/renderer/block/model/BakedQuad shade Z
+accessible field net/minecraft/client/renderer/block/model/BakedQuad shade Z
 accessible field net/minecraft/client/renderer/block/model/BlockModel textureMap Ljava/util/Map;
 accessible method net/minecraft/client/gui/GuiComponent innerBlit (Lorg/joml/Matrix4f;IIIIIFFFF)V

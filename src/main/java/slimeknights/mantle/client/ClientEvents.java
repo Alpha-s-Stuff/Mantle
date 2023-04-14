@@ -34,6 +34,7 @@ import slimeknights.mantle.client.model.fluid.FluidTextureModel;
 import slimeknights.mantle.client.model.fluid.FluidsModel;
 import slimeknights.mantle.client.model.inventory.InventoryModel;
 import slimeknights.mantle.client.model.util.ColoredBlockModel;
+import slimeknights.mantle.client.model.util.MantleItemLayerModel;
 import slimeknights.mantle.client.model.util.ModelHelper;
 import slimeknights.mantle.client.render.MantleShaders;
 import slimeknights.mantle.fluid.tooltip.FluidTooltipHandler;
@@ -82,7 +83,7 @@ public class ClientEvents implements ClientModInitializer {
   static void registerModelLoaders(Map<ResourceLocation, IGeometryLoader<?>> loaders) {
     // standard models - useful in resource packs for any model
     loaders.put(Mantle.getResource("connected"), ConnectedModel.Loader.INSTANCE);
-//    loaders.put(Mantle.getResource("item_layer"), MantleItemLayerModel.LOADER);
+    loaders.put(Mantle.getResource("item_layer"), MantleItemLayerModel.LOADER);
     loaders.put(Mantle.getResource("colored_block"), ColoredBlockModel.LOADER);
     loaders.put(Mantle.getResource("fallback"), FallbackModelLoader.INSTANCE);
 
