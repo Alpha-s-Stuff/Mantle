@@ -60,16 +60,6 @@ public class MantleItemLayerModel implements IUnbakedGeometry<MantleItemLayerMod
     return layers.get(index);
   }
 
-//  @Override
-//  public Collection<Material> getMaterials(IGeometryBakingContext owner, Function<ResourceLocation,UnbakedModel> modelGetter, Set<Pair<String,String>> missingTextureErrors) {
-//    ImmutableList.Builder<Material> builder = ImmutableList.builder();
-//    for (int i = 0; owner.hasMaterial("layer" + i); i++) {
-//      builder.add(owner.getMaterial("layer" + i));
-//    }
-//    textures = builder.build();
-//    return textures;
-//  }
-
   @Override
   public BakedModel bake(BlockModel owner, ModelBaker baker, Function<Material,TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides, ResourceLocation modelLocation) {
     // determine particle texture
@@ -85,7 +75,6 @@ public class MantleItemLayerModel implements IUnbakedGeometry<MantleItemLayerMod
       builder.addAll(getQuadsForSprite(data.color(), data.noTint() ? -1 : i, sprite, transform, data.luminosity(), pixels));
     }
     // transform data
-//    ImmutableMap<ItemDisplayContext,Transformation> transformMap = PerspectiveMapWrapper.getTransforms(owner.getTransforms()/*new CompositeModelState(owner.getCombinedTransform(), modelTransform)*/);
     return new BakedItemModel(builder.build(), particle, owner.getTransforms(), overrides, true, owner.getGuiLight().lightLikeBlock());
   }
 

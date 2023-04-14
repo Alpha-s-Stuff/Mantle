@@ -114,7 +114,7 @@ public class NBTKeyModel implements IUnbakedGeometry<NBTKeyModel> {
   private static BakedModel bakeModel(BlockModel owner, Material texture, Function<Material,TextureAtlasSprite> spriteGetter, ItemOverrides overrides) {
     TextureAtlasSprite sprite = spriteGetter.apply(texture);
     List<BakedQuad> quads = UnbakedGeometryHelper.bakeElements(UnbakedGeometryHelper.createUnbakedItemElements(-1, sprite.contents()), spriteGetter, new SimpleModelState(Transformation.identity()), sprite.contents().name());
-    return new BakedItemModel(quads, sprite, null, overrides, true, owner.getGuiLight().lightLikeBlock());
+    return new BakedItemModel(quads, sprite, owner.getTransforms(), overrides, true, owner.getGuiLight().lightLikeBlock());
   }
 
   @Override
