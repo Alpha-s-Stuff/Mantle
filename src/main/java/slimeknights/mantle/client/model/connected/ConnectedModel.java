@@ -84,58 +84,49 @@ public class ConnectedModel implements IUnbakedGeometry<ConnectedModel> {
   /** List of sides to check when getting block directions */
   private final Set<Direction> sides;
 
-  /** Map of full texture name to the resulting material, filled during {@link #getMaterials(BlockModel, Function, Set)} */
+  /** Map of full texture name to the resulting material, filled during {@link #bake(BlockModel, ModelBaker, Function, ModelState, ItemOverrides, ResourceLocation)} */
   private Map<String,Material> extraTextures;
-
-//  @Override
-//  public Collection<Material> getMaterials(IGeometryBakingContext owner, Function<ResourceLocation,UnbakedModel> modelGetter, Set<Pair<String,String>> missingTextureErrors) {
-//    Collection<Material> textures = model.getMaterials(owner, modelGetter, missingTextureErrors);
-//    // for all connected textures, add suffix textures
-//    Map<String, Material> extraTextures = new HashMap<>();
-//    for (Entry<String,String[]> entry : connectedTextures.entrySet()) {
-//      // fetch data from the base texture
-//      String name = entry.getKey();
-//      // skip if missing
-//      if (!owner.hasMaterial(name)) {
-//        continue;
-//      }
-//      Material base = owner.getMaterial(name);
-//      ResourceLocation atlas = base.atlasLocation();
-//      ResourceLocation texture = base.texture();
-//      String namespace = texture.getNamespace();
-//      String path = texture.getPath();
-//
-//      // use base atlas and texture, but suffix the name
-//      String[] suffixes = entry.getValue();
-//      for (String suffix : suffixes) {
-//        if (suffix.isEmpty()) {
-//          continue;
-//        }
-//        // skip running if we have seen it before
-//        String suffixedName = name + "_" + suffix;
-//        if (!extraTextures.containsKey(suffixedName)) {
-//          Material mat;
-//          // allow overriding a specific texture
-//          if (owner.hasMaterial(suffixedName)) {
-//            mat = owner.getMaterial(suffixedName);
-//          } else {
-//            mat = new Material(atlas, new ResourceLocation(namespace, path + "/" + suffix));
-//          }
-//          textures.add(mat);
-//          // cache the texture name, we use it a lot in rebaking
-//          extraTextures.put(suffixedName, mat);
-//        }
-//      }
-//    }
-//    // copy into immutable for better performance
-//    this.extraTextures = ImmutableMap.copyOf(extraTextures);
-//
-//    // return textures list
-//    return textures;
-//  }
 
   @Override
   public BakedModel bake(BlockModel owner, ModelBaker baker, Function<Material,TextureAtlasSprite> spriteGetter, ModelState transform, ItemOverrides overrides, ResourceLocation location) {
+    // for all connected textures, add suffix textures
+    Map<String, Material> extraTextures = new HashMap<>();
+    for (Entry<String,String[]> entry : connectedTextures.entrySet()) {
+      // fetch data from the base texture
+      String name = entry.getKey();
+      // skip if missing
+      if (!owner.hasTexture(name)) {
+        continue;
+      }
+      Material base = owner.getMaterial(name);
+      ResourceLocation atlas = base.atlasLocation();
+      ResourceLocation texture = base.texture();
+      String namespace = texture.getNamespace();
+      String path = texture.getPath();
+
+      // use base atlas and texture, but suffix the name
+      String[] suffixes = entry.getValue();
+      for (String suffix : suffixes) {
+        if (suffix.isEmpty()) {
+          continue;
+        }
+        // skip running if we have seen it before
+        String suffixedName = name + "_" + suffix;
+        if (!extraTextures.containsKey(suffixedName)) {
+          Material mat;
+          // allow overriding a specific texture
+          if (owner.hasTexture(suffixedName)) {
+            mat = owner.getMaterial(suffixedName);
+          } else {
+            mat = new Material(atlas, new ResourceLocation(namespace, path + "/" + suffix));
+          }
+          // cache the texture name, we use it a lot in rebaking
+          extraTextures.put(suffixedName, mat);
+        }
+      }
+    }
+    // copy into immutable for better performance
+    this.extraTextures = ImmutableMap.copyOf(extraTextures);
     BakedModel baked = model.bakeModel(owner, transform, overrides, spriteGetter, location);
     return new Baked(this, new ExtraTextureConfiguration(owner, extraTextures), transform, baked);
   }
