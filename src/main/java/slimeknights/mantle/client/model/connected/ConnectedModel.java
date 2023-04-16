@@ -396,31 +396,29 @@ public class ConnectedModel implements IUnbakedGeometry<ConnectedModel> {
 
     @Override
     public void emitBlockQuads(BlockAndTintGetter blockView, BlockState state, BlockPos pos, Supplier<RandomSource> randomSupplier, RenderContext context) {
-      if (blockView instanceof RenderAttachedBlockView renderAttachedBlockView) {
-        SinglePropertyData data = getModelData(blockView, pos, state, new SinglePropertyData<>(CONNECTIONS));
-        // try model data first
-        Byte connections = (Byte) data.getData(CONNECTIONS);
-        // if model data failed, try block state
-        // temporary fallback until Forge has model data in multipart/weighted random
-        if (connections == null) {
-          // no state? return original
-          if (state == null) {
-            super.emitBlockQuads(blockView, state, pos, randomSupplier, context);
-            return;
-          }
-          // this will return original if the state is missing all properties
-          Transformation rotation = transforms.getRotation();
-          connections = getConnections((dir) -> {
-            if (!parent.sides.contains(dir)) {
-              return false;
-            }
-            BooleanProperty prop = IMultipartConnectedBlock.CONNECTED_DIRECTIONS.get(rotation.rotateTransform(dir));
-            return state.hasProperty(prop) && state.getValue(prop);
-          });
+      SinglePropertyData data = getModelData(blockView, pos, state, new SinglePropertyData<>(CONNECTIONS));
+      // try model data first
+      Byte connections = (Byte) data.getData(CONNECTIONS);
+      // if model data failed, try block state
+      // temporary fallback until Forge has model data in multipart/weighted random
+      if (connections == null) {
+        // no state? return original
+        if (state == null) {
+          super.emitBlockQuads(blockView, state, pos, randomSupplier, context);
+          return;
         }
-        // get quads using connections
-        getCachedQuads(connections, blockView, state, pos, randomSupplier, context);
+        // this will return original if the state is missing all properties
+        Transformation rotation = transforms.getRotation();
+        connections = getConnections((dir) -> {
+          if (!parent.sides.contains(dir)) {
+            return false;
+          }
+          BooleanProperty prop = IMultipartConnectedBlock.CONNECTED_DIRECTIONS.get(rotation.rotateTransform(dir));
+          return state.hasProperty(prop) && state.getValue(prop);
+        });
       }
+      // get quads using connections
+      getCachedQuads(connections, blockView, state, pos, randomSupplier, context);
     }
   }
 
