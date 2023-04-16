@@ -62,10 +62,10 @@ public class ColoredBlockModel implements IUnbakedGeometry<ColoredBlockModel> {
     return model.getElements();
   }
 
-//  @Override
-//  public Collection<Material> getTextures(IModelConfiguration owner, Function<ResourceLocation,UnbakedModel> modelGetter, Set<Pair<String,String>> missingTextureErrors) {
-//    return model.getTextures(owner, modelGetter, missingTextureErrors);
-//  }
+  @Override
+  public void resolveParents(Function<ResourceLocation, UnbakedModel> modelGetter, BlockModel context) {
+    model.resolveParents(modelGetter, context);
+  }
 
   /**
    * Bakes a single part of the model into the builder
