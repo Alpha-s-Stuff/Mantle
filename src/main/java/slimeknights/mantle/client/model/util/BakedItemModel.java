@@ -36,13 +36,12 @@ public class BakedItemModel implements BakedModel, TransformTypeDependentItemBak
     this.transforms = transforms;
     this.overrides = overrides;
     this.useBlockLight = useBlockLight;
-    this.guiModel = null;
+    this.guiModel = untransformed && hasGuiIdentity(transforms) ? new BakedGuiItemModel<>(this) : null;
   }
 
-  private static boolean hasGuiIdentity(ImmutableMap<ItemDisplayContext, Transformation> transforms)
+  private static boolean hasGuiIdentity(ItemTransforms transforms)
   {
-    Transformation guiTransform = transforms.get(ItemDisplayContext.GUI);
-    return guiTransform == null || guiTransform.equals(Transformation.identity());
+    return transforms.getTransform(ItemDisplayContext.GUI) == ItemTransform.NO_TRANSFORM;
   }
 
   @Override public boolean useAmbientOcclusion() { return true; }
