@@ -1,5 +1,7 @@
 package slimeknights.mantle.item;
 
+import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroupEntries;
+import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.core.Holder;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.Registry;
@@ -33,17 +35,16 @@ public class RetexturedBlockItem extends BlockTooltipItem {
 
   /** Tag used for getting the texture */
   protected final TagKey<Item> textureTag;
-  public RetexturedBlockItem(Block block, TagKey<Item> textureTag, Properties builder) {
+  public RetexturedBlockItem(Block block, TagKey<Item> textureTag, Properties builder, @Nullable CreativeModeTab tab) {
     super(block, builder);
     this.textureTag = textureTag;
+    if (tab != null)
+      ItemGroupEvents.modifyEntriesEvent(tab).register(this::fillItemCategory);
   }
 
-//  @Override TODO: PORT
-//  public void fillItemCategory(CreativeModeTab group, NonNullList<ItemStack> items) {
-//    if (this.allowdedIn(group)) {
-//      addTagVariants(this.getBlock(), textureTag, items, true);
-//    }
-//  }
+  public void fillItemCategory(FabricItemGroupEntries items) {
+    addTagVariants(this.getBlock(), textureTag, items, true);
+  }
 
   @Override
   public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
@@ -118,7 +119,7 @@ public class RetexturedBlockItem extends BlockTooltipItem {
    * @param list              List of texture blocks
    * @param showAllVariants   If true, shows all variants. If false, shows just the first
    */
-  public static void addTagVariants(ItemLike block, TagKey<Item> tag, NonNullList<ItemStack> list, boolean showAllVariants) {
+  public static void addTagVariants(ItemLike block, TagKey<Item> tag, FabricItemGroupEntries list, boolean showAllVariants) {
     boolean added = false;
     // using item tags as that is what will be present in the recipe
     Class<?> clazz = block.getClass();
@@ -137,14 +138,14 @@ public class RetexturedBlockItem extends BlockTooltipItem {
         continue;
       }
       added = true;
-      list.add(setTexture(new ItemStack(block), textureBlock));
+      list.accept(setTexture(new ItemStack(block), textureBlock));
       if (!showAllVariants) {
         return;
       }
     }
     // if we never got one, just add the textureless one
     if (!added) {
-      list.add(new ItemStack(block));
+      list.accept(new ItemStack(block));
     }
   }
 }
