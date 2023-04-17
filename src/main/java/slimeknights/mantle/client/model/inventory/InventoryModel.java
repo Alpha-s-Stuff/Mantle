@@ -32,10 +32,10 @@ public class InventoryModel implements IUnbakedGeometry<InventoryModel> {
   protected final SimpleBlockModel model;
   protected final List<ModelItem> items;
 
-//  @Override
-//  public Collection<Material> getMaterials(IGeometryBakingContext owner, Function<ResourceLocation,UnbakedModel> modelGetter, Set<Pair<String,String>> missingTextureErrors) {
-//    return model.getMaterials(owner, modelGetter, missingTextureErrors);
-//  }
+  @Override
+  public void resolveParents(Function<ResourceLocation,UnbakedModel> modelGetter, BlockModel owner) {
+    model.resolveParents(modelGetter, owner);
+  }
 
   @Override
   public BakedModel bake(BlockModel owner, ModelBaker baker, Function<Material,TextureAtlasSprite> spriteGetter, ModelState transform, ItemOverrides overrides, ResourceLocation location) {
