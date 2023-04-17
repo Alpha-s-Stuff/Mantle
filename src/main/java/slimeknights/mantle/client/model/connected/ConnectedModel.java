@@ -84,12 +84,15 @@ public class ConnectedModel implements IUnbakedGeometry<ConnectedModel> {
   /** List of sides to check when getting block directions */
   private final Set<Direction> sides;
 
-  /** Map of full texture name to the resulting material, filled during {@link #bake(BlockModel, ModelBaker, Function, ModelState, ItemOverrides, ResourceLocation)} */
-  private Map<String,Material> extraTextures;
+  @Override
+  public void resolveParents(Function<ResourceLocation, UnbakedModel> modelGetter, BlockModel context) {
+    model.resolveParents(modelGetter, context);
+  }
 
   @Override
   public BakedModel bake(BlockModel owner, ModelBaker baker, Function<Material,TextureAtlasSprite> spriteGetter, ModelState transform, ItemOverrides overrides, ResourceLocation location) {
     // for all connected textures, add suffix textures
+    // Map of full texture name to the resulting material
     Map<String, Material> extraTextures = new HashMap<>();
     for (Entry<String,String[]> entry : connectedTextures.entrySet()) {
       // fetch data from the base texture
@@ -125,10 +128,9 @@ public class ConnectedModel implements IUnbakedGeometry<ConnectedModel> {
         }
       }
     }
-    // copy into immutable for better performance
-    this.extraTextures = ImmutableMap.copyOf(extraTextures);
+    // copy extra textures into immutable for better performance
     BakedModel baked = model.bakeModel(owner, transform, overrides, spriteGetter, location);
-    return new Baked(this, new ExtraTextureConfiguration(owner, extraTextures), transform, baked);
+    return new Baked(this, new ExtraTextureConfiguration(owner, ImmutableMap.copyOf(extraTextures)), transform, baked);
   }
 
   @SuppressWarnings("WeakerAccess")
@@ -378,11 +380,10 @@ public class ConnectedModel implements IUnbakedGeometry<ConnectedModel> {
      * Shared logic to get quads from a connections array
      *
      * @param connections Byte with 6 bits for the 6 different sides
-     * @param state       Block state instance
-     * @param side        Cullface
-     * @param rand        Random instance
-     * @param data        Model data instance
-     * @return Model quads for the given side
+     * @param blockView       The world
+     * @param state           Block state instance
+     * @param randomSupplier  Random instance
+     * @param context         Render context
      */
     protected synchronized void getCachedQuads(byte connections, BlockAndTintGetter blockView, BlockState state, BlockPos pos, Supplier<RandomSource> randomSupplier, RenderContext context) {
       // bake a new model if the orientation is not yet baked
