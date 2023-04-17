@@ -216,6 +216,24 @@ public class RetexturedModel implements IUnbakedGeometry<RetexturedModel> {
     }
 
     @Override
+    public void emitItemQuads(ItemStack stack, Supplier<RandomSource> randomSupplier, RenderContext context) {
+      if (stack.isEmpty() || !stack.hasTag()) {
+        super.emitItemQuads(stack, randomSupplier, context);
+        return;
+      }
+
+      // get the block first, ensuring its valid
+      Block block = RetexturedBlockItem.getTexture(stack);
+      if (block == Blocks.AIR) {
+        super.emitItemQuads(stack, randomSupplier, context);
+        return;
+      }
+
+      // if valid, use the block
+      ((FabricBakedModel)getCachedModel(block)).emitItemQuads(stack, randomSupplier, context);
+    }
+
+    @Override
     public ItemOverrides getOverrides() {
       return RetexturedOverride.INSTANCE;
     }
