@@ -1,9 +1,7 @@
 package slimeknights.mantle.client.model;
 
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
@@ -18,41 +16,37 @@ import lombok.RequiredArgsConstructor;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockModel;
+import net.minecraft.client.renderer.block.model.ItemModelGenerator;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
-import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.client.resources.model.ModelBaker;
-import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.model.ModelState;
-import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import slimeknights.mantle.client.model.util.BakedItemModel;
 import slimeknights.mantle.client.model.util.ModelTextureIteratable;
 import slimeknights.mantle.util.JsonHelper;
 
 import javax.annotation.Nullable;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Objects;
-import java.util.Set;
 import java.util.function.Function;
 
 @RequiredArgsConstructor
 public class NBTKeyModel implements IUnbakedGeometry<NBTKeyModel> {
   /** Model loader instance */
   public static final Loader LOADER = new Loader();
+
+  private static final ItemModelGenerator ITEM_MODEL_GENERATOR = new ItemModelGenerator();
 
   /** Map of statically registered extra textures, used for addon mods */
   private static final Multimap<ResourceLocation,Pair<String,ResourceLocation>> EXTRA_TEXTURES = HashMultimap.create();
@@ -79,7 +73,7 @@ public class NBTKeyModel implements IUnbakedGeometry<NBTKeyModel> {
   /** Bakes a model for the given texture */
   private static BakedModel bakeModel(BlockModel owner, Material texture, Function<Material,TextureAtlasSprite> spriteGetter, ItemOverrides overrides) {
     TextureAtlasSprite sprite = spriteGetter.apply(texture);
-    List<BakedQuad> quads = UnbakedGeometryHelper.bakeElements(UnbakedGeometryHelper.createUnbakedItemElements(-1, sprite.contents()), spriteGetter, new SimpleModelState(Transformation.identity()), sprite.contents().name());
+    List<BakedQuad> quads = UnbakedGeometryHelper.bakeElements(ITEM_MODEL_GENERATOR.processFrames(-1, sprite.contents().name().toString(), sprite.contents()), spriteGetter, new SimpleModelState(Transformation.identity()), sprite.contents().name());
     return new BakedItemModel(quads, sprite, owner.getTransforms(), overrides, true, owner.getGuiLight().lightLikeBlock());
   }
 
