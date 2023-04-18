@@ -76,39 +76,39 @@ public class NBTKeyModel implements IUnbakedGeometry<NBTKeyModel> {
   /** Map of textures for the model */
   private Map<String,Material> textures = Collections.emptyMap();
 
-//  @Override
-//  public Collection<Material> getMaterials(IGeometryBakingContext owner, Function<ResourceLocation,UnbakedModel> modelGetter, Set<Pair<String,String>> missingTextureErrors) {
-//    textures = new HashMap<>();
-//    // must have a default
-//    Material defaultTexture = owner.getMaterial("default");
-//    textures.put("default", defaultTexture);
-//    if (Objects.equals(defaultTexture.texture(), MissingTextureAtlasSprite.getLocation())) {
-//      missingTextureErrors.add(Pair.of("default", owner.getModelName()));
-//    }
-//    // fetch others
-//    UnbakedModel model = owner.getOwnerModel();
-//    if (model instanceof BlockModel) {
-//      ModelTextureIteratable iterable = new ModelTextureIteratable(null, (BlockModel) model);
-//      for (Map<String,Either<Material,String>> map : iterable) {
-//        for (String key : map.keySet()) {
-//          if (!textures.containsKey(key) && owner.hasMaterial(key)) {
-//            textures.put(key, owner.getMaterial(key));
-//          }
-//        }
-//      }
-//    }
-//    // fetch extra textures
-//    if (extraTexturesKey != null) {
-//      for (Pair<String,ResourceLocation> extra : EXTRA_TEXTURES.get(extraTexturesKey)) {
-//        String key = extra.getFirst();
-//        if (!textures.containsKey(key)) {
-//          textures.put(key, new Material(TextureAtlas.LOCATION_BLOCKS, extra.getSecond()));
-//        }
-//      }
-//    }
-//    // map doubles as a useful set for the return
-//    return textures.values();
-//  }
+  @Override
+  public Collection<Material> getMaterials(IGeometryBakingContext owner, Function<ResourceLocation,UnbakedModel> modelGetter, Set<Pair<String,String>> missingTextureErrors) {
+    textures = new HashMap<>();
+    // must have a default
+    Material defaultTexture = owner.getMaterial("default");
+    textures.put("default", defaultTexture);
+    if (Objects.equals(defaultTexture.texture(), MissingTextureAtlasSprite.getLocation())) {
+      missingTextureErrors.add(Pair.of("default", owner.getModelName()));
+    }
+    // fetch others
+    UnbakedModel model = owner.getOwnerModel();
+    if (model instanceof BlockModel) {
+      ModelTextureIteratable iterable = new ModelTextureIteratable(null, (BlockModel) model);
+      for (Map<String,Either<Material,String>> map : iterable) {
+        for (String key : map.keySet()) {
+          if (!textures.containsKey(key) && owner.hasMaterial(key)) {
+            textures.put(key, owner.getMaterial(key));
+          }
+        }
+      }
+    }
+    // fetch extra textures
+    if (extraTexturesKey != null) {
+      for (Pair<String,ResourceLocation> extra : EXTRA_TEXTURES.get(extraTexturesKey)) {
+        String key = extra.getFirst();
+        if (!textures.containsKey(key)) {
+          textures.put(key, new Material(TextureAtlas.LOCATION_BLOCKS, extra.getSecond()));
+        }
+      }
+    }
+    // map doubles as a useful set for the return
+    return textures.values();
+  }
 
   /** Bakes a model for the given texture */
   private static BakedModel bakeModel(BlockModel owner, Material texture, Function<Material,TextureAtlasSprite> spriteGetter, ItemOverrides overrides) {
@@ -119,6 +119,28 @@ public class NBTKeyModel implements IUnbakedGeometry<NBTKeyModel> {
 
   @Override
   public BakedModel bake(BlockModel owner, ModelBaker bakery, Function<Material,TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides, ResourceLocation modelLocation) {
+    textures = new HashMap<>();
+    // must have a default
+    Material defaultTexture = owner.getMaterial("default");
+    textures.put("default", defaultTexture);
+    // fetch others
+    ModelTextureIteratable iterable = new ModelTextureIteratable(null, owner);
+    for (Map<String,Either<Material,String>> map : iterable) {
+      for (String key : map.keySet()) {
+        if (!textures.containsKey(key) && owner.hasTexture(key)) {
+          textures.put(key, owner.getMaterial(key));
+        }
+      }
+    }
+    // fetch extra textures
+    if (extraTexturesKey != null) {
+      for (Pair<String,ResourceLocation> extra : EXTRA_TEXTURES.get(extraTexturesKey)) {
+        String key = extra.getFirst();
+        if (!textures.containsKey(key)) {
+          textures.put(key, new Material(TextureAtlas.LOCATION_BLOCKS, extra.getSecond()));
+        }
+      }
+    }
     ImmutableMap.Builder<String, BakedModel> variants = ImmutableMap.builder();
     for (Entry<String,Material> entry : textures.entrySet()) {
       String key = entry.getKey();

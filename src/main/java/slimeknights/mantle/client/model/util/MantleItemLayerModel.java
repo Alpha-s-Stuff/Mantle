@@ -30,7 +30,6 @@ import slimeknights.mantle.util.ReversedListBuilder;
 import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.BitSet;
-import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.function.Function;
@@ -49,8 +48,6 @@ public class MantleItemLayerModel implements IUnbakedGeometry<MantleItemLayerMod
 
   /** Layers in the model */
   private final List<LayerData> layers;
-  /** Textures fetched during baking */
-  private List<Material> textures = Collections.emptyList();
 
   /** Gets the layer at the given index */
   private LayerData getLayer(int index) {
@@ -62,6 +59,11 @@ public class MantleItemLayerModel implements IUnbakedGeometry<MantleItemLayerMod
 
   @Override
   public BakedModel bake(BlockModel owner, ModelBaker baker, Function<Material,TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides, ResourceLocation modelLocation) {
+    ImmutableList.Builder<Material> materialBuilder = ImmutableList.builder();
+    for (int i = 0; owner.hasTexture("layer" + i); i++) {
+      materialBuilder.add(owner.getMaterial("layer" + i));
+    }
+    List<Material> textures = materialBuilder.build();
     // determine particle texture
     TextureAtlasSprite particle = spriteGetter.apply(owner.hasTexture("particle") ? owner.getMaterial("particle") : textures.get(0));
     // bake in special properties
