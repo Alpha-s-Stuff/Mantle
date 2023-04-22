@@ -57,7 +57,7 @@ public class EntityTypeDeferredRegister extends DeferredRegisterWrapper<EntityTy
   public <T extends Mob> RegistryObject<EntityType<T>> registerWithEgg(String name, Supplier<FabricEntityTypeBuilder<T>> sup, int primary, int secondary) {
     RegistryObject<EntityType<T>> object = register(name, sup);
     var spawnEgg = itemRegistry.register(name + "_spawn_egg", () -> new LazySpawnEggItem(object, primary, secondary, new Item.Properties()));
-    ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.SPAWN_EGGS).register(entries -> entries.prepend(spawnEgg.get()));
+    ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.SPAWN_EGGS).register(entries -> entries.accept(spawnEgg.get()));
     return object;
   }
 }

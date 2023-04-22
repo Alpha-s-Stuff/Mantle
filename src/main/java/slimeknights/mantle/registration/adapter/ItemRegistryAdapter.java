@@ -269,7 +269,7 @@ public class ItemRegistryAdapter extends EnumRegistryAdapter<Item> {
    */
   public SpawnEggItem registerSpawnEgg(Supplier<? extends EntityType<? extends Mob>> type, int primary, int secondary, String baseName) {
     SpawnEggItem spawnEgg = register(new LazySpawnEggItem(type, primary, secondary, new Properties()), baseName + "_spawn_egg");
-    ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.SPAWN_EGGS).register(entries -> entries.prepend(spawnEgg));
+    ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.SPAWN_EGGS).register(entries -> entries.accept(spawnEgg));
     return spawnEgg;
   }
 }

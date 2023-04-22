@@ -30,7 +30,7 @@ public class EdibleItem extends Item {
     super(new Properties().food(foodIn));
     this.displayEffectsTooltip = displayEffectsTooltip;
     ItemGroupEvents.modifyEntriesEvent(itemGroup).register(entries -> {
-      entries.prepend(this);
+      entries.accept(this);
     });
   }
 

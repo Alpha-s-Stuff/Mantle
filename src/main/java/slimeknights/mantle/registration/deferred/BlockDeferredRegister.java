@@ -269,18 +269,18 @@ public class BlockDeferredRegister extends DeferredRegisterWrapper<Block> {
 
     // Add entries to tab
     ItemGroupEvents.modifyEntriesEvent(group).register(entries -> {
-      entries.prepend(planks.asItem());
-      entries.prepend(fence.asItem());
-      entries.prepend(strippedLog.asItem());
-      entries.prepend(strippedWood.asItem());
-      entries.prepend(log.asItem());
-      entries.prepend(wood.asItem());
-      entries.prepend(door.asItem());
-      entries.prepend(trapdoor.asItem());
-      entries.prepend(fenceGate.asItem());
-      entries.prepend(pressurePlate.asItem());
-      entries.prepend(button.asItem());
-      entries.prepend(standingSign.get());
+      entries.accept(planks.asItem());
+      entries.accept(fence.asItem());
+      entries.accept(strippedLog.asItem());
+      entries.accept(strippedWood.asItem());
+      entries.accept(log.asItem());
+      entries.accept(wood.asItem());
+      entries.accept(door.asItem());
+      entries.accept(trapdoor.asItem());
+      entries.accept(fenceGate.asItem());
+      entries.accept(pressurePlate.asItem());
+      entries.accept(button.asItem());
+      entries.accept(standingSign.get());
     });
     // finally, return
     return new WoodBlockObject(resource(name), woodType, planks, log, strippedLog, wood, strippedWood, fence, fenceGate, door, trapdoor, pressurePlate, button, standingSign, wallSign);
