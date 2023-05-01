@@ -4,7 +4,6 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.item.ItemStack;
 import io.github.fabricators_of_create.porting_lib.util.ForgeI18n;
 
@@ -65,7 +64,7 @@ public class TranslationHelper {
    */
   public static void addEachLine(String text, List<Component> tooltip) {
     for (String string : text.split("\n")) {
-      tooltip.add(new TextComponent(string).withStyle(ChatFormatting.GRAY));
+      tooltip.add(Component.literal(string).withStyle(ChatFormatting.GRAY));
     }
   }
 

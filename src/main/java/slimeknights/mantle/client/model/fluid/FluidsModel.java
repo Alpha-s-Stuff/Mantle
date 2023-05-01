@@ -3,6 +3,10 @@ package slimeknights.mantle.client.model.fluid;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.mojang.datafixers.util.Pair;
+import io.github.fabricators_of_create.porting_lib.model.BlockGeometryBakingContext;
+import io.github.fabricators_of_create.porting_lib.model.IGeometryBakingContext;
+import io.github.fabricators_of_create.porting_lib.model.IGeometryLoader;
+import io.github.fabricators_of_create.porting_lib.model.IUnbakedGeometry;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.fabricmc.fabric.api.renderer.v1.model.ForwardingBakedModel;
@@ -15,10 +19,8 @@ import net.minecraft.client.resources.model.ModelState;
 import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
+import slimeknights.mantle.client.model.inventory.InventoryModel;
 import slimeknights.mantle.client.model.util.SimpleBlockModel;
-import io.github.fabricators_of_create.porting_lib.model.IModelConfiguration;
-import io.github.fabricators_of_create.porting_lib.model.IModelGeometry;
-import io.github.fabricators_of_create.porting_lib.model.IModelLoader;
 
 import java.util.Collection;
 import java.util.List;
@@ -29,17 +31,17 @@ import java.util.function.Function;
  * This model contains a list of fluid cuboids for the sake of rendering multiple fluid regions in world. It is used by the faucet at this time
  */
 @AllArgsConstructor
-public class FluidsModel implements IModelGeometry<FluidsModel> {
+public class FluidsModel implements IUnbakedGeometry<FluidsModel> {
   private final SimpleBlockModel model;
   private final List<FluidCuboid> fluids;
 
   @Override
-  public Collection<Material> getTextures(IModelConfiguration owner, Function<ResourceLocation,UnbakedModel> modelGetter, Set<Pair<String,String>> missingTextureErrors) {
-    return model.getTextures(owner, modelGetter, missingTextureErrors);
-  }
+  public Collection<Material> getMaterials(IGeometryBakingContext owner, Function<ResourceLocation,UnbakedModel> modelGetter, Set<Pair<String,String>> missingTextureErrors) {
+    var _owner = ((BlockGeometryBakingContext)owner).owner;
+    return model.getTextures(_owner, _owner.getElements(), missingTextureErrors);  }
 
   @Override
-  public BakedModel bake(IModelConfiguration owner, ModelBakery bakery, Function<Material,TextureAtlasSprite> spriteGetter, ModelState transform, ItemOverrides overrides, ResourceLocation location) {
+  public BakedModel bake(IGeometryBakingContext owner, ModelBakery bakery, Function<Material,TextureAtlasSprite> spriteGetter, ModelState transform, ItemOverrides overrides, ResourceLocation location) {
     BakedModel baked = model.bakeModel(owner, transform, overrides, spriteGetter, location);
     return new Baked(baked, fluids);
   }
@@ -56,17 +58,14 @@ public class FluidsModel implements IModelGeometry<FluidsModel> {
   }
 
   /** Loader for this model */
-  public static class Loader implements IModelLoader<FluidsModel> {
+  public static class Loader implements IGeometryLoader<FluidsModel> {
     /**
      * Shared loader instance
      */
     public static final Loader INSTANCE = new Loader();
 
     @Override
-    public void onResourceManagerReload(ResourceManager resourceManager) {}
-
-    @Override
-    public FluidsModel read(JsonDeserializationContext deserializationContext, JsonObject modelContents) {
+    public FluidsModel read(JsonObject modelContents, JsonDeserializationContext deserializationContext) {
       SimpleBlockModel model = SimpleBlockModel.deserialize(deserializationContext, modelContents);
       List<FluidCuboid> fluid = FluidCuboid.listFromJson(modelContents, "fluids");
       return new FluidsModel(model, fluid);

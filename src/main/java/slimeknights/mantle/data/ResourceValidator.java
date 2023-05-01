@@ -36,8 +36,8 @@ public class ResourceValidator implements IEarlySafeManagerReloadListener, Predi
     // FIXME: this does not validate folder names
     this.resources = manager.listResources(folder, (loc) -> {
       // must have proper extension and contain valid characters
-      return loc.endsWith(extension) && isPathValid(loc);
-    }).stream().map((location) -> {
+      return loc.getPath().endsWith(extension) && isPathValid(loc.getPath());
+    }).keySet().stream().map((location) -> {
       String path = location.getPath();
       return new ResourceLocation(location.getNamespace(), path.substring(trim, path.length() - extensionLength));
     }).collect(Collectors.toSet());

@@ -1,9 +1,11 @@
 package slimeknights.mantle.data;
 
+import com.google.common.hash.HashCode;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.HashCache;
@@ -12,6 +14,7 @@ import net.minecraft.server.packs.PackType;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -46,20 +49,13 @@ public abstract class GenericDataProvider implements DataProvider {
     this(generator, folder, GSON);
   }
 
-  protected void saveThing(HashCache cache, ResourceLocation location, Object materialJson) {
+  protected void saveThing(CachedOutput cache, ResourceLocation location, Object materialJson) {
     try {
       String json = gson.toJson(materialJson);
       Path path = this.generator.getOutputFolder().resolve(Paths.get(type.getDirectory(), location.getNamespace(), folder, location.getPath() + ".json"));
-      String hash = SHA1.hashUnencodedChars(json).toString();
-      if (!Objects.equals(cache.getHash(path), hash) || !Files.exists(path)) {
-        Files.createDirectories(path.getParent());
+      cache.writeIfNeeded(path, json.getBytes(StandardCharsets.UTF_8), HashCode.fromInt(json.hashCode()));
 
-        try (BufferedWriter bufferedwriter = Files.newBufferedWriter(path)) {
-          bufferedwriter.write(json);
-        }
-      }
 
-      cache.putNew(path, hash);
     } catch (IOException e) {
       log.error("Couldn't create data for {}", location, e);
     }

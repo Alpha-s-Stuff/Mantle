@@ -38,7 +38,7 @@ public class ItemStorageHandler implements IItemHandlerModifiable {
 		List<ItemStack> stacks = new ArrayList<>();
 		List<Long> capacities = new ArrayList<>();
 		try (Transaction t = TransferUtil.getTransaction()) {
-			for (StorageView<ItemVariant> view : storage.iterable(t)) {
+			for (StorageView<ItemVariant> view : storage) {
 				stacks.add(view.getResource().toStack((int) view.getAmount()));
 				capacities.add(view.getCapacity());
 			}
@@ -116,7 +116,7 @@ public class ItemStorageHandler implements IItemHandlerModifiable {
 		ItemStack finalVal = ItemStack.EMPTY;
 		try (Transaction t = TransferUtil.getTransaction()) {
 			int index = 0;
-			for (StorageView<ItemVariant> view : storage.iterable(t)) {
+			for (StorageView<ItemVariant> view : storage) {
 				if (index == slot) {
 					ItemVariant variant = view.getResource();
 					long extracted = view.isResourceBlank() ? 0 : view.extract(variant, amount, t);

@@ -5,8 +5,8 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.minecraft.Util;
 import net.minecraft.core.Registry;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.MobType;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -163,6 +163,6 @@ public class Mantle implements ModInitializer {
    * @return  Translation key
    */
   public static MutableComponent makeComponent(String base, String name) {
-    return new TranslatableComponent(makeDescriptionId(base, name));
+    return Component.translatable(makeDescriptionId(base, name));
   }
 }

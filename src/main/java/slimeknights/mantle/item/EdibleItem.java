@@ -4,7 +4,6 @@ import com.mojang.datafixers.util.Pair;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.CreativeModeTab;
@@ -38,7 +37,7 @@ public class EdibleItem extends Item {
     if (this.displayEffectsTooltip) {
       for (Pair<MobEffectInstance, Float> pair : stack.getItem().getFoodProperties().getEffects()) {
         if (pair.getFirst() != null) {
-          tooltip.add(new TextComponent(I18n.get(pair.getFirst().getDescriptionId()).trim()).withStyle(ChatFormatting.GRAY));
+          tooltip.add(Component.literal(I18n.get(pair.getFirst().getDescriptionId()).trim()).withStyle(ChatFormatting.GRAY));
         }
       }
     }

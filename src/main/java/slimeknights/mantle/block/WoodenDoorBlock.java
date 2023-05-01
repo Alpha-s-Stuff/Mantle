@@ -17,7 +17,7 @@ public class WoodenDoorBlock extends DoorBlock implements CustomPathNodeTypeBloc
 
   @Nullable
   @Override
-  public BlockPathTypes getAiPathNodeType(BlockState state, BlockGetter world, BlockPos pos, @Nullable Mob entity) {
+  public BlockPathTypes getBlockPathType(BlockState state, BlockGetter world, BlockPos pos, @org.jetbrains.annotations.Nullable Mob entity) {
     return state.getValue(OPEN) ? BlockPathTypes.DOOR_OPEN : BlockPathTypes.DOOR_WOOD_CLOSED;
   }
 }

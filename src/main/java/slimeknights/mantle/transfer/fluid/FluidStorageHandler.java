@@ -40,7 +40,7 @@ public class FluidStorageHandler implements IFluidHandler {
 		List<FluidStack> stacks = new ArrayList<>();
 		List<Long> capacities = new ArrayList<>();
 		try (Transaction t = TransferUtil.getTransaction()) {
-			for (StorageView<FluidVariant> view : storage.iterable(t)) {
+			for (StorageView<FluidVariant> view : storage) {
 				stacks.add(new FluidStack(view.getResource(), view.getAmount()));
 				capacities.add(view.getCapacity());
 			}
@@ -128,7 +128,7 @@ public class FluidStorageHandler implements IFluidHandler {
 
 		FluidStack extracted = FluidStack.EMPTY;
 		try (Transaction t = TransferUtil.getTransaction()) {
-			for (StorageView<FluidVariant> view : storage.iterable(t)) {
+			for (StorageView<FluidVariant> view : storage) {
 				FluidVariant var = view.getResource();
 				if (var.isBlank() || !extracted.canFill(var)) continue;
 				long drained = view.extract(var, toExtract, t);

@@ -1,13 +1,12 @@
 package slimeknights.mantle.block.entity;
 
+import io.github.fabricators_of_create.porting_lib.model.data.ModelData;
 import net.fabricmc.fabric.api.rendering.data.v1.RenderAttachmentBlockEntity;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import org.jetbrains.annotations.Nullable;
 import slimeknights.mantle.block.RetexturedBlock;
-import slimeknights.mantle.client.model.data.SinglePropertyData;
-import io.github.fabricators_of_create.porting_lib.model.IModelData;
 import slimeknights.mantle.util.RetexturedHelper;
 
 /**
@@ -48,16 +47,16 @@ public interface IRetexturedBlockEntity extends RenderAttachmentBlockEntity {
    * Gets the model data instance with the relevant texture block
    * @return  Model data for the TE
    */
-  default IModelData getRetexturedModelData() {
+  default ModelData getRetexturedModelData() {
     // texture not loaded
     Block block = getTexture();
     // cannot support air, saves a conditional on usage
     if (block == Blocks.AIR) {
       block = null;
     }
-    return new SinglePropertyData<>(RetexturedHelper.BLOCK_PROPERTY, block);
+    return ModelData.builder().with(RetexturedHelper.BLOCK_PROPERTY, block).build();
   }
 
   @Override
-  @Nullable IModelData getRenderAttachmentData();
+  @Nullable ModelData getRenderAttachmentData();
 }

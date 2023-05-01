@@ -58,31 +58,24 @@ public abstract class MergingJsonDataLoader<B> implements ResourceManagerReloadL
   @Override
   public void onResourceManagerReload(ResourceManager manager) {
     Map<ResourceLocation,B> map = new HashMap<>();
-    for (ResourceLocation filePath : manager.listResources(folder, fileName -> fileName.endsWith(".json"))) {
+    for (ResourceLocation filePath : manager.listResources(folder, fileName -> fileName.getPath().endsWith(".json")).keySet()) {
       String path = filePath.getPath();
       ResourceLocation id = new ResourceLocation(filePath.getNamespace(), path.substring(folder.length() + 1, path.length() - JSON_LENGTH));
 
-      try {
-        for (Resource resource : manager.getResources(filePath)) {
-          try (
-            InputStream inputstream = resource.getInputStream();
-            Reader reader = new BufferedReader(new InputStreamReader(inputstream, StandardCharsets.UTF_8))
-          ) {
-            JsonElement json = GsonHelper.fromJson(gson, reader, JsonElement.class);
-            if (json == null) {
-              log.error("Couldn't load data file {} from {} in data pack {} as its null or empty", id, filePath, resource.getSourceName());
-            } else {
-              B builder = map.computeIfAbsent(id, builderConstructor);
-              parse(builder, id, json);
-            }
-          } catch (RuntimeException | IOException ex) {
-            log.error("Couldn't parse data file {} from {} in data pack {}", id, filePath, resource.getSourceName(), ex);
-          } finally {
-            IOUtils.closeQuietly(resource);
+      for (Resource resource : manager.getResourceStack(filePath)) {
+        try (
+          Reader reader = resource.openAsReader();
+        ) {
+          JsonElement json = GsonHelper.fromJson(gson, reader, JsonElement.class);
+          if (json == null) {
+            log.error("Couldn't load data file {} from {} in data pack {} as its null or empty", id, filePath, resource.sourcePackId());
+          } else {
+            B builder = map.computeIfAbsent(id, builderConstructor);
+            parse(builder, id, json);
           }
+        } catch (RuntimeException | IOException ex) {
+          log.error("Couldn't parse data file {} from {} in data pack {}", id, filePath, resource.sourcePackId(), ex);
         }
-      } catch (IOException ex) {
-        log.error("Couldn't read material trait mapping {} from {}", id, filePath, ex);
       }
     }
     finishLoad(map, manager);

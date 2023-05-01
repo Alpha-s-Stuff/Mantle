@@ -1,11 +1,13 @@
 package slimeknights.mantle.datagen;
 
-import io.github.fabricators_of_create.porting_lib.util.FluidAttributes;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
+import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataGenerator;
 import slimeknights.mantle.Mantle;
 import slimeknights.mantle.fluid.tooltip.AbstractFluidTooltipProvider;
 import slimeknights.mantle.fluid.tooltip.FluidTooltipHandler;
+
+import java.io.IOException;
 
 /** Mantle datagen for fluid tooltips. For mods, don't use this, use {@link AbstractFluidTooltipProvider} */
 public class MantleFluidTooltipProvider extends AbstractFluidTooltipProvider {

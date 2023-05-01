@@ -3,6 +3,10 @@ package slimeknights.mantle.client.model.inventory;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.mojang.datafixers.util.Pair;
+import io.github.fabricators_of_create.porting_lib.model.BlockGeometryBakingContext;
+import io.github.fabricators_of_create.porting_lib.model.IGeometryBakingContext;
+import io.github.fabricators_of_create.porting_lib.model.IGeometryLoader;
+import io.github.fabricators_of_create.porting_lib.model.IUnbakedGeometry;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.fabricmc.fabric.api.renderer.v1.model.ForwardingBakedModel;
@@ -16,9 +20,6 @@ import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import slimeknights.mantle.client.model.util.SimpleBlockModel;
-import io.github.fabricators_of_create.porting_lib.model.IModelConfiguration;
-import io.github.fabricators_of_create.porting_lib.model.IModelGeometry;
-import io.github.fabricators_of_create.porting_lib.model.IModelLoader;
 
 import java.util.Collection;
 import java.util.List;
@@ -29,17 +30,18 @@ import java.util.function.Function;
  * This model contains a list of multiple items to display in a TESR
  */
 @AllArgsConstructor
-public class InventoryModel implements IModelGeometry<InventoryModel> {
+public class InventoryModel implements IUnbakedGeometry<InventoryModel> {
   protected final SimpleBlockModel model;
   protected final List<ModelItem> items;
 
   @Override
-  public Collection<Material> getTextures(IModelConfiguration owner, Function<ResourceLocation,UnbakedModel> modelGetter, Set<Pair<String,String>> missingTextureErrors) {
-    return model.getTextures(owner, modelGetter, missingTextureErrors);
+  public Collection<Material> getMaterials(IGeometryBakingContext owner, Function<ResourceLocation,UnbakedModel> modelGetter, Set<Pair<String,String>> missingTextureErrors) {
+    var _owner = ((BlockGeometryBakingContext)owner).owner;
+    return model.getTextures(_owner, _owner.getElements(), missingTextureErrors);
   }
 
   @Override
-  public BakedModel bake(IModelConfiguration owner, ModelBakery bakery, Function<Material,TextureAtlasSprite> spriteGetter, ModelState transform, ItemOverrides overrides, ResourceLocation location) {
+  public BakedModel bake(IGeometryBakingContext owner, ModelBakery bakery, Function<Material,TextureAtlasSprite> spriteGetter, ModelState transform, ItemOverrides overrides, ResourceLocation location) {
     BakedModel baked = model.bakeModel(owner, transform, overrides, spriteGetter, location);
     return new Baked(baked, items);
   }
@@ -56,17 +58,14 @@ public class InventoryModel implements IModelGeometry<InventoryModel> {
   }
 
   /** Loader for this model */
-  public static class Loader implements IModelLoader<InventoryModel> {
+  public static class Loader implements IGeometryLoader<InventoryModel> {
     /**
      * Shared loader instance
      */
     public static final Loader INSTANCE = new Loader();
 
     @Override
-    public void onResourceManagerReload(ResourceManager resourceManager) {}
-
-    @Override
-    public InventoryModel read(JsonDeserializationContext deserializationContext, JsonObject modelContents) {
+    public InventoryModel read(JsonObject modelContents, JsonDeserializationContext deserializationContext) {
       SimpleBlockModel model = SimpleBlockModel.deserialize(deserializationContext, modelContents);
       List<ModelItem> items = ModelItem.listFromJson(modelContents, "items");
       return new InventoryModel(model, items);

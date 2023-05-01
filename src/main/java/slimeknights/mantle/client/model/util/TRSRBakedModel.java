@@ -99,7 +99,7 @@
 //
 //  @Nonnull
 //  @Override
-//  public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, Random rand, IModelData data) {
+//  public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, Random rand, ModelData data) {
 //    // transform quads obtained from parent
 //
 //    ImmutableList.Builder<BakedQuad> builder = ImmutableList.builder();

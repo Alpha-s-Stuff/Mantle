@@ -1,6 +1,5 @@
 package slimeknights.mantle.registration.deferred;
 
-import io.github.fabricators_of_create.porting_lib.util.FluidAttributes;
 import io.github.fabricators_of_create.porting_lib.util.LazyRegistrar;
 import net.minecraft.core.Registry;
 import net.minecraft.world.item.BucketItem;
@@ -47,7 +46,7 @@ public class FluidDeferredRegister extends DeferredRegisterWrapper<Fluid> {
    * @return  Fluid to supply
    */
   public <I extends Fluid> RegistryObject<I> registerFluid(final String name, final Supplier<? extends I> sup) {
-    return register.register(name, sup.get());
+    return (RegistryObject<I>) register.register(name, sup.get());
   }
 
   /**
@@ -104,7 +103,6 @@ public class FluidDeferredRegister extends DeferredRegisterWrapper<Fluid> {
    * Registers a fluid with still, flowing, block, and bucket using the default fluid block
    * @param name       Fluid name
    * @param tagName    Name for tagging under forge
-   * @param builder    Properties builder
    * @param still      Function to create still from the properties
    * @param flowing    Function to create flowing from the properties
    * @param material   Block material
@@ -112,11 +110,10 @@ public class FluidDeferredRegister extends DeferredRegisterWrapper<Fluid> {
    * @param <F>      Fluid type
    * @return  Fluid object
    */
-  public <F extends SimpleFlowableFluid> FluidObject<F> register(String name, String tagName, FluidAttributes.Builder builder,
-                                                                 Function<Properties,? extends F> still, Function<Properties,? extends F> flowing, Material material, int lightLevel) {
+  public <F extends SimpleFlowableFluid> FluidObject<F> register(String name, String tagName, Function<Properties,? extends F> still, Function<Properties,? extends F> flowing, Material material, int lightLevel) {
     return register(
-      name, tagName, new FluidBuilder(builder.luminosity(lightLevel)).explosionResistance(100f), still, flowing,
-      fluid -> new LiquidBlock(fluid.get(), Block.Properties.of(material).noCollission().strength(100.0F).noDrops().lightLevel(state -> lightLevel))
+      name, tagName, new FluidBuilder().explosionResistance(100f), still, flowing,
+      fluid -> new LiquidBlock(fluid.get(), Block.Properties.of(material).noCollission().strength(100.0F).noLootTable().lightLevel(state -> lightLevel))
     );
   }
 
@@ -158,7 +155,6 @@ public class FluidDeferredRegister extends DeferredRegisterWrapper<Fluid> {
   /**
    * Registers a fluid with still, flowing, block, and bucket using the default fluid block
    * @param name       Fluid name
-   * @param builder    Properties builder
    * @param still      Function to create still from the properties
    * @param flowing    Function to create flowing from the properties
    * @param material   Block material
@@ -166,16 +162,14 @@ public class FluidDeferredRegister extends DeferredRegisterWrapper<Fluid> {
    * @param <F>      Fluid type
    * @return  Fluid object
    */
-  public <F extends SimpleDirectionalFluid> FluidObject<F> registerUpsideDown(String name, FluidAttributes.Builder builder,
-                                                                              Function<SimpleDirectionalFluid.Properties,? extends F> still, Function<SimpleDirectionalFluid.Properties,? extends F> flowing, Material material, int lightLevel) {
-    return registerUpsideDown(name, name, builder, still, flowing, material, lightLevel);
+  public <F extends SimpleDirectionalFluid> FluidObject<F> registerUpsideDown(String name, Function<SimpleDirectionalFluid.Properties,? extends F> still, Function<SimpleDirectionalFluid.Properties,? extends F> flowing, Material material, int lightLevel) {
+    return registerUpsideDown(name, name, still, flowing, material, lightLevel);
   }
 
   /**
    * Registers a fluid with still, flowing, block, and bucket using the default fluid block
    * @param name       Fluid name
    * @param tagName    Name for tagging under forge
-   * @param builder    Properties builder
    * @param still      Function to create still from the properties
    * @param flowing    Function to create flowing from the properties
    * @param material   Block material
@@ -183,11 +177,10 @@ public class FluidDeferredRegister extends DeferredRegisterWrapper<Fluid> {
    * @param <F>      Fluid type
    * @return  Fluid object
    */
-  public <F extends SimpleDirectionalFluid> FluidObject<F> registerUpsideDown(String name, String tagName, FluidAttributes.Builder builder,
-                                                                              Function<SimpleDirectionalFluid.Properties,? extends F> still, Function<SimpleDirectionalFluid.Properties,? extends F> flowing, Material material, int lightLevel) {
+  public <F extends SimpleDirectionalFluid> FluidObject<F> registerUpsideDown(String name, String tagName, Function<SimpleDirectionalFluid.Properties,? extends F> still, Function<SimpleDirectionalFluid.Properties,? extends F> flowing, Material material, int lightLevel) {
     return registerUpsideDown(
-      name, tagName, new FluidBuilder(builder.luminosity(lightLevel)).explosionResistance(100f), still, flowing,
-      fluid -> new LiquidBlock(fluid.get(), Block.Properties.of(material).noCollission().strength(100.0F).noDrops().lightLevel(state -> lightLevel))
+      name, tagName, new FluidBuilder().explosionResistance(100f), still, flowing,
+      fluid -> new LiquidBlock(fluid.get(), Block.Properties.of(material).noCollission().strength(100.0F).noLootTable().lightLevel(state -> lightLevel))
     );
   }
 
@@ -195,31 +188,28 @@ public class FluidDeferredRegister extends DeferredRegisterWrapper<Fluid> {
    * Registers a fluid with generic still, flowing, block, and bucket using the default Forge fluid
    * @param name       Fluid name
    * @param tagName    Name for tagging under forge
-   * @param builder    Properties builder
    * @param material   Block material
    * @param lightLevel Block light level
    * @return  Fluid object
    */
-  public FluidObject<SimpleFlowableFluid> register(String name, String tagName, FluidAttributes.Builder builder, Material material, int lightLevel) {
-    return register(name, tagName, builder, SimpleFlowableFluid.Still::new, SimpleFlowableFluid.Flowing::new, material, lightLevel);
+  public FluidObject<SimpleFlowableFluid> register(String name, String tagName, Material material, int lightLevel) {
+    return register(name, tagName, SimpleFlowableFluid.Still::new, SimpleFlowableFluid.Flowing::new, material, lightLevel);
   }
 
   /**
    * Registers a fluid with generic still, flowing, block, and bucket using the default Forge fluid
    * @param name       Fluid name
-   * @param builder    Properties builder
    * @param material   Block material
    * @param lightLevel Block light level
    * @return  Fluid object
    */
-  public FluidObject<SimpleFlowableFluid> register(String name, FluidAttributes.Builder builder, Material material, int lightLevel) {
-    return register(name, name, builder, material, lightLevel);
+  public FluidObject<SimpleFlowableFluid> register(String name, Material material, int lightLevel) {
+    return register(name, name, material, lightLevel);
   }
 
   /**
    * Registers a fluid with still, flowing, block, and bucket using the default fluid block
    * @param name       Fluid name
-   * @param builder    Properties builder
    * @param still      Function to create still from the properties
    * @param flowing    Function to create flowing from the properties
    * @param material   Block material
@@ -227,8 +217,8 @@ public class FluidDeferredRegister extends DeferredRegisterWrapper<Fluid> {
    * @param <F>      Fluid type
    * @return  Fluid object
    */
-  public <F extends SimpleFlowableFluid> FluidObject<F> register(String name, FluidAttributes.Builder builder,
+  public <F extends SimpleFlowableFluid> FluidObject<F> register(String name,
                                                                  Function<Properties,? extends F> still, Function<Properties,? extends F> flowing, Material material, int lightLevel) {
-    return register(name, name, builder, still, flowing, material, lightLevel);
+    return register(name, name, still, flowing, material, lightLevel);
   }
 }

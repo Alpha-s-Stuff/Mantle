@@ -11,11 +11,12 @@ import com.google.gson.JsonSyntaxException;
 import com.mojang.datafixers.util.Either;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.math.Transformation;
-import io.github.fabricators_of_create.porting_lib.model.IModelConfiguration;
-import io.github.fabricators_of_create.porting_lib.model.IModelData;
-import io.github.fabricators_of_create.porting_lib.model.IModelGeometry;
-import io.github.fabricators_of_create.porting_lib.model.IModelLoader;
-import io.github.fabricators_of_create.porting_lib.model.ModelProperty;
+import io.github.fabricators_of_create.porting_lib.model.BlockGeometryBakingContext;
+import io.github.fabricators_of_create.porting_lib.model.IGeometryBakingContext;
+import io.github.fabricators_of_create.porting_lib.model.IGeometryLoader;
+import io.github.fabricators_of_create.porting_lib.model.IUnbakedGeometry;
+import io.github.fabricators_of_create.porting_lib.model.data.ModelData;
+import io.github.fabricators_of_create.porting_lib.model.data.ModelProperty;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import net.fabricmc.fabric.api.renderer.v1.model.FabricBakedModel;
@@ -24,6 +25,7 @@ import net.fabricmc.fabric.api.rendering.data.v1.RenderAttachedBlockView;
 import net.minecraft.client.renderer.block.model.BlockElement;
 import net.minecraft.client.renderer.block.model.BlockElementFace;
 import net.minecraft.client.renderer.block.model.BlockFaceUV;
+import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
@@ -36,13 +38,12 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.Direction.Plane;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.GsonHelper;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import slimeknights.mantle.block.IMultipartConnectedBlock;
-import slimeknights.mantle.client.model.data.SinglePropertyData;
 import slimeknights.mantle.client.model.util.DynamicBakedWrapper;
 import slimeknights.mantle.client.model.util.ExtraTextureConfiguration;
 import slimeknights.mantle.client.model.util.ModelTextureIteratable;
@@ -57,7 +58,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiPredicate;
@@ -69,7 +69,7 @@ import java.util.function.Supplier;
  * Model that handles generating variants for connected textures
  */
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public class ConnectedModel implements IModelGeometry<ConnectedModel> {
+public class ConnectedModel implements IUnbakedGeometry<ConnectedModel> {
 
   /** Property of the connections cache key. Contains a 6 bit number with each bit representing a direction */
   private static final ModelProperty<Byte> CONNECTIONS = new ModelProperty<>();
@@ -83,22 +83,23 @@ public class ConnectedModel implements IModelGeometry<ConnectedModel> {
   /** List of sides to check when getting block directions */
   private final Set<Direction> sides;
 
-  /** Map of full texture name to the resulting material, filled during {@link #getTextures(IModelConfiguration, Function, Set)} */
+  /** Map of full texture name to the resulting material, filled during {@link #getMaterials(IGeometryBakingContext, Function, Set)} */
   private Map<String,Material> extraTextures;
 
   @Override
-  public Collection<Material> getTextures(IModelConfiguration owner, Function<ResourceLocation,UnbakedModel> modelGetter, Set<Pair<String,String>> missingTextureErrors) {
-    Collection<Material> textures = model.getTextures(owner, modelGetter, missingTextureErrors);
+  public Collection<Material> getMaterials(IGeometryBakingContext owner, Function<ResourceLocation,UnbakedModel> modelGetter, Set<Pair<String,String>> missingTextureErrors) {
+    var _model = ((BlockGeometryBakingContext)owner).owner;
+    Collection<Material> textures = model.getTextures(_model, _model.getElements(), missingTextureErrors);
     // for all connected textures, add suffix textures
     Map<String, Material> extraTextures = new HashMap<>();
     for (Entry<String,String[]> entry : connectedTextures.entrySet()) {
       // fetch data from the base texture
       String name = entry.getKey();
       // skip if missing
-      if (!owner.isTexturePresent(name)) {
+      if (!owner.hasMaterial(name)) {
         continue;
       }
-      Material base = owner.resolveTexture(name);
+      Material base = owner.getMaterial(name);
       ResourceLocation atlas = base.atlasLocation();
       ResourceLocation texture = base.texture();
       String namespace = texture.getNamespace();
@@ -115,8 +116,8 @@ public class ConnectedModel implements IModelGeometry<ConnectedModel> {
         if (!extraTextures.containsKey(suffixedName)) {
           Material mat;
           // allow overriding a specific texture
-          if (owner.isTexturePresent(suffixedName)) {
-            mat = owner.resolveTexture(suffixedName);
+          if (owner.hasMaterial(suffixedName)) {
+            mat = owner.getMaterial(suffixedName);
           } else {
             mat = new Material(atlas, new ResourceLocation(namespace, path + "/" + suffix));
           }
@@ -134,7 +135,7 @@ public class ConnectedModel implements IModelGeometry<ConnectedModel> {
   }
 
   @Override
-  public BakedModel bake(IModelConfiguration owner, ModelBakery bakery, Function<Material,TextureAtlasSprite> spriteGetter, ModelState transform, ItemOverrides overrides, ResourceLocation location) {
+  public BakedModel bake(IGeometryBakingContext owner, ModelBakery bakery, Function<Material,TextureAtlasSprite> spriteGetter, ModelState transform, ItemOverrides overrides, ResourceLocation location) {
     BakedModel baked = model.bakeModel(owner, transform, overrides, spriteGetter, location);
     return new Baked(this, new ExtraTextureConfiguration(owner, extraTextures), transform, baked);
   }
@@ -143,13 +144,13 @@ public class ConnectedModel implements IModelGeometry<ConnectedModel> {
   protected static class Baked extends DynamicBakedWrapper<BakedModel> {
 
     private final ConnectedModel parent;
-    private final IModelConfiguration owner;
+    private final IGeometryBakingContext owner;
     private final ModelState transforms;
     private final BakedModel[] cache = new BakedModel[64];
     private final Map<String, String> nameMappingCache = new ConcurrentHashMap<>();
     private final ModelTextureIteratable modelTextures;
 
-    public Baked(ConnectedModel parent, IModelConfiguration owner, ModelState transforms, BakedModel baked) {
+    public Baked(ConnectedModel parent, IGeometryBakingContext owner, ModelState transforms, BakedModel baked) {
       super(baked);
       this.parent = parent;
       this.owner = owner;
@@ -364,35 +365,35 @@ public class ConnectedModel implements IModelGeometry<ConnectedModel> {
     }
 
     @Nonnull
-    public IModelData getModelData(BlockAndTintGetter world, BlockPos pos, BlockState state, IModelData tileData) {
+    public ModelData getModelData(BlockAndTintGetter world, BlockPos pos, BlockState state, ModelData tileData) {
       // if the data is already defined, return it, will happen in multipart models
-      if (tileData.getData(CONNECTIONS) != null) {
+      if (tileData.get(CONNECTIONS) != null) {
         return tileData;
       }
 
       // if the property is not supported, make new data instance
-      IModelData data = tileData;
-      if (!data.hasProperty(CONNECTIONS)) {
-        data = new SinglePropertyData<>(CONNECTIONS);
+      ModelData data = tileData;
+      if (!data.has(CONNECTIONS)) {
+        data = ModelData.builder().with(CONNECTIONS, null).build();
       }
 
       // gather connections data
       Transformation rotation = transforms.getRotation();
-      data.setData(CONNECTIONS, getConnections((dir) -> parent.sides.contains(dir) && parent.connectionPredicate.test(state, world.getBlockState(pos.relative(rotation.rotateTransform(dir))))));
+      data = data.derive().with(CONNECTIONS, getConnections((dir) -> parent.sides.contains(dir) && parent.connectionPredicate.test(state, world.getBlockState(pos.relative(rotation.rotateTransform(dir)))))).build();
       return data;
     }
 
     /**
      * Shared logic to get quads from a connections array
      *
-     * @param connections Byte with 6 bits for the 6 different sides
-     * @param state       Block state instance
-     * @param side        Cullface
-     * @param rand        Random instance
-     * @param data        Model data instance
+     * @param connections     Byte with 6 bits for the 6 different sides
+     * @param state           Block state instance
+     * @param blockView       Cullface
+     * @param randomSupplier  Random instance
+     * @param context         Model data instance
      * @return Model quads for the given side
      */
-    protected synchronized void getCachedQuads(byte connections, BlockAndTintGetter blockView, BlockState state, BlockPos pos, Supplier<Random> randomSupplier, RenderContext context) {
+    protected synchronized void getCachedQuads(byte connections, BlockAndTintGetter blockView, BlockState state, BlockPos pos, Supplier<RandomSource> randomSupplier, RenderContext context) {
       // bake a new model if the orientation is not yet baked
       if (cache[connections] == null) {
         cache[connections] = applyConnections(connections);
@@ -403,11 +404,11 @@ public class ConnectedModel implements IModelGeometry<ConnectedModel> {
     }
 
     @Override
-    public void emitBlockQuads(BlockAndTintGetter blockView, BlockState state, BlockPos pos, Supplier<Random> randomSupplier, RenderContext context) {
+    public void emitBlockQuads(BlockAndTintGetter blockView, BlockState state, BlockPos pos, Supplier<RandomSource> randomSupplier, RenderContext context) {
       if (blockView instanceof RenderAttachedBlockView renderAttachedBlockView) {
-        IModelData data = getModelData(blockView, pos, state, new SinglePropertyData<>(CONNECTIONS));
+        ModelData data = getModelData(blockView, pos, state, ModelData.builder().with(CONNECTIONS, null).build());
         // try model data first
-        Byte connections = data.getData(CONNECTIONS);
+        Byte connections = data.get(CONNECTIONS);
         // if model data failed, try block state
         // temporary fallback until Forge has model data in multipart/weighted random
         if (connections == null) {
@@ -433,15 +434,12 @@ public class ConnectedModel implements IModelGeometry<ConnectedModel> {
   }
 
   /** Loader class containing singleton instance */
-  public static class Loader implements IModelLoader<ConnectedModel> {
+  public static class Loader implements IGeometryLoader<ConnectedModel> {
     /** Shared loader instance */
     public static final ConnectedModel.Loader INSTANCE = new ConnectedModel.Loader();
 
     @Override
-    public void onResourceManagerReload(ResourceManager resourceManager) {}
-
-    @Override
-    public ConnectedModel read(JsonDeserializationContext context, JsonObject json) {
+    public ConnectedModel read(JsonObject json, JsonDeserializationContext context) {
       SimpleBlockModel model = SimpleBlockModel.deserialize(context, json);
 
       // root object for all model data

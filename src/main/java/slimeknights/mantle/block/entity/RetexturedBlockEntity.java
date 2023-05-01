@@ -1,6 +1,6 @@
 package slimeknights.mantle.block.entity;
 
-import io.github.fabricators_of_create.porting_lib.model.IModelData;
+import io.github.fabricators_of_create.porting_lib.model.data.ModelData;
 import io.github.fabricators_of_create.porting_lib.util.Lazy;
 import net.fabricmc.fabric.api.rendering.data.v1.RenderAttachmentBlockEntity;
 import net.minecraft.core.BlockPos;
@@ -21,14 +21,14 @@ import static slimeknights.mantle.util.RetexturedHelper.TAG_TEXTURE;
 @Deprecated
 public class RetexturedBlockEntity extends MantleBlockEntity implements IRetexturedBlockEntity {
   /** Lazy value of model data as it will not change after first fetch */
-  private final Lazy<IModelData> data = Lazy.of(this::getRetexturedModelData);
+  private Lazy<ModelData> data = Lazy.of(this::getRetexturedModelData);
   public RetexturedBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
     super(type, pos, state);
   }
 
   @Nonnull
   @Override
-  public IModelData getRenderAttachmentData() {
+  public ModelData getRenderAttachmentData() {
     return data.get();
   }
 
@@ -55,7 +55,7 @@ public class RetexturedBlockEntity extends MantleBlockEntity implements IRetextu
     String newName = getTextureName();
     // if the texture name changed, mark the position for rerender
     if (!oldName.equals(newName) && level != null && level.isClientSide) {
-      data.get().setData(RetexturedHelper.BLOCK_PROPERTY, getTexture());
+      data = () -> data.get().derive().with(RetexturedHelper.BLOCK_PROPERTY, getTexture()).build();
 //      requestModelDataUpdate();
       BlockState state = getBlockState();
       level.sendBlockUpdated(worldPosition, state, state, 0);

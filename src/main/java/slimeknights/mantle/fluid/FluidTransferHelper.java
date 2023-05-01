@@ -19,7 +19,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
@@ -110,7 +110,7 @@ public class FluidTransferHelper {
                   handler.fill(fluidStack, false);
                   bucket.checkExtraContent(player, world, held, pos.relative(offset));
                   world.playSound(null, pos, FluidVariantAttributes.getEmptySound(FluidVariant.of(fluid)), SoundSource.BLOCKS, 1.0F, 1.0F);
-                  player.displayClientMessage(new TranslatableComponent(getKeyFilled(), FluidTextUtil.getUnicodeMillibuckets(FluidConstants.BUCKET, Config.FLUID_UNIT.get(), true), fluidStack.getDisplayName()), true);
+                  player.displayClientMessage(Component.translatable(getKeyFilled(), FluidTextUtil.getUnicodeMillibuckets(FluidConstants.BUCKET, Config.FLUID_UNIT.get(), true), fluidStack.getDisplayName()), true);
                   if (!player.isCreative()) {
                     player.setItemInHand(hand, held.getItem().getCraftingRemainingItem().getDefaultInstance());
                   }
@@ -127,7 +127,7 @@ public class FluidTransferHelper {
   /** Plays the sound from filling a TE */
   private static void playEmptySound(Level world, BlockPos pos, Player player, FluidStack transferred) {
     world.playSound(null, pos, FluidVariantAttributes.getHandlerOrDefault(transferred.getFluid()).getEmptySound(transferred.getType()).orElse(SoundEvents.BUCKET_EMPTY), SoundSource.BLOCKS, 1.0F, 1.0F);
-    player.displayClientMessage(new TranslatableComponent(getKeyFilled(), FluidTextUtil.getUnicodeMillibuckets(transferred.getAmount(), Config.FLUID_UNIT.get(), true), transferred.getDisplayName()), true);
+    player.displayClientMessage(Component.translatable(getKeyFilled(), FluidTextUtil.getUnicodeMillibuckets(transferred.getAmount(), Config.FLUID_UNIT.get(), true), transferred.getDisplayName()), true);
   }
 
   /** Plays the sound from draining a TE */
@@ -135,7 +135,7 @@ public class FluidTransferHelper {
     world.playSound(null, pos, FluidVariantAttributes.getHandlerOrDefault(transferred.getFluid()).getFillSound(transferred.getType())
       .or(() -> transferred.getFluid().getPickupSound())
       .orElse(SoundEvents.BUCKET_FILL), SoundSource.BLOCKS, 1.0F, 1.0F);
-    player.displayClientMessage(new TranslatableComponent(getKeyDrained(), FluidTextUtil.getUnicodeMillibuckets(transferred.getAmount(), Config.FLUID_UNIT.get(), true), transferred.getDisplayName()), true);
+    player.displayClientMessage(Component.translatable(getKeyDrained(), FluidTextUtil.getUnicodeMillibuckets(transferred.getAmount(), Config.FLUID_UNIT.get(), true), transferred.getDisplayName()), true);
   }
 
   /**

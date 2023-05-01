@@ -4,8 +4,7 @@ import lombok.AllArgsConstructor;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import slimeknights.mantle.client.book.BookLoader;
@@ -29,7 +28,7 @@ public class OpenNamedBookPacket implements IThreadsafePacket {
   public void handleThreadsafe(ISimplePacket.Context context) {
     BookData bookData = BookLoader.getBook(book);
     if(bookData != null) {
-      bookData.openGui(new TextComponent("Book"), "", null, null);
+      bookData.openGui(Component.literal("Book"), "", null, null);
     } else {
       ClientOnly.errorStatus(book);
     }
@@ -39,7 +38,7 @@ public class OpenNamedBookPacket implements IThreadsafePacket {
     private static void errorStatus(ResourceLocation book) {
       Player player = Minecraft.getInstance().player;
       if (player != null) {
-        player.displayClientMessage(new TranslatableComponent(BOOK_ERROR, book).withStyle(ChatFormatting.RED), false);
+        player.displayClientMessage(Component.translatable(BOOK_ERROR, book).withStyle(ChatFormatting.RED), false);
       }
     }
   }

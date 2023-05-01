@@ -78,7 +78,7 @@ public class BlockDeferredRegister extends DeferredRegisterWrapper<Block> {
    * @return  Block registry object
    */
   public <B extends Block> RegistryObject<B> registerNoItem(String name, Supplier<? extends B> block) {
-    return register.register(name, block.get());
+    return (RegistryObject<B>) register.register(name, block.get());
   }
 
   /**

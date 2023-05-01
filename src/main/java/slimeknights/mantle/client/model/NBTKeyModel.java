@@ -10,6 +10,10 @@ import com.google.gson.JsonObject;
 import com.mojang.datafixers.util.Either;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.math.Transformation;
+import io.github.fabricators_of_create.porting_lib.model.BlockGeometryBakingContext;
+import io.github.fabricators_of_create.porting_lib.model.IGeometryBakingContext;
+import io.github.fabricators_of_create.porting_lib.model.IGeometryLoader;
+import io.github.fabricators_of_create.porting_lib.model.IUnbakedGeometry;
 import io.github.fabricators_of_create.porting_lib.model.ItemLayerModel;
 import io.github.fabricators_of_create.porting_lib.model.PerspectiveMapWrapper;
 import lombok.RequiredArgsConstructor;
@@ -33,10 +37,8 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import slimeknights.mantle.client.model.util.BakedItemModel;
+import slimeknights.mantle.client.model.util.MantleItemLayerModel;
 import slimeknights.mantle.client.model.util.ModelTextureIteratable;
-import io.github.fabricators_of_create.porting_lib.model.IModelConfiguration;
-import io.github.fabricators_of_create.porting_lib.model.IModelGeometry;
-import io.github.fabricators_of_create.porting_lib.model.IModelLoader;
 import slimeknights.mantle.util.JsonHelper;
 
 import javax.annotation.Nullable;
@@ -50,7 +52,7 @@ import java.util.Set;
 import java.util.function.Function;
 
 @RequiredArgsConstructor
-public class NBTKeyModel implements IModelGeometry<NBTKeyModel> {
+public class NBTKeyModel implements IUnbakedGeometry<NBTKeyModel> {
   /** Model loader instance */
   public static final Loader LOADER = new Loader();
 
@@ -77,22 +79,22 @@ public class NBTKeyModel implements IModelGeometry<NBTKeyModel> {
   private Map<String,Material> textures = Collections.emptyMap();
 
   @Override
-  public Collection<Material> getTextures(IModelConfiguration owner, Function<ResourceLocation,UnbakedModel> modelGetter, Set<Pair<String,String>> missingTextureErrors) {
+  public Collection<Material> getMaterials(IGeometryBakingContext owner, Function<ResourceLocation,UnbakedModel> modelGetter, Set<Pair<String,String>> missingTextureErrors) {
     textures = new HashMap<>();
     // must have a default
-    Material defaultTexture = owner.resolveTexture("default");
+    Material defaultTexture = owner.getMaterial("default");
     textures.put("default", defaultTexture);
     if (Objects.equals(defaultTexture.texture(), MissingTextureAtlasSprite.getLocation())) {
       missingTextureErrors.add(Pair.of("default", owner.getModelName()));
     }
     // fetch others
-    UnbakedModel model = owner.getOwnerModel();
+    UnbakedModel model = ((BlockGeometryBakingContext)owner).owner.getRootModel();
     if (model instanceof BlockModel) {
       ModelTextureIteratable iterable = new ModelTextureIteratable(null, (BlockModel) model);
       for (Map<String,Either<Material,String>> map : iterable) {
         for (String key : map.keySet()) {
-          if (!textures.containsKey(key) && owner.isTexturePresent(key)) {
-            textures.put(key, owner.resolveTexture(key));
+          if (!textures.containsKey(key) && owner.hasMaterial(key)) {
+            textures.put(key, owner.getMaterial(key));
           }
         }
       }
@@ -111,23 +113,24 @@ public class NBTKeyModel implements IModelGeometry<NBTKeyModel> {
   }
 
   /** Bakes a model for the given texture */
-  private static BakedModel bakeModel(IModelConfiguration owner, Material texture, Function<Material,TextureAtlasSprite> spriteGetter, ImmutableMap<TransformType,Transformation> transformMap, ItemOverrides overrides) {
+  private static BakedModel bakeModel(BlockModel owner, Material texture, Function<Material,TextureAtlasSprite> spriteGetter, ImmutableMap<TransformType,Transformation> transformMap, ItemOverrides overrides) {
     TextureAtlasSprite sprite = spriteGetter.apply(texture);
-    ImmutableList<BakedQuad> quads = ItemLayerModel.getQuadsForSprite(-1, sprite, Transformation.identity());
-    return new BakedItemModel(quads, sprite, transformMap, overrides, true, owner.isSideLit());
+    ImmutableList<BakedQuad> quads = MantleItemLayerModel.getQuadsForSprite(-1, -1, sprite, Transformation.identity(), 0);
+    return new BakedItemModel(quads, sprite, transformMap, overrides, true, owner.getGuiLight().lightLikeBlock());
   }
 
   @Override
-  public BakedModel bake(IModelConfiguration owner, ModelBakery bakery, Function<Material,TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides, ResourceLocation modelLocation) {
+  public BakedModel bake(IGeometryBakingContext owner, ModelBakery bakery, Function<Material,TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides, ResourceLocation modelLocation) {
     ImmutableMap.Builder<String, BakedModel> variants = ImmutableMap.builder();
-    ImmutableMap<TransformType,Transformation> transformMap = Maps.immutableEnumMap(PerspectiveMapWrapper.getTransforms(owner.getCombinedTransform()));
+    ImmutableMap<TransformType,Transformation> transformMap = Maps.immutableEnumMap(PerspectiveMapWrapper.getTransforms(owner.getTransforms()));
+    var _owner = ((BlockGeometryBakingContext)owner).owner;
     for (Entry<String,Material> entry : textures.entrySet()) {
       String key = entry.getKey();
       if (!key.equals("default")) {
-        variants.put(key, bakeModel(owner, entry.getValue(), spriteGetter, transformMap, ItemOverrides.EMPTY));
+        variants.put(key, bakeModel(_owner, entry.getValue(), spriteGetter, transformMap, ItemOverrides.EMPTY));
       }
     }
-    return bakeModel(owner, textures.get("default"), spriteGetter, transformMap, new Overrides(nbtKey, textures, variants.build()));
+    return bakeModel(_owner, textures.get("default"), spriteGetter, transformMap, new Overrides(nbtKey, textures, variants.build()));
   }
 
   /** Overrides list for a tool slot item model */
@@ -154,12 +157,10 @@ public class NBTKeyModel implements IModelGeometry<NBTKeyModel> {
   }
 
   /** Loader logic */
-  private static class Loader implements IModelLoader<NBTKeyModel> {
-    @Override
-    public void onResourceManagerReload(ResourceManager resourceManager) {}
+  private static class Loader implements IGeometryLoader<NBTKeyModel> {
 
     @Override
-    public NBTKeyModel read(JsonDeserializationContext deserializationContext, JsonObject modelContents) {
+    public NBTKeyModel read(JsonObject modelContents, JsonDeserializationContext deserializationContext) {
       String key = GsonHelper.getAsString(modelContents, "nbt_key");
       ResourceLocation extraTexturesKey = null;
       if (modelContents.has("extra_textures_key")) {

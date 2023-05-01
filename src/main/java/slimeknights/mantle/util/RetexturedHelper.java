@@ -1,6 +1,7 @@
 package slimeknights.mantle.util;
 
-import io.github.fabricators_of_create.porting_lib.model.IModelData;
+import io.github.fabricators_of_create.porting_lib.model.data.ModelData;
+import io.github.fabricators_of_create.porting_lib.model.data.ModelProperty;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -10,7 +11,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import io.github.fabricators_of_create.porting_lib.model.ModelProperty;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import slimeknights.mantle.block.entity.IRetexturedBlockEntity;
@@ -67,7 +67,7 @@ public final class RetexturedHelper {
     if (block == Blocks.AIR) {
       return "";
     }
-    return Objects.requireNonNull(block.getRegistryName()).toString();
+    return Objects.requireNonNull(Registry.BLOCK.getKey(block)).toString();
   }
 
 
@@ -95,9 +95,9 @@ public final class RetexturedHelper {
     if (level != null && level.isClientSide) {
       Block texture = self.getTexture();
       texture = texture == Blocks.AIR ? null : texture;
-      IModelData data = self.getRenderAttachmentData();
-      if (data.getData(BLOCK_PROPERTY) != texture) {
-        data.setData(BLOCK_PROPERTY, texture);
+      ModelData data = self.getRenderAttachmentData();
+      if (data.get(BLOCK_PROPERTY) != texture) {
+        data = data.derive().with(BLOCK_PROPERTY, texture).build();
         BlockState state = self.getBlockState();
         level.sendBlockUpdated(self.getBlockPos(), state, state, 0);
       }

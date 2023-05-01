@@ -1,6 +1,5 @@
 package slimeknights.mantle.recipe.data;
 
-import io.github.fabricators_of_create.porting_lib.extensions.RegistryNameProvider;
 import net.fabricmc.fabric.api.resource.conditions.v1.ConditionJsonProvider;
 import net.fabricmc.fabric.api.resource.conditions.v1.DefaultResourceConditions;
 import net.minecraft.core.Registry;
@@ -51,27 +50,6 @@ public interface IRecipeHelper {
   default ResourceLocation wrap(ResourceLocation loc, String prefix, String suffix) {
     return modResource(prefix + loc.getPath() + suffix);
   }
-
-  /**
-   * Prefixes the resource location path with the given value
-   * @param entry    Item registry name to use
-   * @param prefix  Prefix value
-   * @return  Resource location path
-   */
-  default ResourceLocation wrap(RegistryNameProvider entry, String prefix, String suffix) {
-    return wrap(Objects.requireNonNull(entry.getRegistryName()), prefix, suffix);
-  }
-
-  /**
-   * Prefixes the resource location path with the given value
-   * @param entry    Item registry name to use
-   * @param prefix  Prefix value
-   * @return  Resource location path
-   */
-  default ResourceLocation wrap(Supplier<? extends RegistryNameProvider> entry, String prefix, String suffix) {
-    return wrap(entry.get(), prefix, suffix);
-  }
-
   /**
    * Prefixes the resource location path with the given value
    * @param location  Entry registry name to use
@@ -80,26 +58,6 @@ public interface IRecipeHelper {
    */
   default ResourceLocation prefix(ResourceLocation location, String prefix) {
     return modResource(prefix + location.getPath());
-  }
-
-  /**
-   * Prefixes the resource location path with the given value
-   * @param entry   Entry registry name to use
-   * @param prefix  Prefix value
-   * @return  Resource location path
-   */
-  default ResourceLocation prefix(RegistryNameProvider entry, String prefix) {
-    return prefix(Objects.requireNonNull(entry.getRegistryName()), prefix);
-  }
-
-  /**
-   * Prefixes the resource location path with the given value
-   * @param entry   Entry registry name to use
-   * @param prefix  Prefix value
-   * @return  Resource location path
-   */
-  default ResourceLocation prefix(Supplier<? extends RegistryNameProvider> entry, String prefix) {
-    return prefix(entry.get(), prefix);
   }
 
 

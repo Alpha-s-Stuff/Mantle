@@ -1,6 +1,5 @@
 package slimeknights.mantle.registration;
 
-import io.github.fabricators_of_create.porting_lib.util.FluidAttributes;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -20,7 +19,6 @@ import java.util.function.Supplier;
 @Setter
 @RequiredArgsConstructor
 public class FluidBuilder {
-  private final FluidAttributes.Builder attributes;
   private boolean canMultiply = false;
   private Supplier<? extends Item> bucket;
   private Supplier<? extends LiquidBlock> block;
@@ -42,7 +40,7 @@ public class FluidBuilder {
    * @return  Forge fluid properties
    */
   public SimpleFlowableFluid.Properties build(Supplier<? extends Fluid> still, Supplier<? extends Fluid> flowing) {
-    SimpleFlowableFluid.Properties properties = new SimpleFlowableFluid.Properties(still, flowing, this.attributes)
+    SimpleFlowableFluid.Properties properties = new SimpleFlowableFluid.Properties(still, flowing)
         .flowSpeed(this.slopeFindDistance)
         .levelDecreasePerBlock(this.levelDecreasePerBlock)
         .blastResistance(this.explosionResistance)
@@ -62,7 +60,7 @@ public class FluidBuilder {
    * @return  Forge fluid properties
    */
   public SimpleDirectionalFluid.Properties buildUpsideDownFluid(Supplier<? extends Fluid> still, Supplier<? extends Fluid> flowing) {
-    SimpleDirectionalFluid.Properties properties = new SimpleDirectionalFluid.Properties(still, flowing, this.attributes)
+    SimpleDirectionalFluid.Properties properties = new SimpleDirectionalFluid.Properties(still, flowing)
       .flowSpeed(this.slopeFindDistance)
       .levelDecreasePerBlock(this.levelDecreasePerBlock)
       .blastResistance(this.explosionResistance)

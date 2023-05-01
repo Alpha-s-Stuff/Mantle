@@ -1,7 +1,7 @@
 package slimeknights.mantle.loot.builder;
 
+import io.github.fabricators_of_create.porting_lib.loot.GlobalLootModifierProvider;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
-import slimeknights.mantle.data.GlobalLootModifierProvider;
 
 import java.util.ArrayList;
 import java.util.List;

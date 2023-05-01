@@ -24,8 +24,8 @@ public class MantleFluidTagProvider extends FabricTagProvider.FluidTagProvider {
     this.tag(LAVA).add(Fluids.LAVA, Fluids.FLOWING_LAVA);
   }
 
-  @Override
+  /*@Override
   public String getName() {
     return "Mantle Fluid Tag Provider";
-  }
+  }*/
 }

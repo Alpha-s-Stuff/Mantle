@@ -5,6 +5,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -20,6 +22,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ContainsItemModifierLootCondition implements ILootModifierCondition {
   public static final ResourceLocation ID = Mantle.getResource("contains_item");
+
+
   private final Ingredient ingredient;
   private final int amountNeeded;
 

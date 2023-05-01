@@ -7,10 +7,13 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import io.github.fabricators_of_create.porting_lib.event.client.ModelLoadCallback;
 import io.github.fabricators_of_create.porting_lib.event.client.OverlayRenderCallback;
 import io.github.fabricators_of_create.porting_lib.event.client.OverlayRenderCallback.Types;
+import io.github.fabricators_of_create.porting_lib.event.client.RegisterGeometryLoadersCallback;
 import io.github.fabricators_of_create.porting_lib.event.client.RegisterShadersCallback;
-import io.github.fabricators_of_create.porting_lib.model.ModelLoaderRegistry;
+import io.github.fabricators_of_create.porting_lib.model.GeometryLoaderManager;
+import io.github.fabricators_of_create.porting_lib.model.IGeometryLoader;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.fabricmc.fabric.impl.client.indigo.renderer.helper.GeometryHelper;
 import net.minecraft.client.AttackIndicatorStatus;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
@@ -46,6 +49,7 @@ import slimeknights.mantle.registration.MantleRegistrations;
 import slimeknights.mantle.registration.RegistrationHelper;
 import slimeknights.mantle.util.OffhandCooldownTracker;
 
+import java.util.Map;
 import java.util.function.Function;
 
 import static net.minecraft.client.renderer.Sheets.SIGN_SHEET;
@@ -77,26 +81,26 @@ public class ClientEvents implements ClientModInitializer {
     registerEntityRenderers();
     registerListeners();
     RegisterShadersCallback.EVENT.register(MantleShaders::registerShaders);
-    ModelLoadCallback.EVENT.register(ClientEvents::registerModelLoaders);
+    RegisterGeometryLoadersCallback.EVENT.register(ClientEvents::registerModelLoaders);
     commonSetup();
     MantleNetwork.INSTANCE.network.initClientListener();
   }
 
-  static void registerModelLoaders(ResourceManager manager, BlockColors colors, ProfilerFiller profiler, int mipLevel) {
+  static void registerModelLoaders(Map<ResourceLocation, IGeometryLoader<?>> callback) {
     // standard models - useful in resource packs for any model
-    ModelLoaderRegistry.registerLoader(Mantle.getResource("connected"), ConnectedModel.Loader.INSTANCE);
-    ModelLoaderRegistry.registerLoader(Mantle.getResource("item_layer"), MantleItemLayerModel.LOADER);
-    ModelLoaderRegistry.registerLoader(Mantle.getResource("colored_block"), ColoredBlockModel.LOADER);
-    ModelLoaderRegistry.registerLoader(Mantle.getResource("fallback"), FallbackModelLoader.INSTANCE);
+    callback.put(Mantle.getResource("connected"), ConnectedModel.Loader.INSTANCE);
+    callback.put(Mantle.getResource("item_layer"), MantleItemLayerModel.LOADER);
+    callback.put(Mantle.getResource("colored_block"), ColoredBlockModel.LOADER);
+    callback.put(Mantle.getResource("fallback"), FallbackModelLoader.INSTANCE);
 
     // NBT dynamic models - require specific data defined in the block/item to use
-    ModelLoaderRegistry.registerLoader(Mantle.getResource("nbt_key"), NBTKeyModel.LOADER);
-    ModelLoaderRegistry.registerLoader(Mantle.getResource("retextured"), RetexturedModel.Loader.INSTANCE);
+    callback.put(Mantle.getResource("nbt_key"), NBTKeyModel.LOADER);
+    callback.put(Mantle.getResource("retextured"), RetexturedModel.Loader.INSTANCE);
 
     // data models - contain information for other parts in rendering rather than rendering directly
-    ModelLoaderRegistry.registerLoader(Mantle.getResource("fluid_texture"), FluidTextureModel.LOADER);
-    ModelLoaderRegistry.registerLoader(Mantle.getResource("inventory"), InventoryModel.Loader.INSTANCE);
-    ModelLoaderRegistry.registerLoader(Mantle.getResource("fluids"), FluidsModel.Loader.INSTANCE);
+    callback.put(Mantle.getResource("fluid_texture"), FluidTextureModel.LOADER);
+    callback.put(Mantle.getResource("inventory"), InventoryModel.Loader.INSTANCE);
+    callback.put(Mantle.getResource("fluids"), FluidsModel.Loader.INSTANCE);
   }
 
   static void commonSetup() {
@@ -109,7 +113,7 @@ public class ClientEvents implements ClientModInitializer {
     // must have a player, not be in spectator, and have the indicator enabled
     Minecraft minecraft = Minecraft.getInstance();
     Options settings = minecraft.options;
-    if (minecraft.player == null || minecraft.gameMode == null || minecraft.gameMode.getPlayerMode() == GameType.SPECTATOR || settings.attackIndicator == AttackIndicatorStatus.OFF) {
+    if (minecraft.player == null || minecraft.gameMode == null || minecraft.gameMode.getPlayerMode() == GameType.SPECTATOR || settings.attackIndicator().get() == AttackIndicatorStatus.OFF) {
       return false;
     }
 
@@ -124,10 +128,10 @@ public class ClientEvents implements ClientModInitializer {
     }
 
     // show attack indicator
-    switch (settings.attackIndicator) {
+    switch (settings.attackIndicator().get()) {
       case CROSSHAIR:
         if (overlay == Types.CROSSHAIRS && minecraft.options.getCameraType().isFirstPerson()) {
-          if (!settings.renderDebug || settings.hideGui || minecraft.player.isReducedDebugInfo() || settings.reducedDebugInfo) {
+          if (!settings.renderDebug || settings.hideGui || minecraft.player.isReducedDebugInfo() || settings.reducedDebugInfo().get()) {
             // mostly cloned from vanilla attack indicator
             RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.ONE_MINUS_DST_COLOR, GlStateManager.DestFactor.ONE_MINUS_SRC_COLOR, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
             int scaledHeight = minecraft.getWindow().getGuiScaledHeight();

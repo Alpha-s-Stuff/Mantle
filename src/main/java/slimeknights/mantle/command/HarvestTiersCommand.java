@@ -13,8 +13,7 @@ import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.ClickEvent.Action;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Tier;
@@ -22,6 +21,7 @@ import net.minecraft.world.level.block.Block;
 import slimeknights.mantle.Mantle;
 import io.github.fabricators_of_create.porting_lib.util.TagUtil;
 
+import java.awt.*;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
@@ -38,8 +38,8 @@ public class HarvestTiersCommand {
   private static final String HARVEST_TIER_PATH = HARVEST_TIERS.getNamespace() + "/" + HARVEST_TIERS.getPath();
 
   // loot modifiers
-  private static final Component SUCCESS_LOG = new TranslatableComponent("command.mantle.harvest_tiers.success_log");
-  private static final Component EMPTY = new TranslatableComponent("command.mantle.tag.empty");
+  private static final Component SUCCESS_LOG = Component.translatable("command.mantle.harvest_tiers.success_log");
+  private static final Component EMPTY = Component.translatable("command.mantle.tag.empty");
 
   /**
    * Registers this sub command with the root command
@@ -55,7 +55,7 @@ public class HarvestTiersCommand {
   /** Creates a clickable component for a block tag */
   private static Object getTagComponent(TagKey<Block> tag) {
     ResourceLocation id = tag.location();
-    return new TextComponent(id.toString()).withStyle(style -> style.withUnderlined(true).withClickEvent(new ClickEvent(Action.SUGGEST_COMMAND, "/mantle dump_tag " + Registry.BLOCK_REGISTRY.location() + " " + id + " save")));
+    return Component.literal(id.toString()).withStyle(style -> style.withUnderlined(true).withClickEvent(new ClickEvent(Action.SUGGEST_COMMAND, "/mantle dump_tag " + Registry.BLOCK_REGISTRY.location() + " " + id + " save")));
   }
 
   /** Runs the command, dumping the tag */
@@ -63,7 +63,7 @@ public class HarvestTiersCommand {
     List<Tier> sortedTiers = TierSortingRegistry.getSortedTiers();
 
     // start building output message
-    MutableComponent output = new TranslatableComponent("command.mantle.harvest_tiers.success_list");
+    MutableComponent output = Component.translatable("command.mantle.harvest_tiers.success_list");
     // if no values, print empty
     if (sortedTiers.isEmpty()) {
       output.append("\n* ").append(EMPTY);
@@ -73,9 +73,9 @@ public class HarvestTiersCommand {
         TagKey<Block> tag = TagUtil.getTagFromTier(tier);
         ResourceLocation id = TierSortingRegistry.getName(tier);
         if (tag != null) {
-          output.append(new TranslatableComponent("command.mantle.harvest_tiers.tag", id, getTagComponent(tag)));
+          output.append(Component.translatable("command.mantle.harvest_tiers.tag", id, getTagComponent(tag)));
         } else {
-          output.append(new TranslatableComponent("command.mantle.harvest_tiers.no_tag", id));
+          output.append(Component.translatable("command.mantle.harvest_tiers.no_tag", id));
         }
       }
     }
@@ -108,7 +108,7 @@ public class HarvestTiersCommand {
       } catch (IOException ex) {
         Mantle.logger.error("Couldn't save harvests tiers to {}", path, ex);
       }
-      context.getSource().sendSuccess(new TranslatableComponent("command.mantle.harvest_tiers.success_save", DumpAllTagsCommand.getOutputComponent(output)), true);
+      context.getSource().sendSuccess(Component.translatable("command.mantle.harvest_tiers.success_save", DumpAllTagsCommand.getOutputComponent(output)), true);
     } else {
       // print to console
       context.getSource().sendSuccess(SUCCESS_LOG, true);

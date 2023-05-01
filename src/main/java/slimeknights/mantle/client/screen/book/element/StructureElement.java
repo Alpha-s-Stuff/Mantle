@@ -5,8 +5,7 @@ import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.math.Quaternion;
 import com.mojang.math.Transformation;
 import com.mojang.math.Vector3f;
-import io.github.fabricators_of_create.porting_lib.model.EmptyModelData;
-import io.github.fabricators_of_create.porting_lib.model.IModelData;
+import io.github.fabricators_of_create.porting_lib.model.data.ModelData;
 import net.fabricmc.fabric.api.rendering.data.v1.RenderAttachmentBlockEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -112,11 +111,11 @@ public class StructureElement extends SizedBookElement {
               else
                 overlay = OverlayTexture.NO_OVERLAY;
 
-              IModelData modelData = EmptyModelData.INSTANCE;
+              ModelData modelData = ModelData.EMPTY;
               BlockEntity te = structureWorld.getBlockEntity(pos);
 
               if (te != null)
-                modelData = (IModelData) ((RenderAttachmentBlockEntity)te).getRenderAttachmentData();
+                modelData = (ModelData) ((RenderAttachmentBlockEntity)te).getRenderAttachmentData();
 
               blockRender.getModelRenderer().tesselateBlock(
                 structureWorld, blockRender.getBlockModel(state), state, pos, transform,

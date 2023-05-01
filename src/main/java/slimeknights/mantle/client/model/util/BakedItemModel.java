@@ -10,6 +10,7 @@ import com.google.common.collect.ImmutableMap;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.fabric.api.renderer.v1.model.ForwardingBakedModel;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.state.BlockState;
 import com.mojang.math.Transformation;
 import net.minecraft.client.renderer.block.model.BakedQuad;
@@ -58,7 +59,7 @@ public class BakedItemModel implements BakedModel, TransformTypeDependentItemBak
   @Override public ItemOverrides getOverrides() { return overrides; }
 
   @Override
-  public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, Random rand)
+  public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, RandomSource rand)
   {
     if (side == null)
     {
@@ -96,7 +97,7 @@ public class BakedItemModel implements BakedModel, TransformTypeDependentItemBak
     }
 
     @Override
-    public List<BakedQuad> getQuads (@Nullable BlockState state, @Nullable Direction side, Random rand)
+    public List<BakedQuad> getQuads (@Nullable BlockState state, @Nullable Direction side, RandomSource rand)
     {
       if(side == null)
       {

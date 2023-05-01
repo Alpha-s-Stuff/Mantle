@@ -229,10 +229,10 @@ public class JsonHelper {
    */
   @Nullable
   public static JsonObject getJson(Resource resource) {
-    try (BufferedReader reader = new BufferedReader(new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8))) {
+    try (BufferedReader reader = resource.openAsReader()) {
       return GsonHelper.parse(reader);
     } catch (JsonParseException | IOException e) {
-      Mantle.logger.error("Failed to load JSON from resource " + resource.getLocation(), e);
+      Mantle.logger.error("Failed to load JSON from resource " + resource.sourcePackId(), e);
       return null;
     }
   }
@@ -244,18 +244,11 @@ public class JsonHelper {
       .filter(ResourceLocation::isValidNamespace)
       .flatMap(namespace -> {
         ResourceLocation location = new ResourceLocation(namespace, path);
-        try {
-          return manager.getResources(location).stream();
-        } catch (FileNotFoundException e) {
-          // suppress, the above method throws instead of returning empty
-        } catch (IOException e) {
-          Mantle.logger.error("Failed to load JSON files from {}", location, e);
-        }
-        return Stream.empty();
+        return manager.getResourceStack(location).stream();
       })
       .map(preferredPath != null ? resource -> {
-        ResourceLocation loaded = resource.getLocation();
-        Mantle.logger.warn("Using deprecated path {} in pack {} - use {}:{} instead", loaded, resource.getSourceName(), loaded.getNamespace(), preferredPath);
+        ResourceLocation loaded = new ResourceLocation(resource.sourcePackId(), path);
+        Mantle.logger.warn("Using deprecated path {} in pack {} - use {}:{} instead", loaded, resource.sourcePackId(), loaded.getNamespace(), preferredPath);
         return getJson(resource);
       } : JsonHelper::getJson)
       .filter(Objects::nonNull).toList();

@@ -2,10 +2,7 @@ package slimeknights.mantle.transfer.item;
 
 import java.util.Arrays;
 
-import slimeknights.mantle.transfer.item.IItemHandlerModifiable;
-import slimeknights.mantle.transfer.item.ItemHandlerHelper;
-import io.github.fabricators_of_create.porting_lib.util.INBTSerializable;
-
+import io.github.fabricators_of_create.porting_lib.extensions.INBTSerializable;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;

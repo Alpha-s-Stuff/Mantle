@@ -60,7 +60,7 @@ class SetBlockPredicate implements BlockPredicate {
     public void serialize(SetBlockPredicate object, JsonObject json) {
       JsonArray blocksJson = new JsonArray();
       for (Block block : object.blocks) {
-        blocksJson.add(Objects.requireNonNull(block.getRegistryName()).toString());
+        blocksJson.add(Objects.requireNonNull(Registry.BLOCK.getKey(block)).toString());
       }
       json.add("blocks", blocksJson);
     }

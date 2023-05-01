@@ -1,6 +1,6 @@
 package slimeknights.mantle.block.entity;
 
-import io.github.fabricators_of_create.porting_lib.model.IModelData;
+import io.github.fabricators_of_create.porting_lib.model.data.ModelData;
 import io.github.fabricators_of_create.porting_lib.util.Lazy;
 import lombok.Getter;
 import net.minecraft.core.BlockPos;
@@ -21,7 +21,7 @@ import static slimeknights.mantle.util.RetexturedHelper.TAG_TEXTURE;
  * Standard implementation for {@link IRetexturedBlockEntity}, use alongside {@link RetexturedBlock} and {@link slimeknights.mantle.item.RetexturedBlockItem}
  */
 public class DefaultRetexturedBlockEntity extends MantleBlockEntity implements IRetexturedBlockEntity {
-  private final Lazy<IModelData> data = Lazy.of(this::getRetexturedModelData);
+  private final Lazy<ModelData> data = Lazy.of(this::getRetexturedModelData);
   @Nonnull
   @Getter
   private Block texture = Blocks.AIR;
@@ -31,7 +31,7 @@ public class DefaultRetexturedBlockEntity extends MantleBlockEntity implements I
 
   @Nonnull
   @Override
-  public IModelData getRenderAttachmentData() {
+  public ModelData getRenderAttachmentData() {
     return this.data.get();
   }
 

@@ -36,8 +36,8 @@ public class SlotItemHandlerFabric extends Slot {
 	@Nonnull
 	public ItemStack getItem() {
     try (Transaction t = TransferUtil.getTransaction()) {
-      if (Iterators.size(getItemHandler().iterator(t)) <= index) return ItemStack.EMPTY;
-      StorageView<ItemVariant> view = Iterators.get(this.getItemHandler().iterator(t), index);
+      if (Iterators.size(getItemHandler().iterator()) <= index) return ItemStack.EMPTY;
+      StorageView<ItemVariant> view = Iterators.get(this.getItemHandler().iterator(), index);
       return view.getResource().toStack((int) view.getAmount());
     }
 	}
@@ -69,7 +69,7 @@ public class SlotItemHandlerFabric extends Slot {
 		maxAdd.setCount(maxInput);
     try (Transaction t = TransferUtil.getTransaction()) {
       Storage<ItemVariant> handler = this.getItemHandler();
-      StorageView<ItemVariant> slot = Iterators.get(handler.iterator(t), index);
+      StorageView<ItemVariant> slot = Iterators.get(handler.iterator(), index);
       ItemStack currentStack = slot.getResource().toStack((int) slot.getAmount());
       if (handler instanceof InventoryStorage inventoryStorage) {
         SingleSlotStorage<ItemVariant> slotStorage = inventoryStorage.getSlot(index);

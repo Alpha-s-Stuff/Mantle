@@ -1,20 +1,33 @@
-package slimeknights.mantle.plugin.jei;
-
-import com.google.common.collect.ImmutableList;
-import mezz.jei.api.constants.VanillaTypes;
-import mezz.jei.api.gui.IRecipeLayout;
-import mezz.jei.api.gui.ingredient.IGuiIngredientGroup;
-import mezz.jei.api.gui.ingredient.IGuiItemStackGroup;
-import mezz.jei.api.gui.ingredient.ITooltipCallback;
-import mezz.jei.api.ingredients.IIngredients;
 import mezz.jei.api.recipe.IFocus;
 import mezz.jei.api.recipe.category.extensions.vanilla.crafting.ICraftingCategoryExtension;
-import mezz.jei.api.recipe.category.extensions.vanilla.crafting.ICustomCraftingCategoryExtension;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import slimeknights.mantle.item.RetexturedBlockItem;
+import slimeknights.mantle.recipe.crafting.ShapedRetexturedRecipe;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+/*
+package slimeknights.mantle.plugin.jei;
+
+import com.google.common.collect.ImmutableList;
+import mezz.jei.api.constants.VanillaTypes;
+import mezz.jei.api.gui.ingredient.IRecipeSlotTooltipCallback;
+import mezz.jei.api.recipe.IFocus;
+import mezz.jei.api.recipe.category.extensions.vanilla.crafting.ICraftingCategoryExtension;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
@@ -28,14 +41,14 @@ import java.util.stream.Collectors;
 
 /**
  * JEI crafting extension to properly show, animate, and focus {@link ShapedRetexturedRecipe} instances
- */
+ *
 @SuppressWarnings("removal")
-public class RetexturableRecipeExtension implements ICraftingCategoryExtension, ICustomCraftingCategoryExtension, ITooltipCallback<ItemStack> {
-  /** Actual recipe instance */
+public class RetexturableRecipeExtension implements ICraftingCategoryExtension, IRecipeSlotTooltipCallback<ItemStack> {
+  /** Actual recipe instance *
   private final ShapedRetexturedRecipe recipe;
-  /** List of all possible outputs, for the sake of recipe lookups */
+  /** List of all possible outputs, for the sake of recipe lookups *
   private final List<List<ItemStack>> allOutputs;
-  /** List of all textured variants, fallback for JEI display */
+  /** List of all textured variants, fallback for JEI display *
   private final List<ItemStack> displayOutputs;
 
   RetexturableRecipeExtension(ShapedRetexturedRecipe recipe) {
@@ -140,14 +153,15 @@ public class RetexturableRecipeExtension implements ICraftingCategoryExtension, 
 
         if (modIdDifferent) {
           String modName = JEIPlugin.modIdHelper.getFormattedModNameForModId(recipeModId);
-          tooltip.add(new TranslatableComponent("jei.tooltip.recipe.by", modName).withStyle(ChatFormatting.GRAY));
+          tooltip.add(Component.translatable("jei.tooltip.recipe.by", modName).withStyle(ChatFormatting.GRAY));
         }
       }
 
       boolean showAdvanced = Minecraft.getInstance().options.advancedItemTooltips || Screen.hasShiftDown();
       if (showAdvanced) {
-        tooltip.add(new TranslatableComponent("jei.tooltip.recipe.id", registryName).withStyle(ChatFormatting.DARK_GRAY));
+        tooltip.add(Component.translatable("jei.tooltip.recipe.id", registryName).withStyle(ChatFormatting.DARK_GRAY));
       }
     }
   }
 }
+*/

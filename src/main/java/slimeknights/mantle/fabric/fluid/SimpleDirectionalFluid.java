@@ -1,6 +1,5 @@
 package slimeknights.mantle.fabric.fluid;
 
-import io.github.fabricators_of_create.porting_lib.util.FluidAttributes;
 import me.alphamode.star.world.fluids.StarFluid;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -30,7 +29,6 @@ public abstract class SimpleDirectionalFluid extends StarFluid {
   private final Supplier<? extends Item> bucket;
   @Nullable
   private final Supplier<? extends LiquidBlock> block;
-  private final FluidAttributes.Builder builder;
   private final boolean infinite;
   private final int flowSpeed;
   private final int levelDecreasePerBlock;
@@ -41,7 +39,6 @@ public abstract class SimpleDirectionalFluid extends StarFluid {
     super(properties.flowDirection);
     this.flowing = properties.flowing;
     this.still = properties.still;
-    this.builder = properties.attributes;
     this.infinite = properties.infinite;
     this.bucket = properties.bucket;
     this.block = properties.block;
@@ -111,11 +108,6 @@ public abstract class SimpleDirectionalFluid extends StarFluid {
   }
 
   @Override
-  public FluidAttributes createAttributes() {
-    return builder.build(this);
-  }
-
-  @Override
   public boolean isSame(Fluid fluid) {
     return fluid == still.get() || fluid == flowing.get();
   }
@@ -162,7 +154,6 @@ public abstract class SimpleDirectionalFluid extends StarFluid {
   public static class Properties {
     private Supplier<? extends Fluid> still;
     private Supplier<? extends Fluid> flowing;
-    private FluidAttributes.Builder attributes;
     private boolean infinite;
     private Supplier<? extends Item> bucket;
     private Supplier<? extends LiquidBlock> block;
@@ -172,10 +163,9 @@ public abstract class SimpleDirectionalFluid extends StarFluid {
     private int tickRate = 5;
     private Direction flowDirection = Direction.DOWN;
 
-    public Properties(Supplier<? extends Fluid> still, Supplier<? extends Fluid> flowing, FluidAttributes.Builder attributes) {
+    public Properties(Supplier<? extends Fluid> still, Supplier<? extends Fluid> flowing) {
       this.still = still;
       this.flowing = flowing;
-      this.attributes = attributes;
     }
 
     public Properties canMultiply() {

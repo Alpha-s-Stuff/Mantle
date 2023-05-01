@@ -5,6 +5,10 @@ import com.google.gson.JsonObject;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.math.Transformation;
 import com.mojang.math.Vector3f;
+import io.github.fabricators_of_create.porting_lib.model.BlockGeometryBakingContext;
+import io.github.fabricators_of_create.porting_lib.model.IGeometryBakingContext;
+import io.github.fabricators_of_create.porting_lib.model.IGeometryLoader;
+import io.github.fabricators_of_create.porting_lib.model.IUnbakedGeometry;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.client.renderer.FaceInfo;
 import net.minecraft.client.renderer.block.model.BakedQuad;
@@ -12,6 +16,7 @@ import net.minecraft.client.renderer.block.model.BlockElement;
 import net.minecraft.client.renderer.block.model.BlockElementFace;
 import net.minecraft.client.renderer.block.model.BlockElementRotation;
 import net.minecraft.client.renderer.block.model.BlockFaceUV;
+import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.renderer.block.model.FaceBakery;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -26,9 +31,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.Mth;
-import io.github.fabricators_of_create.porting_lib.model.IModelConfiguration;
-import io.github.fabricators_of_create.porting_lib.model.IModelGeometry;
-import io.github.fabricators_of_create.porting_lib.model.IModelLoader;
 import slimeknights.mantle.util.JsonHelper;
 import slimeknights.mantle.util.LogicHelper;
 
@@ -44,7 +46,7 @@ import static net.minecraft.client.renderer.block.model.BlockModel.FACE_BAKERY;
  * Blonet.minecraft.client.renderer.block.model.BlockModeletting element lighting. Similar to {@link MantleItemLayerModel} but for blocks
  */
 @RequiredArgsConstructor
-public class ColoredBlockModel implements IModelGeometry<ColoredBlockModel> {
+public class ColoredBlockModel implements IUnbakedGeometry<ColoredBlockModel> {
   public static final Loader LOADER = new Loader();
 
   /** Base model to display */
@@ -53,8 +55,9 @@ public class ColoredBlockModel implements IModelGeometry<ColoredBlockModel> {
   private final List<ColorData> colorData;
 
   @Override
-  public Collection<Material> getTextures(IModelConfiguration owner, Function<ResourceLocation,UnbakedModel> modelGetter, Set<Pair<String,String>> missingTextureErrors) {
-    return model.getTextures(owner, modelGetter, missingTextureErrors);
+  public Collection<Material> getMaterials(IGeometryBakingContext owner, Function<ResourceLocation,UnbakedModel> modelGetter, Set<Pair<String,String>> missingTextureErrors) {
+    var _model = ((BlockGeometryBakingContext)owner).owner;
+    return model.getTextures(_model, _model.getElements(), missingTextureErrors);
   }
 
   /**
@@ -68,7 +71,7 @@ public class ColoredBlockModel implements IModelGeometry<ColoredBlockModel> {
    * @param spriteGetter  Sprite getter
    * @param location      Model location
    */
-  public static void bakePart(SimpleBakedModel.Builder builder, IModelConfiguration owner, BlockElement part, int color, int luminosity, ModelState transform, Function<Material,TextureAtlasSprite> spriteGetter, ResourceLocation location) {
+  public static void bakePart(SimpleBakedModel.Builder builder, BlockModel owner, BlockElement part, int color, int luminosity, ModelState transform, Function<Material,TextureAtlasSprite> spriteGetter, ResourceLocation location) {
     for (Direction direction : part.faces.keySet()) {
       BlockElementFace face = part.faces.get(direction);
       // ensure the name is not prefixed (it always is)
@@ -77,7 +80,7 @@ public class ColoredBlockModel implements IModelGeometry<ColoredBlockModel> {
         texture = texture.substring(1);
       }
       // bake the face with the extra colors
-      TextureAtlasSprite sprite = spriteGetter.apply(owner.resolveTexture(texture));
+      TextureAtlasSprite sprite = spriteGetter.apply(owner.getMaterial(texture));
       BakedQuad quad = bakeFace(part, face, sprite, direction, transform, color, luminosity, location);
       // apply cull face
       //noinspection ConstantConditions  the annotation is a liar
@@ -99,10 +102,10 @@ public class ColoredBlockModel implements IModelGeometry<ColoredBlockModel> {
    * @param location      Model bake location
    * @return  Baked model
    */
-  public static BakedModel bakeModel(IModelConfiguration owner, List<BlockElement> elements, List<ColorData> colorData, ModelState transform, ItemOverrides overrides, Function<Material,TextureAtlasSprite> spriteGetter, ResourceLocation location) {
+  public static BakedModel bakeModel(BlockModel owner, List<BlockElement> elements, List<ColorData> colorData, ModelState transform, ItemOverrides overrides, Function<Material,TextureAtlasSprite> spriteGetter, ResourceLocation location) {
     // iterate parts, adding to the builder
-    TextureAtlasSprite particle = spriteGetter.apply(owner.resolveTexture("particle"));
-    SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(owner.useSmoothLighting(), owner.isSideLit(), owner.isShadedInGui(), owner.getCameraTransforms(), overrides).particle(particle);
+    TextureAtlasSprite particle = spriteGetter.apply(owner.getMaterial("particle"));
+    SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(owner.hasAmbientOcclusion(), owner.getGeometry().isGui3d(), owner.getGuiLight().lightLikeBlock(), owner.getTransforms(), overrides).particle(particle);
     int size = elements.size();
     for (int i = 0; i < size; i++) {
       BlockElement part = elements.get(i);
@@ -113,8 +116,8 @@ public class ColoredBlockModel implements IModelGeometry<ColoredBlockModel> {
   }
 
   @Override
-  public BakedModel bake(IModelConfiguration owner, ModelBakery bakery, Function<Material,TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides, ResourceLocation modelLocation) {
-    return bakeModel(owner, model.getElements(), colorData, modelTransform, overrides, spriteGetter, modelLocation);
+  public BakedModel bake(IGeometryBakingContext owner, ModelBakery bakery, Function<Material,TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides, ResourceLocation modelLocation) {
+    return bakeModel(((BlockGeometryBakingContext)owner).owner, model.getElements(), colorData, modelTransform, overrides, spriteGetter, modelLocation);
   }
 
   /**
@@ -134,12 +137,10 @@ public class ColoredBlockModel implements IModelGeometry<ColoredBlockModel> {
   }
 
   /** Loader logic */
-  private static class Loader implements IModelLoader<ColoredBlockModel> {
-    @Override
-    public void onResourceManagerReload(ResourceManager resourceManager) {}
+  private static class Loader implements IGeometryLoader<ColoredBlockModel> {
 
     @Override
-    public ColoredBlockModel read(JsonDeserializationContext deserializationContext, JsonObject modelContents) {
+    public ColoredBlockModel read(JsonObject modelContents, JsonDeserializationContext deserializationContext) {
       SimpleBlockModel model = SimpleBlockModel.deserialize(deserializationContext, modelContents);
       List<ColorData> colorData = JsonHelper.parseList(modelContents, "colors", ColorData::fromJson);
       return new ColoredBlockModel(model, colorData);
