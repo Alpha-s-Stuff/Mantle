@@ -70,8 +70,7 @@ public class RetexturedModel implements IUnbakedGeometry<RetexturedModel> {
 
   @Override
   public Collection<Material> getMaterials(IGeometryBakingContext owner, Function<ResourceLocation,UnbakedModel> modelGetter, Set<Pair<String,String>> missingTextureErrors) {
-    var model = ((BlockGeometryBakingContext)owner).owner;
-    return this.model.getTextures(model, model.getElements(), missingTextureErrors);
+    return this.model.getMaterials(owner, modelGetter, missingTextureErrors);
   }
 
   @Override

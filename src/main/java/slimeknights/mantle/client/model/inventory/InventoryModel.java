@@ -36,8 +36,7 @@ public class InventoryModel implements IUnbakedGeometry<InventoryModel> {
 
   @Override
   public Collection<Material> getMaterials(IGeometryBakingContext owner, Function<ResourceLocation,UnbakedModel> modelGetter, Set<Pair<String,String>> missingTextureErrors) {
-    var _owner = ((BlockGeometryBakingContext)owner).owner;
-    return model.getTextures(_owner, _owner.getElements(), missingTextureErrors);
+    return model.getMaterials(owner, modelGetter, missingTextureErrors);
   }
 
   @Override

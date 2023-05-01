@@ -56,8 +56,7 @@ public class ColoredBlockModel implements IUnbakedGeometry<ColoredBlockModel> {
 
   @Override
   public Collection<Material> getMaterials(IGeometryBakingContext owner, Function<ResourceLocation,UnbakedModel> modelGetter, Set<Pair<String,String>> missingTextureErrors) {
-    var _model = ((BlockGeometryBakingContext)owner).owner;
-    return model.getTextures(_model, _model.getElements(), missingTextureErrors);
+    return model.getMaterials(owner, modelGetter, missingTextureErrors);
   }
 
   /**
@@ -71,7 +70,7 @@ public class ColoredBlockModel implements IUnbakedGeometry<ColoredBlockModel> {
    * @param spriteGetter  Sprite getter
    * @param location      Model location
    */
-  public static void bakePart(SimpleBakedModel.Builder builder, BlockModel owner, BlockElement part, int color, int luminosity, ModelState transform, Function<Material,TextureAtlasSprite> spriteGetter, ResourceLocation location) {
+  public static void bakePart(SimpleBakedModel.Builder builder, IGeometryBakingContext owner, BlockElement part, int color, int luminosity, ModelState transform, Function<Material,TextureAtlasSprite> spriteGetter, ResourceLocation location) {
     for (Direction direction : part.faces.keySet()) {
       BlockElementFace face = part.faces.get(direction);
       // ensure the name is not prefixed (it always is)
@@ -102,10 +101,10 @@ public class ColoredBlockModel implements IUnbakedGeometry<ColoredBlockModel> {
    * @param location      Model bake location
    * @return  Baked model
    */
-  public static BakedModel bakeModel(BlockModel owner, List<BlockElement> elements, List<ColorData> colorData, ModelState transform, ItemOverrides overrides, Function<Material,TextureAtlasSprite> spriteGetter, ResourceLocation location) {
+  public static BakedModel bakeModel(IGeometryBakingContext owner, List<BlockElement> elements, List<ColorData> colorData, ModelState transform, ItemOverrides overrides, Function<Material,TextureAtlasSprite> spriteGetter, ResourceLocation location) {
     // iterate parts, adding to the builder
     TextureAtlasSprite particle = spriteGetter.apply(owner.getMaterial("particle"));
-    SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(owner.hasAmbientOcclusion(), owner.getGeometry().isGui3d(), owner.getGuiLight().lightLikeBlock(), owner.getTransforms(), overrides).particle(particle);
+    SimpleBakedModel.Builder builder = new SimpleBakedModel.Builder(owner.useAmbientOcclusion(), owner.useBlockLight(), owner.isGui3d(), owner.getTransforms(), overrides).particle(particle);
     int size = elements.size();
     for (int i = 0; i < size; i++) {
       BlockElement part = elements.get(i);
@@ -117,7 +116,7 @@ public class ColoredBlockModel implements IUnbakedGeometry<ColoredBlockModel> {
 
   @Override
   public BakedModel bake(IGeometryBakingContext owner, ModelBakery bakery, Function<Material,TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides, ResourceLocation modelLocation) {
-    return bakeModel(((BlockGeometryBakingContext)owner).owner, model.getElements(), colorData, modelTransform, overrides, spriteGetter, modelLocation);
+    return bakeModel(owner, model.getElements(), colorData, modelTransform, overrides, spriteGetter, modelLocation);
   }
 
   /**

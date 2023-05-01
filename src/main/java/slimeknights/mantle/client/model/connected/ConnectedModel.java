@@ -88,8 +88,7 @@ public class ConnectedModel implements IUnbakedGeometry<ConnectedModel> {
 
   @Override
   public Collection<Material> getMaterials(IGeometryBakingContext owner, Function<ResourceLocation,UnbakedModel> modelGetter, Set<Pair<String,String>> missingTextureErrors) {
-    var _model = ((BlockGeometryBakingContext)owner).owner;
-    Collection<Material> textures = model.getTextures(_model, _model.getElements(), missingTextureErrors);
+    Collection<Material> textures = model.getMaterials(owner, modelGetter, missingTextureErrors);
     // for all connected textures, add suffix textures
     Map<String, Material> extraTextures = new HashMap<>();
     for (Entry<String,String[]> entry : connectedTextures.entrySet()) {

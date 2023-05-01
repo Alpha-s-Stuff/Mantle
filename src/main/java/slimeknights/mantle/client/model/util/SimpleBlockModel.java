@@ -102,7 +102,7 @@ public class SimpleBlockModel implements IUnbakedGeometry<SimpleBlockModel> {
    * Fetches parent models for this model and its parents
    * @param modelGetter  Model getter function
    */
-  public void fetchParent(BlockModel owner, Function<ResourceLocation,UnbakedModel> modelGetter) {
+  public void fetchParent(IGeometryBakingContext owner, Function<ResourceLocation,UnbakedModel> modelGetter) {
     // no work if no parent or the parent is fetched already
     if (parent != null || parentLocation == null) {
       return;
@@ -112,7 +112,7 @@ public class SimpleBlockModel implements IUnbakedGeometry<SimpleBlockModel> {
     Set<UnbakedModel> chain = Sets.newLinkedHashSet();
 
     // load the first model directly
-    parent = getParent(modelGetter, chain, parentLocation, owner.name);
+    parent = getParent(modelGetter, chain, parentLocation, owner.getModelName());
     // null means no model, so set missing
     if (parent == null) {
       parent = getMissing(modelGetter);
@@ -183,7 +183,7 @@ public class SimpleBlockModel implements IUnbakedGeometry<SimpleBlockModel> {
    * @param missingTextureErrors  Missing texture set
    * @return  Textures dependencies
    */
-  public static Collection<Material> getTextures(BlockModel owner, List<BlockElement> elements, Set<Pair<String,String>> missingTextureErrors) {
+  public static Collection<Material> getTextures(IGeometryBakingContext owner, List<BlockElement> elements, Set<Pair<String,String>> missingTextureErrors) {
     // always need a particle texture
     Set<Material> textures = Sets.newHashSet(owner.getMaterial("particle"));
     // iterate all elements, fetching needed textures from the material
@@ -191,7 +191,7 @@ public class SimpleBlockModel implements IUnbakedGeometry<SimpleBlockModel> {
       for(BlockElementFace face : part.faces.values()) {
         Material material = owner.getMaterial(face.texture);
         if (Objects.equals(material.texture(), MissingTextureAtlasSprite.getLocation())) {
-          missingTextureErrors.add(Pair.of(face.texture, owner.name));
+          missingTextureErrors.add(Pair.of(face.texture, owner.getModelName()));
         }
         textures.add(material);
       }
@@ -208,9 +208,8 @@ public class SimpleBlockModel implements IUnbakedGeometry<SimpleBlockModel> {
    */
   @Override
   public Collection<Material> getMaterials(IGeometryBakingContext context, Function<ResourceLocation, UnbakedModel> modelGetter, Set<Pair<String, String>> missingTextureErrors) {
-    var owner = ((BlockGeometryBakingContext)context).owner;
-    this.fetchParent(owner, modelGetter);
-    return getTextures(owner, getElements(), missingTextureErrors);
+    this.fetchParent(context, modelGetter);
+    return getTextures(context, getElements(), missingTextureErrors);
   }
 
 

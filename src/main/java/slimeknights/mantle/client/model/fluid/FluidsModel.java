@@ -37,8 +37,8 @@ public class FluidsModel implements IUnbakedGeometry<FluidsModel> {
 
   @Override
   public Collection<Material> getMaterials(IGeometryBakingContext owner, Function<ResourceLocation,UnbakedModel> modelGetter, Set<Pair<String,String>> missingTextureErrors) {
-    var _owner = ((BlockGeometryBakingContext)owner).owner;
-    return model.getTextures(_owner, _owner.getElements(), missingTextureErrors);  }
+    return model.getMaterials(owner, modelGetter, missingTextureErrors);
+  }
 
   @Override
   public BakedModel bake(IGeometryBakingContext owner, ModelBakery bakery, Function<Material,TextureAtlasSprite> spriteGetter, ModelState transform, ItemOverrides overrides, ResourceLocation location) {
