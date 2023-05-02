@@ -23,6 +23,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.level.material.Fluid;
 import slimeknights.mantle.client.model.util.ModelHelper;
+import slimeknights.mantle.registration.ModelFluidAttributes;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
@@ -95,7 +96,7 @@ public class FluidTextureModel implements IUnbakedGeometry<FluidTextureModel> {
   }
 
   /** Model loader, also doubles as the fluid model provider */
-  private static class Loader implements IGeometryLoader<FluidTextureModel> {
+  private static class Loader implements ModelFluidAttributes.IFluidModelProvider, IGeometryLoader<FluidTextureModel> {
     private final Map<Fluid,Baked> modelCache = new ConcurrentHashMap<>();
 
     /** Gets a model for a fluid */
@@ -110,7 +111,7 @@ public class FluidTextureModel implements IUnbakedGeometry<FluidTextureModel> {
       return modelCache.computeIfAbsent(fluid, this::getFluidModel);
     }
 
-    /*@Override
+    @Override
     @Nullable
     public ResourceLocation getStillTexture(Fluid fluid) {
       Baked model = getCachedModel(fluid);
@@ -135,7 +136,7 @@ public class FluidTextureModel implements IUnbakedGeometry<FluidTextureModel> {
     public int getColor(Fluid fluid) {
       Baked model = getCachedModel(fluid);
       return model == null ? -1 : model.getColor();
-    }*/
+    }
 
     @Override
     public FluidTextureModel read(JsonObject modelContents, JsonDeserializationContext deserializationContext) {
