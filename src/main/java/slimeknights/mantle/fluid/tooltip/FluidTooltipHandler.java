@@ -245,7 +245,7 @@ public class FluidTooltipHandler extends SimpleJsonResourceReloadListener implem
    */
   public static void appendShift(List<Component> tooltip) {
     if(!SafeClientAccess.getTooltipKey().isShiftOrUnknown()) {
-      tooltip.add((Component) Component.EMPTY);
+      tooltip.add(Component.empty());
       tooltip.add(HOLD_SHIFT);
     }
   }

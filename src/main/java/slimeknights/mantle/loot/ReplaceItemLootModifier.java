@@ -133,7 +133,7 @@ public class ReplaceItemLootModifier extends LootModifier {
 
   @Override
   public Codec<? extends IGlobalLootModifier> codec() {
-    return null;
+    return CODEC;
   }
 
   /*public static class Serializer extends GlobalLootModifierSerializer<ReplaceItemLootModifier> {

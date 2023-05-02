@@ -141,7 +141,7 @@ public class TextComponentDataRenderer {
     }
 
     if (BookScreen.debug && !action.isEmpty()) {
-      tooltip.add((Component) Component.EMPTY);
+      tooltip.add(Component.empty());
       tooltip.add(Component.literal("Action: " + action).withStyle(ChatFormatting.GRAY));
     }
 
