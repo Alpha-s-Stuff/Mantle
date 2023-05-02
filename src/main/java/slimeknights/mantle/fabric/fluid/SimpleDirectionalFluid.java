@@ -6,6 +6,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
@@ -16,6 +17,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
+import slimeknights.mantle.fluid.attributes.FluidAttributes;
 import slimeknights.mantle.util.SimpleFlowableFluid;
 
 import javax.annotation.Nullable;
@@ -154,6 +156,7 @@ public abstract class SimpleDirectionalFluid extends StarFluid {
   public static class Properties {
     private Supplier<? extends Fluid> still;
     private Supplier<? extends Fluid> flowing;
+    public FluidAttributes.Builder attributes;
     private boolean infinite;
     private Supplier<? extends Item> bucket;
     private Supplier<? extends LiquidBlock> block;
@@ -163,9 +166,10 @@ public abstract class SimpleDirectionalFluid extends StarFluid {
     private int tickRate = 5;
     private Direction flowDirection = Direction.DOWN;
 
-    public Properties(Supplier<? extends Fluid> still, Supplier<? extends Fluid> flowing) {
+    public Properties(Supplier<? extends Fluid> still, Supplier<? extends Fluid> flowing, FluidAttributes.Builder attributes) {
       this.still = still;
       this.flowing = flowing;
+      this.attributes = attributes;
     }
 
     public Properties canMultiply() {

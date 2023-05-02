@@ -8,6 +8,7 @@ import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.item.Item;
 import slimeknights.mantle.fabric.fluid.SimpleDirectionalFluid;
+import slimeknights.mantle.fluid.attributes.FluidAttributes;
 import slimeknights.mantle.util.SimpleFlowableFluid;
 
 import java.util.function.Supplier;
@@ -19,6 +20,7 @@ import java.util.function.Supplier;
 @Setter
 @RequiredArgsConstructor
 public class FluidBuilder {
+  private final FluidAttributes.Builder attributes;
   private boolean canMultiply = false;
   private Supplier<? extends Item> bucket;
   private Supplier<? extends LiquidBlock> block;
@@ -40,13 +42,13 @@ public class FluidBuilder {
    * @return  Forge fluid properties
    */
   public SimpleFlowableFluid.Properties build(Supplier<? extends Fluid> still, Supplier<? extends Fluid> flowing) {
-    SimpleFlowableFluid.Properties properties = new SimpleFlowableFluid.Properties(still, flowing)
-        .flowSpeed(this.slopeFindDistance)
-        .levelDecreasePerBlock(this.levelDecreasePerBlock)
-        .blastResistance(this.explosionResistance)
-        .tickRate(this.tickRate)
-        .block(this.block)
-        .bucket(this.bucket);
+    SimpleFlowableFluid.Properties properties = new SimpleFlowableFluid.Properties(still, flowing, this.attributes)
+      .flowSpeed(this.slopeFindDistance)
+      .levelDecreasePerBlock(this.levelDecreasePerBlock)
+      .blastResistance(this.explosionResistance)
+      .tickRate(this.tickRate)
+      .block(this.block)
+      .bucket(this.bucket);
     if (this.canMultiply) {
       properties.canMultiply();
     }
@@ -60,7 +62,7 @@ public class FluidBuilder {
    * @return  Forge fluid properties
    */
   public SimpleDirectionalFluid.Properties buildUpsideDownFluid(Supplier<? extends Fluid> still, Supplier<? extends Fluid> flowing) {
-    SimpleDirectionalFluid.Properties properties = new SimpleDirectionalFluid.Properties(still, flowing)
+    SimpleDirectionalFluid.Properties properties = new SimpleDirectionalFluid.Properties(still, flowing, this.attributes)
       .flowSpeed(this.slopeFindDistance)
       .levelDecreasePerBlock(this.levelDecreasePerBlock)
       .blastResistance(this.explosionResistance)
