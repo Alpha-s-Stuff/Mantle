@@ -9,8 +9,7 @@ import io.github.fabricators_of_create.porting_lib.event.client.OverlayRenderCal
 import io.github.fabricators_of_create.porting_lib.event.client.OverlayRenderCallback.Types;
 import io.github.fabricators_of_create.porting_lib.event.client.RegisterGeometryLoadersCallback;
 import io.github.fabricators_of_create.porting_lib.event.client.RegisterShadersCallback;
-import io.github.fabricators_of_create.porting_lib.model.GeometryLoaderManager;
-import io.github.fabricators_of_create.porting_lib.model.IGeometryLoader;
+import io.github.fabricators_of_create.porting_lib.model.geometry.IGeometryLoader;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.impl.client.indigo.renderer.helper.GeometryHelper;

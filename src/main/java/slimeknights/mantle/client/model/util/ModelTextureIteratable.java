@@ -2,8 +2,8 @@ package slimeknights.mantle.client.model.util;
 
 import com.mojang.datafixers.util.Either;
 import io.github.fabricators_of_create.porting_lib.mixin.client.accessor.BlockModelAccessor;
-import io.github.fabricators_of_create.porting_lib.model.BlockGeometryBakingContext;
-import io.github.fabricators_of_create.porting_lib.model.IGeometryBakingContext;
+import io.github.fabricators_of_create.porting_lib.model.geometry.BlockGeometryBakingContext;
+import io.github.fabricators_of_create.porting_lib.model.geometry.IGeometryBakingContext;
 import lombok.AllArgsConstructor;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.resources.model.UnbakedModel;

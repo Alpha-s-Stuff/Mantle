@@ -6,6 +6,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandlerRegistry;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BucketItem;
@@ -87,10 +88,14 @@ public class FluidDeferredRegister extends DeferredRegisterWrapper<Fluid> {
     F stillFluid = Registry.register(Registry.FLUID, new ResourceLocation(this.modID, name), still.apply(props));
     FluidAttributes attributes = props.attributes.build(stillFluid);
     FluidVariantAttributes.register(stillFluid, new FluidAttributeHandler(attributes));
-    EnvExecutor.runWhenOn(EnvType.CLIENT, () -> () -> FluidRenderHandlerRegistry.INSTANCE.register(stillFluid, new FluidAttributeClientHandler(attributes)));
+    if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
+      EnvExecutor.runWhenOn(EnvType.CLIENT, () -> () -> FluidRenderHandlerRegistry.INSTANCE.register(stillFluid, new FluidAttributeClientHandler(attributes)));
+    }
     F flowingFluid = Registry.register(Registry.FLUID, new ResourceLocation(this.modID, "flowing_" + name), flowing.apply(props));
     FluidVariantAttributes.register(flowingFluid, new FluidAttributeHandler(attributes));
-    EnvExecutor.runWhenOn(EnvType.CLIENT, () -> () -> FluidRenderHandlerRegistry.INSTANCE.register(flowingFluid, new FluidAttributeClientHandler(attributes)));
+    if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
+      EnvExecutor.runWhenOn(EnvType.CLIENT, () -> () -> FluidRenderHandlerRegistry.INSTANCE.register(flowingFluid, new FluidAttributeClientHandler(attributes)));
+    }
     Supplier<F> stillSup = () -> stillFluid;
     Supplier<F> flowingSup = () -> flowingFluid;
     stillDelayed.setSupplier(stillSup);
@@ -166,7 +171,7 @@ public class FluidDeferredRegister extends DeferredRegisterWrapper<Fluid> {
     FluidVariantAttributes.register(stillFluid, new FluidAttributeHandler(attributes));
     F flowingFluid = Registry.register(Registry.FLUID, new ResourceLocation(this.modID, "flowing_" + name), flowing.apply(props));
     FluidVariantAttributes.register(flowingFluid, new FluidAttributeHandler(attributes));
-    EnvExecutor.runWhenOn(EnvType.CLIENT, () -> () -> FluidRenderHandlerRegistry.INSTANCE.register(stillFluid, flowingFluid, new UpsideDownFluidAttributeClientHandler(attributes)));
+    //EnvExecutor.runWhenOn(EnvType.CLIENT, () -> () -> FluidRenderHandlerRegistry.INSTANCE.register(stillFluid, flowingFluid, new UpsideDownFluidAttributeClientHandler(attributes)));
     Supplier<F> stillSup = () -> stillFluid;
     Supplier<F> flowingSup = () -> flowingFluid;
     stillDelayed.setSupplier(stillSup);

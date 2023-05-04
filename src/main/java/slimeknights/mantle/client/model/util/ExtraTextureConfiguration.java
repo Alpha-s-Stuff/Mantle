@@ -1,7 +1,7 @@
 package slimeknights.mantle.client.model.util;
 
 import com.google.common.collect.ImmutableMap;
-import io.github.fabricators_of_create.porting_lib.model.IGeometryBakingContext;
+import io.github.fabricators_of_create.porting_lib.model.geometry.IGeometryBakingContext;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.resources.model.Material;
