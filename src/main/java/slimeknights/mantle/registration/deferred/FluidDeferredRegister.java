@@ -18,6 +18,7 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Material;
 import slimeknights.mantle.fabric.fluid.SimpleDirectionalFluid;
 import slimeknights.mantle.fluid.attributes.FluidAttributes;
+import slimeknights.mantle.item.DispensibleBucketItem;
 import slimeknights.mantle.registration.DelayedSupplier;
 import slimeknights.mantle.registration.FluidAttributeClientHandler;
 import slimeknights.mantle.registration.FluidAttributeHandler;
@@ -56,7 +57,7 @@ public class FluidDeferredRegister extends DeferredRegisterWrapper<Fluid> {
    * @return  Fluid to supply
    */
   public <I extends Fluid> RegistryObject<I> registerFluid(final String name, final Supplier<? extends I> sup) {
-    return (RegistryObject<I>) register.register(name, sup);
+    return register.register(name, sup);
   }
 
   /**
@@ -79,7 +80,7 @@ public class FluidDeferredRegister extends DeferredRegisterWrapper<Fluid> {
 
     // create block and bucket, they just need a still supplier
     RegistryObject<LiquidBlock> blockObj = blockRegister.register(name + "_fluid", () -> block.apply(stillDelayed));
-    builder.bucket(itemRegister.register(name + "_bucket", () -> new BucketItem(stillDelayed.get(), ItemProperties.BUCKET_PROPS)));
+    builder.bucket(itemRegister.register(name + "_bucket", () -> new DispensibleBucketItem(stillDelayed.get(), ItemProperties.BUCKET_PROPS)));
 
     // create props with the suppliers
     Properties props = builder.block(blockObj).build(stillDelayed, flowingDelayed);

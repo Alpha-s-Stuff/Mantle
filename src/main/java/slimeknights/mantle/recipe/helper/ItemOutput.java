@@ -4,6 +4,12 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSyntaxException;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.Dynamic;
+import com.mojang.serialization.JsonOps;
+import io.github.fabricators_of_create.porting_lib.loot.LootModifierManager;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
@@ -14,15 +20,22 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
 import io.github.fabricators_of_create.porting_lib.crafting.CraftingHelper;
+import slimeknights.mantle.loot.MantleLoot;
 import slimeknights.mantle.util.JsonHelper;
 
 import java.util.Objects;
 import java.util.function.Supplier;
 
+import static slimeknights.mantle.loot.MantleLoot.LOOT_MOD_GSON;
+
 /**
  * Class representing an item stack output. Supports both direct stacks and tag output, behaving like an ingredient used for output
  */
+@NoArgsConstructor
 public abstract class ItemOutput implements Supplier<ItemStack> {
+  public static final Codec<ItemOutput> ITEM_OUTPUT_CODEC = Codec.PASSTHROUGH.flatXmap(dynamic -> DataResult.success(ItemOutput.fromJson(MantleLoot.getJson(dynamic))), itemOutput -> DataResult.success(new Dynamic<>(JsonOps.INSTANCE, itemOutput.serialize())));
+
+
   /**
    * Gets the item output of this recipe
    * @return  Item output

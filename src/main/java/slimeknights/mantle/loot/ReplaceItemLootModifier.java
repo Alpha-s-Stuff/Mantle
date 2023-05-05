@@ -43,29 +43,10 @@ import java.util.function.BiFunction;
 import static slimeknights.mantle.loot.AddEntryLootModifier.LOOT_ITEM_FUNCTIONS_CODEC;
 import static slimeknights.mantle.loot.AddEntryLootModifier.LOOT_POOL_ENTRY_CODEC;
 import static slimeknights.mantle.loot.MantleLoot.LOOT_MOD_GSON;
+import static slimeknights.mantle.recipe.helper.ItemOutput.ITEM_OUTPUT_CODEC;
 
 /** Loot modifier to replace an item with another */
 public class ReplaceItemLootModifier extends LootModifier {
-  public static final Codec<ItemOutput> ITEM_OUTPUT_CODEC = Codec.PASSTHROUGH.flatXmap(
-    d -> {
-      try {
-        ItemOutput conditions = LOOT_MOD_GSON.fromJson(MantleLoot.getJson(d), ItemOutput.class);
-        return DataResult.success(conditions);
-      } catch (JsonSyntaxException e) {
-        LootModifierManager.LOGGER.warn("Unable to decode loot modifier conditions", e);
-        return DataResult.error(e.getMessage());
-      }
-    }, conditions -> {
-      try {
-        JsonElement element = LOOT_MOD_GSON.toJsonTree(conditions, ItemOutput.class);
-        return DataResult.success(new Dynamic<>(JsonOps.INSTANCE, element));
-      } catch (JsonSyntaxException e) {
-        LootModifierManager.LOGGER.warn("Unable to encode loot modifier conditions", e);
-        return DataResult.error(e.getMessage());
-      }
-    }
-  );
-
   public static final Codec<Ingredient> INGREDIENT = Codec.PASSTHROUGH.flatXmap(
     d -> {
       try {
