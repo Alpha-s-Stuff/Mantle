@@ -98,8 +98,8 @@ public class MantleItemLayerModel implements IUnbakedGeometry<MantleItemLayerMod
       builder.addAll(getQuadsForSprite(data.color(), data.noTint() ? -1 : i, sprite, transform, data.luminosity(), pixels));
     }
     // transform data
-    ImmutableMap<ItemTransforms.TransformType,Transformation> transformMap = PerspectiveMapWrapper.getTransforms(new CompositeModelState(new SimpleModelState(owner.getRootTransform(), false), modelTransform));
-    return new BakedItemModel(builder.build(), particle, Maps.immutableEnumMap(transformMap), overrides, true, owner.isGui3d());
+    ImmutableMap<ItemTransforms.TransformType,Transformation> transformMap = PerspectiveMapWrapper.getTransforms(owner.getTransforms());
+    return new BakedItemModel(builder.build(), particle, transformMap, overrides, true, owner.isGui3d());
   }
 
   /**

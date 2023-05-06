@@ -2,6 +2,7 @@ package slimeknights.mantle.inventory;
 
 import net.minecraft.world.item.ItemStack;
 import slimeknights.mantle.transfer.item.IItemHandler;
+import slimeknights.mantle.transfer.item.IItemHandlerModifiable;
 import slimeknights.mantle.transfer.item.SlotItemHandler;
 
 /** Forge still uses dumb vanilla logic for determining slot limits instead of their own method */

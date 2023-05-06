@@ -17,7 +17,9 @@ import slimeknights.mantle.inventory.WrapperSlot;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Stream;
 
 public class MultiModuleScreen<CONTAINER extends MultiModuleContainerMenu<?>> extends AbstractContainerScreen<CONTAINER> {
 
@@ -71,6 +73,13 @@ public class MultiModuleScreen<CONTAINER extends MultiModuleContainerMenu<?>> ex
     for (ModuleScreen<?,?> module : this.modules) {
       module.init(this.minecraft, width, height);
       this.updateSubmodule(module);
+      var slots = this.menu.slots.stream().filter(slot -> getModuleForSlot(slot.index) == module);
+      slots.forEach(slot -> {
+        if (slot instanceof WrapperSlot wrapper) {
+          wrapper.x = wrapper.parent.x;
+          wrapper.y = wrapper.parent.y;
+        }
+      });
     }
   }
 

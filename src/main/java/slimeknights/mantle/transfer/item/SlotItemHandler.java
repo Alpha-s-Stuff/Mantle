@@ -50,6 +50,11 @@ public class SlotItemHandler extends Slot {
   }
 
   @Override
+  public void initialize(ItemStack itemStack) {
+    this.set(itemStack);
+  }
+
+  @Override
   public int getMaxStackSize(@Nonnull ItemStack stack) {
     ItemStack maxAdd = stack.copy();
     int maxInput = stack.getMaxStackSize();
@@ -57,8 +62,7 @@ public class SlotItemHandler extends Slot {
 
     IItemHandler handler = this.getItemHandler();
     ItemStack currentStack = handler.getStackInSlot(index);
-    if (handler instanceof IItemHandlerModifiable) {
-      IItemHandlerModifiable handlerModifiable = (IItemHandlerModifiable) handler;
+    if (handler instanceof IItemHandlerModifiable handlerModifiable) {
 
       handlerModifiable.setStackInSlot(index, ItemStack.EMPTY);
 

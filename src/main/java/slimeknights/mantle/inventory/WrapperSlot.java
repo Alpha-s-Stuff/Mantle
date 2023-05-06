@@ -16,6 +16,8 @@ public class WrapperSlot extends Slot {
   public WrapperSlot(Slot slot) {
     super(slot.container, slot.getSlotIndex(), slot.x, slot.y);
     this.parent = slot;
+    this.x = slot.x;
+    this.y = slot.y;
   }
 
   @Override
@@ -46,6 +48,11 @@ public class WrapperSlot extends Slot {
   @Override
   public void onTake(Player playerIn, ItemStack stack) {
     this.parent.onTake(playerIn, stack);
+  }
+
+  @Override
+  public void initialize(ItemStack itemStack) {
+    this.parent.initialize(itemStack);
   }
 
   @Override
