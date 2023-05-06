@@ -26,10 +26,10 @@ public class MetalItemObject extends ItemObject<Block> {
     super(block);
     this.ingot = ingot;
     this.nugget = nugget;
-    this.blockTag = TagKey.create(Registry.BLOCK_REGISTRY, new ResourceLocation("c", "storage_blocks/" + tagName));
-    this.blockItemTag = getTag("storage_blocks/" + tagName);
-    this.ingotTag = getTag("ingots/" + tagName);
-    this.nuggetTag = getTag("nuggets/" + tagName);
+    this.blockTag = TagKey.create(Registry.BLOCK_REGISTRY, new ResourceLocation("c", tagName + "_storage_blocks"));
+    this.blockItemTag = getTag(tagName + "_storage_blocks");
+    this.ingotTag = getTag(tagName + "_ingots");
+    this.nuggetTag = getTag(tagName + "_nuggets");
   }
 
   /** Gets the ingot for this object */
