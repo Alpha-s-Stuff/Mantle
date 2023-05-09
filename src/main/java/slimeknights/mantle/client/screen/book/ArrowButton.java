@@ -25,7 +25,7 @@ public class ArrowButton extends Button {
   public int hoverColor;
 
   public ArrowButton(@Nullable BookData bookData, int x, int y, ArrowType arrowType, int color, int hoverColor, OnPress iPressable) {
-    super(x, y, arrowType.w, arrowType.h, (Component) MutableComponent.EMPTY, iPressable);
+    super(x, y, arrowType.w, arrowType.h, Component.empty(), iPressable);
 
     this.arrowType = arrowType;
     this.color = color;
