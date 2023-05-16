@@ -126,7 +126,7 @@ dependencies {
     // api for REI
     modImplementation("dev.architectury:architectury-fabric:${project.architectury_version}")
 
-    modRuntimeOnly("com.simibubi.create:create-fabric-${project.minecraft_version}:${project.create_version}+${project.minecraft_version}")
+    //modRuntimeOnly("com.simibubi.create:create-fabric-${project.minecraft_version}:${project.create_version}+${project.minecraft_version}")
 
     modCompileOnly("mezz.jei:jei-${project.minecraft_version}-fabric:${project.jei_version}") { transitive = false }
 

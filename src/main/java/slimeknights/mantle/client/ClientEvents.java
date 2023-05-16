@@ -4,19 +4,22 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import io.github.fabricators_of_create.porting_lib.event.client.ModelLoadCallback;
+import com.mojang.datafixers.util.Either;
+import com.mojang.datafixers.util.Pair;
 import io.github.fabricators_of_create.porting_lib.event.client.OverlayRenderCallback;
 import io.github.fabricators_of_create.porting_lib.event.client.OverlayRenderCallback.Types;
 import io.github.fabricators_of_create.porting_lib.event.client.RegisterGeometryLoadersCallback;
 import io.github.fabricators_of_create.porting_lib.event.client.RegisterShadersCallback;
 import io.github.fabricators_of_create.porting_lib.model.geometry.IGeometryLoader;
+import io.github.fabricators_of_create.porting_lib.util.EnvExecutor;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandler;
+import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandlerRegistry;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
-import net.fabricmc.fabric.impl.client.indigo.renderer.helper.GeometryHelper;
 import net.minecraft.client.AttackIndicatorStatus;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
-import net.minecraft.client.color.block.BlockColors;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
@@ -24,10 +27,9 @@ import net.minecraft.client.renderer.blockentity.SignRenderer;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
-import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.level.GameType;
+import net.minecraft.world.level.material.FlowingFluid;
 import slimeknights.mantle.Mantle;
 import slimeknights.mantle.client.book.BookLoader;
 import slimeknights.mantle.client.book.repository.FileRepository;
@@ -41,13 +43,19 @@ import slimeknights.mantle.client.model.inventory.InventoryModel;
 import slimeknights.mantle.client.model.util.ColoredBlockModel;
 import slimeknights.mantle.client.model.util.MantleItemLayerModel;
 import slimeknights.mantle.client.model.util.ModelHelper;
+import slimeknights.mantle.fabric.fluid.SimpleDirectionalFluid;
+import slimeknights.mantle.fluid.attributes.FluidAttributes;
 import slimeknights.mantle.fluid.tooltip.FluidTooltipHandler;
 import slimeknights.mantle.client.render.MantleShaders;
 import slimeknights.mantle.network.MantleNetwork;
+import slimeknights.mantle.registration.FluidAttributeClientHandler;
 import slimeknights.mantle.registration.MantleRegistrations;
 import slimeknights.mantle.registration.RegistrationHelper;
 import slimeknights.mantle.util.OffhandCooldownTracker;
+import slimeknights.mantle.util.SimpleFlowableFluid;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -56,6 +64,7 @@ import static net.minecraft.client.renderer.Sheets.SIGN_SHEET;
 @SuppressWarnings("unused")
 public class ClientEvents implements ClientModInitializer {
   private static final Function<OffhandCooldownTracker,Float> COOLDOWN_TRACKER = OffhandCooldownTracker::getCooldown;
+  private static final List<Map.Entry<Either<? extends FlowingFluid, Pair<? extends FlowingFluid, ? extends FlowingFluid>>, ? extends FluidRenderHandler>> FLUID_RENDERERS = new LinkedList<>();
 
   static void registerEntityRenderers() {
     BlockEntityRenderers.register(MantleRegistrations.SIGN, SignRenderer::new);
@@ -83,6 +92,17 @@ public class ClientEvents implements ClientModInitializer {
     RegisterGeometryLoadersCallback.EVENT.register(ClientEvents::registerModelLoaders);
     commonSetup();
     MantleNetwork.INSTANCE.network.initClientListener();
+
+    FLUID_RENDERERS.forEach((kvp) -> {
+      kvp.getKey().ifLeft(key -> FluidRenderHandlerRegistry.INSTANCE.register(key, kvp.getValue())).ifRight(keys -> FluidRenderHandlerRegistry.INSTANCE.register(keys.getFirst(), keys.getSecond(), kvp.getValue()));
+    });
+  }
+
+  public static <F extends SimpleFlowableFluid> void deferFluidRenderHandler(F fluid, FluidAttributes attributes) {
+    FLUID_RENDERERS.add(Map.entry(Either.left(fluid), new FluidAttributeClientHandler(attributes)));
+  }
+  public static <F extends SimpleDirectionalFluid> void deferUpsideDownFluidRenderHandler(F still, F flowing, FluidAttributes attributes) {
+    FLUID_RENDERERS.add(Map.entry(Either.right(Pair.of(still, flowing)), new FluidAttributeClientHandler(attributes)));
   }
 
   static void registerModelLoaders(Map<ResourceLocation, IGeometryLoader<?>> callback) {
