@@ -48,8 +48,6 @@ import net.minecraft.world.phys.BlockHitResult;
  */
 public class FluidAttributes
 {
-  public static final int BUCKET_VOLUME = 1000;
-
   private String translationKey;
 
   private final ResourceLocation stillTexture;
