@@ -1,10 +1,6 @@
 package slimeknights.mantle.item;
 
-import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroupEntries;
-import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.core.Holder;
-import net.minecraft.core.NonNullList;
-import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.tags.TagKey;
@@ -40,7 +36,7 @@ public class RetexturedBlockItem extends BlockTooltipItem {
     this.textureTag = textureTag;
   }
 
-  public void fillItemCategory(FabricItemGroupEntries items) {
+  public void fillItemCategory(CreativeModeTab.Output items) {
     addTagVariants(this.getBlock(), textureTag, items, true);
   }
 
@@ -117,7 +113,7 @@ public class RetexturedBlockItem extends BlockTooltipItem {
    * @param list              List of texture blocks
    * @param showAllVariants   If true, shows all variants. If false, shows just the first
    */
-  public static void addTagVariants(ItemLike block, TagKey<Item> tag, FabricItemGroupEntries list, boolean showAllVariants) {
+  public static void addTagVariants(ItemLike block, TagKey<Item> tag, CreativeModeTab.Output list, boolean showAllVariants) {
     boolean added = false;
     // using item tags as that is what will be present in the recipe
     Class<?> clazz = block.getClass();
