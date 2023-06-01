@@ -212,6 +212,8 @@ public class RetexturedModel implements IUnbakedGeometry<RetexturedModel> {
           return;
         }
         ((FabricBakedModel)getCachedModel(block)).emitBlockQuads(blockView, state, pos, randomSupplier, context);
+      } else {
+        super.emitBlockQuads(blockView, state, pos, randomSupplier, context);
       }
     }
 

@@ -358,14 +358,14 @@ public class ConnectedModel implements IUnbakedGeometry<ConnectedModel> {
     }
 
     @Nonnull
-    public SinglePropertyData getModelData(BlockAndTintGetter world, BlockPos pos, BlockState state, SinglePropertyData tileData) {
+    public SinglePropertyData<Byte> getModelData(BlockAndTintGetter world, BlockPos pos, BlockState state, SinglePropertyData<Byte> tileData) {
       // if the data is already defined, return it, will happen in multipart models
       if (tileData.getData(CONNECTIONS) != null) {
         return tileData;
       }
 
       // if the property is not supported, make new data instance
-      SinglePropertyData data = tileData;
+      SinglePropertyData<Byte> data = tileData;
       if (!data.hasProperty(CONNECTIONS)) {
         data = new SinglePropertyData<>(CONNECTIONS);
       }
@@ -397,17 +397,12 @@ public class ConnectedModel implements IUnbakedGeometry<ConnectedModel> {
 
     @Override
     public void emitBlockQuads(BlockAndTintGetter blockView, BlockState state, BlockPos pos, Supplier<RandomSource> randomSupplier, RenderContext context) {
-      SinglePropertyData data = getModelData(blockView, pos, state, new SinglePropertyData<>(CONNECTIONS));
+      SinglePropertyData<Byte> data = getModelData(blockView, pos, state, new SinglePropertyData<>(CONNECTIONS));
       // try model data first
-      Byte connections = (Byte) data.getData(CONNECTIONS);
+      Byte connections = data.getData(CONNECTIONS);
       // if model data failed, try block state
       // temporary fallback until Forge has model data in multipart/weighted random
       if (connections == null) {
-        // no state? return original
-        if (state == null) {
-          super.emitBlockQuads(blockView, state, pos, randomSupplier, context);
-          return;
-        }
         // this will return original if the state is missing all properties
         Transformation rotation = transforms.getRotation();
         connections = getConnections((dir) -> {
