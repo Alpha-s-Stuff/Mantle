@@ -61,16 +61,21 @@ public class SimpleBlockModel implements IUnbakedGeometry<SimpleBlockModel> {
   private ResourceLocation parentLocation;
   /** Model parts for baked model, if empty uses parent parts */
   private final List<BlockElement> parts;
+  /** Fallback textures in case the owner does not contain a block model */
+  @Getter
+  private final Map<String,Either<Material, String>> textures;
   @Getter
   private BlockModel parent;
 
   /**
    * Creates a new simple block model
    * @param parentLocation  Location of the parent model, if unset has no parent
+   * @param textures        List of textures for iteration, in case the owner is not BlockModel
    * @param parts           List of parts in the model
    */
-  public SimpleBlockModel(@Nullable ResourceLocation parentLocation, List<BlockElement> parts) {
+  public SimpleBlockModel(@Nullable ResourceLocation parentLocation, Map<String,Either<Material,String>> textures, List<BlockElement> parts) {
     this.parts = parts;
+    this.textures = textures;
     this.parentLocation = parentLocation;
   }
 
@@ -304,6 +309,7 @@ public class SimpleBlockModel implements IUnbakedGeometry<SimpleBlockModel> {
     ResourceLocation parent = parentName.isEmpty() ? null : new ResourceLocation(parentName);
 
     // textures, empty map if missing
+    Map<String, Either<Material, String>> textureMap;
     if (json.has("textures")) {
       ImmutableMap.Builder<String, Either<Material, String>> builder = new ImmutableMap.Builder<>();
       ResourceLocation atlas = InventoryMenu.BLOCK_ATLAS;
@@ -311,6 +317,9 @@ public class SimpleBlockModel implements IUnbakedGeometry<SimpleBlockModel> {
       for(Entry<String, JsonElement> entry : textures.entrySet()) {
         builder.put(entry.getKey(), BlockModel.Deserializer.parseTextureLocationOrReference(atlas, entry.getValue().getAsString()));
       }
+      textureMap = builder.build();
+    } else {
+      textureMap = Collections.emptyMap();
     }
 
     // elements, empty list if missing
@@ -320,7 +329,7 @@ public class SimpleBlockModel implements IUnbakedGeometry<SimpleBlockModel> {
     } else {
       parts = Collections.emptyList();
     }
-    return new SimpleBlockModel(parent, parts);
+    return new SimpleBlockModel(parent, textureMap, parts);
   }
 
   /**

@@ -34,8 +34,7 @@ public class ModelTextureIteratable implements Iterable<Map<String,Either<Materi
    * @return  Iteratable over block model texture maps
    */
   public static ModelTextureIteratable of(BlockModel owner, SimpleBlockModel fallback) {
-    return new ModelTextureIteratable(null, owner);
-//    return new ModelTextureIteratable(fallback.getTextures(), fallback.getParent());
+    return new ModelTextureIteratable(fallback.getTextures(), fallback.getParent());
   }
 
   @Override
