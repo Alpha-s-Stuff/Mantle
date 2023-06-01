@@ -35,11 +35,9 @@ public class RetexturedBlockItem extends BlockTooltipItem {
 
   /** Tag used for getting the texture */
   protected final TagKey<Item> textureTag;
-  public RetexturedBlockItem(Block block, TagKey<Item> textureTag, Properties builder, @Nullable CreativeModeTab tab) {
+  public RetexturedBlockItem(Block block, TagKey<Item> textureTag, Properties builder) {
     super(block, builder);
     this.textureTag = textureTag;
-    if (tab != null)
-      ItemGroupEvents.modifyEntriesEvent(tab).register(this::fillItemCategory);
   }
 
   public void fillItemCategory(FabricItemGroupEntries items) {
