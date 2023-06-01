@@ -1,13 +1,11 @@
 package slimeknights.mantle.item;
 
 import com.mojang.datafixers.util.Pair;
-import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.food.FoodProperties;
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -22,16 +20,13 @@ public class EdibleItem extends Item {
   /** if false, does not display effects of food in tooltip */
   private boolean displayEffectsTooltip;
 
-  public EdibleItem(FoodProperties foodIn, CreativeModeTab itemGroup) {
-    this(foodIn, itemGroup, true);
+  public EdibleItem(FoodProperties foodIn) {
+    this(foodIn, true);
   }
 
-  public EdibleItem(FoodProperties foodIn, CreativeModeTab itemGroup, boolean displayEffectsTooltip) {
+  public EdibleItem(FoodProperties foodIn, boolean displayEffectsTooltip) {
     super(new Properties().food(foodIn));
     this.displayEffectsTooltip = displayEffectsTooltip;
-    ItemGroupEvents.modifyEntriesEvent(itemGroup).register(entries -> {
-      entries.accept(this);
-    });
   }
 
   @Override
