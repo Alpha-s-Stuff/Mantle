@@ -1,14 +1,12 @@
 package slimeknights.mantle.registration.deferred;
 
 import io.github.fabricators_of_create.porting_lib.util.RegistryObject;
-import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.object.builder.v1.block.type.BlockSetTypeRegistry;
 import net.fabricmc.fabric.api.object.builder.v1.block.type.WoodTypeRegistry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.DoubleHighBlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.SignItem;
@@ -213,10 +211,9 @@ public class BlockDeferredRegister extends DeferredRegisterWrapper<Block> {
    * @param name             Name of the wood object
    * @param behaviorCreator  Logic to create the behavior
    * @param flammable        If true, this wood type is flammable
-   * @param group            Item group
    * @return Wood object
    */
-  public WoodBlockObject registerWood(String name, Function<WoodVariant,BlockBehaviour.Properties> behaviorCreator, boolean flammable, CreativeModeTab group) {
+  public WoodBlockObject registerWood(String name, Function<WoodVariant,BlockBehaviour.Properties> behaviorCreator, boolean flammable) {
     BlockSetType setType = BlockSetTypeRegistry.registerWood(resource(name));
     WoodType woodType = WoodTypeRegistry.register(resource(name), setType);
     RegistrationHelper.registerWoodType(woodType);
@@ -267,21 +264,6 @@ public class BlockDeferredRegister extends DeferredRegisterWrapper<Block> {
     // sign is included automatically in asItem of the standing sign
     this.itemRegister.register(name + "_sign", () -> burnableSignItem.apply(standingSign.get(), wallSign.get()));
 
-    // Add entries to tab
-    ItemGroupEvents.modifyEntriesEvent(group).register(entries -> {
-      entries.accept(planks.asItem());
-      entries.accept(fence.asItem());
-      entries.accept(strippedLog.asItem());
-      entries.accept(strippedWood.asItem());
-      entries.accept(log.asItem());
-      entries.accept(wood.asItem());
-      entries.accept(door.asItem());
-      entries.accept(trapdoor.asItem());
-      entries.accept(fenceGate.asItem());
-      entries.accept(pressurePlate.asItem());
-      entries.accept(button.asItem());
-      entries.accept(standingSign.get());
-    });
     // finally, return
     return new WoodBlockObject(resource(name), woodType, planks, log, strippedLog, wood, strippedWood, fence, fenceGate, door, trapdoor, pressurePlate, button, standingSign, wallSign);
   }
