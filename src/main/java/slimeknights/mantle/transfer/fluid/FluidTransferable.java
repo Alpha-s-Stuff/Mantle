@@ -7,8 +7,4 @@ import net.minecraft.core.Direction;
 
 public interface FluidTransferable {
 	LazyOptional<IFluidHandler> getFluidHandler(@Nullable Direction direction);
-
-	default boolean shouldRunClientSide() {
-		return true;
-	}
 }

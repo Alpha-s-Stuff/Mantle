@@ -116,26 +116,20 @@ public class TransferUtil {
 	}
 
 	public static LazyOptional<IFluidHandler> getFluidHandler(BlockEntity be) {
-		return getFluidHandler(be, null);
+    if (be instanceof FluidTransferable t)
+      return t.getFluidHandler(null);
+		return getFluidHandler(be.getLevel(), be.getBlockPos(), null);
 	}
 
-	public static LazyOptional<IFluidHandler> getFluidHandler(BlockEntity be, @Nullable Direction side) {
-		boolean client = Objects.requireNonNull(be.getLevel()).isClientSide();
-		// lib handling
-		if (be instanceof FluidTransferable transferable) {
-			if (client && !transferable.shouldRunClientSide()) {
-				return LazyOptional.empty();
-			}
+	public static LazyOptional<IFluidHandler> getFluidHandler(Level l, BlockPos pos, @Nullable Direction side) {
+		if (l.getBlockEntity(pos) instanceof FluidTransferable transferable) {
 			return transferable.getFluidHandler(side);
 		}
 		// external handling
 		List<Storage<FluidVariant>> fluidStorages = new ArrayList<>();
-		Level l = be.getLevel();
-		BlockPos pos = be.getBlockPos();
-		BlockState state = be.getBlockState();
 
 		for (Direction direction : getDirections(side)) {
-			Storage<FluidVariant> fluidStorage = FluidStorage.SIDED.find(l, pos, state, be, direction);
+			Storage<FluidVariant> fluidStorage = FluidStorage.SIDED.find(l, pos, direction);
 
 			if (fluidStorage != null) {
 				if (fluidStorages.size() == 0) {
@@ -172,7 +166,7 @@ public class TransferUtil {
 		if (handler == IItemHandler.class) {
 			return getItemHandler(be, direction);
 		} else if (handler == IFluidHandler.class) {
-			return getFluidHandler(be, direction);
+			return getFluidHandler(be.getLevel(), be.getBlockPos(), direction);
 		} else throw new RuntimeException("Handler class must be IItemHandler or IFluidHandler");
 	}
 

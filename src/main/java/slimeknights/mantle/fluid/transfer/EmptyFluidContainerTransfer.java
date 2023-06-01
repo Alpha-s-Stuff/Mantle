@@ -6,8 +6,12 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
+import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import lombok.RequiredArgsConstructor;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
@@ -51,16 +55,19 @@ public class EmptyFluidContainerTransfer implements IFluidContainerTransfer {
   }
 
   @Override
-  public TransferResult transfer(ItemStack stack, FluidStack fluid, IFluidHandler handler) {
+  public TransferResult transfer(ItemStack stack, FluidStack fluid, Storage<FluidVariant> handler) {
     FluidStack contained = getFluid(stack);
-    long simulated = handler.fill(contained.copy(), true);
+    long simulated = handler.simulateInsert(contained.getType(), contained.getAmount(), null);
     if (simulated == this.fluid.getAmount()) {
-      long actual = handler.fill(contained.copy(), false);
-      if (actual > 0) {
-        if (actual != this.fluid.getAmount()) {
-          Mantle.logger.error("Wrong amount filled from {}, expected {}, filled {}", BuiltInRegistries.ITEM.getKey(stack.getItem()), this.fluid.getAmount(), actual);
+      try (Transaction t = TransferUtil.getTransaction()) {
+        long actual = handler.insert(contained.getType(), contained.getAmount(), t);
+        if (actual > 0) {
+          if (actual != this.fluid.getAmount()) {
+            Mantle.logger.error("Wrong amount filled from {}, expected {}, filled {}", BuiltInRegistries.ITEM.getKey(stack.getItem()), this.fluid.getAmount(), actual);
+          }
+          return new TransferResult(filled.get().copy(), contained, false);
         }
-        return new TransferResult(filled.get().copy(), contained, false);
+        t.commit();
       }
     }
     return null;

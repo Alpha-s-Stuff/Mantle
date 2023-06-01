@@ -6,6 +6,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
+import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import slimeknights.mantle.transfer.fluid.IFluidHandler;
@@ -53,14 +57,17 @@ public class FillFluidContainerTransfer implements IFluidContainerTransfer {
 
   @Nullable
   @Override
-  public TransferResult transfer(ItemStack stack, FluidStack fluid, IFluidHandler handler) {
+  public TransferResult transfer(ItemStack stack, FluidStack fluid, Storage<FluidVariant> handler) {
     long amount = this.fluid.getAmount(fluid.getFluid());
     FluidStack toDrain = new FluidStack(fluid, amount);
-    FluidStack simulated = handler.drain(toDrain.copy(), true);
-    if (simulated.getAmount() == amount) {
-      FluidStack actual = handler.drain(toDrain.copy(), false);
-      if (actual.getAmount() != amount) {
-        Mantle.logger.error("Wrong amount drained from {}, expected {}, filled {}", BuiltInRegistries.ITEM.getKey(stack.getItem()), fluid.getAmount(), actual.getAmount());
+    long simulated = handler.simulateExtract(toDrain.getType(), toDrain.getAmount(), null);
+    if (simulated == amount) {
+      try (Transaction t = TransferUtil.getTransaction()) {
+        long actual = handler.extract(toDrain.getType(), toDrain.getAmount(), t);
+        if (actual != amount) {
+          Mantle.logger.error("Wrong amount drained from {}, expected {}, filled {}", BuiltInRegistries.ITEM.getKey(stack.getItem()), fluid.getAmount(), actual);
+        }
+        t.commit();
       }
       return new TransferResult(getFilled(toDrain), toDrain, true);
     }

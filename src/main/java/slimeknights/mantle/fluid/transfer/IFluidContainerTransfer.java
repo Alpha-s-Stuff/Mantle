@@ -1,5 +1,7 @@
 package slimeknights.mantle.fluid.transfer;
 
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import slimeknights.mantle.transfer.fluid.IFluidHandler;
 import io.github.fabricators_of_create.porting_lib.util.FluidStack;
 import net.minecraft.world.item.Item;
@@ -31,7 +33,7 @@ public interface IFluidContainerTransfer extends IJsonSerializable {
    * @return  container after the transfer and the fluid transferred, null if the transfer failed
    */
   @Nullable
-  TransferResult transfer(ItemStack stack, FluidStack fluid, IFluidHandler handler);
+  TransferResult transfer(ItemStack stack, FluidStack fluid, Storage<FluidVariant> handler);
 
   /**
    * Result after transferring a fluid
