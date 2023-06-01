@@ -10,10 +10,10 @@ import lombok.NoArgsConstructor;
 import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorageUtil;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -34,7 +34,6 @@ import slimeknights.mantle.config.Config;
 import slimeknights.mantle.fluid.transfer.FluidContainerTransferManager;
 import slimeknights.mantle.fluid.transfer.IFluidContainerTransfer;
 import slimeknights.mantle.fluid.transfer.IFluidContainerTransfer.TransferResult;
-import slimeknights.mantle.transfer.fluid.IFluidHandler;
 import slimeknights.mantle.transfer.item.ItemHandlerHelper;
 
 /**
@@ -63,23 +62,29 @@ public class FluidTransferHelper {
    * @param maxFill  Maximum to transfer
    * @return  True if transfer succeeded
    */
-  public static FluidStack tryTransfer(IFluidHandler input, IFluidHandler output, long maxFill) {
-    // first, figure out how much we can drain
-    FluidStack simulated = input.drain(maxFill, true);
-    if (!simulated.isEmpty()) {
-      // next, find out how much we can fill
-      long simulatedFill = output.fill(simulated, true);
-      if (simulatedFill > 0) {
-        // actually drain
-        FluidStack drainedFluid = input.drain(simulatedFill, false);
-        if (!drainedFluid.isEmpty()) {
-          // acutally fill
-          long actualFill = output.fill(drainedFluid.copy(), false);
-          if (actualFill != drainedFluid.getAmount()) {
-            Mantle.logger.error("Lost {} fluid during transfer", drainedFluid.getAmount() - actualFill);
-          }
+  public static FluidStack tryTransfer(Storage<FluidVariant> input, Storage<FluidVariant> output, long maxFill) {
+    for (StorageView<FluidVariant> view : input) {
+      if (view.isResourceBlank()) continue;
+      FluidVariant resource = view.getResource();
+      long maxExtracted;
+
+      // check how much can be extracted
+      try (Transaction extractionTestTransaction = Transaction.openOuter()) {
+        maxExtracted = view.extract(resource, maxFill, extractionTestTransaction);
+        extractionTestTransaction.abort();
+      }
+
+      try (Transaction transferTransaction = Transaction.openOuter()) {
+        // check how much can be inserted
+        long accepted = output.insert(resource, maxExtracted, transferTransaction);
+
+        // extract it, or rollback if the amounts don't match
+        long drained = view.extract(resource, accepted, transferTransaction);
+        if (drained != accepted) {
+          Mantle.logger.error("Lost {} fluid during transfer", drained - accepted);
         }
-        return drainedFluid;
+        transferTransaction.commit();
+        return new FluidStack(view.getResource(), drained);
       }
     }
     return FluidStack.EMPTY;
@@ -162,7 +167,21 @@ public class FluidTransferHelper {
 
         // if the item has a capability, do a direct transfer
         if (FluidStorage.ITEM.find(stack, ContainerItemContext.withConstant(stack)) != null) {
-          return FluidStorageUtil.interactWithFluidStorage(teHandler, player, hand);
+          if (!world.isClientSide) {
+            Storage<FluidVariant> itemHandler = ContainerItemContext.forPlayerInteraction(player, hand).find(FluidStorage.ITEM);
+            // first, try filling the TE from the item
+            FluidStack transferred = tryTransfer(itemHandler, teHandler, Long.MAX_VALUE);
+            if (!transferred.isEmpty()) {
+              playEmptySound(world, pos, player, transferred);
+            } else {
+              // if that failed, try filling the item handler from the TE
+              transferred = tryTransfer(teHandler, itemHandler, Integer.MAX_VALUE);
+              if (!transferred.isEmpty()) {
+                playFillSound(world, pos, player, transferred);
+              }
+            }
+          }
+          return true;
         }
 
         // fallback to JSON based transfer
