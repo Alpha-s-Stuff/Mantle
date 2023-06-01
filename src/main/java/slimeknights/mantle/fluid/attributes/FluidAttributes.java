@@ -46,8 +46,7 @@ import net.minecraft.world.phys.BlockHitResult;
  * water.
  *
  */
-public class FluidAttributes
-{
+public class FluidAttributes {
   private String translationKey;
 
   private final ResourceLocation stillTexture;

@@ -5,6 +5,7 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.mojang.math.Transformation;
 import io.github.fabricators_of_create.porting_lib.models.ItemLayerModel;
+import io.github.fabricators_of_create.porting_lib.models.QuadTransformers;
 import io.github.fabricators_of_create.porting_lib.models.geometry.IGeometryLoader;
 import io.github.fabricators_of_create.porting_lib.models.geometry.IUnbakedGeometry;
 import lombok.RequiredArgsConstructor;
@@ -342,6 +343,7 @@ public class MantleItemLayerModel implements IUnbakedGeometry<MantleItemLayerMod
     putVertex(builder, side, x1, y1, z1, u1, v1, color, luminosity, 1);
     putVertex(builder, side, x2, y2, z2, u2, v2, color, luminosity, 2);
     putVertex(builder, side, x3, y3, z3, u3, v3, color, luminosity, 3);
+    QuadTransformers.applying(transform).transform(builder);
     BakedQuad quad = builder.toBakedQuad(0, sprite, true);
     return quad;
   }
