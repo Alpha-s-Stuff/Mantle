@@ -256,8 +256,8 @@ public class FaucetFluidLoader extends SimpleJsonResourceReloadListener implemen
       if (element.isJsonPrimitive()) {
         int value = element.getAsInt();
         return def.stream().map(cuboid -> {
-          Vector3f from = cuboid.getFrom();
-         from.y = value;
+          Vector3f from = new Vector3f(cuboid.getFrom());
+          from.y = value;
           return new FluidCuboid(from, cuboid.getTo(), cuboid.getFaces());
         }).collect(Collectors.toList());
       } else {

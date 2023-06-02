@@ -67,6 +67,7 @@ public class FluidCuboid {
    */
   public Vector3f getFromScaled() {
     if (fromScaled == null) {
+      fromScaled = new Vector3f(from);
       fromScaled = from.mul(1 / 16f);
     }
     return fromScaled;
@@ -78,6 +79,7 @@ public class FluidCuboid {
    */
   public Vector3f getToScaled() {
     if (toScaled == null) {
+      toScaled = new Vector3f(to);
       toScaled = to.mul(1 / 16f);
     }
     return toScaled;
