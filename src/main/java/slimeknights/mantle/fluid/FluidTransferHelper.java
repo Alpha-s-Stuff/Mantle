@@ -84,7 +84,7 @@ public class FluidTransferHelper {
           Mantle.logger.error("Lost {} fluid during transfer", drained - accepted);
         }
         transferTransaction.commit();
-        return new FluidStack(view.getResource(), drained);
+        return new FluidStack(resource, drained);
       }
     }
     return FluidStack.EMPTY;
