@@ -1,5 +1,6 @@
 package slimeknights.mantle.block;
 
+import io.github.fabricators_of_create.porting_lib.util.NetworkHooks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Containers;
@@ -20,7 +21,6 @@ import slimeknights.mantle.block.entity.INameableMenuProvider;
 import slimeknights.mantle.inventory.BaseContainerMenu;
 import slimeknights.mantle.transfer.TransferUtil;
 import slimeknights.mantle.transfer.item.IItemHandler;
-import io.github.fabricators_of_create.porting_lib.util.NetworkUtil;
 
 import javax.annotation.Nullable;
 
@@ -45,7 +45,7 @@ public abstract class InventoryBlock extends Block implements EntityBlock {
     if (!world.isClientSide()) {
       MenuProvider container = this.getMenuProvider(world.getBlockState(pos), world, pos);
       if (container != null && player instanceof ServerPlayer serverPlayer) {
-        NetworkUtil.openGui(serverPlayer, container, pos);
+        NetworkHooks.openScreen(serverPlayer, container, pos);
         if (player.containerMenu instanceof BaseContainerMenu<?> menu) {
           menu.syncOnOpen(serverPlayer);
         }

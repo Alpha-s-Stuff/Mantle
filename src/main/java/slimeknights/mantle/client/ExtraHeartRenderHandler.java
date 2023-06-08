@@ -6,7 +6,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
@@ -25,7 +25,7 @@ import java.util.Random;
 public class ExtraHeartRenderHandler {
   private static final ResourceLocation ICON_HEARTS = new ResourceLocation(Mantle.modId, "textures/gui/hearts.png");
   private static final ResourceLocation ICON_ABSORB = new ResourceLocation(Mantle.modId, "textures/gui/absorb.png");
-  private static final ResourceLocation ICON_VANILLA = GuiComponent.GUI_ICONS_LOCATION;
+  private static final ResourceLocation ICON_VANILLA = Gui.GUI_ICONS_LOCATION;
 
   private final Minecraft mc = Minecraft.getInstance();
 
@@ -39,7 +39,8 @@ public class ExtraHeartRenderHandler {
 
   /**
    * Draws a texture to the screen
-   * @param matrixStack  Matrix stack instance
+   * @param guiGraphics  gui graphics instance
+   * @param texture      The texture to draw
    * @param x            X position
    * @param y            Y position
    * @param textureX     Texture X
@@ -47,17 +48,17 @@ public class ExtraHeartRenderHandler {
    * @param width        Width to draw
    * @param height       Height to draw
    */
-  private void blit(PoseStack matrixStack, int x, int y, int textureX, int textureY, int width, int height) {
-    Minecraft.getInstance().gui.blit(matrixStack, x, y, textureX, textureY, width, height);
+  private void blit(GuiGraphics guiGraphics, ResourceLocation texture, int x, int y, int textureX, int textureY, int width, int height) {
+    guiGraphics.blit(texture, x, y, textureX, textureY, width, height);
   }
 
   /* HUD */
 
   /**
    * Event listener
-   * @param matrixStack  Event instance
+   * @param guiGraphics  Event instance
    */
-  public boolean renderHealthbar(PoseStack matrixStack, float partialTicks, Window window, Types type) {
+  public boolean renderHealthbar(GuiGraphics guiGraphics, float partialTicks, Window window, Types type) {
     if (!Config.EXTRA_HEART_RENDERER.get() || type != Types.PLAYER_HEALTH) {
       return false;
     }
@@ -150,41 +151,40 @@ public class ExtraHeartRenderHandler {
       if (health <= 4) y += this.rand.nextInt(2);
       if (i == this.regen) y -= 2;
 
-      this.blit(matrixStack, x, y, BACKGROUND, TOP, 9, 9);
+      this.blit(guiGraphics, Gui.GUI_ICONS_LOCATION, x, y, BACKGROUND, TOP, 9, 9);
 
       if (highlight) {
         if (i * 2 + 1 < healthLast) {
-          this.blit(matrixStack, x, y, MARGIN + 54, TOP, 9, 9); //6
+          this.blit(guiGraphics, Gui.GUI_ICONS_LOCATION, x, y, MARGIN + 54, TOP, 9, 9); //6
         }
         else if (i * 2 + 1 == healthLast) {
-          this.blit(matrixStack, x, y, MARGIN + 63, TOP, 9, 9); //7
+          this.blit(guiGraphics, Gui.GUI_ICONS_LOCATION, x, y, MARGIN + 63, TOP, 9, 9); //7
         }
       }
 
       if (absorbRemaining > 0.0F) {
         if (absorbRemaining == absorb && absorb % 2.0F == 1.0F) {
-          this.blit(matrixStack, x, y, MARGIN + 153, TOP, 9, 9); //17
+          this.blit(guiGraphics, Gui.GUI_ICONS_LOCATION, x, y, MARGIN + 153, TOP, 9, 9); //17
           absorbRemaining -= 1.0F;
         }
         else {
-          this.blit(matrixStack, x, y, MARGIN + 144, TOP, 9, 9); //16
+          this.blit(guiGraphics, Gui.GUI_ICONS_LOCATION, x, y, MARGIN + 144, TOP, 9, 9); //16
           absorbRemaining -= 2.0F;
         }
       }
       else {
         if (i * 2 + 1 < health) {
-          this.blit(matrixStack, x, y, MARGIN + 36, TOP, 9, 9); //4
+          this.blit(guiGraphics, Gui.GUI_ICONS_LOCATION, x, y, MARGIN + 36, TOP, 9, 9); //4
         }
         else if (i * 2 + 1 == health) {
-          this.blit(matrixStack, x, y, MARGIN + 45, TOP, 9, 9); //5
+          this.blit(guiGraphics, Gui.GUI_ICONS_LOCATION, x, y, MARGIN + 45, TOP, 9, 9); //5
         }
       }
     }
 
-    this.renderExtraHearts(matrixStack, left, top, player);
-    this.renderExtraAbsorption(matrixStack, left, top - rowHeight, player);
+    this.renderExtraHearts(guiGraphics, left, top, player);
+    this.renderExtraAbsorption(guiGraphics, left, top - rowHeight, player);
 
-    RenderSystem.setShaderTexture(0, ICON_VANILLA);
     left_height += 10;
     if (absorb > 0) {
       left_height += 10;
@@ -219,34 +219,32 @@ public class ExtraHeartRenderHandler {
 
   /**
    * Renders the health above 10 hearts
-   * @param matrixStack  Matrix stack instance
+   * @param guiGraphics  Gui graphics instance
    * @param xBasePos     Health bar top corner
    * @param yBasePos     Health bar top corner
    * @param player       Player instance
    */
-  private void renderExtraHearts(PoseStack matrixStack, int xBasePos, int yBasePos, Player player) {
+  private void renderExtraHearts(GuiGraphics guiGraphics, int xBasePos, int yBasePos, Player player) {
     int potionOffset = this.getPotionOffset(player);
 
     // Extra hearts
-    RenderSystem.setShaderTexture(0, ICON_HEARTS);
     int hp = Mth.ceil(player.getHealth());
-    this.renderCustomHearts(matrixStack, xBasePos, yBasePos, potionOffset, hp, false);
+    this.renderCustomHearts(guiGraphics, ICON_HEARTS, xBasePos, yBasePos, potionOffset, hp, false);
   }
 
   /**
    * Renders the absorption health above 10 hearts
-   * @param matrixStack  Matrix stack instance
+   * @param guiGraphics  Gui graphics instance
    * @param xBasePos     Health bar top corner
    * @param yBasePos     Health bar top corner
    * @param player       Player instance
    */
-  private void renderExtraAbsorption(PoseStack matrixStack, int xBasePos, int yBasePos, Player player) {
+  private void renderExtraAbsorption(GuiGraphics guiGraphics, int xBasePos, int yBasePos, Player player) {
     int potionOffset = this.getPotionOffset(player);
 
     // Extra hearts
-    RenderSystem.setShaderTexture(0, ICON_ABSORB);
     int absorb = Mth.ceil(player.getAbsorptionAmount());
-    this.renderCustomHearts(matrixStack, xBasePos, yBasePos, potionOffset, absorb, true);
+    this.renderCustomHearts(guiGraphics, ICON_ABSORB, xBasePos, yBasePos, potionOffset, absorb, true);
   }
 
   /**
@@ -260,14 +258,15 @@ public class ExtraHeartRenderHandler {
 
   /**
    * Shared logic to render custom hearts
-   * @param matrixStack  Matrix stack instance
+   * @param guiGraphics  Gui graphics instance
+   * @param texture      Texture to draw
    * @param xBasePos     Health bar top corner
    * @param yBasePos     Health bar top corner
    * @param potionOffset Offset from the potion effect
    * @param count        Number to render
    * @param absorb       If true, render absorption hearts
    */
-  private void renderCustomHearts(PoseStack matrixStack, int xBasePos, int yBasePos, int potionOffset, int count, boolean absorb) {
+  private void renderCustomHearts(GuiGraphics guiGraphics, ResourceLocation texture, int xBasePos, int yBasePos, int potionOffset, int count, boolean absorb) {
     int regenOffset = absorb ? 10 : 0;
     for (int iter = 0; iter < count / 20; iter++) {
       int renderHearts = (count - 20 * (iter + 1)) / 2;
@@ -278,16 +277,16 @@ public class ExtraHeartRenderHandler {
       for (int i = 0; i < renderHearts; i++) {
         int y = this.getYRegenOffset(i, regenOffset);
         if (absorb) {
-          this.blit(matrixStack, xBasePos + 8 * i, yBasePos + y, 0, 54, 9, 9);
+          this.blit(guiGraphics, texture, xBasePos + 8 * i, yBasePos + y, 0, 54, 9, 9);
         }
-        this.blit(matrixStack, xBasePos + 8 * i, yBasePos + y, 18 * heartIndex, potionOffset, 9, 9);
+        this.blit(guiGraphics, texture, xBasePos + 8 * i, yBasePos + y, 18 * heartIndex, potionOffset, 9, 9);
       }
       if (count % 2 == 1 && renderHearts < 10) {
         int y = this.getYRegenOffset(renderHearts, regenOffset);
         if (absorb) {
-          this.blit(matrixStack, xBasePos + 8 * renderHearts, yBasePos + y, 0, 54, 9, 9);
+          this.blit(guiGraphics, texture, xBasePos + 8 * renderHearts, yBasePos + y, 0, 54, 9, 9);
         }
-        this.blit(matrixStack, xBasePos + 8 * renderHearts, yBasePos + y, 9 + 18 * heartIndex, potionOffset, 9, 9);
+        this.blit(guiGraphics, texture, xBasePos + 8 * renderHearts, yBasePos + y, 9 + 18 * heartIndex, potionOffset, 9, 9);
       }
     }
   }

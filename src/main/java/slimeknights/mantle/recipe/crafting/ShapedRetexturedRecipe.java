@@ -14,7 +14,6 @@ import net.minecraft.world.item.crafting.ShapedRecipe;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import slimeknights.mantle.item.RetexturedBlockItem;
-import io.github.fabricators_of_create.porting_lib.crafting.CraftingHelper;
 import slimeknights.mantle.recipe.MantleRecipeSerializers;
 import slimeknights.mantle.util.JsonHelper;
 

@@ -2,9 +2,9 @@ package slimeknights.mantle;
 
 import io.github.fabricators_of_create.porting_lib.config.ConfigRegistry;
 import io.github.fabricators_of_create.porting_lib.config.ConfigType;
-import io.github.fabricators_of_create.porting_lib.crafting.CraftingHelper;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
+import net.fabricmc.fabric.api.recipe.v1.ingredient.CustomIngredientSerializer;
 import net.minecraft.Util;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
@@ -94,7 +94,7 @@ public class Mantle implements ModInitializer {
     MantleRecipeSerializers.CRAFTING_SHAPED_RETEXTURED = adapter.register(new ShapedRetexturedRecipe.Serializer(), "crafting_shaped_retextured");
 
 //    CraftingHelper.register(TagEmptyCondition.SERIALIZER);
-    CraftingHelper.register(FluidContainerIngredient.ID, FluidContainerIngredient.SERIALIZER);
+    CustomIngredientSerializer.register(FluidContainerIngredient.SERIALIZER);
 
     // fluid container transfer
     FluidContainerTransferManager.TRANSFER_LOADERS.registerDeserializer(EmptyFluidContainerTransfer.ID, EmptyFluidContainerTransfer.DESERIALIZER);

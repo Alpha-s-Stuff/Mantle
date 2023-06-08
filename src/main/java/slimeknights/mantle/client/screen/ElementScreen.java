@@ -1,7 +1,9 @@
 package slimeknights.mantle.client.screen;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.resources.ResourceLocation;
 
 /**
  * Represents a GUI element INSIDE the graphics file.
@@ -52,8 +54,8 @@ public class ElementScreen {
    * @param xPos X-Coordinate on the screen
    * @param yPos Y-Coordinate on the screen
    */
-  public int draw(PoseStack matrixStack, int xPos, int yPos) {
-    Screen.blit(matrixStack, xPos, yPos, this.x, this.y, this.w, this.h, this.texW, this.texH);
+  public int draw(GuiGraphics guiGraphics, ResourceLocation texture, int xPos, int yPos) {
+    guiGraphics.blit(texture, xPos, yPos, this.x, this.y, this.w, this.h, this.texW, this.texH);
     return this.w;
   }
 

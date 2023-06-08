@@ -1,6 +1,8 @@
 package slimeknights.mantle.client.screen;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 
 // a vertical slider!
@@ -116,15 +118,15 @@ public class SliderWidget extends Widget {
   }
 
   @Override
-  public void draw(PoseStack matrixStack) {
+  public void draw(GuiGraphics guiGraphics, ResourceLocation texture) {
     if (this.hidden) {
       return;
     }
 
     // slide bar background
-    this.slideBarTop.draw(matrixStack, this.xPos, this.yPos);
-    this.slideBar.drawScaledY(matrixStack, this.xPos, this.yPos + this.slideBarTop.h, this.getUsableSlidebarHeight());
-    this.slideBarBottom.draw(matrixStack, this.xPos, this.yPos + this.height - this.slideBarBottom.h);
+    this.slideBarTop.draw(guiGraphics, texture, this.xPos, this.yPos);
+    this.slideBar.drawScaledY(guiGraphics, texture, this.xPos, this.yPos + this.slideBarTop.h, this.getUsableSlidebarHeight());
+    this.slideBarBottom.draw(guiGraphics, texture, this.xPos, this.yPos + this.height - this.slideBarBottom.h);
 
     int x = this.xPos + this.sliderOffset;
     int y = this.yPos + this.getSliderTop();
@@ -132,14 +134,14 @@ public class SliderWidget extends Widget {
     // the slider depending on state
     if (this.enabled) {
       if (this.isScrolling) {
-        this.sliderDisabled.draw(matrixStack, x, y);
+        this.sliderDisabled.draw(guiGraphics, texture, x, y);
       } else if (this.isHighlighted) {
-        this.sliderHighlighted.draw(matrixStack, x, y);
+        this.sliderHighlighted.draw(guiGraphics, texture, x, y);
       } else {
-        this.slider.draw(matrixStack, x, y);
+        this.slider.draw(guiGraphics, texture, x, y);
       }
     } else {
-      this.sliderDisabled.draw(matrixStack, x, y);
+      this.sliderDisabled.draw(guiGraphics, texture, x, y);
     }
   }
 

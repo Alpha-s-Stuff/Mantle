@@ -6,18 +6,16 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.JsonOps;
-import io.github.fabricators_of_create.porting_lib.PortingLibRegistries;
+import io.github.fabricators_of_create.porting_lib.core.util.LamdbaExceptionUtils;
 import io.github.fabricators_of_create.porting_lib.loot.IGlobalLootModifier;
 import io.github.fabricators_of_create.porting_lib.loot.LootModifier;
-import io.github.fabricators_of_create.porting_lib.util.LamdbaExceptionUtils;
+import io.github.fabricators_of_create.porting_lib.loot.PortingLibLoot;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.minecraft.data.CachedOutput;
-import net.minecraft.data.DataGenerator;
 import net.minecraft.data.DataProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Tuple;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -73,7 +71,7 @@ public abstract class GlobalLootModifierProvider implements DataProvider
       Path modifierPath = gen.getOutputFolder().resolve(modPath + name + ".json");
 
       JsonObject json = pair.getB();
-      json.addProperty("type", PortingLibRegistries.GLOBAL_LOOT_MODIFIER_SERIALIZERS.get().getKey(pair.getA()).toString());
+      json.addProperty("type", PortingLibLoot.GLOBAL_LOOT_MODIFIER_SERIALIZERS.get().getKey(pair.getA()).toString());
 
       futuresBuilder.add(DataProvider.saveStable(cache, json, modifierPath));
     }));

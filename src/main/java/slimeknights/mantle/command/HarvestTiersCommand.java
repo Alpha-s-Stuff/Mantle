@@ -78,7 +78,7 @@ public class HarvestTiersCommand {
         }
       }
     }
-    context.getSource().sendSuccess(output, true);
+    context.getSource().sendSuccess(() -> output, true);
     return sortedTiers.size();
   }
 
@@ -107,10 +107,10 @@ public class HarvestTiersCommand {
       } catch (IOException ex) {
         Mantle.logger.error("Couldn't save harvests tiers to {}", path, ex);
       }
-      context.getSource().sendSuccess(Component.translatable("command.mantle.harvest_tiers.success_save", DumpAllTagsCommand.getOutputComponent(output)), true);
+      context.getSource().sendSuccess(() -> Component.translatable("command.mantle.harvest_tiers.success_save", DumpAllTagsCommand.getOutputComponent(output)), true);
     } else {
       // print to console
-      context.getSource().sendSuccess(SUCCESS_LOG, true);
+      context.getSource().sendSuccess(() -> SUCCESS_LOG, true);
       Mantle.logger.info("Dump of harvests tiers:\n{}", DumpTagCommand.GSON.toJson(json));
     }
     // return a number to finish

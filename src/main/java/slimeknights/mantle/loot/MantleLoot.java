@@ -5,8 +5,8 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.JsonOps;
-import io.github.fabricators_of_create.porting_lib.PortingLibRegistries;
 import io.github.fabricators_of_create.porting_lib.loot.IGlobalLootModifier;
+import io.github.fabricators_of_create.porting_lib.loot.PortingLibLoot;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import net.minecraft.core.Registry;
@@ -51,7 +51,7 @@ public class MantleLoot {
    * Called during serializer registration to register any relevant loot logic
    */
   public static void registerGlobalLootModifiers() {
-    RegistryAdapter<Codec<? extends IGlobalLootModifier>> adapter = new RegistryAdapter<>(PortingLibRegistries.GLOBAL_LOOT_MODIFIER_SERIALIZERS.get(), Mantle.modId);
+    RegistryAdapter<Codec<? extends IGlobalLootModifier>> adapter = new RegistryAdapter<>(PortingLibLoot.GLOBAL_LOOT_MODIFIER_SERIALIZERS.get(), Mantle.modId);
     ADD_ENTRY = adapter.register(AddEntryLootModifier.CODEC, "add_entry");
     REPLACE_ITEM = adapter.register(ReplaceItemLootModifier.CODEC, "replace_item");
 

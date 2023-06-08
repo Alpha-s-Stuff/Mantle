@@ -1,8 +1,7 @@
 package slimeknights.mantle.client.screen.book;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
 import slimeknights.mantle.client.book.data.BookData;
@@ -40,14 +39,7 @@ public class ArrowButton extends Button {
     this(null, x, y, arrowType, color, hoverColor, iPressable, createNarration);
   }
 
-  public void renderButton(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks, @Nullable BookData bookData) {
-    Minecraft minecraft = Minecraft.getInstance();
-    if (bookData != null) {
-      RenderSystem.setShaderTexture(0, bookData.appearance.getBookTexture());
-    } else {
-      RenderSystem.setShaderTexture(0, TEX_BOOK);
-    }
-
+  public void renderButton(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks, @Nullable BookData bookData) {
     this.isHovered = mouseX >= this.getX() && mouseY >= this.getY() && mouseX < this.getX() + this.width && mouseY < this.getY() + this.height;
 
     int color = this.isHovered ? this.hoverColor : this.color;
@@ -57,12 +49,12 @@ public class ArrowButton extends Button {
     float b = (color & 0xff) / 255.F;
 
     RenderSystem.setShaderColor(r, g, b, 1f);
-    blit(matrixStack, this.getX(), this.getY(), this.width, this.height, this.arrowType.x, this.arrowType.y, this.width, this.height, 512, 512);
+    guiGraphics.blit(bookData != null ? bookData.appearance.getBookTexture() : TEX_BOOK, this.getX(), this.getY(), this.width, this.height, this.arrowType.x, this.arrowType.y, this.width, this.height, 512, 512);
   }
 
   @Override
-  public void renderWidget(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
-    renderButton(matrixStack, mouseX, mouseY, partialTicks, bookData);
+  public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+    renderButton(guiGraphics, mouseX, mouseY, partialTicks, bookData);
   }
 
   public enum ArrowType {

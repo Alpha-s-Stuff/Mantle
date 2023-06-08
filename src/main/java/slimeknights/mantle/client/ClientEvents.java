@@ -3,7 +3,6 @@ package slimeknights.mantle.client;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import io.github.fabricators_of_create.porting_lib.event.client.OverlayRenderCallback;
 import io.github.fabricators_of_create.porting_lib.event.client.OverlayRenderCallback.Types;
 import io.github.fabricators_of_create.porting_lib.models.geometry.IGeometryLoader;
@@ -14,7 +13,8 @@ import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.client.AttackIndicatorStatus;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
-import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.blockentity.SignRenderer;
@@ -105,7 +105,7 @@ public class ClientEvents implements ClientModInitializer {
   }
 
   // registered with FORGE bus
-  private static boolean renderOffhandAttackIndicator(PoseStack matrixStack, float partialTicks, Window window, OverlayRenderCallback.Types overlay) {
+  private static boolean renderOffhandAttackIndicator(GuiGraphics guiGraphics, float partialTicks, Window window, OverlayRenderCallback.Types overlay) {
     // must have a player, not be in spectator, and have the indicator enabled
     Minecraft minecraft = Minecraft.getInstance();
     Options settings = minecraft.options;
@@ -135,9 +135,8 @@ public class ClientEvents implements ClientModInitializer {
             int y = (scaledHeight / 2) - 14 + (2 * (scaledHeight % 2));
             int x = minecraft.getWindow().getGuiScaledWidth() / 2 - 8;
             int width = (int)(cooldown * 17.0F);
-            RenderSystem.setShaderTexture(0, GuiComponent.GUI_ICONS_LOCATION);
-            minecraft.gui.blit(matrixStack, x, y, 36, 94, 16, 4);
-            minecraft.gui.blit(matrixStack, x, y, 52, 94, width, 4);
+            guiGraphics.blit(Gui.GUI_ICONS_LOCATION, x, y, 36, 94, 16, 4);
+            guiGraphics.blit(Gui.GUI_ICONS_LOCATION, x, y, 52, 94, width, 4);
           }
         }
         break;
@@ -152,11 +151,10 @@ public class ClientEvents implements ClientModInitializer {
           } else {
             x = centerWidth + 91 + 6 + 32;
           }
-          RenderSystem.setShaderTexture(0, GuiComponent.GUI_ICONS_LOCATION);
           int l1 = (int)(cooldown * 19.0F);
           RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-          minecraft.gui.blit(matrixStack, x, y, 0, 94, 18, 18);
-          minecraft.gui.blit(matrixStack, x, y + 18 - l1, 18, 112 - l1, 18, l1);
+          guiGraphics.blit(Gui.GUI_ICONS_LOCATION, x, y, 0, 94, 18, 18);
+          guiGraphics.blit(Gui.GUI_ICONS_LOCATION, x, y + 18 - l1, 18, 112 - l1, 18, l1);
         }
         break;
     }

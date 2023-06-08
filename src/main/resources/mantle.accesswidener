@@ -17,7 +17,7 @@ transitive-accessible method net/minecraft/client/renderer/block/model/ItemOverr
 transitive-accessible method net/minecraft/client/resources/model/SimpleBakedModel$Builder <init> (ZZZLnet/minecraft/client/renderer/block/model/ItemTransforms;Lnet/minecraft/client/renderer/block/model/ItemOverrides;)V
 transitive-accessible method net/minecraft/client/renderer/block/model/BlockModel bakeFace (Lnet/minecraft/client/renderer/block/model/BlockElement;Lnet/minecraft/client/renderer/block/model/BlockElementFace;Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;Lnet/minecraft/core/Direction;Lnet/minecraft/client/resources/model/ModelState;Lnet/minecraft/resources/ResourceLocation;)Lnet/minecraft/client/renderer/block/model/BakedQuad;
 transitive-accessible method net/minecraft/resources/ResourceLocation isValidNamespace (Ljava/lang/String;)Z
-transitive-extendable method net/minecraft/client/gui/screens/inventory/AbstractContainerScreen renderSlot (Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/world/inventory/Slot;)V
+transitive-extendable method net/minecraft/client/gui/screens/inventory/AbstractContainerScreen renderSlot (Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/world/inventory/Slot;)V
 transitive-extendable method net/minecraft/client/gui/screens/inventory/AbstractContainerScreen isHovering (Lnet/minecraft/world/inventory/Slot;DD)Z
 transitive-extendable class net/minecraft/world/item/crafting/Ingredient
 transitive-accessible class net/minecraft/client/gui/screens/MenuScreens$ScreenConstructor
@@ -42,8 +42,12 @@ transitive-accessible field com/mojang/blaze3d/vertex/VertexFormatElement count 
 transitive-accessible field net/minecraft/util/datafix/DataFixers SAME_NAMESPACED Ljava/util/function/BiFunction;
 transitive-mutable field net/minecraft/world/inventory/Slot x I
 transitive-mutable field net/minecraft/world/inventory/Slot y I
-
+accessible method net/minecraft/client/gui/GuiGraphics innerBlit (Lnet/minecraft/resources/ResourceLocation;IIIIIFFFF)V
 mutable field net/minecraft/client/renderer/block/model/BakedQuad shade Z
 accessible field net/minecraft/client/renderer/block/model/BakedQuad shade Z
 accessible field net/minecraft/client/renderer/block/model/BlockModel textureMap Ljava/util/Map;
-accessible method net/minecraft/client/gui/GuiComponent innerBlit (Lorg/joml/Matrix4f;IIIIIFFFF)V
+
+accessible method net/minecraft/client/gui/GuiGraphics flushIfUnmanaged ()V
+accessible method net/minecraft/client/gui/GuiGraphics <init> (Lnet/minecraft/client/Minecraft;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;)V
+
+accessible field net/minecraft/client/gui/Gui GUI_ICONS_LOCATION Lnet/minecraft/resources/ResourceLocation;

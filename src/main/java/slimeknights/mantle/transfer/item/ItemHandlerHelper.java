@@ -62,7 +62,7 @@ public class ItemHandlerHelper {
 		if (stack.isEmpty()) return;
 
 		IItemHandler inventory = new PlayerMainInvWrapper(player.getInventory());
-		Level world = player.level;
+		Level world = player.level();
 
 		// try adding it into the inventory
 		ItemStack remainder = stack;

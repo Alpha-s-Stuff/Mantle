@@ -26,6 +26,7 @@ repositories {
     maven { url = "https://maven.jamieswhiteshirt.com/libs-release" }
     maven { url = "https://dvs1.progwml6.com/files/maven/" }
     maven { url = "https://maven.wispforest.io" }
+    maven { url = "https://maven.vram.io" }
     maven { url = "https://jitpack.io" }
     maven {
         // location of a maven mirror for JEI files, as a fallback
@@ -126,7 +127,7 @@ dependencies {
     // api for REI
     modImplementation("dev.architectury:architectury-fabric:${project.architectury_version}")
 
-    modCompileOnly("mezz.jei:jei-${minecraft_version}-fabric:${jei_version}")
+    modCompileOnly("mezz.jei:jei-1.19.4-fabric:${jei_version}")
 
     implementation(include("com.google.code.findbugs:jsr305:3.0.2"))
 

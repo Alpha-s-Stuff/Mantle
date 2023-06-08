@@ -64,10 +64,10 @@ public class ContentStructure extends PageContent {
 
     for (int i = 0; i < this.templateBlocks.size(); i++) {
       StructureTemplate.StructureBlockInfo info = this.templateBlocks.get(i);
-      if (info.state == Blocks.AIR.defaultBlockState()) {
+      if (info.state() == Blocks.AIR.defaultBlockState()) {
         this.templateBlocks.remove(i);
         i--;
-      } else if (info.state.isAir())
+      } else if (info.state().isAir())
         // Usually means it contains a block that has been renamed
         Mantle.logger.error("Found non-default air block in template " + this.data);
     }

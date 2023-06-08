@@ -6,6 +6,7 @@ import com.mojang.math.Transformation;
 import net.fabricmc.fabric.api.rendering.data.v1.RenderAttachmentBlockEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -60,8 +61,9 @@ public class StructureElement extends SizedBookElement {
   }
 
   @Override
-  public void draw(PoseStack transform, int mouseX, int mouseY, float partialTicks, Font fontRenderer) {
+  public void draw(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks, Font fontRenderer) {
     MultiBufferSource.BufferSource buffer = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
+    PoseStack transform = guiGraphics.pose();
     PoseStack.Pose lastEntryBeforeTry = transform.last();
 
     try {

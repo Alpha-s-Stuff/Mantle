@@ -165,23 +165,6 @@ public class FluidAttributes {
   }
 
   /**
-   * Determines if this fluid should vaporize in dimensions where water vaporizes when placed.
-   * To preserve the intentions of vanilla, fluids that can turn lava into obsidian should vaporize.
-   * This prevents players from making the nether safe with a single bucket.
-   * Based on {@link BucketItem#emptyContents(Player, Level, BlockPos, BlockHitResult)}
-   *
-   * @param fluidStack The fluidStack is trying to be placed.
-   * @return true if this fluid should vaporize in dimensions where water vaporizes when placed.
-   */
-  public boolean doesVaporize(BlockAndTintGetter reader, BlockPos pos, FluidStack fluidStack)
-  {
-    BlockState blockstate = getBlock(reader, pos, getStateForPlacement(reader, pos, fluidStack));
-    if (blockstate == null)
-      return false;
-    return blockstate.getMaterial() == net.minecraft.world.level.material.Material.WATER;
-  }
-
-  /**
    * Called instead of placing the fluid block if {@link DimensionType#ultraWarm()} and {@link #doesVaporize(BlockAndTintGetter, BlockPos, FluidStack)} are true.
    * Override this to make your explosive liquid blow up instead of the default smoke, etc.
    * Based on {@link BucketItem#emptyContents(Player, Level, BlockPos, BlockHitResult)}

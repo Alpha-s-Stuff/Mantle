@@ -110,7 +110,7 @@ public class TagsForCommand {
           .sorted(ResourceLocation::compareNamespaced)
           .forEach(tag -> output.append("\n* " + tag));
     }
-    context.getSource().sendSuccess(output, true);
+    context.getSource().sendSuccess(() -> output, true);
     return tags.size();
   }
 
@@ -151,7 +151,7 @@ public class TagsForCommand {
     if (block != Blocks.AIR) {
       return printOwningTags(context, BuiltInRegistries.BLOCK, block);
     }
-    source.sendSuccess(NO_HELD_BLOCK, true);
+    source.sendSuccess(() -> NO_HELD_BLOCK, true);
     return 0;
   }
 
@@ -170,7 +170,7 @@ public class TagsForCommand {
         }
       }
     }
-    source.sendSuccess(NO_HELD_FLUID, true);
+    source.sendSuccess(() -> NO_HELD_FLUID, true);
     return 0;
   }
 
@@ -182,7 +182,7 @@ public class TagsForCommand {
     if (potion != Potions.EMPTY) {
       return printOwningTags(context, BuiltInRegistries.POTION, potion);
     }
-    source.sendSuccess(NO_HELD_POTION, true);
+    source.sendSuccess(() -> NO_HELD_POTION, true);
     return 0;
   }
 
@@ -199,7 +199,7 @@ public class TagsForCommand {
       }
       return totalTags;
     }
-    source.sendSuccess(NO_HELD_ENCHANTMENT, true);
+    source.sendSuccess(() -> NO_HELD_ENCHANTMENT, true);
     return 0;
   }
 
@@ -211,7 +211,7 @@ public class TagsForCommand {
       EntityType<?> type = egg.getType(stack.getTag());
       return printOwningTags(context, BuiltInRegistries.ENTITY_TYPE, type);
     }
-    source.sendSuccess(NO_HELD_ENTITY, true);
+    source.sendSuccess(() -> NO_HELD_ENTITY, true);
     return 0;
   }
 
@@ -237,7 +237,7 @@ public class TagsForCommand {
       }
     }
     // failed
-    source.sendSuccess(NO_TARGETED_BLOCK_ENTITY, true);
+    source.sendSuccess(() -> NO_TARGETED_BLOCK_ENTITY, true);
     return 0;
   }
 
@@ -261,7 +261,7 @@ public class TagsForCommand {
       return printOwningTags(context, BuiltInRegistries.ENTITY_TYPE, target);
     }
     // failed
-    source.sendSuccess(NO_TARGETED_ENTITY, true);
+    source.sendSuccess(() -> NO_TARGETED_ENTITY, true);
     return 0;
   }
 }

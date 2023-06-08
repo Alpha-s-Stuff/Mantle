@@ -4,6 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.Util;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
@@ -74,7 +75,8 @@ public class ItemElement extends SizedBookElement {
   }
 
   @Override
-  public void draw(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks, Font fontRenderer) {
+  public void draw(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks, Font fontRenderer) {
+    PoseStack matrixStack = guiGraphics.pose();
     long nano = Util.getNanos();
 
     if(nano > lastTime + ITEM_SWITCH_TIME) {
@@ -99,10 +101,10 @@ public class ItemElement extends SizedBookElement {
       poses.mulPoseMatrix(matrixStack.last().pose());
 
       ItemStack stack = this.itemCycle.get(this.currentItem);
-      this.mc.getItemRenderer().renderAndDecorateItem(new PoseStack(), stack, 0, 0);
+      guiGraphics.renderItem(stack, 0, 0);
       Font font = fontRenderer;//net.minecraftforge.client.RenderProperties.get(stack).getFont(stack);
       if (font == null) font = mc.font;
-      this.mc.getItemRenderer().renderGuiItemDecorations(new PoseStack(), font, stack, 0, 0, null);
+      guiGraphics.renderItemDecorations(font, stack, 0, 0, null);
 
       matrixStack.popPose();
       poses.popPose();
@@ -112,13 +114,13 @@ public class ItemElement extends SizedBookElement {
   }
 
   @Override
-  public void drawOverlay(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks, Font fontRenderer) {
+  public void drawOverlay(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks, Font fontRenderer) {
     if (this.isHovered(mouseX, mouseY) && this.currentItem < this.itemCycle.size()) {
       if (this.tooltip != null) {
-        this.drawTooltip(matrixStack, this.tooltip, mouseX, mouseY, fontRenderer);
+        this.drawTooltip(guiGraphics, this.tooltip, mouseX, mouseY, fontRenderer);
       }
       else {
-        this.renderToolTip(matrixStack, fontRenderer, this.itemCycle.get(this.currentItem), mouseX, mouseY);
+        this.renderToolTip(guiGraphics, fontRenderer, this.itemCycle.get(this.currentItem), mouseX, mouseY);
       }
     }
   }

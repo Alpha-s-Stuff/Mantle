@@ -38,7 +38,7 @@ public class TemplateChunkSource extends ChunkSource {
     Map<ChunkPos, List<StructureBlockInfo>> byChunk = new HashMap<>();
 
     for (StructureBlockInfo info : blocks) {
-      byChunk.computeIfAbsent(new ChunkPos(info.pos), $ -> new ArrayList<>()).add(info);
+      byChunk.computeIfAbsent(new ChunkPos(info.pos()), $ -> new ArrayList<>()).add(info);
     }
 
     this.chunks = byChunk.entrySet().stream()

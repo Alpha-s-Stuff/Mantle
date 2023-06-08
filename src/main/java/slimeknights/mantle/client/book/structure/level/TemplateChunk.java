@@ -33,15 +33,15 @@ public class TemplateChunk extends EmptyLevelChunk {
     this.tiles = new HashMap<>();
 
     for (StructureBlockInfo info : blocksInChunk) {
-      this.blocksInChunk.put(info.pos, info);
+      this.blocksInChunk.put(info.pos(), info);
 
       //noinspection ConstantConditions wrong nullability annotations
-      if (info.nbt != null) {
-        BlockEntity tile = BlockEntity.loadStatic(info.pos, info.state, info.nbt);
+      if (info.nbt() != null) {
+        BlockEntity tile = BlockEntity.loadStatic(info.pos(), info.state(), info.nbt());
 
         if (tile != null) {
           tile.setLevel(level);
-          this.tiles.put(info.pos, tile);
+          this.tiles.put(info.pos(), tile);
         }
       }
     }
@@ -53,7 +53,7 @@ public class TemplateChunk extends EmptyLevelChunk {
       StructureBlockInfo result = this.blocksInChunk.get(pos);
 
       if (result != null)
-        return result.state;
+        return result.state();
     }
 
     return Blocks.VOID_AIR.defaultBlockState();

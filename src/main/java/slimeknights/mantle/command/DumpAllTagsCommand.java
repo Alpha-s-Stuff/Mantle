@@ -74,7 +74,7 @@ public class DumpAllTagsCommand {
     File output = getOutputFile(context);
     int tagsDumped = context.getSource().registryAccess().registries().mapToInt(r -> runForFolder(context, r.key(), output)).sum();
     // print the output path
-    context.getSource().sendSuccess(Component.translatable("command.mantle.dump_all_tags.success", getOutputComponent(output)), true);
+    context.getSource().sendSuccess(() -> Component.translatable("command.mantle.dump_all_tags.success", getOutputComponent(output)), true);
     return tagsDumped;
   }
 
@@ -84,7 +84,7 @@ public class DumpAllTagsCommand {
     Registry<?> registry = RegistryArgument.getResult(context, "type");
     int result = runForFolder(context, registry.key(), output);
     // print result
-    context.getSource().sendSuccess(Component.translatable("command.mantle.dump_all_tags.type_success", registry.key().location(), getOutputComponent(output)), true);
+    context.getSource().sendSuccess(() -> Component.translatable("command.mantle.dump_all_tags.type_success", registry.key().location(), getOutputComponent(output)), true);
     return result;
   }
 
