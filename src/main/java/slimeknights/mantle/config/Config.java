@@ -1,10 +1,10 @@
 package slimeknights.mantle.config;
 
+import io.github.fabricators_of_create.porting_lib.config.ModConfigSpec;
+import io.github.fabricators_of_create.porting_lib.config.ModConfigSpec.BooleanValue;
+import io.github.fabricators_of_create.porting_lib.config.ModConfigSpec.ConfigValue;
+import io.github.fabricators_of_create.porting_lib.config.ModConfigSpec.EnumValue;
 import io.github.fabricators_of_create.porting_lib.util.FluidUnit;
-import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.common.ForgeConfigSpec.BooleanValue;
-import net.minecraftforge.common.ForgeConfigSpec.EnumValue;
-import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
 
 import java.util.Arrays;
 import java.util.List;
@@ -22,11 +22,11 @@ public class Config {
 	private static final List<String> DEFAULT_TAG_PREFERENCES = Arrays.asList("minecraft", "tconstruct", "tmechworks", "create", "immersiveengineering", "mekanism", "thermal");
 	public static final ConfigValue<List<? extends String>> TAG_PREFERENCES;
 
-	public static final ForgeConfigSpec CLIENT_SPEC, SERVER_SPEC;
+	public static final ModConfigSpec CLIENT_SPEC, SERVER_SPEC;
 
 	static {
-    ForgeConfigSpec.Builder client = new ForgeConfigSpec.Builder();
-    ForgeConfigSpec.Builder server = new ForgeConfigSpec.Builder();
+    ModConfigSpec.Builder client = new ModConfigSpec.Builder();
+    ModConfigSpec.Builder server = new ModConfigSpec.Builder();
 
 		// client options
 		EXTRA_HEART_RENDERER = client

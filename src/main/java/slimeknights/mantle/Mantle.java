@@ -1,6 +1,7 @@
 package slimeknights.mantle;
 
-import fuzs.forgeconfigapiport.api.config.v2.ForgeConfigRegistry;
+import io.github.fabricators_of_create.porting_lib.config.ConfigRegistry;
+import io.github.fabricators_of_create.porting_lib.config.ConfigType;
 import io.github.fabricators_of_create.porting_lib.crafting.CraftingHelper;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
@@ -11,7 +12,6 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.MobType;
 import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraftforge.fml.config.ModConfig.Type;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import slimeknights.mantle.block.entity.MantleSignBlockEntity;
@@ -59,8 +59,8 @@ public class Mantle implements ModInitializer {
   /* Proxies for sides, used for graphics processing */
   @Override
   public void onInitialize() {
-    ForgeConfigRegistry.INSTANCE.register(modId, Type.CLIENT, Config.CLIENT_SPEC);
-    ForgeConfigRegistry.INSTANCE.register(modId, Type.SERVER, Config.SERVER_SPEC);
+    ConfigRegistry.registerConfig(modId, ConfigType.CLIENT, Config.CLIENT_SPEC);
+    ConfigRegistry.registerConfig(modId, ConfigType.SERVER, Config.SERVER_SPEC);
 
     FluidContainerTransferManager.INSTANCE.init();
     MantleTags.init();
