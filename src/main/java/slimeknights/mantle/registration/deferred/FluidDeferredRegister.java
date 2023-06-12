@@ -127,11 +127,11 @@ public class FluidDeferredRegister extends DeferredRegisterWrapper<Fluid> {
    * @param <F>      Fluid type
    * @return  Fluid object
    */
-  public <F extends SimpleFlowableFluid> FluidObject<F> register(String name, String tagName, FluidAttributes.Builder builder, Function<BlockBehaviour.Properties, BlockBehaviour.Properties> settingsConsume,
+  public <F extends SimpleFlowableFluid> FluidObject<F> register(String name, String tagName, FluidAttributes.Builder builder, Function<BlockBehaviour.Properties, BlockBehaviour.Properties> settingsConsumer,
                                                                  Function<Properties,? extends F> still, Function<Properties,? extends F> flowing, int lightLevel) {
     return register(
       name, tagName, new FluidBuilder(builder.luminosity(lightLevel)).explosionResistance(100f), still, flowing,
-      fluid -> new LiquidBlock(fluid.get(), settingsConsume.apply(FabricBlockSettings.of().noCollission().strength(100.0F).noLootTable().lightLevel(state -> lightLevel)))
+      fluid -> new LiquidBlock(fluid.get(), settingsConsumer.apply(FabricBlockSettings.of().noCollission().strength(100.0F).noLootTable().lightLevel(state -> lightLevel)))
     );
   }
 
@@ -186,9 +186,9 @@ public class FluidDeferredRegister extends DeferredRegisterWrapper<Fluid> {
    * @param <F>      Fluid type
    * @return  Fluid object
    */
-  public <F extends SimpleDirectionalFluid> FluidObject<F> registerUpsideDown(String name, FluidAttributes.Builder builder,
+  public <F extends SimpleDirectionalFluid> FluidObject<F> registerUpsideDown(String name, FluidAttributes.Builder builder, Function<BlockBehaviour.Properties, BlockBehaviour.Properties> settingsConsumer,
                                                                               Function<SimpleDirectionalFluid.Properties,? extends F> still, Function<SimpleDirectionalFluid.Properties,? extends F> flowing, int lightLevel) {
-    return registerUpsideDown(name, name, builder, still, flowing, lightLevel);
+    return registerUpsideDown(name, name, builder, settingsConsumer, still, flowing, lightLevel);
   }
 
   /**
@@ -202,11 +202,11 @@ public class FluidDeferredRegister extends DeferredRegisterWrapper<Fluid> {
    * @param <F>      Fluid type
    * @return  Fluid object
    */
-  public <F extends SimpleDirectionalFluid> FluidObject<F> registerUpsideDown(String name, String tagName, FluidAttributes.Builder builder,
+  public <F extends SimpleDirectionalFluid> FluidObject<F> registerUpsideDown(String name, String tagName, FluidAttributes.Builder builder, Function<BlockBehaviour.Properties, BlockBehaviour.Properties> settingsConsumer,
                                                                               Function<SimpleDirectionalFluid.Properties,? extends F> still, Function<SimpleDirectionalFluid.Properties,? extends F> flowing, int lightLevel) {
     return registerUpsideDown(
       name, tagName, new FluidBuilder(builder.luminosity(lightLevel)).explosionResistance(100f), still, flowing,
-      fluid -> new LiquidBlock(fluid.get(), Block.Properties.of().noCollission().strength(100.0F).noLootTable().lightLevel(state -> lightLevel))
+      fluid -> new LiquidBlock(fluid.get(), settingsConsumer.apply(Block.Properties.of().noCollission().strength(100.0F).noLootTable().lightLevel(state -> lightLevel)))
     );
   }
 
@@ -229,8 +229,8 @@ public class FluidDeferredRegister extends DeferredRegisterWrapper<Fluid> {
    * @param lightLevel Block light level
    * @return  Fluid object
    */
-  public FluidObject<SimpleFlowableFluid> register(String name, FluidAttributes.Builder builder, int lightLevel) {
-    return register(name, name, builder, properties -> properties, lightLevel);
+  public FluidObject<SimpleFlowableFluid> register(String name, FluidAttributes.Builder builder, Function<BlockBehaviour.Properties, BlockBehaviour.Properties> settingsConsumer, int lightLevel) {
+    return register(name, name, builder, settingsConsumer, lightLevel);
   }
 
   /**
@@ -243,8 +243,8 @@ public class FluidDeferredRegister extends DeferredRegisterWrapper<Fluid> {
    * @param <F>      Fluid type
    * @return  Fluid object
    */
-  public <F extends SimpleFlowableFluid> FluidObject<F> register(String name, FluidAttributes.Builder builder,
+  public <F extends SimpleFlowableFluid> FluidObject<F> register(String name, FluidAttributes.Builder builder, Function<BlockBehaviour.Properties, BlockBehaviour.Properties> settingsConsumer,
                                                                  Function<Properties,? extends F> still, Function<Properties,? extends F> flowing, int lightLevel) {
-    return register(name, name, builder, properties -> properties, still, flowing, lightLevel);
+    return register(name, name, builder, settingsConsumer, still, flowing, lightLevel);
   }
 }
