@@ -13,6 +13,7 @@ import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.LiquidBlock;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.level.material.Fluid;
 import slimeknights.mantle.fabric.fluid.SimpleDirectionalFluid;
@@ -26,6 +27,7 @@ import slimeknights.mantle.registration.object.FluidObject;
 import slimeknights.mantle.util.SimpleFlowableFluid;
 import slimeknights.mantle.util.SimpleFlowableFluid.Properties;
 
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -125,11 +127,11 @@ public class FluidDeferredRegister extends DeferredRegisterWrapper<Fluid> {
    * @param <F>      Fluid type
    * @return  Fluid object
    */
-  public <F extends SimpleFlowableFluid> FluidObject<F> register(String name, String tagName, FluidAttributes.Builder builder,
+  public <F extends SimpleFlowableFluid> FluidObject<F> register(String name, String tagName, FluidAttributes.Builder builder, Function<BlockBehaviour.Properties, BlockBehaviour.Properties> settingsConsume,
                                                                  Function<Properties,? extends F> still, Function<Properties,? extends F> flowing, int lightLevel) {
     return register(
       name, tagName, new FluidBuilder(builder.luminosity(lightLevel)).explosionResistance(100f), still, flowing,
-      fluid -> new LiquidBlock(fluid.get(), FabricBlockSettings.of().noCollission().strength(100.0F).noLootTable().lightLevel(state -> lightLevel))
+      fluid -> new LiquidBlock(fluid.get(), settingsConsume.apply(FabricBlockSettings.of().noCollission().strength(100.0F).noLootTable().lightLevel(state -> lightLevel)))
     );
   }
 
@@ -216,8 +218,8 @@ public class FluidDeferredRegister extends DeferredRegisterWrapper<Fluid> {
    * @param lightLevel Block light level
    * @return  Fluid object
    */
-  public FluidObject<SimpleFlowableFluid> register(String name, String tagName, FluidAttributes.Builder builder, int lightLevel) {
-    return register(name, tagName, builder, SimpleFlowableFluid.Still::new, SimpleFlowableFluid.Flowing::new, lightLevel);
+  public FluidObject<SimpleFlowableFluid> register(String name, String tagName, FluidAttributes.Builder builder, Function<BlockBehaviour.Properties, BlockBehaviour.Properties> settingsConsumer, int lightLevel) {
+    return register(name, tagName, builder, settingsConsumer, SimpleFlowableFluid.Still::new, SimpleFlowableFluid.Flowing::new, lightLevel);
   }
 
   /**
@@ -228,7 +230,7 @@ public class FluidDeferredRegister extends DeferredRegisterWrapper<Fluid> {
    * @return  Fluid object
    */
   public FluidObject<SimpleFlowableFluid> register(String name, FluidAttributes.Builder builder, int lightLevel) {
-    return register(name, name, builder, lightLevel);
+    return register(name, name, builder, properties -> properties, lightLevel);
   }
 
   /**
@@ -243,6 +245,6 @@ public class FluidDeferredRegister extends DeferredRegisterWrapper<Fluid> {
    */
   public <F extends SimpleFlowableFluid> FluidObject<F> register(String name, FluidAttributes.Builder builder,
                                                                  Function<Properties,? extends F> still, Function<Properties,? extends F> flowing, int lightLevel) {
-    return register(name, name, builder, still, flowing, lightLevel);
+    return register(name, name, builder, properties -> properties, still, flowing, lightLevel);
   }
 }
