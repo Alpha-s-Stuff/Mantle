@@ -20,7 +20,7 @@ import slimeknights.mantle.util.RetexturedHelper;
 public interface IRetexturedBlockEntity extends RenderAttachmentBlockEntity {
   /* Gets the Forge tile data for the tile entity */
   default CompoundTag getTileData() {
-    return ((BlockEntity)this).getExtraCustomData();
+    return ((BlockEntity)this).getCustomData();
   }
 
   /**

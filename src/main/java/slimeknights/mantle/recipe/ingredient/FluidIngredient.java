@@ -9,7 +9,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.google.gson.JsonSyntaxException;
-import io.github.fabricators_of_create.porting_lib.util.FluidStack;
+import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;

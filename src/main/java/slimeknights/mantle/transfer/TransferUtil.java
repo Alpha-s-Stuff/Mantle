@@ -14,7 +14,7 @@ import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.level.block.ChestBlock;
 import slimeknights.mantle.transfer.item.ItemHandlerHelper;
 
-import io.github.fabricators_of_create.porting_lib.util.FluidStack;
+import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
 import org.jetbrains.annotations.Nullable;
 
 import io.github.fabricators_of_create.porting_lib.util.LazyOptional;

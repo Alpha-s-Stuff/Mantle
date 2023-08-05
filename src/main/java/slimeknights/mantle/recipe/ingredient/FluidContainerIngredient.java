@@ -2,7 +2,7 @@ package slimeknights.mantle.recipe.ingredient;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import io.github.fabricators_of_create.porting_lib.util.FluidStack;
+import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
 import net.fabricmc.fabric.api.recipe.v1.ingredient.CustomIngredient;
 import net.fabricmc.fabric.api.recipe.v1.ingredient.CustomIngredientSerializer;
 import net.minecraft.network.FriendlyByteBuf;

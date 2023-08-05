@@ -1,6 +1,6 @@
 package slimeknights.mantle.transfer.fluid;
 
-import io.github.fabricators_of_create.porting_lib.util.FluidStack;
+import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import org.jetbrains.annotations.ApiStatus;
 

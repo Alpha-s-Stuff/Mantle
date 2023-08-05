@@ -39,7 +39,7 @@ public class Config {
     FLUID_UNIT = client
       .comment("Determines what Fluid Unit should be used to display fluids.")
       .translation("config.mantle.fabric.fluidUnit")
-      .defineEnum("fluidUnit", FluidUnit.MILIBUCKETS);
+      .defineEnum("fluidUnit", FluidUnit.MILLIBUCKETS);
 
 		// server options
 		TAG_PREFERENCES = server.comment("Preferences for outputs from tags used in automatic compat in recipes")

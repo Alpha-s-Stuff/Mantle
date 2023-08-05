@@ -1,6 +1,6 @@
 package slimeknights.mantle.transfer.fluid;
 
-import io.github.fabricators_of_create.porting_lib.util.FluidStack;
+import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
 
 public class EmptyTank extends FluidTank {
 	public static final EmptyTank INSTANCE = new EmptyTank();

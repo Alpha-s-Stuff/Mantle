@@ -7,7 +7,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import io.github.fabricators_of_create.porting_lib.util.CraftingHelper;
-import io.github.fabricators_of_create.porting_lib.util.FluidStack;
+import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;

@@ -73,7 +73,7 @@ public class FallbackModelLoader implements IGeometryLoader<FallbackModelLoader.
    */
   record BlockModelWrapper(BlockModel model) implements IUnbakedGeometry<BlockModelWrapper> {
     @Override
-    public BakedModel bake(BlockModel owner, ModelBaker baker, Function<Material,TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides, ResourceLocation modelLocation) {
+    public BakedModel bake(BlockModel owner, ModelBaker baker, Function<Material,TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides, ResourceLocation modelLocation, boolean isGui3d) {
       return model.bake(baker, model, spriteGetter, modelTransform, modelLocation, true);
     }
 

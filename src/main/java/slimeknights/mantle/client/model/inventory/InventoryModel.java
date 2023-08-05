@@ -38,7 +38,7 @@ public class InventoryModel implements IUnbakedGeometry<InventoryModel> {
   }
 
   @Override
-  public BakedModel bake(BlockModel owner, ModelBaker baker, Function<Material,TextureAtlasSprite> spriteGetter, ModelState transform, ItemOverrides overrides, ResourceLocation location) {
+  public BakedModel bake(BlockModel owner, ModelBaker baker, Function<Material,TextureAtlasSprite> spriteGetter, ModelState transform, ItemOverrides overrides, ResourceLocation location, boolean isGui3d) {
     BakedModel baked = model.bakeModel(owner, transform, overrides, spriteGetter, location);
     return new Baked(baked, items);
   }

@@ -3,7 +3,7 @@ package slimeknights.mantle.recipe.helper;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import io.github.fabricators_of_create.porting_lib.mixin.accessors.common.accessor.RecipeManagerAccessor;
-import io.github.fabricators_of_create.porting_lib.util.FluidStack;
+import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
 import io.netty.handler.codec.DecoderException;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

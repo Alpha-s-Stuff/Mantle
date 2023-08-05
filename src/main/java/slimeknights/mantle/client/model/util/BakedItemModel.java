@@ -68,11 +68,11 @@ public class BakedItemModel implements BakedModel, TransformTypeDependentItemBak
   }
 
   @Override
-  public BakedModel applyTransform(ItemDisplayContext type, PoseStack poseStack, boolean applyLeftHandTransform)
+  public BakedModel applyTransform(ItemDisplayContext type, PoseStack poseStack, boolean applyLeftHandTransform, DefaultTransform defaultTransform)
   {
     if (type == ItemDisplayContext.GUI && this.guiModel != null)
     {
-      return ((TransformTypeDependentItemBakedModel)this.guiModel).applyTransform(type, poseStack, applyLeftHandTransform);
+      return ((TransformTypeDependentItemBakedModel)this.guiModel).applyTransform(type, poseStack, applyLeftHandTransform, defaultTransform);
     }
     transforms.getTransform(type).apply(applyLeftHandTransform, poseStack);
     return this;
@@ -107,7 +107,7 @@ public class BakedItemModel implements BakedModel, TransformTypeDependentItemBak
     }
 
     @Override
-    public BakedModel applyTransform(ItemDisplayContext type, PoseStack poseStack, boolean leftHanded)
+    public BakedModel applyTransform(ItemDisplayContext type, PoseStack poseStack, boolean leftHanded, DefaultTransform defaultTransform)
     {
       if (type == ItemDisplayContext.GUI)
       {
@@ -116,7 +116,7 @@ public class BakedItemModel implements BakedModel, TransformTypeDependentItemBak
       }
 
       if(this.wrapped instanceof TransformTypeDependentItemBakedModel model)
-        return model.applyTransform(type, poseStack, leftHanded);
+        return model.applyTransform(type, poseStack, leftHanded, defaultTransform);
       return this;
     }
   }

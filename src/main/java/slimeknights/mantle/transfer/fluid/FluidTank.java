@@ -2,7 +2,7 @@ package slimeknights.mantle.transfer.fluid;
 
 import java.util.function.Predicate;
 
-import io.github.fabricators_of_create.porting_lib.util.FluidStack;
+import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
 import net.minecraft.nbt.CompoundTag;
 
 public class FluidTank implements IFluidHandler {

@@ -74,9 +74,9 @@ public class RetexturedModel implements IUnbakedGeometry<RetexturedModel> {
   }
 
   @Override
-  public BakedModel bake(BlockModel owner, ModelBaker baker, Function<Material,TextureAtlasSprite> spriteGetter, ModelState transform, ItemOverrides overrides, ResourceLocation location) {
+  public BakedModel bake(BlockModel owner, ModelBaker baker, Function<Material,TextureAtlasSprite> spriteGetter, ModelState transform, ItemOverrides overrides, ResourceLocation location, boolean isGui3d) {
     // bake the model and return
-    BakedModel baked = model.bake(owner, baker, spriteGetter, transform, overrides, location);
+    BakedModel baked = model.bake(owner, baker, spriteGetter, transform, overrides, location, isGui3d);
     return new Baked(baked, owner, model, transform, getAllRetextured(owner, this.model.getModel(), retextured));
   }
 

@@ -2,7 +2,7 @@ package slimeknights.mantle.fluid;
 
 import io.github.fabricators_of_create.porting_lib.mixin.accessors.common.accessor.BucketItemAccessor;
 import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
-import io.github.fabricators_of_create.porting_lib.util.FluidStack;
+import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
 import io.github.fabricators_of_create.porting_lib.util.FluidTextUtil;
 import io.github.fabricators_of_create.porting_lib.util.FluidUnit;
 import lombok.AccessLevel;
@@ -48,11 +48,11 @@ public class FluidTransferHelper {
   private static final String KEY_DRAINED_DROPLET = Mantle.makeDescriptionId("block", "tank.drained.droplets");
 
   public static String getKeyFilled() {
-    return Config.FLUID_UNIT.get() == FluidUnit.MILIBUCKETS ? KEY_FILLED : KEY_FILLED_DROPLET;
+    return Config.FLUID_UNIT.get() == FluidUnit.MILLIBUCKETS ? KEY_FILLED : KEY_FILLED_DROPLET;
   }
 
   public static String getKeyDrained() {
-    return Config.FLUID_UNIT.get() == FluidUnit.MILIBUCKETS ? KEY_DRAINED : KEY_DRAINED_DROPLET;
+    return Config.FLUID_UNIT.get() == FluidUnit.MILLIBUCKETS ? KEY_DRAINED : KEY_DRAINED_DROPLET;
   }
 
   /**

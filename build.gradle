@@ -118,7 +118,7 @@ dependencies {
     modImplementation("net.fabricmc:fabric-loader:${project.loader_version}")
     modImplementation("net.fabricmc.fabric-api:fabric-api:${project.fabric_version}")
 
-    modApi(include("io.github.fabricators_of_create.Porting-Lib:Porting-Lib:${project.port_lib_version}+${project.minecraft_version}-entity-refactor"))
+    modApi(include("io.github.fabricators_of_create.Porting-Lib:Porting-Lib:${project.port_lib_version}+1.20-entity-refactor"))
 
     // compile against the REI API but do not include it at runtime
     modCompileOnly("me.shedaniel:RoughlyEnoughItems-api-fabric:${project.rei_version}")
@@ -127,7 +127,7 @@ dependencies {
     // api for REI
     modImplementation("dev.architectury:architectury-fabric:${project.architectury_version}")
 
-    modCompileOnly("mezz.jei:jei-1.19.4-fabric:${jei_version}")
+    modCompileOnly("mezz.jei:jei-${project.minecraft_version}-fabric:${jei_version}")
 
     implementation(include("com.google.code.findbugs:jsr305:3.0.2"))
 
@@ -145,7 +145,7 @@ dependencies {
     testCompileOnly "org.projectlombok:lombok:1.18.22"
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.22'
 
-    modImplementation(include("me.alphamode:Star:${project.star_version}+${project.minecraft_version}"))
+    modImplementation(include("me.alphamode:Star:${project.star_version}+1.20"))
 }
 
 task buildOrPublish {

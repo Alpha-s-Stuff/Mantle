@@ -2,7 +2,7 @@ package slimeknights.mantle.recipe.data;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import io.github.fabricators_of_create.porting_lib.util.FluidStack;
+import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.material.Fluid;

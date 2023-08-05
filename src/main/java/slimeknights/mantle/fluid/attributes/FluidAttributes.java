@@ -2,7 +2,7 @@ package slimeknights.mantle.fluid.attributes;
 
 import javax.annotation.Nullable;
 
-import io.github.fabricators_of_create.porting_lib.util.FluidStack;
+import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.level.block.state.BlockState;

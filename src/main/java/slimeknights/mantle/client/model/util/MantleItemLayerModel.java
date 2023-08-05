@@ -59,7 +59,7 @@ public class MantleItemLayerModel implements IUnbakedGeometry<MantleItemLayerMod
   }
 
   @Override
-  public BakedModel bake(BlockModel owner, ModelBaker baker, Function<Material,TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides, ResourceLocation modelLocation) {
+  public BakedModel bake(BlockModel owner, ModelBaker baker, Function<Material,TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides, ResourceLocation modelLocation, boolean isGui3d) {
     ImmutableList.Builder<Material> materialBuilder = ImmutableList.builder();
     for (int i = 0; owner.hasTexture("layer" + i); i++) {
       materialBuilder.add(owner.getMaterial("layer" + i));

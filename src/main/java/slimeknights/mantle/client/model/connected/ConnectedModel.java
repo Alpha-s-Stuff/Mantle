@@ -90,7 +90,7 @@ public class ConnectedModel implements IUnbakedGeometry<ConnectedModel> {
   }
 
   @Override
-  public BakedModel bake(BlockModel owner, ModelBaker baker, Function<Material,TextureAtlasSprite> spriteGetter, ModelState transform, ItemOverrides overrides, ResourceLocation location) {
+  public BakedModel bake(BlockModel owner, ModelBaker baker, Function<Material,TextureAtlasSprite> spriteGetter, ModelState transform, ItemOverrides overrides, ResourceLocation location, boolean isGui3d) {
     // for all connected textures, add suffix textures
     // Map of full texture name to the resulting material
     Map<String, Material> extraTextures = new HashMap<>();

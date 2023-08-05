@@ -8,10 +8,10 @@ import com.google.gson.JsonObject;
 import com.mojang.datafixers.util.Either;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.math.Transformation;
-import io.github.fabricators_of_create.porting_lib.models.SimpleModelState;
 import io.github.fabricators_of_create.porting_lib.models.UnbakedGeometryHelper;
 import io.github.fabricators_of_create.porting_lib.models.geometry.IGeometryLoader;
 import io.github.fabricators_of_create.porting_lib.models.geometry.IUnbakedGeometry;
+import io.github.fabricators_of_create.porting_lib.models.geometry.SimpleModelState;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.block.model.BakedQuad;
@@ -78,7 +78,7 @@ public class NBTKeyModel implements IUnbakedGeometry<NBTKeyModel> {
   }
 
   @Override
-  public BakedModel bake(BlockModel owner, ModelBaker bakery, Function<Material,TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides, ResourceLocation modelLocation) {
+  public BakedModel bake(BlockModel owner, ModelBaker baker, Function<Material,TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides, ResourceLocation modelLocation, boolean isGui3d) {
     textures = new HashMap<>();
     // must have a default
     Material defaultTexture = owner.getMaterial("default");

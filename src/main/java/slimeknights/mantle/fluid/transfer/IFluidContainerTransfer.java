@@ -3,7 +3,7 @@ package slimeknights.mantle.fluid.transfer;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import slimeknights.mantle.transfer.fluid.IFluidHandler;
-import io.github.fabricators_of_create.porting_lib.util.FluidStack;
+import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import slimeknights.mantle.data.GenericRegisteredSerializer.IJsonSerializable;

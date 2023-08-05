@@ -73,7 +73,7 @@ public class FluidTextureModel implements IUnbakedGeometry<FluidTextureModel> {
 //  }
 
   @Override
-  public BakedModel bake(BlockModel owner, ModelBaker baker, Function<Material,TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides, ResourceLocation modelLocation) {
+  public BakedModel bake(BlockModel owner, ModelBaker baker, Function<Material,TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides, ResourceLocation modelLocation, boolean isGui3d) {
     Material still = owner.getMaterial("still");
     Material flowing = owner.getMaterial("flowing");
     Material overlay = owner.getMaterial("overlay");

@@ -141,7 +141,7 @@ public class ColoredBlockModel implements IUnbakedGeometry<ColoredBlockModel> {
   }
 
   @Override
-  public BakedModel bake(BlockModel owner, ModelBaker baker, Function<Material,TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides, ResourceLocation modelLocation) {
+  public BakedModel bake(BlockModel owner, ModelBaker baker, Function<Material,TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides, ResourceLocation modelLocation, boolean isGui3d) {
     return bakeModel(owner, model.getElements(), colorData, modelTransform, overrides, spriteGetter, modelLocation);
   }
 

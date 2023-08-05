@@ -5,7 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import slimeknights.mantle.transfer.TransferUtil;
-import io.github.fabricators_of_create.porting_lib.util.FluidStack;
+import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
 import org.jetbrains.annotations.Nullable;
 
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;

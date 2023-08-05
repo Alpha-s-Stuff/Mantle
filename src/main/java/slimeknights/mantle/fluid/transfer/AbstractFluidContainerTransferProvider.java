@@ -2,7 +2,7 @@ package slimeknights.mantle.fluid.transfer;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import io.github.fabricators_of_create.porting_lib.util.FluidStack;
+import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.resource.conditions.v1.ConditionJsonProvider;
 import net.fabricmc.fabric.api.resource.conditions.v1.ResourceConditions;
