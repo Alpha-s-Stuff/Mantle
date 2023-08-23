@@ -3,6 +3,7 @@ package slimeknights.mantle.client;
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
@@ -82,6 +83,9 @@ public class ExtraHeartRenderHandler {
 
     // extra setup stuff from us
     int left_height = 39;
+    if (FabricLoader.getInstance().getObjectShare().get("raised:hud") instanceof Integer distance) {
+      left_height += distance;
+    }
     int width = this.mc.getWindow().getGuiScaledWidth();
     int height = this.mc.getWindow().getGuiScaledHeight();
     int updateCounter = this.mc.gui.getGuiTicks();
