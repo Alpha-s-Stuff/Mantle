@@ -1,12 +1,12 @@
 package slimeknights.mantle.inventory;
 
+import io.github.fabricators_of_create.porting_lib.transfer.item.SlotItemHandler;
+import io.github.fabricators_of_create.porting_lib.transfer.item.SlottedStackStorage;
 import net.minecraft.world.item.ItemStack;
-import slimeknights.mantle.transfer.item.IItemHandler;
-import slimeknights.mantle.transfer.item.SlotItemHandler;
 
 /** Forge still uses dumb vanilla logic for determining slot limits instead of their own method */
 public class SmartItemHandlerSlot extends SlotItemHandler {
-	public SmartItemHandlerSlot(IItemHandler itemHandler, int index, int xPosition, int yPosition) {
+	public SmartItemHandlerSlot(SlottedStackStorage itemHandler, int index, int xPosition, int yPosition) {
 		super(itemHandler, index, xPosition, yPosition);
 	}
 
