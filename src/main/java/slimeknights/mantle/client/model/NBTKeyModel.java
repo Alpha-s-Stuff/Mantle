@@ -13,6 +13,9 @@ import io.github.fabricators_of_create.porting_lib.models.geometry.IGeometryLoad
 import io.github.fabricators_of_create.porting_lib.models.geometry.IUnbakedGeometry;
 import io.github.fabricators_of_create.porting_lib.models.geometry.SimpleModelState;
 import lombok.RequiredArgsConstructor;
+import net.fabricmc.fabric.api.renderer.v1.RendererAccess;
+import net.fabricmc.fabric.api.renderer.v1.mesh.MeshBuilder;
+import net.fabricmc.fabric.api.renderer.v1.mesh.QuadEmitter;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockModel;
@@ -74,7 +77,13 @@ public class NBTKeyModel implements IUnbakedGeometry<NBTKeyModel> {
   private static BakedModel bakeModel(BlockModel owner, Material texture, Function<Material,TextureAtlasSprite> spriteGetter, ItemOverrides overrides) {
     TextureAtlasSprite sprite = spriteGetter.apply(texture);
     List<BakedQuad> quads = UnbakedGeometryHelper.bakeElements(ITEM_MODEL_GENERATOR.processFrames(-1, sprite.contents().name().toString(), sprite.contents()), spriteGetter, new SimpleModelState(Transformation.identity()), sprite.contents().name());
-    return new BakedItemModel(quads, sprite, owner.getTransforms(), overrides, true, owner.getGuiLight().lightLikeBlock());
+    MeshBuilder meshBuilder = RendererAccess.INSTANCE.getRenderer().meshBuilder();
+    QuadEmitter emitter = meshBuilder.getEmitter();
+    for (BakedQuad quad : quads) {
+      emitter.fromVanilla(quad, RendererAccess.INSTANCE.getRenderer().materialFinder().find(), null);
+      emitter.emit();
+    }
+    return new BakedItemModel(meshBuilder.build(), sprite, owner.getTransforms(), overrides, true, owner.getGuiLight().lightLikeBlock());
   }
 
   @Override

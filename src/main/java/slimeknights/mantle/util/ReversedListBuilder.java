@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Builder for creating a list by adding the last elements for the final list first
@@ -19,6 +20,10 @@ public class ReversedListBuilder<E> {
    */
   public void addAll(Collection<E> collection) {
     unpacked.add(collection);
+  }
+
+  public void add(E collection) {
+    unpacked.add(Set.of(collection));
   }
 
   /** Builds the final list of quads */
