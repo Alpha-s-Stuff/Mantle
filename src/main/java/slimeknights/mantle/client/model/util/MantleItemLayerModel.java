@@ -10,6 +10,7 @@ import io.github.fabricators_of_create.porting_lib.models.geometry.IGeometryLoad
 import io.github.fabricators_of_create.porting_lib.models.geometry.IUnbakedGeometry;
 import lombok.RequiredArgsConstructor;
 import net.fabricmc.fabric.api.renderer.v1.RendererAccess;
+import net.fabricmc.fabric.api.renderer.v1.material.MaterialFinder;
 import net.fabricmc.fabric.api.renderer.v1.mesh.MutableQuadView;
 import net.fabricmc.fabric.api.renderer.v1.mesh.QuadEmitter;
 import net.minecraft.client.renderer.block.model.BakedQuad;
@@ -334,18 +335,18 @@ public class MantleItemLayerModel implements IUnbakedGeometry<MantleItemLayerMod
                                        float x2, float y2, float z2, float u2, float v2,
                                        float x3, float y3, float z3, float u3, float v3) {
     QuadEmitter builder = RendererAccess.INSTANCE.getRenderer().meshBuilder().getEmitter();
+    MaterialFinder material = RendererAccess.INSTANCE.getRenderer().materialFinder();
     builder.spriteBake(0, sprite, MutableQuadView.BAKE_ROTATE_NONE);
     builder.colorIndex(tint);
     builder.nominalFace(side);
-//    builder.setApplyDiffuseLighting(false); // TODO: luminosity == 0?
+    builder.material(material.disableDiffuse(true).find());
 
     putVertex(builder, side, x0, y0, z0, u0, v0, color, luminosity, 0);
     putVertex(builder, side, x1, y1, z1, u1, v1, color, luminosity, 1);
     putVertex(builder, side, x2, y2, z2, u2, v2, color, luminosity, 2);
     putVertex(builder, side, x3, y3, z3, u3, v3, color, luminosity, 3);
     QuadTransformers.applying(transform).transform(builder);
-    BakedQuad quad = builder.toBakedQuad(0, sprite, true);
-    return quad;
+    return builder.toBakedQuad(sprite);
   }
 
   /**
