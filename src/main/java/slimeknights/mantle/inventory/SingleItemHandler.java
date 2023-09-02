@@ -52,11 +52,6 @@ public abstract class SingleItemHandler<T extends MantleBlockEntity> extends Sin
   }
 
   @Override
-  protected boolean canExtract(ItemVariant itemVariant) {
-    return isItemValid(itemVariant);
-  }
-
-  @Override
   public int getSlotCount() {
     return 1;
   }
