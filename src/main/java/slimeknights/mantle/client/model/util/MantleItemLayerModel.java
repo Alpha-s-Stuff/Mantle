@@ -346,7 +346,7 @@ public class MantleItemLayerModel implements IUnbakedGeometry<MantleItemLayerMod
     emitter.spriteBake(sprite, MutableQuadView.BAKE_ROTATE_NONE);
     emitter.colorIndex(tint);
     emitter.nominalFace(side);
-    emitter.material(material.disableDiffuse(true).emissive(true).find());
+    emitter.material(material.disableDiffuse(true).find());
 
     putVertex(emitter, side, x0, y0, z0, u0, v0, color, luminosity, 0);
     putVertex(emitter, side, x1, y1, z1, u1, v1, color, luminosity, 1);
