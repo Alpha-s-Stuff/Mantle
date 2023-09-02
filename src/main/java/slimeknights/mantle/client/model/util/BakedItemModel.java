@@ -71,7 +71,9 @@ public class BakedItemModel implements BakedModel, TransformTypeDependentItemBak
 
   @Override
   public void emitItemQuads(ItemStack stack, Supplier<RandomSource> randomSupplier, RenderContext context) {
+    context.pushTransform(this.transform);
     this.quads.outputTo(context.getEmitter());
+    context.popTransform();
   }
 
   @Override
