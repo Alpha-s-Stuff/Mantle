@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.item.base.SingleStackStorage;
+import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import slimeknights.mantle.block.entity.MantleBlockEntity;
@@ -75,6 +77,31 @@ public abstract class SingleItemHandler<T extends MantleBlockEntity> implements 
     if (slot == 0) {
       setStack(stack);
     }
+  }
+
+  @Override
+  public SingleSlotStorage<ItemVariant> getSlot(int slot) {
+    return new SingleStackStorage() {
+      @Override
+      protected ItemStack getStack() {
+        return SingleItemHandler.this.getStackInSlot(slot);
+      }
+
+      @Override
+      protected void setStack(ItemStack stack) {
+        SingleItemHandler.this.setStackInSlot(slot, stack);
+      }
+    };
+  }
+
+  @Override
+  public long insert(ItemVariant resource, long maxAmount, TransactionContext transaction) {
+    return getSlot(0).insert(resource, maxAmount, transaction);
+  }
+
+  @Override
+  public long extract(ItemVariant resource, long maxAmount, TransactionContext transaction) {
+    return getSlot(0).extract(resource, maxAmount, transaction);
   }
 
   /**
