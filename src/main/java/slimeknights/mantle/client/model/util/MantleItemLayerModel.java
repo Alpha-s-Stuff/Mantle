@@ -15,6 +15,7 @@ import net.fabricmc.fabric.api.renderer.v1.mesh.Mesh;
 import net.fabricmc.fabric.api.renderer.v1.mesh.MeshBuilder;
 import net.fabricmc.fabric.api.renderer.v1.mesh.MutableQuadView;
 import net.fabricmc.fabric.api.renderer.v1.mesh.QuadEmitter;
+import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
@@ -379,7 +380,7 @@ public class MantleItemLayerModel implements IUnbakedGeometry<MantleItemLayerMod
 
     consumer.sprite(vertexIndex, 0, u, v);
 
-    consumer.lightmap(vertexIndex, luminosity);
+    consumer.lightmap(vertexIndex, LightTexture.pack(luminosity, luminosity));
 
     float offX = (float) side.getStepX();
     float offY = (float) side.getStepY();
