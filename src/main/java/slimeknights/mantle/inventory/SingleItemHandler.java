@@ -2,6 +2,10 @@ package slimeknights.mantle.inventory;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.item.base.SingleStackStorage;
+import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import slimeknights.mantle.block.entity.MantleBlockEntity;
@@ -15,7 +19,7 @@ import javax.annotation.Nonnull;
  */
 @SuppressWarnings("unused")
 @RequiredArgsConstructor
-public abstract class SingleItemHandler<T extends MantleBlockEntity> implements IItemHandlerModifiable {
+public abstract class SingleItemHandler<T extends MantleBlockEntity> extends SingleStackStorage {
   protected final T parent;
   private final int maxStackSize;
 
@@ -37,104 +41,34 @@ public abstract class SingleItemHandler<T extends MantleBlockEntity> implements 
    * @param stack  Stack
    * @return  True if valid
    */
-  protected abstract boolean isItemValid(ItemStack stack);
+  protected abstract boolean isItemValid(ItemVariant stack);
 
 
   /* Properties */
 
   @Override
-  public boolean isItemValid(int slot, ItemStack stack) {
-    return slot == 0 && isItemValid(stack);
+  public boolean canInsert(ItemVariant stack) {
+    return isItemValid(stack);
   }
 
   @Override
-  public int getSlots() {
+  protected boolean canExtract(ItemVariant itemVariant) {
+    return isItemValid(itemVariant);
+  }
+
+  @Override
+  public int getSlotCount() {
     return 1;
-  }
-
-  @Override
-  public int getSlotLimit(int slot) {
-    return maxStackSize;
   }
 
   @Nonnull
   @Override
-  public ItemStack getStackInSlot(int slot) {
-    if (slot == 0) {
-      return stack;
-    }
-    return ItemStack.EMPTY;
+  public ItemStack getStack() {
+    return stack;
   }
 
 
   /* Interaction */
-
-  @Override
-  public void setStackInSlot(int slot, ItemStack stack) {
-    if (slot == 0) {
-      setStack(stack);
-    }
-  }
-  
-  @Nonnull
-  @Override
-  public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
-    if (stack.isEmpty()) {
-      return ItemStack.EMPTY;
-    }
-    if (slot == 0) {
-      ItemStack current = getStack();
-      if (current.isEmpty()) {
-        if (this.isItemValid(slot, stack)) {
-          // insert up to the stack limit
-          int size = Math.min(stack.getCount(), getSlotLimit(0));
-          if (!simulate) {
-            this.setStack(ItemHandlerHelper.copyStackWithSize(stack, size));
-          }
-          return ItemHandlerHelper.copyStackWithSize(stack, stack.getCount() - size);
-        }
-      } else if (ItemHandlerHelper.canItemStacksStack(current, stack)) {
-        // increase up to the stack limit
-        int added = Math.min(stack.getCount(), getSlotLimit(0) - current.getCount());
-        if (added > 0) {
-          if (!simulate) {
-            current.grow(added);
-            setStack(current);
-          }
-          return ItemHandlerHelper.copyStackWithSize(stack, stack.getCount() - added);
-        }
-      }
-    }
-    return stack;
-  }
-
-  @Nonnull
-  @Override
-  public ItemStack extractItem(int slot, int amount, boolean simulate) {
-    if (amount == 0 || slot != 0) {
-      return ItemStack.EMPTY;
-    }
-    if (stack.isEmpty()) {
-      return ItemStack.EMPTY;
-    }
-
-    // if amount is less than our size, need to do some shrinking
-    if (amount < stack.getCount()) {
-      ItemStack result = ItemHandlerHelper.copyStackWithSize(stack, amount);
-      if (!simulate) {
-        setStack(ItemHandlerHelper.copyStackWithSize(stack, stack.getCount() - amount));
-      }
-      return result;
-    }
-    // equal to or bigger means we give them our stack directly
-    if (simulate) {
-      return stack.copy();
-    } else {
-      ItemStack ret = stack;
-      setStack(ItemStack.EMPTY);
-      return ret;
-    }
-  }
 
   /**
    * Writes this module to NBT
