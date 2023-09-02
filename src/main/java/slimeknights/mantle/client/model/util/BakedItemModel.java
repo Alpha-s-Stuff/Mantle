@@ -77,6 +77,11 @@ public class BakedItemModel implements BakedModel, TransformTypeDependentItemBak
   }
 
   @Override
+  public boolean isVanillaAdapter() {
+    return false;
+  }
+
+  @Override
   public BakedModel applyTransform(ItemDisplayContext type, PoseStack poseStack, boolean applyLeftHandTransform, DefaultTransform defaultTransform)
   {
     if (type == ItemDisplayContext.GUI && this.guiModel != null)
@@ -105,6 +110,11 @@ public class BakedItemModel implements BakedModel, TransformTypeDependentItemBak
       context.pushTransform(quad -> quad.lightFace() == Direction.SOUTH);
       super.emitItemQuads(stack, randomSupplier, context);
       context.popTransform();
+    }
+
+    @Override
+    public boolean isVanillaAdapter() {
+      return false;
     }
 
     @Override
