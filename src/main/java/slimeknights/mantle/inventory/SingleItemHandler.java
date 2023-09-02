@@ -1,16 +1,13 @@
 package slimeknights.mantle.inventory;
 
+import io.github.fabricators_of_create.porting_lib.transfer.item.SlottedStackStorage;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.item.base.SingleStackStorage;
-import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
-import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import slimeknights.mantle.block.entity.MantleBlockEntity;
-import slimeknights.mantle.transfer.item.IItemHandlerModifiable;
-import slimeknights.mantle.transfer.item.ItemHandlerHelper;
 
 import javax.annotation.Nonnull;
 
@@ -19,7 +16,7 @@ import javax.annotation.Nonnull;
  */
 @SuppressWarnings("unused")
 @RequiredArgsConstructor
-public abstract class SingleItemHandler<T extends MantleBlockEntity> extends SingleStackStorage {
+public abstract class SingleItemHandler<T extends MantleBlockEntity> implements SlottedStackStorage {
   protected final T parent;
   private final int maxStackSize;
 
@@ -47,8 +44,8 @@ public abstract class SingleItemHandler<T extends MantleBlockEntity> extends Sin
   /* Properties */
 
   @Override
-  public boolean canInsert(ItemVariant stack) {
-    return isItemValid(stack);
+  public boolean isItemValid(int slot, ItemVariant stack) {
+    return slot == 0 && isItemValid(stack);
   }
 
   @Override
@@ -56,14 +53,29 @@ public abstract class SingleItemHandler<T extends MantleBlockEntity> extends Sin
     return 1;
   }
 
+  @Override
+  public int getSlotLimit(int slot) {
+    return maxStackSize;
+  }
+
   @Nonnull
   @Override
-  public ItemStack getStack() {
-    return stack;
+  public ItemStack getStackInSlot(int slot) {
+    if (slot == 0) {
+      return stack;
+    }
+    return ItemStack.EMPTY;
   }
 
 
   /* Interaction */
+
+  @Override
+  public void setStackInSlot(int slot, ItemStack stack) {
+    if (slot == 0) {
+      setStack(stack);
+    }
+  }
 
   /**
    * Writes this module to NBT
