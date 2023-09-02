@@ -86,7 +86,7 @@ public class MantleItemLayerModel implements IUnbakedGeometry<MantleItemLayerMod
     for (Mesh mesh : builder.build()) {
       mesh.outputTo(emitter);
     }
-    return new BakedItemModel(finalMesh.build(), particle, owner.getTransforms(), overrides, true, owner.getGuiLight().lightLikeBlock());
+    return new BakedItemModel(finalMesh.build(), quad -> true, particle, owner.getTransforms(), overrides, true, owner.getGuiLight().lightLikeBlock());
   }
 
   /**

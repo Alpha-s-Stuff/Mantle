@@ -83,7 +83,7 @@ public class NBTKeyModel implements IUnbakedGeometry<NBTKeyModel> {
       emitter.fromVanilla(quad, RendererAccess.INSTANCE.getRenderer().materialFinder().find(), null);
       emitter.emit();
     }
-    return new BakedItemModel(meshBuilder.build(), sprite, owner.getTransforms(), overrides, true, owner.getGuiLight().lightLikeBlock());
+    return new BakedItemModel(meshBuilder.build(), quad -> true, sprite, owner.getTransforms(), overrides, true, owner.getGuiLight().lightLikeBlock());
   }
 
   @Override

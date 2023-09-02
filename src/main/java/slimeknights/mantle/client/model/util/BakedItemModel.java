@@ -1,38 +1,43 @@
 package slimeknights.mantle.client.model.util;
 
+import javax.annotation.Nullable;
+
+import java.util.List;
+import java.util.function.Supplier;
+
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.mojang.blaze3d.vertex.PoseStack;
 import io.github.fabricators_of_create.porting_lib.models.TransformTypeDependentItemBakedModel;
 import net.fabricmc.fabric.api.renderer.v1.mesh.Mesh;
 import net.fabricmc.fabric.api.renderer.v1.model.ForwardingBakedModel;
 import net.fabricmc.fabric.api.renderer.v1.render.RenderContext;
-import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.block.model.ItemTransform;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
-
-import javax.annotation.Nullable;
-import java.util.List;
-import java.util.function.Supplier;
+import com.mojang.math.Transformation;
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.renderer.block.model.ItemOverrides;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.core.Direction;
 
 public class BakedItemModel implements BakedModel, TransformTypeDependentItemBakedModel {
   protected final Mesh quads;
+  protected final RenderContext.QuadTransform transform;
   protected final TextureAtlasSprite particle;
   protected final ItemTransforms transforms;
   protected final ItemOverrides overrides;
   protected final BakedModel guiModel;
   protected final boolean useBlockLight;
 
-  public BakedItemModel(Mesh quads, TextureAtlasSprite particle, ItemTransforms transforms, ItemOverrides overrides, boolean untransformed, boolean useBlockLight)
+  public BakedItemModel(Mesh quads, RenderContext.QuadTransform transform, TextureAtlasSprite particle, ItemTransforms transforms, ItemOverrides overrides, boolean untransformed, boolean useBlockLight)
   {
     this.quads = quads;
+    this.transform = transform;
     this.particle = particle;
     this.transforms = transforms;
     this.overrides = overrides;
@@ -82,7 +87,6 @@ public class BakedItemModel implements BakedModel, TransformTypeDependentItemBak
 
   public static class BakedGuiItemModel<T extends BakedItemModel> extends ForwardingBakedModel implements TransformTypeDependentItemBakedModel
   {
-
     public BakedGuiItemModel(T originalModel)
     {
       this.wrapped = originalModel;
