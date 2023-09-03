@@ -299,7 +299,7 @@ public class RetexturedModel implements IUnbakedGeometry<RetexturedModel> {
 
       // if valid, use the block
       if (originalModel instanceof WrapperBakedModel model)
-        return model.getWrappedModel();
+        return ((Baked)model.getWrappedModel()).getCachedModel(block);
       return ((Baked)originalModel).getCachedModel(block);
     }
   }
