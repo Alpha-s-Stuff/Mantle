@@ -13,6 +13,7 @@ import io.github.fabricators_of_create.porting_lib.models.geometry.IUnbakedGeome
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import net.fabricmc.fabric.api.renderer.v1.model.FabricBakedModel;
+import net.fabricmc.fabric.api.renderer.v1.model.WrapperBakedModel;
 import net.fabricmc.fabric.api.renderer.v1.render.RenderContext;
 import net.fabricmc.fabric.api.rendering.data.v1.RenderAttachedBlockView;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -297,6 +298,8 @@ public class RetexturedModel implements IUnbakedGeometry<RetexturedModel> {
       }
 
       // if valid, use the block
+      if (originalModel instanceof WrapperBakedModel model)
+        return model.getWrappedModel();
       return ((Baked)originalModel).getCachedModel(block);
     }
   }
