@@ -1,13 +1,14 @@
 package slimeknights.mantle.loot;
 
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.fabricators_of_create.porting_lib.loot.IGlobalLootModifier;
+import io.github.fabricators_of_create.porting_lib.loot.LootModifier;
+import io.github.fabricators_of_create.porting_lib.transfer.item.ItemHandlerHelper;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -15,17 +16,13 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.storage.loot.LootContext;
-import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunction;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunctions;
-import net.minecraft.util.GsonHelper;
+import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import slimeknights.mantle.data.GlobalLootModifierProvider;
-import io.github.fabricators_of_create.porting_lib.loot.LootModifier;
-import slimeknights.mantle.transfer.item.ItemHandlerHelper;
 import slimeknights.mantle.loot.builder.AbstractLootModifierBuilder;
 import slimeknights.mantle.recipe.helper.ItemOutput;
 import slimeknights.mantle.recipe.helper.RecipeHelper;
-import slimeknights.mantle.util.JsonHelper;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;

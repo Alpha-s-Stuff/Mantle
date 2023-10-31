@@ -1,6 +1,10 @@
 package slimeknights.mantle.block;
 
 import io.github.fabricators_of_create.porting_lib.util.NetworkHooks;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Containers;
@@ -19,8 +23,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import slimeknights.mantle.block.entity.INameableMenuProvider;
 import slimeknights.mantle.inventory.BaseContainerMenu;
-import slimeknights.mantle.transfer.TransferUtil;
-import slimeknights.mantle.transfer.item.IItemHandler;
 
 import javax.annotation.Nullable;
 
@@ -101,11 +103,11 @@ public abstract class InventoryBlock extends Block implements EntityBlock {
   @Override
   public void onRemove(BlockState state, Level worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
     if (state.getBlock() != newState.getBlock()) {
-      BlockEntity te = worldIn.getBlockEntity(pos);
-      if (te != null) {
-        TransferUtil.getItemHandler(te).ifPresent(inventory -> dropInventoryItems(state, worldIn, pos, inventory));
+      Storage<ItemVariant> inventory = ItemStorage.SIDED.find(worldIn, pos, null);
+      if (inventory != null)
+        dropInventoryItems(state, worldIn, pos, inventory);
+      if (worldIn.getBlockEntity(pos) != null)
         worldIn.updateNeighbourForOutputSignal(pos, this);
-      }
     }
 
     super.onRemove(state, worldIn, pos, newState, isMoving);
@@ -118,7 +120,7 @@ public abstract class InventoryBlock extends Block implements EntityBlock {
    * @param pos         Tile position
    * @param inventory   Item handler
    */
-  protected void dropInventoryItems(BlockState state, Level worldIn, BlockPos pos, IItemHandler inventory) {
+  protected void dropInventoryItems(BlockState state, Level worldIn, BlockPos pos, Storage<ItemVariant> inventory) {
     dropInventoryItems(worldIn, pos, inventory);
   }
 
@@ -128,12 +130,12 @@ public abstract class InventoryBlock extends Block implements EntityBlock {
    * @param pos        Position to drop
    * @param inventory  Inventory instance
    */
-  public static void dropInventoryItems(Level world, BlockPos pos, IItemHandler inventory) {
+  public static void dropInventoryItems(Level world, BlockPos pos, Storage<ItemVariant> inventory) {
     double x = pos.getX();
     double y = pos.getY();
     double z = pos.getZ();
-    for(int i = 0; i < inventory.getSlots(); ++i) {
-      Containers.dropItemStack(world, x, y, z, inventory.getStackInSlot(i));
+    for(StorageView<ItemVariant> view : inventory) {
+      Containers.dropItemStack(world, x, y, z, view.getResource().toStack((int) Math.max(view.getResource().getItem().getMaxStackSize(), view.getAmount())));
     }
   }
 

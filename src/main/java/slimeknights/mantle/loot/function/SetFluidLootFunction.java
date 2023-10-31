@@ -4,13 +4,18 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
+import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
+import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.functions.LootItemConditionalFunction;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.minecraft.util.GsonHelper;
-import slimeknights.mantle.transfer.TransferUtil;
 import slimeknights.mantle.loot.MantleLoot;
 import slimeknights.mantle.recipe.helper.RecipeHelper;
 
@@ -31,11 +36,16 @@ public class SetFluidLootFunction extends LootItemConditionalFunction {
 
   @Override
   protected ItemStack run(ItemStack stack, LootContext context) {
-    return TransferUtil.getFluidHandlerItem(stack)
-                .map(handler -> {
-                  handler.fill(fluid.copy(), false);
-                  return handler.getContainer();
-                }).orElse(stack);
+    ContainerItemContext container = ContainerItemContext.withInitial(stack);
+    Storage<FluidVariant> storage = FluidStorage.ITEM.find(stack, container);
+    if (storage != null) {
+      try (Transaction tx = TransferUtil.getTransaction()) {
+        storage.insert(fluid.getType(), fluid.getAmount(), tx);
+        tx.commit();
+        return container.getItemVariant().toStack((int) container.getAmount());
+      }
+    }
+    return stack;
   }
 
   @Override

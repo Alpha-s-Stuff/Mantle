@@ -1,6 +1,10 @@
 package slimeknights.mantle.block.entity;
 
 import lombok.Getter;
+import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.storage.base.SidedStorageBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
@@ -17,17 +21,12 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
-import slimeknights.mantle.transfer.item.IItemHandler;
-import slimeknights.mantle.transfer.item.IItemHandlerModifiable;
-import slimeknights.mantle.transfer.item.wrapper.InvWrapper;
-import slimeknights.mantle.transfer.item.ItemTransferable;
-import io.github.fabricators_of_create.porting_lib.util.LazyOptional;
 import slimeknights.mantle.util.ItemStackList;
 
 import javax.annotation.Nonnull;
 
 // Updated version of InventoryLogic in Mantle. Also contains a few bugfixes DOES NOT OVERRIDE createMenu
-public abstract class InventoryBlockEntity extends NameableBlockEntity implements Container, MenuProvider, Nameable, ItemTransferable {
+public abstract class InventoryBlockEntity extends NameableBlockEntity implements Container, MenuProvider, Nameable, SidedStorageBlockEntity {
   private static final String TAG_INVENTORY_SIZE = "InventorySize";
   private static final String TAG_ITEMS = "Items";
   private static final String TAG_SLOT = "Slot";
@@ -37,8 +36,7 @@ public abstract class InventoryBlockEntity extends NameableBlockEntity implement
   private final boolean saveSizeToNBT;
   protected int stackSizeLimit;
   @Getter
-  protected IItemHandlerModifiable itemHandler;
-  protected LazyOptional<IItemHandlerModifiable> itemHandlerCap;
+  protected InventoryStorage itemHandler;
 
   /**
    * @param name Localization String for the inventory title. Can be overridden through setCustomName
@@ -55,20 +53,13 @@ public abstract class InventoryBlockEntity extends NameableBlockEntity implement
     this.saveSizeToNBT = saveSizeToNBT;
     this.inventory = NonNullList.withSize(inventorySize, ItemStack.EMPTY);
     this.stackSizeLimit = maxStackSize;
-    this.itemHandler = new InvWrapper(this);
-    this.itemHandlerCap = LazyOptional.of(() -> this.itemHandler);
+    this.itemHandler = InventoryStorage.of(this, null);
   }
 
   @Nonnull
   @Override
-  public LazyOptional<IItemHandler> getItemHandler(@Nullable Direction direction) {
-    return this.itemHandlerCap.cast();
-  }
-
-  //  @Override
-  public void invalidateCaps() {
-//    super.invalidateCaps();
-    this.itemHandlerCap.invalidate();
+  public Storage<ItemVariant> getItemStorage(@Nullable Direction direction) {
+    return this.itemHandler;
   }
 
   /* Inventory management */
