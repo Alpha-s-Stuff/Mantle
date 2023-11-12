@@ -97,7 +97,7 @@ public final class RetexturedHelper {
     if (level != null && level.isClientSide) {
       Block texture = self.getTexture();
       texture = texture == Blocks.AIR ? null : texture;
-      IModelData data = self.getRetexturedModelData();
+      IModelData data = self.getRenderData();
       if (data.getData(BLOCK_PROPERTY) != texture) {
         data.setData(BLOCK_PROPERTY, texture);
         BlockState state = self.getBlockState();

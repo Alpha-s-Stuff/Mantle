@@ -1,14 +1,11 @@
 package slimeknights.mantle.block.entity;
 
 import io.github.fabricators_of_create.porting_lib.common.util.Lazy;
-import net.fabricmc.fabric.api.rendering.data.v1.RenderAttachmentBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import org.jetbrains.annotations.Nullable;
 import slimeknights.mantle.client.model.data.IModelData;
-import slimeknights.mantle.client.model.data.SinglePropertyData;
 import slimeknights.mantle.util.RetexturedHelper;
 
 import javax.annotation.Nonnull;
@@ -20,7 +17,7 @@ import static slimeknights.mantle.util.RetexturedHelper.TAG_TEXTURE;
  * @deprecated use {@link DefaultRetexturedBlockEntity}
  */
 @Deprecated
-public class RetexturedBlockEntity extends MantleBlockEntity implements IRetexturedBlockEntity, RenderAttachmentBlockEntity {
+public class RetexturedBlockEntity extends MantleBlockEntity implements IRetexturedBlockEntity {
   /** Lazy value of model data as it will not change after first fetch */
   private final Lazy<IModelData> data = Lazy.of(this::getRetexturedModelData);
   public RetexturedBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
@@ -29,7 +26,7 @@ public class RetexturedBlockEntity extends MantleBlockEntity implements IRetextu
 
   @Nonnull
   @Override
-  public IModelData getRenderAttachmentData() {
+  public IModelData getRenderData() {
     return data.get();
   }
 

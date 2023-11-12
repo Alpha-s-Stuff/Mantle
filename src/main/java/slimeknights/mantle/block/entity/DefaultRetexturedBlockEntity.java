@@ -32,7 +32,7 @@ public class DefaultRetexturedBlockEntity extends MantleBlockEntity implements I
 
   @Nonnull
   @Override
-  public IModelData getRenderAttachmentData() {
+  public IModelData getRenderData() {
     return this.data.get();
   }
 

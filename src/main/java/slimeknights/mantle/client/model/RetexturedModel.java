@@ -8,6 +8,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import com.mojang.datafixers.util.Either;
+import io.github.fabricators_of_create.porting_lib.models.CustomParticleIconModel;
 import io.github.fabricators_of_create.porting_lib.models.geometry.IGeometryLoader;
 import io.github.fabricators_of_create.porting_lib.models.geometry.IUnbakedGeometry;
 import lombok.AccessLevel;
@@ -37,6 +38,7 @@ import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import slimeknights.mantle.client.model.data.IModelData;
 import slimeknights.mantle.client.model.data.SinglePropertyData;
 import slimeknights.mantle.client.model.util.ColoredBlockModel;
 import slimeknights.mantle.client.model.util.DynamicBakedWrapper;
@@ -151,7 +153,7 @@ public class RetexturedModel implements IUnbakedGeometry<RetexturedModel> {
   }
 
   /** Baked variant of the model, used to swap out quads based on the texture */
-  public static class Baked extends DynamicBakedWrapper<BakedModel> {
+  public static class Baked extends DynamicBakedWrapper<BakedModel> implements CustomParticleIconModel {
     /** Cache of texture name to baked model */
     private final Map<ResourceLocation,BakedModel> cache = new ConcurrentHashMap<>();
     /* Properties for rebaking */
@@ -191,28 +193,30 @@ public class RetexturedModel implements IUnbakedGeometry<RetexturedModel> {
       return cache.computeIfAbsent(ModelHelper.getParticleTexture(block), this::getRetexturedModel);
     }
 
-    // TODO: PORT
-//    @Override
-//    public TextureAtlasSprite getParticleIcon(IModelData data) {
-//      // if particle is retextured, fetch particle from the cached model
-//      if (retextured.contains("particle")) {
-//        Block block = data.getData(RetexturedHelper.BLOCK_PROPERTY);
-//        if (block != null) {
-//          return getCachedModel(block).getParticleIcon(data);
-//        }
-//      }
-//      return wrapped.getParticleIcon(data);
-//    }
+    @Override
+    public TextureAtlasSprite getParticleIcon(Object obj) {
+      // if particle is retextured, fetch particle from the cached model
+      if (retextured.contains("particle") && obj instanceof IModelData data) {
+        Block block = data.getData(RetexturedHelper.BLOCK_PROPERTY);
+        if (block != null) {
+          var cached = getCachedModel(block);
+          return cached instanceof CustomParticleIconModel cachedParticle ? cachedParticle.getParticleIcon(data) : cached.getParticleIcon();
+        }
+      }
+      if (wrapped instanceof CustomParticleIconModel customParticleIconModel)
+        return customParticleIconModel.getParticleIcon(obj);
+      return wrapped.getParticleIcon();
+    }
 
     @Override
     public void emitBlockQuads(BlockAndTintGetter blockView, BlockState state, BlockPos pos, Supplier<RandomSource> randomSupplier, RenderContext context) {
-      if(blockView instanceof RenderAttachedBlockView renderAttachedBlockView && renderAttachedBlockView.getBlockEntityRenderAttachment(pos) instanceof SinglePropertyData data) {
-        Block block = (Block) data.getData(RetexturedHelper.BLOCK_PROPERTY);
+      if(blockView.getBlockEntityRenderData(pos) instanceof IModelData data) {
+        Block block = data.getData(RetexturedHelper.BLOCK_PROPERTY);
         if (block == null) {
           super.emitBlockQuads(blockView, state, pos, randomSupplier, context);
           return;
         }
-        ((FabricBakedModel)getCachedModel(block)).emitBlockQuads(blockView, state, pos, randomSupplier, context);
+        getCachedModel(block).emitBlockQuads(blockView, state, pos, randomSupplier, context);
       } else {
         super.emitBlockQuads(blockView, state, pos, randomSupplier, context);
       }
@@ -233,7 +237,7 @@ public class RetexturedModel implements IUnbakedGeometry<RetexturedModel> {
       }
 
       // if valid, use the block
-      ((FabricBakedModel)getCachedModel(block)).emitItemQuads(stack, randomSupplier, context);
+      getCachedModel(block).emitItemQuads(stack, randomSupplier, context);
     }
 
     @Override
@@ -298,9 +302,7 @@ public class RetexturedModel implements IUnbakedGeometry<RetexturedModel> {
       }
 
       // if valid, use the block
-      if (originalModel instanceof Baked model)
-        return model.getCachedModel(block);
-      return ((Baked) ((WrapperBakedModel) originalModel).getWrappedModel()).getCachedModel(block);
+      return ModelHelper.unwrap(originalModel, Baked.class).getCachedModel(block);
     }
   }
 }
