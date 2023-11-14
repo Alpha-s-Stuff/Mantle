@@ -3,6 +3,7 @@ package slimeknights.mantle.block.entity;
 import lombok.Getter;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.SlottedStorage;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SidedStorageBlockEntity;
 import net.minecraft.core.BlockPos;
@@ -36,7 +37,7 @@ public abstract class InventoryBlockEntity extends NameableBlockEntity implement
   private final boolean saveSizeToNBT;
   protected int stackSizeLimit;
   @Getter
-  protected InventoryStorage itemHandler;
+  protected SlottedStorage<ItemVariant> itemHandler;
 
   /**
    * @param name Localization String for the inventory title. Can be overridden through setCustomName
