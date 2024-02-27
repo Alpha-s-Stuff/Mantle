@@ -52,7 +52,7 @@ public abstract class EntityIngredient implements Predicate<EntityType<?>> {
     Collection<EntityType<?>> collection = getTypes();
     buffer.writeVarInt(collection.size());
     for (EntityType<?> type : collection) {
-      buffer.writeResourceLocation(BuiltInRegistries.ENTITY_TYPE.getKey(type));
+      buffer.writeVarInt(BuiltInRegistries.ENTITY_TYPE.getId(type));
     }
   }
 
@@ -99,11 +99,11 @@ public abstract class EntityIngredient implements Predicate<EntityType<?>> {
   public static EntityIngredient read(FriendlyByteBuf buffer) {
     int count = buffer.readVarInt();
     if (count == 1) {
-      return new Single(BuiltInRegistries.ENTITY_TYPE.get(buffer.readResourceLocation()));
+      return new Single(BuiltInRegistries.ENTITY_TYPE.byId(buffer.readVarInt()));
     }
     List<EntityType<?>> list = new ArrayList<>(count);
     for (int i = 0; i < count; i++) {
-      list.add(BuiltInRegistries.ENTITY_TYPE.get(buffer.readResourceLocation()));
+      list.add(BuiltInRegistries.ENTITY_TYPE.byId(buffer.readVarInt()));
     }
     return new SetMatch(ImmutableSet.copyOf(list));
   }

@@ -8,11 +8,16 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSyntaxException;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.GsonHelper;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.Property;
 import slimeknights.mantle.Mantle;
 import slimeknights.mantle.network.NetworkWrapper;
 import slimeknights.mantle.network.packet.ISimplePacket;
@@ -305,7 +310,7 @@ public class JsonHelper {
   public static BlockState convertToBlockState(JsonElement element, String key) {
     // primitive means its a block directly
     if (element.isJsonPrimitive()) {
-      return JsonHelper.convertToEntry(ForgeRegistries.BLOCKS, element, key).defaultBlockState();
+      return JsonHelper.convertToEntry(BuiltInRegistries.BLOCK, element, key).defaultBlockState();
     }
     if (element.isJsonObject()) {
       return convertToBlockState(element.getAsJsonObject());
@@ -351,7 +356,7 @@ public class JsonHelper {
    * @throws JsonSyntaxException  if any property name or property value is invalid
    */
   public static BlockState convertToBlockState(JsonObject json) {
-    Block block = JsonHelper.getAsEntry(ForgeRegistries.BLOCKS, json, "block");
+    Block block = JsonHelper.getAsEntry(BuiltInRegistries.BLOCK, json, "block");
     BlockState state = block.defaultBlockState();
     if (json.has("properties")) {
       StateDefinition<Block,BlockState> definition = block.getStateDefinition();
@@ -375,7 +380,7 @@ public class JsonHelper {
   public static JsonElement serializeBlockState(BlockState state) {
     Block block = state.getBlock();
     if (state == block.defaultBlockState()) {
-      return new JsonPrimitive(Objects.requireNonNull(block.getRegistryName()).toString());
+      return new JsonPrimitive(Objects.requireNonNull(BuiltInRegistries.BLOCK.getKey(block)).toString());
     }
     return serializeBlockState(state, new JsonObject());
   }
@@ -395,7 +400,7 @@ public class JsonHelper {
    */
   public static JsonObject serializeBlockState(BlockState state, JsonObject json) {
     Block block = state.getBlock();
-    json.addProperty("block", Objects.requireNonNull(block.getRegistryName()).toString());
+    json.addProperty("block", Objects.requireNonNull(BuiltInRegistries.BLOCK.getKey(block)).toString());
     BlockState defaultState = block.defaultBlockState();
     JsonObject properties = new JsonObject();
     for (Property<?> property : block.getStateDefinition().getProperties()) {

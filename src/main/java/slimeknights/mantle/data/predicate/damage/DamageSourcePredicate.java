@@ -1,7 +1,8 @@
 package slimeknights.mantle.data.predicate.damage;
 
+import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.damagesource.EntityDamageSource;
+import net.minecraft.world.damagesource.DamageTypes;
 import slimeknights.mantle.data.GenericLoaderRegistry;
 import slimeknights.mantle.data.GenericLoaderRegistry.IGenericLoader;
 import slimeknights.mantle.data.predicate.AndJsonPredicate;
@@ -30,31 +31,31 @@ public interface DamageSourcePredicate extends IJsonPredicate<DamageSource> {
   NestedJsonPredicateLoader<DamageSource,OrJsonPredicate<DamageSource>> OR = OrJsonPredicate.createLoader(LOADER, INVERTED);
 
   /* Vanilla getters */
-  DamageSourcePredicate PROJECTILE = simple(DamageSource::isProjectile);
-  DamageSourcePredicate EXPLOSION = simple(DamageSource::isExplosion);
-  DamageSourcePredicate BYPASS_ARMOR = simple(DamageSource::isBypassArmor);
-  DamageSourcePredicate DAMAGE_HELMET = simple(DamageSource::isDamageHelmet);
-  DamageSourcePredicate BYPASS_INVULNERABLE = simple(DamageSource::isBypassInvul);
-  DamageSourcePredicate BYPASS_MAGIC = simple(DamageSource::isBypassMagic);
-  DamageSourcePredicate FIRE = simple(DamageSource::isFire);
-  DamageSourcePredicate MAGIC = simple(DamageSource::isMagic);
-  DamageSourcePredicate FALL = simple(DamageSource::isFall);
+  DamageSourcePredicate PROJECTILE = simple(damageSource -> damageSource.is(DamageTypeTags.IS_PROJECTILE));
+  DamageSourcePredicate EXPLOSION = simple(damageSource -> damageSource.is(DamageTypeTags.IS_EXPLOSION));
+  DamageSourcePredicate BYPASS_ARMOR = simple(damageSource -> damageSource.is(DamageTypeTags.BYPASSES_ARMOR));
+  DamageSourcePredicate DAMAGE_HELMET = simple(damageSource -> damageSource.is(DamageTypeTags.DAMAGES_HELMET));
+  DamageSourcePredicate BYPASS_INVULNERABLE = simple(damageSource -> damageSource.is(DamageTypeTags.BYPASSES_INVULNERABILITY));
+  DamageSourcePredicate BYPASS_MAGIC = simple(damageSource -> damageSource.is(DamageTypeTags.BYPASSES_EFFECTS));
+  DamageSourcePredicate FIRE = simple(damageSource -> damageSource.is(DamageTypeTags.IS_FIRE));
+  DamageSourcePredicate MAGIC = simple(damageSource -> damageSource.is(DamageTypes.MAGIC));
+  DamageSourcePredicate FALL = simple(damageSource -> damageSource.is(DamageTypeTags.IS_FALL));
 
   /** Damage that protection works against */
-  DamageSourcePredicate CAN_PROTECT = simple(source -> !source.isBypassMagic() && !source.isBypassInvul());
+  DamageSourcePredicate CAN_PROTECT = simple(source -> !source.is(DamageTypeTags.BYPASSES_EFFECTS) && !source.is(DamageTypeTags.BYPASSES_INVULNERABILITY));
   /** Custom concept: damage dealt by non-projectile entities */
   DamageSourcePredicate MELEE = simple(source -> {
-    if (source.isProjectile()) {
+    if (source.is(DamageTypeTags.IS_PROJECTILE)) {
       return false;
     }
     // if it's caused by an entity, require it to simply not be thorns
     // meets most normal melee attacks, like zombies, but also means a melee fire or melee magic attack will work
     if (source.getEntity() != null) {
-      return source instanceof EntityDamageSource entityDamage && !entityDamage.isThorns();
+      return !source.is(DamageTypes.THORNS);
     } else {
       // for non-entity damage, require it to not be any other type
       // blocks fall damage, falling blocks, cactus, but not starving, drowning, freezing
-      return !source.isBypassArmor() && !source.isFire() && !source.isMagic() && !source.isExplosion();
+      return !source.is(DamageTypeTags.BYPASSES_ARMOR) && !source.is(DamageTypeTags.IS_FIRE) && !source.is(DamageTypes.MAGIC) && !source.is(DamageTypeTags.IS_EXPLOSION);
     }
   });
 

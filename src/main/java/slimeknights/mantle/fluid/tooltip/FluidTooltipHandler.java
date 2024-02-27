@@ -6,6 +6,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
+import io.github.fabricators_of_create.porting_lib.event.common.TagsUpdatedCallback;
 import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
 import lombok.extern.log4j.Log4j2;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
@@ -85,7 +86,7 @@ public class FluidTooltipHandler extends SimpleJsonResourceReloadListener implem
   public static void init() {
     ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(INSTANCE);
     // clear the cache on tag reload, if the tags changed it might be wrong
-    MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, TagsUpdatedEvent.class, event -> INSTANCE.listCache.clear());
+    TagsUpdatedCallback.EVENT.register(registries -> INSTANCE.listCache.clear());
   }
 
   private FluidTooltipHandler() {

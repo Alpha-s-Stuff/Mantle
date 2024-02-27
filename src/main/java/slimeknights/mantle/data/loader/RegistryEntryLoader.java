@@ -1,9 +1,8 @@
 package slimeknights.mantle.data.loader;
 
 import com.google.gson.JsonObject;
+import net.minecraft.core.Registry;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.registries.IForgeRegistry;
-import net.minecraftforge.registries.IForgeRegistryEntry;
 import slimeknights.mantle.data.GenericLoaderRegistry.IGenericLoader;
 import slimeknights.mantle.data.GenericLoaderRegistry.IHaveLoader;
 import slimeknights.mantle.util.JsonHelper;
@@ -17,9 +16,9 @@ import java.util.function.Function;
  * @param <V>  Registry entry type
  * @see RegistrySetLoader
  */
-public record RegistryEntryLoader<O extends IHaveLoader<?>,V extends IForgeRegistryEntry<V>>(
+public record RegistryEntryLoader<O extends IHaveLoader<?>,V>(
   String key,
-  IForgeRegistry<V> registry,
+  Registry<V> registry,
   Function<V,O> constructor,
   Function<O,V> getter
 ) implements IGenericLoader<O> {
@@ -31,16 +30,16 @@ public record RegistryEntryLoader<O extends IHaveLoader<?>,V extends IForgeRegis
 
   @Override
   public void serialize(O object, JsonObject json) {
-    json.addProperty(key, Objects.requireNonNull(getter.apply(object).getRegistryName()).toString());
+    json.addProperty(key, Objects.requireNonNull(registry.getKey(getter.apply(object))).toString());
   }
 
   @Override
   public O fromNetwork(FriendlyByteBuf buffer) {
-    return constructor.apply(buffer.readRegistryIdUnsafe(registry));
+    return constructor.apply(registry.byId(buffer.readVarInt()));
   }
 
   @Override
   public void toNetwork(O object, FriendlyByteBuf buffer) {
-    buffer.writeRegistryIdUnsafe(registry, getter.apply(object));
+    buffer.writeVarInt(registry.getId(getter.apply(object)));
   }
 }

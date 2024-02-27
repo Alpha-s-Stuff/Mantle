@@ -2,7 +2,6 @@ package slimeknights.mantle.network.packet;
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.network.NetworkEvent;
 import slimeknights.mantle.client.book.BookLoader;
 import slimeknights.mantle.client.book.data.BookData;
 import slimeknights.mantle.network.packet.OpenNamedBookPacket.ClientOnly;
@@ -26,7 +25,7 @@ public record ClearBookCachePacket(@Nullable ResourceLocation book) implements I
   }
 
   @Override
-  public void handleThreadsafe(NetworkEvent.Context context) {
+  public void handleThreadsafe(ISimplePacket.Context context) {
     if (book != null) {
       BookData bookData = BookLoader.getBook(book);
       if (bookData != null) {

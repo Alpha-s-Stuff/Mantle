@@ -10,12 +10,12 @@ import com.google.gson.JsonSyntaxException;
 import io.netty.handler.codec.DecoderException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
-import net.minecraftforge.registries.ForgeRegistries;
 import slimeknights.mantle.data.GenericLoaderRegistry.IGenericLoader;
 import slimeknights.mantle.data.predicate.IJsonPredicate;
 import slimeknights.mantle.util.JsonHelper;
@@ -61,7 +61,7 @@ public record BlockPropertiesPredicate(Block block, List<Matcher> properties) im
   private static Property<?> parseProperty(Block block, String name, Function<String, RuntimeException> exception) {
     Property<?> property = block.getStateDefinition().getProperty(name);
     if (property == null) {
-      throw exception.apply("Property " + name + " does not exist in block " + block.getRegistryName());
+      throw exception.apply("Property " + name + " does not exist in block " + BuiltInRegistries.BLOCK.getKey(block));
     }
     return property;
   }
@@ -69,7 +69,7 @@ public record BlockPropertiesPredicate(Block block, List<Matcher> properties) im
   public static final IGenericLoader<BlockPropertiesPredicate> LOADER = new IGenericLoader<>() {
     @Override
     public BlockPropertiesPredicate deserialize(JsonObject json) {
-      Block block = JsonHelper.getAsEntry(ForgeRegistries.BLOCKS, json, "block");
+      Block block = JsonHelper.getAsEntry(BuiltInRegistries.BLOCK, json, "block");
       ImmutableList.Builder<Matcher> builder = ImmutableList.builder();
       for (Entry<String, JsonElement> entry : GsonHelper.getAsJsonObject(json, "properties").entrySet()) {
         Property<?> property = parseProperty(block, entry.getKey(), JSON_EXCEPTION);
@@ -80,7 +80,7 @@ public record BlockPropertiesPredicate(Block block, List<Matcher> properties) im
 
     @Override
     public void serialize(BlockPropertiesPredicate object, JsonObject json) {
-      json.addProperty("block", Objects.requireNonNull(object.block.getRegistryName()).toString());
+      json.addProperty("block", Objects.requireNonNull(BuiltInRegistries.BLOCK.getKey(object.block)).toString());
       JsonObject properties = new JsonObject();
       for (Matcher matcher : object.properties) {
         properties.add(matcher.property().getName(), matcher.serialize());
@@ -90,7 +90,7 @@ public record BlockPropertiesPredicate(Block block, List<Matcher> properties) im
 
     @Override
     public BlockPropertiesPredicate fromNetwork(FriendlyByteBuf buffer) {
-      Block block = buffer.readRegistryIdUnsafe(ForgeRegistries.BLOCKS);
+      Block block = BuiltInRegistries.BLOCK.byId(buffer.readVarInt());
       int size = buffer.readVarInt();
       ImmutableList.Builder<Matcher> builder = ImmutableList.builder();
       for (int i = 0; i < size; i++) {
@@ -101,7 +101,7 @@ public record BlockPropertiesPredicate(Block block, List<Matcher> properties) im
 
     @Override
     public void toNetwork(BlockPropertiesPredicate object, FriendlyByteBuf buffer) {
-      buffer.writeRegistryIdUnsafe(ForgeRegistries.BLOCKS, object.block);
+      buffer.writeVarInt(BuiltInRegistries.BLOCK.getId(object.block));
       buffer.writeVarInt(object.properties.size());
       for (Matcher matcher : object.properties) {
         matcher.toNetwork(buffer);
