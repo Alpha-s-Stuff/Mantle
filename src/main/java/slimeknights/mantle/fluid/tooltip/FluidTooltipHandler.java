@@ -84,6 +84,8 @@ public class FluidTooltipHandler extends SimpleJsonResourceReloadListener implem
    */
   public static void init() {
     ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(INSTANCE);
+    // clear the cache on tag reload, if the tags changed it might be wrong
+    MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, TagsUpdatedEvent.class, event -> INSTANCE.listCache.clear());
   }
 
   private FluidTooltipHandler() {

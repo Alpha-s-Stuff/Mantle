@@ -10,7 +10,8 @@ import slimeknights.mantle.data.fabric.IdentifiableISafeManagerReloadListener;
 import java.util.function.Consumer;
 
 /**
- * Same as {@link ResourceManagerReloadListener}, but only runs if the mod loader state is valid, used as client resource listeners can cause a misleading crash report if something else throws
+ * Same as {@link ResourceManagerReloadListener}, but only runs if the mod loader state is valid, used as client resource listeners can cause a misleading crash report if something else throws.
+ * TODO 1.19: move to {@code slimeknights.data.listener}
  */
 public interface ISafeManagerReloadListener extends ResourceManagerReloadListener, IdentifiableResourceReloadListener {
   @Override
