@@ -8,9 +8,8 @@
 
 //file:noinspection GroovyAssignabilityCheck
 plugins {
-    id 'fabric-loom' version '1.0-SNAPSHOT'
+    id 'fabric-loom' version '1.5-SNAPSHOT'
     id 'maven-publish'
-    id 'io.github.juuxel.loom-vineflower' version '1.+'
     id 'org.quiltmc.quilt-mappings-on-loom' version '4.+'
 }
 
@@ -98,10 +97,21 @@ loom {
 assemble.dependsOn runDatagen
 
 processResources {
-    inputs.property "version", project.version
+    Map<String, Object> properties = [
+        "version": version,
+        "minecraft_version": minecraft_version,
+        "loader_version": loader_version,
+        "fabric_version": fabric_version,
+        "reach_entity_attributes_version": reach_entity_attributes_version
+    ]
+    for (String module in port_lib_modules.split(","))
+        properties.put("port_lib_${module}_version".toString(), port_lib_version)
+    properties.put("port_lib_tags_version", "3.0") // the weird one
+
+    properties.forEach((k, v) -> inputs.property(k, v))
 
     filesMatching("fabric.mod.json") {
-        expand "version": project.version
+        expand properties
     }
 }
 
@@ -117,7 +127,12 @@ dependencies {
     modImplementation("net.fabricmc:fabric-loader:${project.loader_version}")
     modImplementation("net.fabricmc.fabric-api:fabric-api:${project.fabric_version}")
 
-    modImplementation("io.github.fabricators_of_create.Porting-Lib:Porting-Lib:${project.port_lib_version}+1.20-entity-refactor")
+    for (String module in port_lib_modules.split(",")) {
+        modApi("io.github.fabricators_of_create.Porting-Lib:$module:$port_lib_version+$minecraft_version")
+    }
+    modApi("com.jamieswhiteshirt:reach-entity-attributes:$reach_entity_attributes_version")
+    api("com.electronwill.night-config:toml:3.6.6")
+    api("com.electronwill.night-config:core:3.6.6")
 
     // compile against the REI API but do not include it at runtime
     modCompileOnly("me.shedaniel:RoughlyEnoughItems-api-fabric:${project.rei_version}")
@@ -163,21 +178,6 @@ task buildOrPublish {
     }
 }
 
-def modsTomlSpec = copySpec {
-    from(sourceSets.main.resources) {
-        include 'META-INF/mods.toml'
-        expand 'version': artifact_version,
-                'loader_version': loader_version,
-                'minecraft_range': minecraft_range
-    }
-}
-
-// need to copy into each build directory, unfortunately does not seem easy to do this automatically
-def buildPaths = [
-        "$rootDir/out/production/resources", // IDEA
-        "$rootDir/bin", // Eclipse
-]
-
 jar {
     manifest {
         attributes([
@@ -194,7 +194,7 @@ jar {
 
 task sourcesJar(type: Jar) {
     from sourceSets.main.allJava
-    classifier = 'sources'
+    archiveClassifier = 'sources'
 }
 
 tasks.withType(JavaCompile).configureEach {

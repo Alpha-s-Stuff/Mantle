@@ -47,8 +47,26 @@
     ]
   },
   "depends": {
-    "fabricloader": ">=0.12.12",
-    "fabric": ">=0.44.0",
-    "minecraft": ">=1.19.4"
+    "minecraft": ">=${minecraft_version}",
+    "fabric": ">=${fabric_version}",
+    "fabricloader": ">=${loader_version}",
+    "porting_lib_accessors": ">=${port_lib_accessors_version}",
+    "porting_lib_attributes": ">=${port_lib_attributes_version}",
+    "porting_lib_base": ">=${port_lib_base_version}",
+    "porting_lib_core": ">=${port_lib_core_version}",
+    "porting_lib_config": ">=${port_lib_config_version}",
+    "porting_lib_common": ">=${port_lib_common_version}",
+    "porting_lib_entity": ">=${port_lib_entity_version}",
+    "porting_lib_extensions": ">=${port_lib_extensions_version}",
+    "porting_lib_transfer": ">=${port_lib_transfer_version}",
+    "porting_lib_fluids": ">=${port_lib_fluids_version}",
+    "porting_lib_lazy_registration": ">=${port_lib_lazy_registration_version}",
+    "porting_lib_loot": ">=${port_lib_loot_version}",
+    "porting_lib_utility": ">=${port_lib_utility_version}",
+    "porting_lib_models": ">=${port_lib_models_version}",
+    "porting_lib_model_loader": ">=${port_lib_model_loader_version}",
+    "porting_lib_networking": ">=${port_lib_common_version}",
+    "porting_lib_tags": ">=${port_lib_tags_version}",
+    "reach-entity-attributes": ">=${reach_entity_attributes_version}"
   }
 }
