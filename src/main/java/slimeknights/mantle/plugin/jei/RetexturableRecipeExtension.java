@@ -1,29 +1,26 @@
 //package slimeknights.mantle.plugin.jei;
 //
 //import com.google.common.collect.ImmutableList;
+//import lombok.Getter;
 //import mezz.jei.api.constants.VanillaTypes;
 //import mezz.jei.api.gui.IRecipeLayout;
-//import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
-//import mezz.jei.api.gui.ingredient.ICraftingGridHelper;
 //import mezz.jei.api.gui.ingredient.IGuiIngredientGroup;
 //import mezz.jei.api.gui.ingredient.IGuiItemStackGroup;
 //import mezz.jei.api.gui.ingredient.ITooltipCallback;
 //import mezz.jei.api.ingredients.IIngredients;
 //import mezz.jei.api.recipe.IFocus;
-//import mezz.jei.api.recipe.IFocusGroup;
-//import mezz.jei.api.recipe.RecipeIngredientRole;
 //import mezz.jei.api.recipe.category.extensions.vanilla.crafting.ICraftingCategoryExtension;
 //import mezz.jei.api.recipe.category.extensions.vanilla.crafting.ICustomCraftingCategoryExtension;
 //import net.minecraft.ChatFormatting;
 //import net.minecraft.client.Minecraft;
 //import net.minecraft.client.gui.screens.Screen;
-//import net.minecraft.core.Registry;
 //import net.minecraft.network.chat.Component;
 //import net.minecraft.network.chat.TranslatableComponent;
 //import net.minecraft.resources.ResourceLocation;
 //import net.minecraft.world.item.ItemStack;
 //import net.minecraft.world.level.block.Block;
 //import net.minecraft.world.level.block.Blocks;
+//import net.minecraftforge.common.util.Size2i;
 //import slimeknights.mantle.item.RetexturedBlockItem;
 //import slimeknights.mantle.recipe.crafting.ShapedRetexturedRecipe;
 //
@@ -34,10 +31,12 @@
 ///**
 // * JEI crafting extension to properly show, animate, and focus {@link ShapedRetexturedRecipe} instances
 // */
-//@SuppressWarnings("removal")
 //public class RetexturableRecipeExtension implements ICraftingCategoryExtension, ICustomCraftingCategoryExtension, ITooltipCallback<ItemStack> {
 //  /** Actual recipe instance */
 //  private final ShapedRetexturedRecipe recipe;
+//  /** Recipe size, TODO: remove when fully updating to JEI 10.0/11.0 */
+//  @Getter
+//  private final Size2i size;
 //  /** List of all possible outputs, for the sake of recipe lookups */
 //  private final List<List<ItemStack>> allOutputs;
 //  /** List of all textured variants, fallback for JEI display */
@@ -45,13 +44,14 @@
 //
 //  RetexturableRecipeExtension(ShapedRetexturedRecipe recipe) {
 //    this.recipe = recipe;
+//    this.size = new Size2i(recipe.getRecipeWidth(), recipe.getRecipeHeight());
 //
 //    // gets the outputs of this recipe
 //    ItemStack output = this.recipe.getResultItem();
 //    // fetch all stacks from the ingredient, note any variants that are not blocks will get a blank shelf
 //    List<ItemStack> displayVariants = Arrays.stream(recipe.getTexture().getItems())
-//      .map(stack -> recipe.getRecipeOutput(stack.getItem()))
-//      .collect(Collectors.toList());
+//                                            .map(stack -> recipe.getRecipeOutput(stack.getItem()))
+//                                            .collect(Collectors.toList());
 //
 //    // needs blank specifically added so recipe lookup works right
 //    ImmutableList.Builder<ItemStack> builder = new ImmutableList.Builder<>();
@@ -79,16 +79,16 @@
 //
 //  @Override
 //  public int getWidth() {
-//    return recipe.getWidth();
+//    return recipe.getRecipeWidth();
 //  }
 //
 //  @Override
 //  public int getHeight() {
-//    return recipe.getHeight();
+//    return recipe.getRecipeHeight();
 //  }
 //
 //  @Override
-//  public void setRecipe(IRecipeLayoutBuilder recipeLayout, ICraftingGridHelper craftingGridHelper, IFocusGroup focuses) {
+//  public void setRecipe(IRecipeLayout recipeLayout, IIngredients ingredients) {
 //    IGuiItemStackGroup guiItemStacks = recipeLayout.getItemStacks();
 //    guiItemStacks.addTooltipCallback(this);
 //
@@ -100,15 +100,15 @@
 //      focus.getValue();
 //      IGuiIngredientGroup<ItemStack> guiIngredients = recipeLayout.getIngredientsGroup(VanillaTypes.ITEM);
 //      ItemStack focusStack = focus.getValue();
-//      RecipeIngredientRole role = focus.getRole();
+//      IFocus.Mode mode = focus.getMode();
 //
 //      // input means we clicked on an ingredient, so if it affects the texture set the output texture
-//      if (role == RecipeIngredientRole.INPUT && recipe.getTexture().test(focusStack)) {
+//      if (mode == IFocus.Mode.INPUT && recipe.getTexture().test(focusStack)) {
 //        outputs = ImmutableList.of(recipe.getRecipeOutput(focusStack.getItem()));
 //      }
 //
 //      // if we clicked the textured block, remove all items which affect the texture that are not the proper texture
-//      else if (role == RecipeIngredientRole.OUTPUT) {
+//      else if (mode == IFocus.Mode.OUTPUT) {
 //        // focus texture may be undefined for the mixed planks bookshelf or missing NBT
 //        Block textureBlock = RetexturedBlockItem.getTexture(focusStack);
 //        if (textureBlock != Blocks.AIR) {
@@ -126,7 +126,7 @@
 //    }
 //
 //    // add the itemstacks to the grid
-//    JEIPlugin.vanillaCraftingHelper.setInputs(guiItemStacks, inputs, getWidth(), getHeight());
+//    JEIPlugin.vanillaCraftingHelper.setInputs(guiItemStacks, inputs, size.width, size.height);
 //    guiItemStacks.set(0, outputs);
 //  }
 //
@@ -137,7 +137,7 @@
 //      if (JEIPlugin.modIdHelper.isDisplayingModNameEnabled()) {
 //        String recipeModId = this.getRegistryName().getNamespace();
 //        boolean modIdDifferent = false;
-//        ResourceLocation itemRegistryName = Registry.ITEM.getKey(ingredient.getItem());
+//        ResourceLocation itemRegistryName = ingredient.getItem().getRegistryName();
 //        if (itemRegistryName != null) {
 //          String itemModId = itemRegistryName.getNamespace();
 //          modIdDifferent = !recipeModId.equals(itemModId);
@@ -145,13 +145,13 @@
 //
 //        if (modIdDifferent) {
 //          String modName = JEIPlugin.modIdHelper.getFormattedModNameForModId(recipeModId);
-//          tooltip.add(Component.translatable("jei.tooltip.recipe.by", modName).withStyle(ChatFormatting.GRAY));
+//          tooltip.add(new TranslatableComponent("jei.tooltip.recipe.by", modName).withStyle(ChatFormatting.GRAY));
 //        }
 //      }
 //
 //      boolean showAdvanced = Minecraft.getInstance().options.advancedItemTooltips || Screen.hasShiftDown();
 //      if (showAdvanced) {
-//        tooltip.add(Component.translatable("jei.tooltip.recipe.id", registryName).withStyle(ChatFormatting.DARK_GRAY));
+//        tooltip.add(new TranslatableComponent("jei.tooltip.recipe.id", registryName).withStyle(ChatFormatting.DARK_GRAY));
 //      }
 //    }
 //  }

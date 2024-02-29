@@ -165,25 +165,6 @@ public class FluidTransferHelper {
       if (teHandler != null) {
         ItemStack copy = ItemHandlerHelper.copyStackWithSize(stack, 1);
 
-        // if the item has a capability, do a direct transfer
-        if (FluidStorage.ITEM.find(stack, ContainerItemContext.withConstant(stack)) != null) {
-          if (!world.isClientSide) {
-            Storage<FluidVariant> itemHandler = ContainerItemContext.forPlayerInteraction(player, hand).find(FluidStorage.ITEM);
-            // first, try filling the TE from the item
-            FluidStack transferred = tryTransfer(itemHandler, teHandler, Long.MAX_VALUE);
-            if (!transferred.isEmpty()) {
-              playEmptySound(world, pos, player, transferred);
-            } else {
-              // if that failed, try filling the item handler from the TE
-              transferred = tryTransfer(teHandler, itemHandler, Integer.MAX_VALUE);
-              if (!transferred.isEmpty()) {
-                playFillSound(world, pos, player, transferred);
-              }
-            }
-          }
-          return true;
-        }
-
         // fallback to JSON based transfer
         if (FluidContainerTransferManager.INSTANCE.mayHaveTransfer(stack)) {
           // only actually transfer on the serverside, client just has items
@@ -199,6 +180,25 @@ public class FluidTransferHelper {
                   playEmptySound(world, pos, player, result.fluid());
                 }
                 player.setItemInHand(hand, ItemUtils.createFilledResult(stack, player, result.stack()));
+              }
+            }
+          }
+          return true;
+        }
+
+        // if the item has a capability, do a direct transfer
+        if (FluidStorage.ITEM.find(stack, ContainerItemContext.withConstant(stack)) != null) {
+          if (!world.isClientSide) {
+            Storage<FluidVariant> itemHandler = ContainerItemContext.forPlayerInteraction(player, hand).find(FluidStorage.ITEM);
+            // first, try filling the TE from the item
+            FluidStack transferred = tryTransfer(itemHandler, teHandler, Long.MAX_VALUE);
+            if (!transferred.isEmpty()) {
+              playEmptySound(world, pos, player, transferred);
+            } else {
+              // if that failed, try filling the item handler from the TE
+              transferred = tryTransfer(teHandler, itemHandler, Integer.MAX_VALUE);
+              if (!transferred.isEmpty()) {
+                playFillSound(world, pos, player, transferred);
               }
             }
           }

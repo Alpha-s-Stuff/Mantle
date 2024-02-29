@@ -23,7 +23,8 @@ import java.nio.file.Paths;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * Generic logic to convert any serializable object into JSON
+ * Generic logic to convert any serializable object into JSON.
+ * TODO 1.19: move to {@link slimeknights.mantle.datagen}
  */
 @RequiredArgsConstructor
 @Log4j2

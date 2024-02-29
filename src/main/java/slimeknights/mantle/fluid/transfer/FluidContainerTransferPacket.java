@@ -18,7 +18,7 @@ public class FluidContainerTransferPacket implements IThreadsafePacket {
     ImmutableSet.Builder<Item> builder = ImmutableSet.builder();
     int size = buffer.readVarInt();
     for (int i = 0; i < size; i++) {
-      builder.add(BuiltInRegistries.ITEM.get(buffer.readResourceLocation()));
+      builder.add(BuiltInRegistries.ITEM.byId(buffer.readVarInt()));
     }
     this.items = builder.build();
   }
@@ -27,7 +27,7 @@ public class FluidContainerTransferPacket implements IThreadsafePacket {
   public void encode(FriendlyByteBuf buffer) {
     buffer.writeVarInt(items.size());
     for (Item item : items) {
-      buffer.writeResourceLocation(BuiltInRegistries.ITEM.getKey(item));
+      buffer.writeVarInt(BuiltInRegistries.ITEM.getId(item));
     }
   }
 
