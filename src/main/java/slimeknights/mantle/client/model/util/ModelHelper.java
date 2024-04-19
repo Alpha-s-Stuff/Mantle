@@ -229,7 +229,7 @@ public class ModelHelper {
   /**
    * Fully unwrap a model, i.e. return the innermost model.
    */
-  public static <T extends BakedModel> T unwrap(BakedModel model, Class<T> modelClass) {
+  public static <T extends BakedModel> BakedModel unwrap(BakedModel model, Class<T> modelClass) {
     while (model instanceof WrapperBakedModel wrapper) {
       if (modelClass.isAssignableFrom(model.getClass()))
         return (T) model;
@@ -243,9 +243,7 @@ public class ModelHelper {
         model = wrapped;
       }
     }
-    if (!modelClass.isAssignableFrom(model.getClass()))
-      throw new RuntimeException("Trying to unwrap " + model + " that isn't assignable to " + modelClass);
 
-    return (T) model;
+    return model;
   }
 }
