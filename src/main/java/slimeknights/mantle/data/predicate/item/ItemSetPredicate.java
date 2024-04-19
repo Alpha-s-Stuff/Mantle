@@ -2,7 +2,7 @@ package slimeknights.mantle.data.predicate.item;
 
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.Item;
-import slimeknights.mantle.data.GenericLoaderRegistry.IGenericLoader;
+import slimeknights.mantle.data.registry.GenericLoaderRegistry.IGenericLoader;
 import slimeknights.mantle.data.loader.RegistrySetLoader;
 import slimeknights.mantle.data.predicate.IJsonPredicate;
 

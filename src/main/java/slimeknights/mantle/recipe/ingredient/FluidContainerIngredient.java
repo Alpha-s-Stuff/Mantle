@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Optional;
 
 /** Ingredient that matches a container of fluid */
+@SuppressWarnings("unused")  // API
 public class FluidContainerIngredient implements CustomIngredient {
   public static final ResourceLocation ID = Mantle.getResource("fluid_container");
   public static final Serializer SERIALIZER = new Serializer();
@@ -54,7 +55,7 @@ public class FluidContainerIngredient implements CustomIngredient {
 
   /** Creates an instance from a fluid ingredient with a display container */
   public static FluidContainerIngredient fromFluid(FluidObject<?> fluid, boolean forgeTag) {
-    return fromIngredient(FluidIngredient.of(forgeTag ? fluid.getForgeTag() : fluid.getLocalTag(), FluidConstants.BUCKET), Ingredient.of(fluid));
+    return fromIngredient(fluid.ingredient(FluidType.BUCKET_VOLUME, forgeTag), Ingredient.of(fluid));
   }
 
   @Override
@@ -76,7 +77,7 @@ public class FluidContainerIngredient implements CustomIngredient {
       long amount = fluidIngredient.getAmount(fluid);
       FluidStack drained = TransferUtil.extractAnyFluid(storage, amount);
       // we need an exact match, and we need the resulting container item to be the same as the item stack's container item
-      return drained.getFluid() == fluid && drained.getAmount() == amount && ItemStack.matches(stack.getItem().getCraftingRemainingItem().getDefaultInstance(), cap);
+      return drained.getFluid() == fluid && drained.getAmount() == amount && ItemStack.matches(stack.getCraftingRemainingItem(), cap.getContainer());
     }).isPresent();
   }
 

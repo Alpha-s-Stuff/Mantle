@@ -19,6 +19,7 @@ import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -53,6 +54,25 @@ public class FluidTransferHelper {
 
   public static String getKeyDrained() {
     return Config.FLUID_UNIT.get() == FluidUnit.MILLIBUCKETS ? KEY_DRAINED : KEY_DRAINED_DROPLET;
+  }
+
+  /** Gets the given sound from the fluid */
+  public static SoundEvent getSound(FluidStack fluid, SoundAction action, SoundEvent fallback) {
+    SoundEvent event = fluid.getFluid().getFluidType().getSound(fluid, action);
+    if (event == null) {
+      return fallback;
+    }
+    return event;
+  }
+
+  /** Gets the empty sound for a fluid */
+  public static SoundEvent getEmptySound(FluidStack fluid) {
+    return getSound(fluid, SoundActions.BUCKET_EMPTY, SoundEvents.BUCKET_EMPTY);
+  }
+
+  /** Gets the fill sound for a fluid */
+  public static SoundEvent getFillSound(FluidStack fluid) {
+    return getSound(fluid, SoundActions.BUCKET_FILL, SoundEvents.BUCKET_FILL);
   }
 
   /**
@@ -115,9 +135,10 @@ public class FluidTransferHelper {
                   handler.insert(fluidStack.getType(), fluidStack.getAmount(), t);
                   t.commit();
                 }
+                SoundEvent sound = getEmptySound(fluidStack);
                 bucket.checkExtraContent(player, world, held, pos.relative(offset));
-                world.playSound(null, pos, FluidVariantAttributes.getEmptySound(FluidVariant.of(fluid)), SoundSource.BLOCKS, 1.0F, 1.0F);
-                player.displayClientMessage(Component.translatable(getKeyFilled(), FluidTextUtil.getUnicodeMillibuckets(FluidConstants.BUCKET, Config.FLUID_UNIT.get(), true), fluidStack.getDisplayName()), true);
+                world.playSound(null, pos, sound, SoundSource.BLOCKS, 1.0F, 1.0F);
+                player.displayClientMessage(Component.translatable(KEY_FILLED, FluidType.BUCKET_VOLUME, fluidStack.getDisplayName()), true);
                 if (!player.isCreative()) {
                   player.setItemInHand(hand, held.getRecipeRemainder());
                 }
@@ -132,16 +153,14 @@ public class FluidTransferHelper {
 
   /** Plays the sound from filling a TE */
   private static void playEmptySound(Level world, BlockPos pos, Player player, FluidStack transferred) {
-    world.playSound(null, pos, FluidVariantAttributes.getHandlerOrDefault(transferred.getFluid()).getEmptySound(transferred.getType()).orElse(SoundEvents.BUCKET_EMPTY), SoundSource.BLOCKS, 1.0F, 1.0F);
-    player.displayClientMessage(Component.translatable(getKeyFilled(), FluidTextUtil.getUnicodeMillibuckets(transferred.getAmount(), Config.FLUID_UNIT.get(), true), transferred.getDisplayName()), true);
+    world.playSound(null, pos, getEmptySound(transferred), SoundSource.BLOCKS, 1.0F, 1.0F);
+    player.displayClientMessage(Component.translatable(KEY_FILLED, transferred.getAmount(), transferred.getDisplayName()), true);
   }
 
   /** Plays the sound from draining a TE */
   private static void playFillSound(Level world, BlockPos pos, Player player, FluidStack transferred) {
-    world.playSound(null, pos, FluidVariantAttributes.getHandlerOrDefault(transferred.getFluid()).getFillSound(transferred.getType())
-      .or(() -> transferred.getFluid().getPickupSound())
-      .orElse(SoundEvents.BUCKET_FILL), SoundSource.BLOCKS, 1.0F, 1.0F);
-    player.displayClientMessage(Component.translatable(getKeyDrained(), FluidTextUtil.getUnicodeMillibuckets(transferred.getAmount(), Config.FLUID_UNIT.get(), true), transferred.getDisplayName()), true);
+    world.playSound(null, pos, getFillSound(transferred), SoundSource.BLOCKS, 1.0F, 1.0F);
+    player.displayClientMessage(Component.translatable(KEY_DRAINED, transferred.getAmount(), transferred.getDisplayName()), true);
   }
 
   /**
@@ -163,8 +182,6 @@ public class FluidTransferHelper {
       // TE must have a capability
       Storage<FluidVariant> teHandler = FluidStorage.SIDED.find(world, pos, face);
       if (teHandler != null) {
-        ItemStack copy = ItemHandlerHelper.copyStackWithSize(stack, 1);
-
         // fallback to JSON based transfer
         if (FluidContainerTransferManager.INSTANCE.mayHaveTransfer(stack)) {
           // only actually transfer on the serverside, client just has items
@@ -187,6 +204,7 @@ public class FluidTransferHelper {
         }
 
         // if the item has a capability, do a direct transfer
+        ItemStack copy = ItemHandlerHelper.copyStackWithSize(stack, 1);
         if (FluidStorage.ITEM.find(stack, ContainerItemContext.withConstant(stack)) != null) {
           if (!world.isClientSide) {
             Storage<FluidVariant> itemHandler = ContainerItemContext.forPlayerInteraction(player, hand).find(FluidStorage.ITEM);

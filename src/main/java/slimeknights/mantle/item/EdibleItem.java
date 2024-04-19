@@ -15,10 +15,11 @@ import slimeknights.mantle.util.TranslationHelper;
 import javax.annotation.Nullable;
 import java.util.List;
 
+// TODO: make this more consistent with modern item classes, properties in constructor
 public class EdibleItem extends Item {
 
   /** if false, does not display effects of food in tooltip */
-  private boolean displayEffectsTooltip;
+  private final boolean displayEffectsTooltip;
 
   public EdibleItem(FoodProperties foodIn) {
     this(foodIn, true);
@@ -34,7 +35,7 @@ public class EdibleItem extends Item {
     TranslationHelper.addOptionalTooltip(stack, tooltip);
 
     if (this.displayEffectsTooltip) {
-      for (Pair<MobEffectInstance, Float> pair : stack.getItem().getFoodProperties().getEffects()) {
+      for (Pair<MobEffectInstance, Float> pair : stack.getItem().getFoodProperties(stack, null).getEffects()) {
         if (pair.getFirst() != null) {
           tooltip.add(Component.literal(I18n.get(pair.getFirst().getDescriptionId()).trim()).withStyle(ChatFormatting.GRAY));
         }

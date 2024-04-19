@@ -189,6 +189,7 @@ public class ExtraHeartRenderHandler {
     this.renderExtraHearts(guiGraphics, left, top, player);
     this.renderExtraAbsorption(guiGraphics, left, top - rowHeight, player);
 
+    RenderSystem.setShaderTexture(0, ICON_VANILLA);
     left_height += 10;
     if (absorb > 0) {
       left_height += 10;

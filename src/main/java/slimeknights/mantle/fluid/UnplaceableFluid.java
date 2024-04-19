@@ -1,9 +1,11 @@
 package slimeknights.mantle.fluid;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Blocks;
@@ -13,20 +15,47 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import slimeknights.mantle.fluid.attributes.FluidAttributes;
+import slimeknights.mantle.fluid.attributes.FluidType;
+import org.jetbrains.annotations.Nullable;
+import slimeknights.mantle.registration.FluidBuilder;
 
 import java.util.function.Supplier;
 
 /** Fluid with a bucket form, but no block form (hence no flowing) */
 @AllArgsConstructor
 public class UnplaceableFluid extends Fluid {
-  /** Bucket form of the liquid, use a supplier to air if no bucket form */
-  private final Supplier<? extends Item> bucket;
   /** Forge fluid attributes builder */
-  private final FluidAttributes.Builder builder;
+  private final Supplier<? extends FluidType> type;
+  /** Bucket form of the liquid, use a supplier to air if no bucket form */
+  @Nullable
+  private final Supplier<? extends Item> bucket;
+  @Getter
+  private final float explosionResistance;
+  private final int tickRate;
+
+  public UnplaceableFluid(FluidBuilder<?> builder) {
+    type = builder.getType();
+    bucket = builder.getBucket();
+    explosionResistance = builder.getExplosionResistance();
+    tickRate = builder.getTickRate();
+  }
+
+  @SuppressWarnings("unused")  // API
+  public UnplaceableFluid(Supplier<? extends FluidType> type, @Nullable Supplier<? extends Item> bucket) {
+    this(type, bucket, 100, 5);
+  }
+
+
+  @Override
+  public FluidType getFluidType() {
+    return type.get();
+  }
 
   @Override
   public Item getBucket() {
+    if (bucket == null) {
+      return Items.AIR;
+    }
     return bucket.get();
   }
 
@@ -37,12 +66,7 @@ public class UnplaceableFluid extends Fluid {
 
   @Override
   public int getTickDelay(LevelReader world) {
-    return 5;
-  }
-
-  @Override
-  protected float getExplosionResistance() {
-    return 100;
+    return tickRate;
   }
 
   @Override
@@ -50,10 +74,6 @@ public class UnplaceableFluid extends Fluid {
     return Blocks.AIR.defaultBlockState();
   }
 
-  public FluidAttributes createAttributes()
-  {
-    return builder.build(this);
-  }
 
   /* Required methods */
 

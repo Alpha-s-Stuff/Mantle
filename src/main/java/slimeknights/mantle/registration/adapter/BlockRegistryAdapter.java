@@ -39,6 +39,8 @@ import slimeknights.mantle.registration.object.WoodBlockObject.WoodVariant;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import static slimeknights.mantle.util.RegistryHelper.getHolder;
+
 /**
  * Provides utility registration methods when registering blocks.
  */
@@ -133,8 +135,8 @@ public class BlockRegistryAdapter extends EnumRegistryAdapter<Block> {
     Supplier<? extends RotatedPillarBlock> stripped = () -> new RotatedPillarBlock(behaviorCreator.apply(WoodVariant.PLANKS).strength(2.0f));
     RotatedPillarBlock strippedLog = register(stripped.get(), "stripped_" + name + "_log");
     RotatedPillarBlock strippedWood = register(stripped.get(), "stripped_" + name + "_wood");
-    RotatedPillarBlock log = register(new StrippableLogBlock(() -> strippedLog, behaviorCreator.apply(WoodVariant.LOG).strength(2.0f)), name + "_log");
-    RotatedPillarBlock wood = register(new StrippableLogBlock(() -> strippedWood, behaviorCreator.apply(WoodVariant.WOOD).strength(2.0f)), name + "_wood");
+    RotatedPillarBlock log = register(new StrippableLogBlock(getHolder(Registry.BLOCK, strippedLog), behaviorCreator.apply(WoodVariant.LOG).strength(2.0f)), name + "_log");
+    RotatedPillarBlock wood = register(new StrippableLogBlock(getHolder(Registry.BLOCK, strippedWood), behaviorCreator.apply(WoodVariant.WOOD).strength(2.0f)), name + "_wood");
 
     // doors
     DoorBlock door = register(new WoodenDoorBlock(behaviorCreator.apply(WoodVariant.PLANKS).strength(3.0F).noOcclusion(), setType), name + "_door");
@@ -146,7 +148,7 @@ public class BlockRegistryAdapter extends EnumRegistryAdapter<Block> {
     ButtonBlock button = register(new ButtonBlock(redstoneProps, setType, 30, true), name + "_button");
     // signs
     StandingSignBlock standingSign = register(new MantleStandingSignBlock(behaviorCreator.apply(WoodVariant.PLANKS).noCollission().strength(1.0F), woodType), name + "_sign");
-    WallSignBlock wallSign = register(new MantleWallSignBlock(behaviorCreator.apply(WoodVariant.PLANKS).noCollission().strength(1.0F)/*.lootFrom(standingSign.delegate)*/, woodType), name + "_wall_sign");
+    WallSignBlock wallSign = register(new MantleWallSignBlock(behaviorCreator.apply(WoodVariant.PLANKS).noCollission().strength(1.0F)/*.dropsLike(standingSign)*/, woodType), name + "_wall_sign");
     // tell mantle to inject these into the TE
     MantleSignBlockEntity.registerSignBlock(() -> standingSign);
     MantleSignBlockEntity.registerSignBlock(() -> wallSign);
@@ -169,7 +171,7 @@ public class BlockRegistryAdapter extends EnumRegistryAdapter<Block> {
 //        new LiquidBlock(fluid, BlockBehaviour.Properties.of(material)
 //                                                     .noCollission()
 //                                                     .strength(100.0F)
-//                                                     .noDrops()
+//                                                     .noLootTable()
 //                                                     .lightLevel((state) -> lightLevel)),
 //        name + "_fluid");
 //  }

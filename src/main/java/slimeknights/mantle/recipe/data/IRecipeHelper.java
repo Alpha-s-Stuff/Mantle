@@ -8,78 +8,136 @@ import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.material.Fluid;
+import org.jetbrains.annotations.ApiStatus;
+import slimeknights.mantle.registration.object.IdAwareObject;
+import slimeknights.mantle.util.IdExtender.LocationExtender;
 
 import java.util.Objects;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 /**
  * Interface for common resource location and condition methods
  */
 @SuppressWarnings("unused")
-public interface IRecipeHelper {
+public interface IRecipeHelper extends LocationExtender {
   /* Location helpers */
 
   /** Gets the ID of the mod adding recipes */
   String getModId();
+
+  /** Use {@link #location(String)}, this method just exists to simplify implementation. */
+  @ApiStatus.Internal
+  @Override
+  default ResourceLocation location(String namespace, String path) {
+    return location(path);
+  }
 
   /**
    * Gets a resource location for the mod
    * @param name  Location path
    * @return  Location for the mod
    */
-  default ResourceLocation modResource(String name) {
+  default ResourceLocation location(String name) {
     return new ResourceLocation(getModId(), name);
   }
 
   /**
-   * Gets a resource location string for Tinkers
+   * Gets a resource location string for your mod
    * @param id  Location path
-   * @return  Location for Tinkers
+   * @return  Location for your mod as a string
    */
-  default String modPrefix(String id) {
+  default String prefix(String id) {
     return getModId() + ":" + id;
   }
 
   /**
-   * Prefixes the resource location path with the given value
-   * @param loc     Name to use
-   * @param prefix  Prefix value
-   * @return  Resource location path
+   * Gets a registry ID for the given item
+   * @param item  Item to fetch ID
+   * @return  ID for the item put in your namespace
    */
-  default ResourceLocation wrap(ResourceLocation loc, String prefix, String suffix) {
-    return modResource(prefix + loc.getPath() + suffix);
+  @SuppressWarnings("deprecation")  // won't be for long
+  default ResourceLocation id(ItemLike item) {
+    return location(Registry.ITEM.getKey(item.asItem()).getPath());
   }
 
   /**
-   * Prefixes the resource location path with the given value
-   * @param entry    Item registry name to use
-   * @param prefix  Prefix value
-   * @return  Resource location path
+   * Gets a registry ID for the given item
+   * @param registry  Registry to fetch IDs
+   * @param value     Registry value
+   * @return  ID for the item put in your namespace
    */
-  default ResourceLocation wrap(Item entry, String prefix, String suffix) {
-    return wrap(Objects.requireNonNull(BuiltInRegistries.ITEM.getKey(entry)), prefix, suffix);
+  default <T> ResourceLocation id(Registry<T> registry, T value) {
+    return location(Objects.requireNonNull(registry.getKey(value)).getPath());
+  }
+
+
+  /* Registry object location helpers */
+
+  /**
+   * Wraps the registry object ID in the given prefix and suffix
+   * @param location  Object to use for location
+   * @param prefix    Path prefix
+   * @param suffix    Path suffix
+   * @return  Location with the given prefix and suffix
+   */
+  default ResourceLocation wrap(RegistryObject<?> location, String prefix, String suffix) {
+    return wrap(location.getId(), prefix, suffix);
   }
 
   /**
-   * Prefixes the resource location path with the given value
-   * @param entry    Item registry name to use
-   * @param prefix  Prefix value
-   * @return  Resource location path
+   * Prefixes the registry object ID
+   * @param location  Object to use for location
+   * @param prefix    Path prefix
+   * @return  Location with the given prefix
    */
-  default ResourceLocation wrap(Supplier<Item> entry, String prefix, String suffix) {
-    return wrap(entry.get(), prefix, suffix);
+  default ResourceLocation prefix(RegistryObject<?> location, String prefix) {
+    return prefix(location.getId(), prefix);
   }
 
   /**
-   * Prefixes the resource location path with the given value
-   * @param location  Entry registry name to use
-   * @param prefix    Prefix value
-   * @return  Resource location path
+   * Suffixes the registry object ID
+   * @param location  Object to use for location
+   * @param suffix    Path suffix
+   * @return  Location with the given suffix
    */
-  default ResourceLocation prefix(ResourceLocation location, String prefix) {
-    return modResource(prefix + location.getPath());
+  default ResourceLocation suffix(RegistryObject<?> location, String suffix) {
+    return suffix(location.getId(), suffix);
+  }
+
+
+  /* Other named object location helpers */
+
+  /**
+   * Wraps the registry object ID in the given prefix and suffix
+   * @param location  Object to use for location
+   * @param prefix    Path prefix
+   * @param suffix    Path suffix
+   * @return  Location with the given prefix and suffix
+   */
+  default ResourceLocation wrap(IdAwareObject location, String prefix, String suffix) {
+    return wrap(location.getId(), prefix, suffix);
+  }
+
+  /**
+   * Prefixes the registry object ID
+   * @param location  Object to use for location
+   * @param prefix    Path prefix
+   * @return  Location with the given prefix
+   */
+  default ResourceLocation prefix(IdAwareObject location, String prefix) {
+    return prefix(location.getId(), prefix);
+  }
+
+  /**
+   * Suffixes the registry object ID
+   * @param location  Object to use for location
+   * @param suffix    Path suffix
+   * @return  Location with the given suffix
+   */
+  default ResourceLocation suffix(IdAwareObject location, String suffix) {
+    return suffix(location.getId(), suffix);
   }
 
 

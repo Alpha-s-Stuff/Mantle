@@ -47,7 +47,6 @@ public abstract class BookElement {
   public void renderToolTip(GuiGraphics guiGraphics, Font fontRenderer, ItemStack stack, int x, int y) {
     List<Component> list = stack.getTooltipLines(this.mc.player, this.mc.options.advancedItemTooltips ? TooltipFlag.Default.ADVANCED : TooltipFlag.Default.NORMAL);
 
-
     Font font = mc.gui.getFont();
     if (font == null) {
       font = fontRenderer;

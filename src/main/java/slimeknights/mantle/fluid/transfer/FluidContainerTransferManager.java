@@ -23,7 +23,7 @@ import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import slimeknights.mantle.Mantle;
-import slimeknights.mantle.data.GenericRegisteredSerializer;
+import slimeknights.mantle.data.gson.GenericRegisteredSerializer;
 import slimeknights.mantle.network.MantleNetwork;
 import slimeknights.mantle.util.JsonHelper;
 

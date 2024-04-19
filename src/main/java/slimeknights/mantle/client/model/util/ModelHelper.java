@@ -4,15 +4,12 @@ import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexFormatElement;
-import com.mojang.math.Transformation;
+import com.mojang.math.Vector3f;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import net.fabricmc.fabric.api.renderer.v1.model.WrapperBakedModel;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
@@ -26,9 +23,6 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import org.joml.Quaternionf;
-import org.joml.Vector3f;
-import slimeknights.mantle.Mantle;
 
 import javax.annotation.Nullable;
 import java.util.Map;
@@ -177,75 +171,5 @@ public class ModelHelper {
     } else {
       throw new JsonParseException("Invalid '" + key + "' " + i + " found, only 0/90/180/270 allowed");
     }
-  }
-
-//  public static BakedQuad colorQuad(int color, BakedQuad quad) {
-//    ColorTransformer transformer = new ColorTransformer(color, quad);
-//    quad.pipe(transformer);
-//    return transformer.build();
-//  }
-
-
-//  private static class ColorTransformer extends VertexTransformer {
-//
-//    private final float r, g, b, a;
-//
-//    public ColorTransformer(int color, BakedQuad quad) {
-//      super(new BakedQuadBuilder(quad.getSprite()));
-//
-//      int a = (color >> 24);
-//      if (a == 0) {
-//        a = 255;
-//      }
-//      int r = (color >> 16) & 0xFF;
-//      int g = (color >> 8) & 0xFF;
-//      int b = (color >> 0) & 0xFF;
-//
-//      this.r = (float) r / 255f;
-//      this.g = (float) g / 255f;
-//      this.b = (float) b / 255f;
-//      this.a = (float) a / 255f;
-//    }
-//
-//    @Override
-//    public void put(int element, float... data) {
-//      VertexFormatElement.Usage usage = this.parent.getVertexFormat().getElements().get(element).getUsage();
-//
-//      // transform normals and position
-//      if (usage == VertexFormatElement.Usage.COLOR && data.length >= 4) {
-//        data[0] = this.r;
-//        data[1] = this.g;
-//        data[2] = this.b;
-//        data[3] = this.a;
-//      }
-//      super.put(element, data);
-//    }
-//
-//    public BakedQuad build() {
-//      return ((BakedQuadBuilder) this.parent).build();
-//    }
-//  }
-
-  /**
-   * Fully unwrap a model, i.e. return the innermost model.
-   */
-  public static <T extends BakedModel> T unwrap(BakedModel model, Class<T> modelClass) {
-    while (model instanceof WrapperBakedModel wrapper) {
-      if (modelClass.isAssignableFrom(model.getClass()))
-        return (T) model;
-      BakedModel wrapped = wrapper.getWrappedModel();
-
-      if (wrapped == null) {
-        return (T) model;
-      } else if (wrapped == model) {
-        throw new IllegalArgumentException("Model " + model + " is wrapping itself!");
-      } else {
-        model = wrapped;
-      }
-    }
-    if (!modelClass.isAssignableFrom(model.getClass()))
-      throw new RuntimeException("Trying to unwrap " + model + " that isn't assignable to " + modelClass);
-
-    return (T) model;
   }
 }

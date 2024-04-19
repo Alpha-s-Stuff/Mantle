@@ -9,10 +9,10 @@ import com.google.gson.JsonSerializationContext;
 import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
 import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
 import lombok.RequiredArgsConstructor;
+import net.minecraft.core.Registry;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -63,7 +63,7 @@ public class FillFluidContainerTransfer implements IFluidContainerTransfer {
       try (Transaction t = TransferUtil.getTransaction()) {
         long actual = handler.extract(toDrain.getType(), toDrain.getAmount(), t);
         if (actual != amount) {
-          Mantle.logger.error("Wrong amount drained from {}, expected {}, filled {}", BuiltInRegistries.ITEM.getKey(stack.getItem()), fluid.getAmount(), actual);
+          Mantle.logger.error("Wrong amount drained from {}, expected {}, filled {}", Registry.ITEM.getKey(stack.getItem()), fluid.getAmount(), actual);
         }
         t.commit();
       }

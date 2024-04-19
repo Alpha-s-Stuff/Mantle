@@ -4,7 +4,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.Util;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
@@ -12,6 +11,8 @@ import net.minecraft.util.StringUtil;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
+import net.minecraftforge.client.extensions.common.IClientItemExtensions;
+import net.minecraftforge.client.extensions.common.IClientItemExtensions.FontContext;
 import slimeknights.mantle.client.book.action.StringActionProcessor;
 
 import javax.annotation.Nullable;
@@ -75,8 +76,7 @@ public class ItemElement extends SizedBookElement {
   }
 
   @Override
-  public void draw(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks, Font fontRenderer) {
-    PoseStack matrixStack = guiGraphics.pose();
+  public void draw(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks, Font fontRenderer) {
     long nano = Util.getNanos();
 
     if(nano > lastTime + ITEM_SWITCH_TIME) {
@@ -101,10 +101,10 @@ public class ItemElement extends SizedBookElement {
       poses.mulPoseMatrix(matrixStack.last().pose());
 
       ItemStack stack = this.itemCycle.get(this.currentItem);
-      guiGraphics.renderItem(stack, 0, 0);
-      Font font = fontRenderer;//net.minecraftforge.client.RenderProperties.get(stack).getFont(stack);
+      this.mc.getItemRenderer().renderAndDecorateItem(stack, 0, 0);
+      Font font = IClientItemExtensions.of(stack).getFont(stack, FontContext.TOOLTIP);
       if (font == null) font = mc.font;
-      guiGraphics.renderItemDecorations(font, stack, 0, 0, null);
+      this.mc.getItemRenderer().renderGuiItemDecorations(font, stack, 0, 0, null);
 
       matrixStack.popPose();
       poses.popPose();
@@ -114,13 +114,13 @@ public class ItemElement extends SizedBookElement {
   }
 
   @Override
-  public void drawOverlay(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks, Font fontRenderer) {
+  public void drawOverlay(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks, Font fontRenderer) {
     if (this.isHovered(mouseX, mouseY) && this.currentItem < this.itemCycle.size()) {
       if (this.tooltip != null) {
-        this.drawTooltip(guiGraphics, this.tooltip, mouseX, mouseY, fontRenderer);
+        this.drawTooltip(matrixStack, this.tooltip, mouseX, mouseY, fontRenderer);
       }
       else {
-        this.renderToolTip(guiGraphics, fontRenderer, this.itemCycle.get(this.currentItem), mouseX, mouseY);
+        this.renderToolTip(matrixStack, fontRenderer, this.itemCycle.get(this.currentItem), mouseX, mouseY);
       }
     }
   }

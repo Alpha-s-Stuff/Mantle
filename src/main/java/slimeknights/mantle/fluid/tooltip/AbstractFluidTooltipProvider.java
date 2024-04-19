@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.minecraft.Util;
 import net.minecraft.data.CachedOutput;
+import net.minecraft.data.DataGenerator;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.tags.TagKey;
@@ -40,11 +41,11 @@ public abstract class AbstractFluidTooltipProvider extends GenericDataProvider {
   public final CompletableFuture<?> run(CachedOutput cache) {
     addFluids();
     final List<CompletableFuture<?>> futures = new ArrayList<>();
-    builders.forEach((key, builder) -> futures.add(saveThing(cache, key, builder.build())));
+    builders.forEach((key, builder) -> saveJson(cache, key, builder.build()));
     redirects.forEach((key, target) -> {
       JsonObject json = new JsonObject();
       json.addProperty("redirect", target.toString());
-      futures.add(saveThing(cache, key, json));
+      futures.add(saveJson(cache, key, json));
     });
     return CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new));
   }

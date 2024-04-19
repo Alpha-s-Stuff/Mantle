@@ -22,7 +22,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -179,7 +178,7 @@ public abstract class EntityIngredient implements Predicate<EntityType<?>> {
     @Override
     public JsonElement serialize() {
       JsonObject object = new JsonObject();
-      object.addProperty("type", Objects.requireNonNull(BuiltInRegistries.ENTITY_TYPE.getKey(type)).toString());
+      object.addProperty("type", Registry.ENTITY_TYPE.getKey(type).toString());
       return object;
     }
   }
@@ -204,7 +203,7 @@ public abstract class EntityIngredient implements Predicate<EntityType<?>> {
       JsonObject object = new JsonObject();
       JsonArray array = new JsonArray();
       for (EntityType<?> type : getTypes()) {
-        array.add(Objects.requireNonNull(BuiltInRegistries.ENTITY_TYPE.getKey(type)).toString());
+        array.add(Registry.ENTITY_TYPE.getKey(type).toString());
       }
       object.add("types", array);
       return object;
