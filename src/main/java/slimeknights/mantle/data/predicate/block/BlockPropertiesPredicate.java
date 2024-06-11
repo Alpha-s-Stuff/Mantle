@@ -16,8 +16,8 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
-import slimeknights.mantle.data.GenericLoaderRegistry.IGenericLoader;
 import slimeknights.mantle.data.predicate.IJsonPredicate;
+import slimeknights.mantle.data.registry.GenericLoaderRegistry.IGenericLoader;
 import slimeknights.mantle.util.JsonHelper;
 
 import javax.annotation.Nullable;
@@ -80,7 +80,7 @@ public record BlockPropertiesPredicate(Block block, List<Matcher> properties) im
 
     @Override
     public void serialize(BlockPropertiesPredicate object, JsonObject json) {
-      json.addProperty("block", Objects.requireNonNull(BuiltInRegistries.BLOCK.getKey(object.block)).toString());
+      json.addProperty("block", BuiltInRegistries.BLOCK.getKey(object.block).toString());
       JsonObject properties = new JsonObject();
       for (Matcher matcher : object.properties) {
         properties.add(matcher.property().getName(), matcher.serialize());

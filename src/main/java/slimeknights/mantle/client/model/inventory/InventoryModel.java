@@ -7,16 +7,15 @@ import io.github.fabricators_of_create.porting_lib.models.geometry.IGeometryLoad
 import io.github.fabricators_of_create.porting_lib.models.geometry.IUnbakedGeometry;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import net.fabricmc.fabric.api.renderer.v1.model.ForwardingBakedModel;
-import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.Material;
-import net.minecraft.client.resources.model.ModelBaker;
+import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.model.ModelState;
 import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.resources.ResourceLocation;
+import slimeknights.mantle.client.model.util.ColoredBlockModel;
 import slimeknights.mantle.client.model.util.SimpleBlockModel;
 
 import java.util.Collection;
@@ -29,43 +28,37 @@ import java.util.function.Function;
  */
 @AllArgsConstructor
 public class InventoryModel implements IUnbakedGeometry<InventoryModel> {
+  public static final IGeometryLoader<InventoryModel> LOADER = InventoryModel::deserialize;
+
   protected final SimpleBlockModel model;
   protected final List<ModelItem> items;
 
   @Override
-  public void resolveParents(Function<ResourceLocation,UnbakedModel> modelGetter, BlockModel owner) {
-    model.resolveParents(modelGetter, owner);
+  public Collection<Material> getMaterials(IGeometryBakingContext owner, Function<ResourceLocation,UnbakedModel> modelGetter, Set<Pair<String,String>> missingTextureErrors) {
+    return model.getMaterials(owner, modelGetter, missingTextureErrors);
   }
 
   @Override
-  public BakedModel bake(BlockModel owner, ModelBaker baker, Function<Material,TextureAtlasSprite> spriteGetter, ModelState transform, ItemOverrides overrides, ResourceLocation location, boolean isGui3d) {
-    BakedModel baked = model.bakeModel(owner, transform, overrides, spriteGetter, location);
+  public BakedModel bake(IGeometryBakingContext owner, ModelBakery bakery, Function<Material,TextureAtlasSprite> spriteGetter, ModelState transform, ItemOverrides overrides, ResourceLocation location) {
+    BakedModel baked = model.bake(owner, bakery, spriteGetter, transform, overrides, location);
     return new Baked(baked, items);
   }
 
   /** Baked model, mostly a data wrapper around a normal model */
   @SuppressWarnings("WeakerAccess")
-  public static class Baked extends ForwardingBakedModel {
+  public static class Baked extends BakedModelWrapper<BakedModel> {
     @Getter
     private final List<ModelItem> items;
     public Baked(BakedModel originalModel, List<ModelItem> items) {
-      wrapped = originalModel;
+      super(originalModel);
       this.items = items;
     }
   }
 
-  /** Loader for this model */
-  public static class Loader implements IGeometryLoader<InventoryModel> {
-    /**
-     * Shared loader instance
-     */
-    public static final Loader INSTANCE = new Loader();
-
-    @Override
-    public InventoryModel read(JsonObject modelContents, JsonDeserializationContext deserializationContext) {
-      SimpleBlockModel model = SimpleBlockModel.deserialize(deserializationContext, modelContents);
-      List<ModelItem> items = ModelItem.listFromJson(modelContents, "items");
-      return new InventoryModel(model, items);
-    }
+  /** Deserializes an inventory model from JSON */
+  public static InventoryModel deserialize(JsonObject json, JsonDeserializationContext context) {
+    ColoredBlockModel model = ColoredBlockModel.deserialize(json, context);
+    List<ModelItem> items = ModelItem.listFromJson(json, "items");
+    return new InventoryModel(model, items);
   }
 }

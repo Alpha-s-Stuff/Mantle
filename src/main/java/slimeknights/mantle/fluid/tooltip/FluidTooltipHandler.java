@@ -26,7 +26,7 @@ import net.minecraft.world.level.material.Fluid;
 import slimeknights.mantle.Mantle;
 import slimeknights.mantle.client.SafeClientAccess;
 import slimeknights.mantle.client.TooltipKey;
-import slimeknights.mantle.data.TagKeySerializer;
+import slimeknights.mantle.data.gson.TagKeySerializer;
 import slimeknights.mantle.recipe.ingredient.FluidIngredient;
 import slimeknights.mantle.util.JsonHelper;
 
@@ -37,7 +37,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Objects;
 import java.util.function.BiConsumer;
 
 /** Handles fluid units displaying in tooltips */
@@ -49,6 +48,7 @@ public class FluidTooltipHandler extends SimpleJsonResourceReloadListener implem
   /** Folder for saving the logic */
   public static final String FOLDER = "mantle/fluid_tooltips";
   /** GSON instance */
+  // TODO: do we even need GSON here? I feel a classical serializer is sufficient as this class is pretty simple
   public static final Gson GSON = (new GsonBuilder())
     .registerTypeAdapter(ResourceLocation.class, new ResourceLocation.Serializer())
     .registerTypeAdapter(FluidIngredient.class, FluidIngredient.SERIALIZER)

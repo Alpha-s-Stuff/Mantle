@@ -4,30 +4,33 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
-import io.github.fabricators_of_create.porting_lib.models.geometry.IGeometryLoader;
-import io.github.fabricators_of_create.porting_lib.models.geometry.IUnbakedGeometry;
+import com.mojang.datafixers.util.Pair;
 import lombok.RequiredArgsConstructor;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.Material;
-import net.minecraft.client.resources.model.ModelBaker;
+import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.model.ModelState;
 import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
+import net.minecraftforge.client.model.geometry.IGeometryBakingContext;
+import net.minecraftforge.client.model.geometry.IGeometryLoader;
+import net.minecraftforge.client.model.geometry.IUnbakedGeometry;
+import net.minecraftforge.fml.ModList;
 
+import java.util.Collection;
+import java.util.Set;
 import java.util.function.Function;
 
 /**
  * Loads the first model from a list of models that has a loaded mod ID, ideal for optional CTM model support
  */
 @RequiredArgsConstructor
-public class FallbackModelLoader implements IGeometryLoader<FallbackModelLoader.BlockModelWrapper> {
-  /** Loader instance */
-  public static final FallbackModelLoader INSTANCE = new FallbackModelLoader();
+public enum FallbackModelLoader implements IGeometryLoader<FallbackModelLoader.BlockModelWrapper> {
+  INSTANCE;
 
   @Override
   public BlockModelWrapper read(JsonObject data, JsonDeserializationContext context) {
@@ -51,7 +54,7 @@ public class FallbackModelLoader implements IGeometryLoader<FallbackModelLoader.
       }
 
       // if the mod is loaded, try loading the given model
-      if (modId == null || FabricLoader.getInstance().isModLoaded(modId)) {
+      if (modId == null || ModList.get().isLoaded(modId)) {
         try {
           // use a model wrapper to ensure the child model gets the proper context
           // this means its not possible to extend the fallback model, but that is not normally possible with loaders
@@ -73,13 +76,13 @@ public class FallbackModelLoader implements IGeometryLoader<FallbackModelLoader.
    */
   record BlockModelWrapper(BlockModel model) implements IUnbakedGeometry<BlockModelWrapper> {
     @Override
-    public BakedModel bake(BlockModel owner, ModelBaker baker, Function<Material,TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides, ResourceLocation modelLocation, boolean isGui3d) {
-      return model.bake(baker, model, spriteGetter, modelTransform, modelLocation, true);
+    public BakedModel bake(IGeometryBakingContext owner, ModelBakery bakery, Function<Material,TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides, ResourceLocation modelLocation) {
+      return model.bake(bakery, model, spriteGetter, modelTransform, modelLocation, true);
     }
 
     @Override
-    public void resolveParents(Function<ResourceLocation,UnbakedModel> modelGetter, BlockModel owner) {
-      model.resolveParents(modelGetter);
+    public Collection<Material> getMaterials(IGeometryBakingContext owner, Function<ResourceLocation,UnbakedModel> modelGetter, Set<Pair<String,String>> missingTextureErrors) {
+      return model.getMaterials(modelGetter, missingTextureErrors);
     }
   }
 }

@@ -2,18 +2,21 @@ package slimeknights.mantle.client.screen.book.element;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.math.Quaternion;
 import com.mojang.math.Transformation;
+import com.mojang.math.Vector3f;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
-import org.joml.Quaternionf;
-import org.joml.Vector3f;
+import net.minecraftforge.client.model.data.ModelData;
 import slimeknights.mantle.client.book.structure.StructureInfo;
 import slimeknights.mantle.client.book.structure.level.TemplateLevel;
 import slimeknights.mantle.client.render.MantleRenderTypes;
@@ -55,13 +58,12 @@ public class StructureElement extends SizedBookElement {
     this.transX = x + width / 2F;
     this.transY = y + height / 2F;
 
-    this.additionalTransform = new Transformation(null, new Quaternionf().rotationXYZ(25 * (float) (Math.PI / 180.0), 0, 0), null, new Quaternionf().rotationXYZ(0, -45 * (float) (Math.PI / 180.0), 0));
+    this.additionalTransform = new Transformation(null, new Quaternion(25, 0, 0, true), null, new Quaternion(0, -45, 0, true));
   }
 
   @Override
-  public void draw(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks, Font fontRenderer) {
+  public void draw(PoseStack transform, int mouseX, int mouseY, float partialTicks, Font fontRenderer) {
     MultiBufferSource.BufferSource buffer = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
-    PoseStack transform = guiGraphics.pose();
     PoseStack.Pose lastEntryBeforeTry = transform.last();
 
     try {
@@ -88,8 +90,8 @@ public class StructureElement extends SizedBookElement {
 
       transform.translate(this.transX, this.transY, Math.max(structureHeight, Math.max(structureWidth, structureLength)));
       transform.scale(this.scale, -this.scale, 1);
-      transform.pushTransformation(this.additionalTransform);
-      transform.mulPose(new Quaternionf());
+      this.additionalTransform.push(transform);
+      transform.mulPose(new Quaternion(0, 0, 0, true));
 
       transform.translate(structureLength / -2f, structureHeight / -2f, structureWidth / -2f);
 
@@ -110,11 +112,21 @@ public class StructureElement extends SizedBookElement {
               else
                 overlay = OverlayTexture.NO_OVERLAY;
 
-              blockRender.getModelRenderer().tesselateBlock(
-                structureWorld, blockRender.getBlockModel(state), state, pos, transform,
-                buffer.getBuffer(MantleRenderTypes.TRANSLUCENT_FULLBRIGHT), false, structureWorld.random, state.getSeed(pos),
-                overlay
-              );
+              ModelData modelData = ModelData.EMPTY;
+              BlockEntity te = structureWorld.getBlockEntity(pos);
+
+              if (te != null) {
+                modelData = te.getModelData();
+              }
+
+              // TODO: verify that we should be using all types here
+              BakedModel model = blockRender.getBlockModel(state);
+              for (RenderType renderType : model.getRenderTypes(state, structureWorld.random, modelData)) {
+                blockRender.getModelRenderer().tesselateBlock(
+                  structureWorld, blockRender.getBlockModel(state), state, pos, transform,
+                  buffer.getBuffer(MantleRenderTypes.TRANSLUCENT_FULLBRIGHT), false, structureWorld.random, state.getSeed(pos),
+                  overlay, modelData, renderType);
+              }
 
               transform.popPose();
             }
@@ -161,8 +173,9 @@ public class StructureElement extends SizedBookElement {
     Vector3f axis = new Vector3f((float) rY, (float) rX, 0);
     float angle = (float) Math.sqrt(axis.dot(axis));
 
-    axis.normalize();
+    if (!axis.normalize())
+      return Transformation.identity();
 
-    return new Transformation(null, new Quaternionf().setAngleAxis(angle, axis.x(), axis.y(), axis.z()), null, null);
+    return new Transformation(null, new Quaternion(axis, angle, true), null, null);
   }
 }

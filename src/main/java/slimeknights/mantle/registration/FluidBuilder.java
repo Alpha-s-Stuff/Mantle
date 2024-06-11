@@ -1,38 +1,83 @@
 package slimeknights.mantle.registration;
 
+import io.github.fabricators_of_create.porting_lib.fluids.FluidType;
+import io.github.fabricators_of_create.porting_lib.util.SimpleFlowableFluid;
+import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
-import net.minecraft.core.Direction;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraft.world.item.Item;
-import slimeknights.mantle.fabric.fluid.SimpleDirectionalFluid;
-import slimeknights.mantle.fluid.attributes.FluidAttributes;
-import slimeknights.mantle.util.SimpleFlowableFluid;
 
+import javax.annotation.Nullable;
 import java.util.function.Supplier;
 
 /**
- * Fluid properties builder class, since the Forge one requires too many suppliers that we do not have access to yet
+ * Fluid properties' builder class, since the Forge one requires too many suppliers that we do not have access to yet
  */
-@Accessors(fluent = true)
-@Setter
-@RequiredArgsConstructor
-public class FluidBuilder {
-  private final FluidAttributes.Builder attributes;
-  private boolean canMultiply = false;
-  private Supplier<? extends Item> bucket;
-  private Supplier<? extends LiquidBlock> block;
+@Getter
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
+public class FluidBuilder<T extends FluidBuilder<T>> {
+  protected Supplier<? extends FluidType> type;
+  @Nullable
+  protected Supplier<? extends Item> bucket;
+  @Nullable
+  protected Supplier<? extends LiquidBlock> block;
   private int slopeFindDistance = 4;
   private int levelDecreasePerBlock = 1;
   private float explosionResistance = 1;
   private int tickRate = 5;
 
-  /** Sets {@code canMultiply} to true */
-  public FluidBuilder canMultiply() {
-    canMultiply = true;
-    return this;
+  /** Creates a new builder instance */
+  public static FluidBuilder<?> create(Supplier<? extends FluidType> type) {
+    FluidBuilder<?> builder = new FluidBuilder<>();
+    builder.type = type;
+    return builder;
+  }
+
+  /** Returns self casted to the given type */
+  @SuppressWarnings("unchecked")
+  private T self() {
+    return (T) this;
+  }
+
+  /** Sets the supplier for the bucket */
+  public T bucket(Supplier<? extends Item> value) {
+    this.bucket = value;
+    return self();
+  }
+
+  /** Sets the supplier for the bucket */
+  public T block(Supplier<? extends LiquidBlock> value) {
+    this.block = value;
+    return self();
+  }
+
+
+  /* Basic properties */
+
+  /** Sets the slope find distance, only used in flowing fluids */
+  public T slopeFindDistance(int value) {
+    this.slopeFindDistance = value;
+    return self();
+  }
+
+  /** Sets how far the fluid can flow, only used in flowing fluids */
+  public T levelDecreasePerBlock(int value) {
+    this.levelDecreasePerBlock = value;
+    return self();
+  }
+
+  /** Sets the explosion resistance */
+  public T explosionResistance(int value) {
+    this.explosionResistance = value;
+    return self();
+  }
+
+  /** Sets the fluid tick rate */
+  public T tickRate(int value) {
+    this.tickRate = value;
+    return self();
   }
 
   /**
@@ -41,39 +86,13 @@ public class FluidBuilder {
    * @param flowing  Flowing supplier
    * @return  Forge fluid properties
    */
-  public SimpleFlowableFluid.Properties build(Supplier<? extends Fluid> still, Supplier<? extends Fluid> flowing) {
-    SimpleFlowableFluid.Properties properties = new SimpleFlowableFluid.Properties(still, flowing, this.attributes)
-        .flowSpeed(this.slopeFindDistance)
+  public SimpleFlowableFluid.Properties build(Supplier<? extends FluidType> type, Supplier<? extends Fluid> still, Supplier<? extends Fluid> flowing) {
+    return new SimpleFlowableFluid.Properties(type, still, flowing)
+        .slopeFindDistance(this.slopeFindDistance)
         .levelDecreasePerBlock(this.levelDecreasePerBlock)
-        .blastResistance(this.explosionResistance)
+        .explosionResistance(this.explosionResistance)
         .tickRate(this.tickRate)
         .block(this.block)
         .bucket(this.bucket);
-    if (this.canMultiply) {
-      properties.canMultiply();
-    }
-    return properties;
   }
-
-  /**
-   * Builds Directional fluid properties from this builder
-   * @param still    Still fluid supplier
-   * @param flowing  Flowing supplier
-   * @return  Forge fluid properties
-   */
-  public SimpleDirectionalFluid.Properties buildUpsideDownFluid(Supplier<? extends Fluid> still, Supplier<? extends Fluid> flowing) {
-    SimpleDirectionalFluid.Properties properties = new SimpleDirectionalFluid.Properties(still, flowing, this.attributes)
-      .flowSpeed(this.slopeFindDistance)
-      .levelDecreasePerBlock(this.levelDecreasePerBlock)
-      .blastResistance(this.explosionResistance)
-      .tickRate(this.tickRate)
-      .block(this.block)
-      .flowDirection(Direction.UP)
-      .bucket(this.bucket);
-    if (this.canMultiply) {
-      properties.canMultiply();
-    }
-    return properties;
-  }
-
 }

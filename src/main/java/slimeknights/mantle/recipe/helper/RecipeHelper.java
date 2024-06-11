@@ -7,11 +7,22 @@ import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
 import io.netty.handler.codec.DecoderException;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.Fluids;
 import slimeknights.mantle.recipe.IMultiRecipe;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -140,7 +151,7 @@ public class RecipeHelper {
    */
   public static JsonObject serializeFluidStack(FluidStack stack) {
     JsonObject json = new JsonObject();
-    json.addProperty("fluid", Objects.requireNonNull(BuiltInRegistries.FLUID.getKey(stack.getFluid())).toString());
+    json.addProperty("fluid", BuiltInRegistries.FLUID.getKey(stack.getFluid()).toString());
     json.addProperty("amount", stack.getAmount());
     return json;
   }

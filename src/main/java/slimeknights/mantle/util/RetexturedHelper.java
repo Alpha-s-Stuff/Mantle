@@ -2,7 +2,6 @@ package slimeknights.mantle.util;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
@@ -12,10 +11,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import slimeknights.mantle.block.entity.IRetexturedBlockEntity;
 import slimeknights.mantle.client.model.ModelProperty;
-import slimeknights.mantle.client.model.data.IModelData;
-import slimeknights.mantle.client.model.data.SinglePropertyData;
 
 import javax.annotation.Nullable;
 import java.util.Objects;
@@ -40,10 +36,7 @@ public final class RetexturedHelper {
    */
   public static Block getBlock(String name) {
     if (!name.isEmpty()) {
-      Block block = BuiltInRegistries.BLOCK.get(new ResourceLocation(name));
-      if (block != null) {
-        return block;
-      }
+      return BuiltInRegistries.BLOCK.get(new ResourceLocation(name));
     }
     return Blocks.AIR;
   }
@@ -90,19 +83,28 @@ public final class RetexturedHelper {
     }
   }
 
-  /** Helper to call client side when the texture changes to refresh model data */
-  public static <T extends BlockEntity & IRetexturedBlockEntity> void onTextureUpdated(T self) {
+  /** Helper to call client side when the model data changes to refresh model data */
+  public static void onTextureUpdated(BlockEntity self) {
     // update the texture in BE data
     Level level = self.getLevel();
     if (level != null && level.isClientSide) {
-      Block texture = self.getTexture();
-      texture = texture == Blocks.AIR ? null : texture;
-      IModelData data = self.getRenderData();
-      if (data.getData(BLOCK_PROPERTY) != texture) {
-        data.setData(BLOCK_PROPERTY, texture);
-        BlockState state = self.getBlockState();
-        level.sendBlockUpdated(self.getBlockPos(), state, state, 0);
-      }
+//      self.requestModelDataUpdate();
+      BlockState state = self.getBlockState();
+      level.sendBlockUpdated(self.getBlockPos(), state, state, 0);
     }
+  }
+
+  /** Creates a builder with the block property as specified */
+  public static ModelData.Builder getModelDataBuilder(Block block) {
+    // cannot support air, saves a conditional on usage
+    if (block == Blocks.AIR) {
+      block = null;
+    }
+    return ModelData.builder().with(BLOCK_PROPERTY, block);
+  }
+
+  /** Creates model data with the block property as specified */
+  public static ModelData getModelData(Block block) {
+    return getModelDataBuilder(block).build();
   }
 }
