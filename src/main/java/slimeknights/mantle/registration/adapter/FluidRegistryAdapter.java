@@ -1,9 +1,9 @@
 package slimeknights.mantle.registration.adapter;
 
+import io.github.fabricators_of_create.porting_lib.util.SimpleFlowableFluid;
+import io.github.fabricators_of_create.porting_lib.util.SimpleFlowableFluid.Properties;
+import net.minecraft.core.Registry;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraftforge.fluids.ForgeFlowingFluid;
-import net.minecraftforge.fluids.ForgeFlowingFluid.Properties;
-import net.minecraftforge.registries.IForgeRegistry;
 import slimeknights.mantle.registration.DelayedSupplier;
 import slimeknights.mantle.registration.FluidBuilder;
 
@@ -15,12 +15,7 @@ import java.util.function.Function;
 @SuppressWarnings("unused")
 public class FluidRegistryAdapter extends RegistryAdapter<Fluid> {
   /** @inheritDoc */
-  public FluidRegistryAdapter(IForgeRegistry<Fluid> registry) {
-    super(registry);
-  }
-
-  /** @inheritDoc */
-  public FluidRegistryAdapter(IForgeRegistry<Fluid> registry, String modId) {
+  public FluidRegistryAdapter(Registry<Fluid> registry, String modId) {
     super(registry, modId);
   }
 
@@ -33,7 +28,7 @@ public class FluidRegistryAdapter extends RegistryAdapter<Fluid> {
    * @param <F>       Fluid type
    * @return  Still fluid instance
    */
-  public <F extends ForgeFlowingFluid> F register(FluidBuilder<?> builder, Function<Properties, F> still, Function<Properties,F> flowing, String name) {
+  public <F extends SimpleFlowableFluid> F register(FluidBuilder<?> builder, Function<Properties, F> still, Function<Properties,F> flowing, String name) {
     // have to create still and flowing later, as the props need these suppliers
     DelayedSupplier<Fluid> stillDelayed = new DelayedSupplier<>();
     DelayedSupplier<Fluid> flowingDelayed = new DelayedSupplier<>();
@@ -58,7 +53,7 @@ public class FluidRegistryAdapter extends RegistryAdapter<Fluid> {
    * @param name     Fluid name
    * @return  Still fluid
    */
-  public ForgeFlowingFluid register(FluidBuilder<?> builder, String name) {
-    return register(builder, ForgeFlowingFluid.Source::new, ForgeFlowingFluid.Flowing::new, name);
+  public SimpleFlowableFluid register(FluidBuilder<?> builder, String name) {
+    return register(builder, SimpleFlowableFluid.Still::new, SimpleFlowableFluid.Flowing::new, name);
   }
 }

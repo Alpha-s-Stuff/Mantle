@@ -1,5 +1,6 @@
 package slimeknights.mantle.fluid;
 
+import io.github.fabricators_of_create.porting_lib.fluids.FluidType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.minecraft.core.BlockPos;
@@ -15,7 +16,6 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import slimeknights.mantle.fluid.attributes.FluidType;
 import org.jetbrains.annotations.Nullable;
 import slimeknights.mantle.registration.FluidBuilder;
 

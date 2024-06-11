@@ -1,7 +1,6 @@
 package slimeknights.mantle.fluid;
 
-import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
-import net.minecraftforge.fluids.FluidType;
+import io.github.fabricators_of_create.porting_lib.fluids.FluidType;
 import slimeknights.mantle.fluid.texture.ClientTextureFluidType;
 
 import java.util.function.Consumer;

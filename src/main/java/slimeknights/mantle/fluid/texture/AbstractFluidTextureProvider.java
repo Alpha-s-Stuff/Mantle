@@ -1,24 +1,25 @@
 package slimeknights.mantle.fluid.texture;
 
+import io.github.fabricators_of_create.porting_lib.fluids.FluidType;
+import io.github.fabricators_of_create.porting_lib.fluids.PortingLibFluids;
+import io.github.fabricators_of_create.porting_lib.util.RegistryObject;
+import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
+import net.minecraft.core.Registry;
 import net.minecraft.data.CachedOutput;
-import net.minecraft.data.DataGenerator;
 import net.minecraft.server.packs.PackType;
-import net.minecraftforge.fluids.FluidType;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.IForgeRegistry;
-import net.minecraftforge.registries.RegistryObject;
 import slimeknights.mantle.data.GenericDataProvider;
 import slimeknights.mantle.registration.object.FluidObject;
 import slimeknights.mantle.util.JsonHelper;
 
 import javax.annotation.Nullable;
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Data provider for {@link FluidTexture}
@@ -30,25 +31,29 @@ public abstract class AbstractFluidTextureProvider extends GenericDataProvider {
   @Nullable
   private final String modId;
 
-  public AbstractFluidTextureProvider(DataGenerator generator, @Nullable String modId) {
-    super(generator, PackType.CLIENT_RESOURCES, FluidTextureManager.FOLDER, JsonHelper.DEFAULT_GSON);
+  public AbstractFluidTextureProvider(FabricDataOutput output, @Nullable String modId) {
+    super(output, PackType.CLIENT_RESOURCES, FluidTextureManager.FOLDER, JsonHelper.DEFAULT_GSON);
     this.modId = modId;
   }
 
   @Override
-  public final void run(CachedOutput cache) throws IOException {
+  public final CompletableFuture<?> run(CachedOutput cache) {
     addTextures();
-    IForgeRegistry<FluidType> fluidTypeRegistry = ForgeRegistries.FLUID_TYPES.get();
+    Registry<FluidType> fluidTypeRegistry = PortingLibFluids.FLUID_TYPES;
 
     // ensure we added textures for all our fluid types
     if (modId != null) {
-      List<String> missing = fluidTypeRegistry.getEntries().stream().filter(entry -> entry.getKey().location().getNamespace().equals(modId) && !allTextures.containsKey(entry.getValue()) && !ignore.contains(entry.getValue())).map(e -> e.getKey().location().toString()).toList();
+      List<String> missing = fluidTypeRegistry.entrySet().stream().filter(entry -> entry.getKey().location().getNamespace().equals(modId) && !allTextures.containsKey(entry.getValue()) && !ignore.contains(entry.getValue())).map(e -> e.getKey().location().toString()).toList();
       if (!missing.isEmpty()) {
         throw new IllegalStateException("Missing fluid textures for: " + String.join(", ", missing));
       }
     }
+
+    List<CompletableFuture<?>> futures = new ArrayList<>();
+
     // save files
-    allTextures.forEach((type, data) -> saveJson(cache, Objects.requireNonNull(fluidTypeRegistry.getKey(type)), data.build().serialize()));
+    allTextures.forEach((type, data) -> saveJson(futures, cache, Objects.requireNonNull(fluidTypeRegistry.getKey(type)), data.build().serialize()));
+    return CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new));
   }
 
   /** Override to add your textures at the proper time */

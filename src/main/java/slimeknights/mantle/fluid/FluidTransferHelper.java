@@ -1,10 +1,11 @@
 package slimeknights.mantle.fluid;
 
+import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
+import io.github.fabricators_of_create.porting_lib.fluids.sound.SoundAction;
+import io.github.fabricators_of_create.porting_lib.fluids.sound.SoundActions;
 import io.github.fabricators_of_create.porting_lib.mixin.accessors.common.accessor.BucketItemAccessor;
 import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
-import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
 import io.github.fabricators_of_create.porting_lib.transfer.item.ItemHandlerHelper;
-import io.github.fabricators_of_create.porting_lib.util.FluidTextUtil;
 import io.github.fabricators_of_create.porting_lib.util.FluidUnit;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -12,8 +13,8 @@ import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.storage.StorageUtil;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.core.BlockPos;
@@ -40,7 +41,7 @@ import slimeknights.mantle.fluid.transfer.IFluidContainerTransfer.TransferResult
 /**
  * Alternative to {@link net.minecraftforge.fluids.FluidUtil} since no one has time to make the forge util not a buggy mess
  */
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "UnstableApiUsage"})
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class FluidTransferHelper {
   private static final String KEY_FILLED = Mantle.makeDescriptionId("block", "tank.filled");
@@ -130,7 +131,7 @@ public class FluidTransferHelper {
           if (handler != null) {
               FluidStack fluidStack = new FluidStack(((BucketItemAccessor)bucket).port_lib$getContent(), FluidConstants.BUCKET);
               // must empty the whole bucket
-              if (handler.simulateInsert(fluidStack.getType(), fluidStack.getAmount(), null) == FluidConstants.BUCKET) {
+              if (StorageUtil.simulateInsert(handler, fluidStack.getType(), fluidStack.getAmount(), null) == FluidConstants.BUCKET) {
                 try (Transaction t = TransferUtil.getTransaction()) {
                   handler.insert(fluidStack.getType(), fluidStack.getAmount(), t);
                   t.commit();
@@ -138,7 +139,7 @@ public class FluidTransferHelper {
                 SoundEvent sound = getEmptySound(fluidStack);
                 bucket.checkExtraContent(player, world, held, pos.relative(offset));
                 world.playSound(null, pos, sound, SoundSource.BLOCKS, 1.0F, 1.0F);
-                player.displayClientMessage(Component.translatable(KEY_FILLED, FluidType.BUCKET_VOLUME, fluidStack.getDisplayName()), true);
+                player.displayClientMessage(Component.translatable(KEY_FILLED, FluidConstants.BUCKET, fluidStack.getDisplayName()), true);
                 if (!player.isCreative()) {
                   player.setItemInHand(hand, held.getRecipeRemainder());
                 }

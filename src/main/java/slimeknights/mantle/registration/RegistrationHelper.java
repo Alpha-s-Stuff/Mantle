@@ -5,9 +5,12 @@ import com.mojang.datafixers.schemas.Schema;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import net.fabricmc.fabric.api.object.builder.v1.block.type.WoodTypeRegistry;
+import net.minecraft.core.DefaultedRegistry;
+import net.minecraft.core.Registry;
 import net.minecraft.util.datafix.DataFixers;
 import net.minecraft.util.datafix.fixes.BlockRenameFix;
 import net.minecraft.world.level.block.state.properties.WoodType;
+import slimeknights.mantle.util.RegistryHelper;
 
 import java.util.ArrayList;
 import java.util.List;

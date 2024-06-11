@@ -1,7 +1,9 @@
 package slimeknights.mantle.recipe.data;
 
+import io.github.fabricators_of_create.porting_lib.util.RegistryObject;
 import net.fabricmc.fabric.api.resource.conditions.v1.ConditionJsonProvider;
 import net.fabricmc.fabric.api.resource.conditions.v1.DefaultResourceConditions;
+import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.recipes.FinishedRecipe;
@@ -59,7 +61,7 @@ public interface IRecipeHelper extends LocationExtender {
    */
   @SuppressWarnings("deprecation")  // won't be for long
   default ResourceLocation id(ItemLike item) {
-    return location(Registry.ITEM.getKey(item.asItem()).getPath());
+    return location(BuiltInRegistries.ITEM.getKey(item.asItem()).getPath());
   }
 
   /**

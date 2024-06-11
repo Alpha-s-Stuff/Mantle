@@ -4,9 +4,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSyntaxException;
+import com.mojang.serialization.Codec;
 import io.github.fabricators_of_create.porting_lib.util.CraftingHelper;
 import lombok.RequiredArgsConstructor;
-import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
@@ -16,6 +16,7 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
+import slimeknights.mantle.data.JsonCodec;
 import slimeknights.mantle.util.JsonHelper;
 
 import java.util.function.Supplier;
@@ -151,7 +152,7 @@ public abstract class ItemOutput implements Supplier<ItemStack> {
 
     @Override
     public JsonElement serialize() {
-      String itemName = Registry.ITEM.getKey(item).toString();
+      String itemName = BuiltInRegistries.ITEM.getKey(item).toString();
       if (count > 1) {
         JsonObject json = new JsonObject();
         json.addProperty("item", itemName);
@@ -175,7 +176,7 @@ public abstract class ItemOutput implements Supplier<ItemStack> {
 
     @Override
     public JsonElement serialize() {
-      String itemName = Registry.ITEM.getKey(stack.getItem()).toString();
+      String itemName = BuiltInRegistries.ITEM.getKey(stack.getItem()).toString();
       int count = stack.getCount();
       // if the item has NBT or a count, write as object
       if (stack.hasTag() || count > 1) {

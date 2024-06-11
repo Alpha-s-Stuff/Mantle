@@ -1,8 +1,12 @@
 package slimeknights.mantle.registration.deferred;
 
+import io.github.fabricators_of_create.porting_lib.fluids.FluidType;
+import io.github.fabricators_of_create.porting_lib.fluids.PortingLibFluids;
+import io.github.fabricators_of_create.porting_lib.util.RegistryObject;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -10,13 +14,6 @@ import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraft.world.level.material.Material;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fluids.FluidType;
-import net.minecraftforge.fluids.ForgeFlowingFluid;
-import net.minecraftforge.fluids.ForgeFlowingFluid.Properties;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
 import slimeknights.mantle.fluid.TextureFluidType;
 import slimeknights.mantle.fluid.UnplaceableFluid;
 import slimeknights.mantle.registration.DelayedSupplier;
@@ -38,18 +35,18 @@ public class FluidDeferredRegister extends DeferredRegisterWrapper<Fluid> {
   private final SynchronizedDeferredRegister<Item> itemRegister;
 
   public FluidDeferredRegister(String modID) {
-    super(Registry.FLUID_REGISTRY, modID);
-    this.fluidTypeRegister = SynchronizedDeferredRegister.create(ForgeRegistries.Keys.FLUID_TYPES, modID);
-    this.blockRegister = SynchronizedDeferredRegister.create(Registry.BLOCK_REGISTRY, modID);
-    this.itemRegister = SynchronizedDeferredRegister.create(Registry.ITEM_REGISTRY, modID);
+    super(Registries.FLUID, modID);
+    this.fluidTypeRegister = SynchronizedDeferredRegister.create(PortingLibFluids.FLUID_TYPE_REGISTRY, modID);
+    this.blockRegister = SynchronizedDeferredRegister.create(Registries.BLOCK, modID);
+    this.itemRegister = SynchronizedDeferredRegister.create(Registries.ITEM, modID);
   }
 
   @Override
-  public void register(IEventBus bus) {
-    super.register(bus);
-    fluidTypeRegister.register(bus);
-    blockRegister.register(bus);
-    itemRegister.register(bus);
+  public void register() {
+    super.register();
+    fluidTypeRegister.register();
+    blockRegister.register();
+    itemRegister.register();
   }
 
   /**

@@ -1,12 +1,12 @@
 package slimeknights.mantle.registration.object;
 
+import io.github.fabricators_of_create.porting_lib.util.RegistryObject;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.minecraft.core.DefaultedRegistry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
-import net.minecraftforge.registries.RegistryObject;
 import slimeknights.mantle.util.RegistryHelper;
 
 import javax.annotation.Nullable;

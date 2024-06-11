@@ -1,13 +1,13 @@
 package slimeknights.mantle.fluid.texture;
 
 import com.google.gson.JsonObject;
+import io.github.fabricators_of_create.porting_lib.fluids.FluidType;
+import io.github.fabricators_of_create.porting_lib.fluids.PortingLibFluids;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
-import net.minecraftforge.fluids.FluidType;
-import net.minecraftforge.registries.ForgeRegistries;
 import slimeknights.mantle.util.IdExtender.LocationExtender;
 import slimeknights.mantle.util.JsonHelper;
 
@@ -71,7 +71,7 @@ public record FluidTexture(ResourceLocation still, ResourceLocation flowing, @Nu
      * @return  Builder instance
      */
     public Builder wrapId(String prefix, String suffix, boolean overlay, boolean camera) {
-      return textures(LocationExtender.INSTANCE.wrap(Objects.requireNonNull(ForgeRegistries.FLUID_TYPES.get().getKey(fluid)), prefix, suffix), overlay, camera);
+      return textures(LocationExtender.INSTANCE.wrap(Objects.requireNonNull(PortingLibFluids.FLUID_TYPES.getKey(fluid)), prefix, suffix), overlay, camera);
     }
 
     /**

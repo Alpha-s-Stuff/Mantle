@@ -1,13 +1,13 @@
 package slimeknights.mantle.registration.object;
 
+import io.github.fabricators_of_create.porting_lib.fluids.FluidType;
 import lombok.Getter;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.FluidTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraftforge.fluids.FluidType;
 import slimeknights.mantle.recipe.ingredient.FluidIngredient;
 
 import javax.annotation.Nonnull;
@@ -31,7 +31,7 @@ public class FlowingFluidObject<F extends FlowingFluid> extends FluidObject<F> {
   /** Main constructor */
   public FlowingFluidObject(ResourceLocation id, String tagName, Supplier<? extends FluidType> type, Supplier<? extends F> still, Supplier<? extends F> flowing, @Nullable Supplier<? extends LiquidBlock> block) {
     super(id, tagName, type, still);
-    this.localTag = FluidTags.create(id);
+    this.localTag = TagKey.create(Registries.FLUID, id);
     this.flowing = flowing;
     this.block = block;
   }
