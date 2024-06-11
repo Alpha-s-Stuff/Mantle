@@ -1,192 +1,167 @@
 package slimeknights.mantle.recipe.ingredient;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonSyntaxException;
 import lombok.RequiredArgsConstructor;
-import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
-import net.minecraft.util.GsonHelper;
 import net.minecraft.world.entity.EntityType;
-import slimeknights.mantle.util.JsonHelper;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraftforge.common.ForgeSpawnEggItem;
+import slimeknights.mantle.data.loadable.IAmLoadable;
+import slimeknights.mantle.data.loadable.Loadable;
+import slimeknights.mantle.data.loadable.Loadables;
+import slimeknights.mantle.data.loadable.mapping.EitherLoadable;
+import slimeknights.mantle.data.loadable.record.RecordLoadable;
+import slimeknights.mantle.util.RegistryHelper;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 /**
  * Ingredient accepting an entity or an entity tag as an input
  */
-public abstract class EntityIngredient implements Predicate<EntityType<?>> {
-  /** Empty entity ingredient, matching nothing */
-  public static final EntityIngredient EMPTY = new SetMatch(Collections.emptySet());
+public abstract class EntityIngredient implements Predicate<EntityType<?>>, IAmLoadable {
+  /** Empty entity ingredient, matching nothing. This ingredient does not parse from JSON, use defaulting methods if you wish to use it */
+  public static final EntityIngredient EMPTY = new Compound(Collections.emptyList());
 
-  /**
-   * Gets a list of entity types matched by this ingredient
-   * @return  List of types
-   */
-  public abstract Collection<EntityType<?>> getTypes();
 
-  /**
-   * Serializes this ingredient to JSON
-   * @return  Json element of this ingredient
-   */
-  public abstract JsonElement serialize();
+  /* Loadables */
 
-  /** Writes this ingredient to the packet buffer */
-  public void write(FriendlyByteBuf buffer) {
-    Collection<EntityType<?>> collection = getTypes();
-    buffer.writeVarInt(collection.size());
-    for (EntityType<?> type : collection) {
-      buffer.writeVarInt(BuiltInRegistries.ENTITY_TYPE.getId(type));
+  /** Creates a builder with set and tag */
+  private static EitherLoadable.TypedBuilder<EntityIngredient> loadableBuilder() {
+    return EitherLoadable.<EntityIngredient>typed().key("types", SET_MATCH).key("type", ENTRY_MATCH).key("tag", TAG_MATCH);
+  }
+  /** Loadable for a single value, notably not used for networking (though that probably would still work fine due to how EitherLoadable works) */
+  private static final RecordLoadable<EntityIngredient> ENTRY_MATCH = RecordLoadable.create(Loadables.ENTITY_TYPE.requiredField("type", i -> {
+    Set<EntityType<?>> types = i.getTypes();
+    if (types.size() == 1) {
+      return types.iterator().next();
     }
-  }
+    throw new IllegalStateException("Cannot use entry match to serialize more than 1 entity");
+  }), EntityIngredient::of);
+  /** Loadable for a set match */
+  private static final RecordLoadable<EntityIngredient> SET_MATCH = RecordLoadable.create(Loadables.ENTITY_TYPE.set().requiredField("types", EntityIngredient::getTypes), EntityIngredient::of);
+  /** Loadable for a tag match */
+  private static final RecordLoadable<TagMatch> TAG_MATCH = RecordLoadable.create(Loadables.ENTITY_TYPE_TAG.requiredField("tag", t -> t.tag), TagMatch::new);
+  /** Loadable disallows nested lists, just handles nested tags and sets */
+  private static final Loadable<Compound> COMPOUND = EntityIngredient.loadableBuilder().build(SET_MATCH).list(2).flatXmap(Compound::new, c -> c.ingredients);
+  /** Loadable for any fluid ingredient */
+  public static final Loadable<EntityIngredient> LOADABLE = loadableBuilder().array(COMPOUND).build(SET_MATCH);
 
-  /**
-   * Creates an ingredient to match a single type
-   */
-  public static EntityIngredient of(EntityType<?> type) {
-    return new Single(type);
-  }
+  /* Constructors */
 
   /**
    * Creates an ingredient to match a set of types
    */
   public static EntityIngredient of(Set<EntityType<?>> set) {
+    if (set.isEmpty()) {
+      return EMPTY;
+    }
     return new SetMatch(set);
   }
 
-  /**
-   * Creates an ingredient to match a set of types
-   */
+  /** Creates an ingredient to match a set of types */
   public static EntityIngredient of(EntityType<?> ... types) {
     return of(ImmutableSet.copyOf(types));
   }
 
-  /**
-   * Creates an ingredient to match a tags
-   */
+  /** Creates an ingredient to match a tags */
   public static EntityIngredient of(TagKey<EntityType<?>> tag) {
     return new TagMatch(tag);
   }
 
-  /**
-   * Creates an ingredient from a list of ingredients
-   */
+  /** Creates an ingredient from a list of ingredients */
   public static EntityIngredient of(EntityIngredient... ingredients) {
-    return new Compound(Arrays.asList(ingredients));
+    return of(List.of(ingredients));
+  }
+
+  /** Creates an ingredient from a list of ingredients */
+  private static EntityIngredient of(List<EntityIngredient> ingredients) {
+    if (ingredients.isEmpty()) {
+      return EMPTY;
+    }
+    if (ingredients.size() == 1) {
+      return ingredients.get(0);
+    }
+    return new Compound(ingredients);
+  }
+
+
+  /* Common methods */
+
+  /**
+   * Gets a list of entity types matched by this ingredient
+   * @return  List of types
+   */
+  public abstract Set<EntityType<?>> getTypes();
+
+  /**
+   * Serializes this ingredient to JSON
+   * @return  Json element of this ingredient
+   */
+  public JsonElement serialize() {
+    return LOADABLE.serialize(this);
+  }
+
+
+  /** Writes this ingredient to the packet buffer */
+  public void write(FriendlyByteBuf buffer) {
+    SET_MATCH.encode(buffer, this);
   }
 
   /**
    * Reads an ingredient from the packet buffer
    * @param buffer  Buffer instance
-   * @return  Ingredient instnace
+   * @return  Ingredient instance
    */
   public static EntityIngredient read(FriendlyByteBuf buffer) {
-    int count = buffer.readVarInt();
-    if (count == 1) {
-      return new Single(BuiltInRegistries.ENTITY_TYPE.byId(buffer.readVarInt()));
-    }
-    List<EntityType<?>> list = new ArrayList<>(count);
-    for (int i = 0; i < count; i++) {
-      list.add(BuiltInRegistries.ENTITY_TYPE.byId(buffer.readVarInt()));
-    }
-    return new SetMatch(ImmutableSet.copyOf(list));
+    return SET_MATCH.decode(buffer);
   }
 
-  /**
-   * Finds an entity type for the given key
-   * @param name  Entity type name
-   * @return  Entity type
-   */
-  private static EntityType<?> findEntityType(ResourceLocation name) {
-    if (BuiltInRegistries.ENTITY_TYPE.containsKey(name)) {
-      EntityType<?> type = BuiltInRegistries.ENTITY_TYPE.get(name);
-      if (type != null) {
-        return type;
-      }
+
+  /* JEI */
+
+  private List<EntityInput> display;
+  private List<ItemStack> eggs;
+
+  /** Gets the list of eggs matching this ingredient, used for display in JEI as it cannot do entity type */
+  public List<EntityInput> getDisplay() {
+    if (display == null) {
+      display = EntityInput.wrap(getTypes());
     }
-    throw new JsonSyntaxException("Invalid entity type " + name);
+    return display;
   }
 
-  /**
-   * Deserializes an ingredient from JSON
-   * @param root  Json
-   * @return  Ingredient
-   */
-  public static EntityIngredient deserialize(JsonElement root) {
-    if (root.isJsonArray()) {
-      JsonArray array = root.getAsJsonArray();
-      ImmutableList.Builder<EntityIngredient> builder = ImmutableList.builder();
-      for (JsonElement element : array) {
-        builder.add(deserialize(element));
-      }
-      return new Compound(builder.build());
+  /** Gets the list of eggs matching this ingredient, used for focus links in JEI */
+  public List<ItemStack> getEggs() {
+    if (eggs == null) {
+      // use getDisplay to guarantee order is the same, just in case
+      eggs = getDisplay().stream().map(type -> new ItemStack(Objects.requireNonNullElse(ForgeSpawnEggItem.fromEntityType(type.type), Items.AIR))).toList();
     }
-    if (!root.isJsonObject()) {
-      throw new JsonSyntaxException("Entity ingredient must be either an object or an array");
-    }
-    JsonObject json = root.getAsJsonObject();
-
-    // type is just a name
-    if (json.has("type")) {
-      ResourceLocation name = new ResourceLocation(GsonHelper.getAsString(json, "type"));
-      return new Single(findEntityType(name));
-    }
-    // tag is also a name
-    if (json.has("tag")) {
-      return new TagMatch(TagKey.create(Registries.ENTITY_TYPE, JsonHelper.getResourceLocation(json, "tag")));
-    }
-    // types is a list
-    if (json.has("types")) {
-      List<EntityType<?>> types = JsonHelper.parseList(json, "types", (element, key) -> findEntityType(new ResourceLocation(GsonHelper.convertToString(element, key))));
-      return new SetMatch(ImmutableSet.copyOf(types));
-    }
-
-    // missed all keys
-    throw new JsonSyntaxException("Invalid entity type ingredient, must have 'type', 'types', or 'tag'");
+    return eggs;
   }
 
-  /** Ingredient matching a single type */
-  @RequiredArgsConstructor
-  private static class Single extends EntityIngredient {
-    private final EntityType<?> type;
 
-    @Override
-    public boolean test(EntityType<?> type) {
-      return type == this.type;
-    }
 
-    @Override
-    public List<EntityType<?>> getTypes() {
-      return Collections.singletonList(type);
-    }
-
-    @Override
-    public JsonElement serialize() {
-      JsonObject object = new JsonObject();
-      object.addProperty("type", Registry.ENTITY_TYPE.getKey(type).toString());
-      return object;
-    }
-  }
+  /* Impls */
 
   /** Ingredient that matches any entity from a set */
   @RequiredArgsConstructor
   private static class SetMatch extends EntityIngredient {
     private final Set<EntityType<?>> types;
+
+    @Override
+    public Loadable<?> loadable() {
+      return types.size() == 1 ? ENTRY_MATCH : SET_MATCH;
+    }
 
     @Override
     public boolean test(EntityType<?> type) {
@@ -197,24 +172,18 @@ public abstract class EntityIngredient implements Predicate<EntityType<?>> {
     public Set<EntityType<?>> getTypes() {
       return types;
     }
-
-    @Override
-    public JsonElement serialize() {
-      JsonObject object = new JsonObject();
-      JsonArray array = new JsonArray();
-      for (EntityType<?> type : getTypes()) {
-        array.add(Registry.ENTITY_TYPE.getKey(type).toString());
-      }
-      object.add("types", array);
-      return object;
-    }
   }
 
   /** Ingredient that matches any entity from a tag */
   @RequiredArgsConstructor
   private static class TagMatch extends EntityIngredient {
     private final TagKey<EntityType<?>> tag;
-    private List<EntityType<?>> types;
+    private Set<EntityType<?>> types;
+
+    @Override
+    public Loadable<?> loadable() {
+      return TAG_MATCH;
+    }
 
     @Override
     public boolean test(EntityType<?> type) {
@@ -222,31 +191,24 @@ public abstract class EntityIngredient implements Predicate<EntityType<?>> {
     }
 
     @Override
-    public List<EntityType<?>> getTypes() {
+    public Set<EntityType<?>> getTypes() {
       if (types == null) {
-        types = StreamSupport.stream(BuiltInRegistries.ENTITY_TYPE.getTagOrEmpty(tag).spliterator(), false)
-                             .filter(Holder::isBound)
-                             .map(Holder::value)
-                             .collect(Collectors.toList());
+        types = RegistryHelper.getTagValueStream(BuiltInRegistries.ENTITY_TYPE, tag).collect(ImmutableSet.toImmutableSet());
       }
       return types;
     }
-
-    @Override
-    public JsonElement serialize() {
-      JsonObject object = new JsonObject();
-      object.addProperty("tag", tag.location().toString());
-      return object;
-    }
   }
 
-  /**
-   * Ingredient combining multiple
-   */
+  /** Ingredient combining multiple */
   @RequiredArgsConstructor
   private static class Compound extends EntityIngredient {
     private final List<EntityIngredient> ingredients;
-    private List<EntityType<?>> allTypes;
+    private Set<EntityType<?>> allTypes;
+
+    @Override
+    public Loadable<?> loadable() {
+      return COMPOUND;
+    }
 
     @Override
     public boolean test(EntityType<?> type) {
@@ -259,23 +221,21 @@ public abstract class EntityIngredient implements Predicate<EntityType<?>> {
     }
 
     @Override
-    public Collection<EntityType<?>> getTypes() {
+    public Set<EntityType<?>> getTypes() {
       if (allTypes == null) {
         allTypes = ingredients.stream()
                               .flatMap(ingredient -> ingredient.getTypes().stream())
-                              .distinct()
-                              .collect(Collectors.toList());
+                              .collect(ImmutableSet.toImmutableSet());
       }
       return allTypes;
     }
+  }
 
-    @Override
-    public JsonElement serialize() {
-      JsonArray array = new JsonArray();
-      for (EntityIngredient ingredient : ingredients) {
-        array.add(ingredient.serialize());
-      }
-      return array;
+  /** Simple wrapper around entity type for usage in JEI */
+  public record EntityInput(EntityType<?> type) {
+    /** Wraps the given list into a list of entity inputs */
+    public static List<EntityInput> wrap(Collection<EntityType<?>> types) {
+      return types.stream().map(EntityInput::new).toList();
     }
   }
 }

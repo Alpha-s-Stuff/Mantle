@@ -30,6 +30,7 @@ import net.minecraftforge.client.model.geometry.IUnbakedGeometry;
 import net.minecraftforge.client.model.geometry.UnbakedGeometryHelper;
 import net.minecraftforge.client.model.pipeline.QuadBakingVertexConsumer;
 import net.minecraftforge.client.model.pipeline.TransformingVertexPipeline;
+import slimeknights.mantle.data.loadable.common.ColorLoadable;
 import slimeknights.mantle.util.ItemLayerPixels;
 import slimeknights.mantle.util.JsonHelper;
 import slimeknights.mantle.util.LogicHelper;
@@ -42,6 +43,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
+import java.util.PrimitiveIterator.OfInt;
 import java.util.Set;
 import java.util.function.Function;
 
@@ -161,7 +163,10 @@ public class MantleItemLayerModel implements IUnbakedGeometry<MantleItemLayerMod
     FaceData faceData = new FaceData(uMax, vMax);
     boolean translucent = false;
 
-    for(int f = 0; f < sprite.getFrameCount(); f++) {
+    OfInt frames = sprite.getUniqueFrames().iterator();
+    boolean hasFrames = frames.hasNext();
+    while (frames.hasNext()) {
+      int f = frames.nextInt();
       boolean ptu;
       boolean[] ptv = new boolean[uMax];
       Arrays.fill(ptv, true);
@@ -308,7 +313,7 @@ public class MantleItemLayerModel implements IUnbakedGeometry<MantleItemLayerMod
       //  3. only use the first frame
       // of these, 2 would give the most accurate result. However, its also the hardest to calculate
       // of the remaining methods, 3 is both more accurate and easier to calculate than 1, so I opted for that approach
-      if (sprite.getFrameCount() > 0) {
+      if (hasFrames) {
         for(int v = 0; v < vMax; v++) {
           for(int u = 0; u < uMax; u++) {
             int alpha = sprite.getPixelRGBA(0, u, vMax - v - 1) >> 24 & 0xFF;
@@ -500,7 +505,7 @@ public class MantleItemLayerModel implements IUnbakedGeometry<MantleItemLayerMod
      * Parses the layer data from JSON
      */
     public static LayerData fromJson(JsonObject json) {
-      int color = JsonHelper.parseColor(GsonHelper.getAsString(json, "color", ""));
+      int color = ColorLoadable.ALPHA.getOrDefault(json, "color", -1);
       // TODO: rename this field?
       int luminosity = GsonHelper.getAsInt(json, "luminosity");
       boolean noTint = GsonHelper.getAsBoolean(json, "no_tint", false);

@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 
 /**
  * Utility that helps get the preferred item from a tag based on mod ID.
@@ -23,10 +25,9 @@ public class TagPreference {
   /** Just an alphabetically late RL to simplify null checks */
   private static final ResourceLocation DEFAULT_ID = new ResourceLocation("zzzzz:zzzzz"); // simplfies null checks
 
-  /** Specific cache to this tag preference class type */
-  private static final Map<ResourceLocation, Optional<?>> PREFERENCE_CACHE = new HashMap<>();
-
-  /** Specific cache to this tag preference class type */
+  /** Cache from any tag key to its value */
+  private static final Map<TagKey<?>, Optional<?>> PREFERENCE_CACHE = new ConcurrentHashMap<>();
+  /** Cache of comparator instances, not concurrent because it's only used inside {@link #getUncachedPreference(TagKey)} which is only used inside the concurrent {@link #PREFERENCE_CACHE}. */
   private static final Map<ResourceKey<?>, RegistryComparator<?>> COMPARATOR_CACHE = new HashMap<>();
 
   /** Registers the listener with the event bus */
@@ -51,6 +52,9 @@ public class TagPreference {
     return RegistryHelper.getTagValueStream(tag).min(getComparator(registry));
   }
 
+  /** Don't create a new lambda instance every time we call {@link #getPreference(TagKey)} */
+  private static final Function<TagKey<?>,Optional<?>> PREFERENCE_LOOKUP = TagPreference::getUncachedPreference;
+
   /**
    * Gets the preferred value from a tag based on mod ID
    * @param tag    Tag to fetch
@@ -59,7 +63,7 @@ public class TagPreference {
   @SuppressWarnings("unchecked")
   public static <T> Optional<T> getPreference(TagKey<T> tag) {
     // fetch cached value if we have one
-    return (Optional<T>) PREFERENCE_CACHE.computeIfAbsent(tag.location(), name -> getUncachedPreference(tag));
+    return (Optional<T>) PREFERENCE_CACHE.computeIfAbsent(tag, PREFERENCE_LOOKUP);
   }
 
   /** Logic to compare two registry values */

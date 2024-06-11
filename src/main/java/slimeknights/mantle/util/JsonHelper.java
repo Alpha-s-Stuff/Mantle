@@ -7,19 +7,20 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSyntaxException;
-import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.GsonHelper;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraftforge.event.OnDatapackSyncEvent;
+import net.minecraftforge.network.PacketDistributor;
+import net.minecraftforge.network.PacketDistributor.PacketTarget;
+import net.minecraftforge.registries.IForgeRegistry;
 import slimeknights.mantle.Mantle;
+import slimeknights.mantle.data.loadable.common.BlockStateLoadable;
+import slimeknights.mantle.data.loadable.common.ColorLoadable;
 import slimeknights.mantle.network.NetworkWrapper;
 import slimeknights.mantle.network.packet.ISimplePacket;
 
@@ -28,9 +29,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map.Entry;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -158,7 +157,7 @@ public class JsonHelper {
     String text = GsonHelper.convertToString(json, key);
     ResourceLocation location = ResourceLocation.tryParse(text);
     if (location == null) {
-      throw new JsonSyntaxException("Expected " + key + " to be a Resource location, was '" + text + "'");
+      throw new JsonSyntaxException("Expected " + key + " to be a resource location, was '" + text + "'");
     }
     return location;
   }
@@ -222,27 +221,14 @@ public class JsonHelper {
    * Parses a color as a string
    * @param color  Color to parse
    * @return  Parsed string
+   * @deprecated use {@link ColorLoadable#parseString(String, String)}
    */
+  @Deprecated(forRemoval = true)
   public static int parseColor(@Nullable String color) {
     if (color == null || color.isEmpty()) {
       return -1;
     }
-    // two options, 6 character or 8 character, must not start with - sign
-    if (color.charAt(0) != '-') {
-      try {
-        // length of 8 must parse as long, supports transparency
-        int length = color.length();
-        if (length == 8) {
-          return (int)Long.parseLong(color, 16);
-        }
-        if (length == 6) {
-          return 0xFF000000 | Integer.parseInt(color, 16);
-        }
-      } catch (NumberFormatException ex) {
-        // NO-OP
-      }
-    }
-    throw new JsonSyntaxException("Invalid color '" + color + "'");
+    return ColorLoadable.ALPHA.parseString(color, "[unknown]");
   }
 
 
@@ -299,6 +285,28 @@ public class JsonHelper {
     sendPackets(network, targetedPlayer, packets);
   }
 
+  /**
+   * Localizes the given resource location to one within the folder
+   * @param path        Path to localize
+   * @param folder      Folder to trim (without trailing /), it is not validated so make sure you call correctly
+   * @param extension   Extension to trim
+   * @return  Localized location
+   */
+  public static String localize(String path, String folder, String extension) {
+    return path.substring(folder.length() + 1, path.length() - extension.length());
+  }
+
+  /**
+   * Localizes the given resource location to one within the folder
+   * @param location    Location to localize
+   * @param folder      Folder to trim (without trailing /), it is not validated so make sure you call correctly
+   * @param extension   Extension to trim
+   * @return  Localized location
+   */
+  public static ResourceLocation localize(ResourceLocation location, String folder, String extension) {
+    return new ResourceLocation(location.getNamespace(), localize(location.getPath(), folder, extension));
+  }
+
 
   /* Block States */
 
@@ -310,14 +318,7 @@ public class JsonHelper {
    * @throws JsonSyntaxException  if a property does not parse or the element is the wrong type
    */
   public static BlockState convertToBlockState(JsonElement element, String key) {
-    // primitive means its a block directly
-    if (element.isJsonPrimitive()) {
-      return JsonHelper.convertToEntry(BuiltInRegistries.BLOCK, element, key).defaultBlockState();
-    }
-    if (element.isJsonObject()) {
-      return convertToBlockState(element.getAsJsonObject());
-    }
-    throw new JsonSyntaxException("Expected " + key + " to be a string or an object, was " + GsonHelper.getType(element));
+    return BlockStateLoadable.DIFFERENCE.convert(element, key);
   }
 
   /**
@@ -328,27 +329,7 @@ public class JsonHelper {
    * @throws JsonSyntaxException  if a property does not parse or the element is missing or the wrong type
    */
   public static BlockState getAsBlockState(JsonObject parent, String key) {
-    if (parent.has(key)) {
-      return convertToBlockState(parent.get(key), key);
-    }
-    throw new JsonSyntaxException("Missing " + key + ", expected to find a string or an object");
-  }
-
-  /**
-   * Sets the property
-   * @param state     State before changes
-   * @param property  Property to set
-   * @param name      Value name
-   * @param <T>  Type of property
-   * @return  State with the property
-   * @throws JsonSyntaxException  if the property has no element with the given name
-   */
-  private static <T extends Comparable<T>> BlockState setValue(BlockState state, Property<T> property, String name) {
-    Optional<T> value = property.getValue(name);
-    if (value.isPresent()) {
-      return state.setValue(property, value.get());
-    }
-    throw new JsonSyntaxException("Property " + property + " does not contain value " + name);
+    return BlockStateLoadable.DIFFERENCE.getIfPresent(parent, key);
   }
 
   /**
@@ -358,20 +339,7 @@ public class JsonHelper {
    * @throws JsonSyntaxException  if any property name or property value is invalid
    */
   public static BlockState convertToBlockState(JsonObject json) {
-    Block block = JsonHelper.getAsEntry(BuiltInRegistries.BLOCK, json, "block");
-    BlockState state = block.defaultBlockState();
-    if (json.has("properties")) {
-      StateDefinition<Block,BlockState> definition = block.getStateDefinition();
-      for (Entry<String,JsonElement> entry : GsonHelper.getAsJsonObject(json, "properties").entrySet()) {
-        String key = entry.getKey();
-        Property<?> property = definition.getProperty(key);
-        if (property == null) {
-          throw new JsonSyntaxException("Property " + key + " does not exist in block " + block);
-        }
-        state = setValue(state, property, GsonHelper.convertToString(entry.getValue(), key));
-      }
-    }
-    return state;
+    return BlockStateLoadable.DIFFERENCE.deserialize(json);
   }
 
   /**
@@ -380,19 +348,7 @@ public class JsonHelper {
    * @return  JsonPrimitive of the block name if it matches the default state, JsonObject otherwise
    */
   public static JsonElement serializeBlockState(BlockState state) {
-    Block block = state.getBlock();
-    if (state == block.defaultBlockState()) {
-      return new JsonPrimitive(Registry.BLOCK.getKey(block).toString());
-    }
-    return serializeBlockState(state, new JsonObject());
-  }
-
-  /** Serializes the property if it differs in the default state */
-  private static <T extends Comparable<T>> void serializeProperty(BlockState serialize, Property<T> property, BlockState defaultState, JsonObject json) {
-    T value = serialize.getValue(property);
-    if (!value.equals(defaultState.getValue(property))) {
-      json.addProperty(property.getName(), property.getName(value));
-    }
+    return BlockStateLoadable.DIFFERENCE.serialize(state);
   }
 
   /**
@@ -401,16 +357,7 @@ public class JsonHelper {
    * @return  JsonObject containing properties that differ from the default state
    */
   public static JsonObject serializeBlockState(BlockState state, JsonObject json) {
-    Block block = state.getBlock();
-    json.addProperty("block", Registry.BLOCK.getKey(block).toString());
-    BlockState defaultState = block.defaultBlockState();
-    JsonObject properties = new JsonObject();
-    for (Property<?> property : block.getStateDefinition().getProperties()) {
-      serializeProperty(state, property, defaultState, properties);
-    }
-    if (properties.size() > 0) {
-      json.add("properties", properties);
-    }
+    BlockStateLoadable.DIFFERENCE.serialize(state, json);
     return json;
   }
 }

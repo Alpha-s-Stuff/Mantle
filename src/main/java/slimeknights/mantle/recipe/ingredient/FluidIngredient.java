@@ -1,44 +1,121 @@
 package slimeknights.mantle.recipe.ingredient;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
-import com.google.gson.JsonSyntaxException;
-import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import net.minecraft.core.Holder;
+import lombok.RequiredArgsConstructor;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
-import net.minecraft.util.GsonHelper;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
-import slimeknights.mantle.util.JsonHelper;
+import net.minecraftforge.fluids.FluidStack;
+import slimeknights.mantle.Mantle;
+import slimeknights.mantle.data.loadable.IAmLoadable;
+import slimeknights.mantle.data.loadable.Loadable;
+import slimeknights.mantle.data.loadable.Loadables;
+import slimeknights.mantle.data.loadable.common.FluidStackLoadable;
+import slimeknights.mantle.data.loadable.mapping.EitherLoadable;
+import slimeknights.mantle.data.loadable.primitive.IntLoadable;
+import slimeknights.mantle.data.loadable.record.RecordLoadable;
+import slimeknights.mantle.util.RegistryHelper;
 
-import java.lang.reflect.Type;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
+/**
+ * Simple displayable ingredient type for fluids.
+ */
 @SuppressWarnings("unused")
-public abstract class FluidIngredient {
-  /** Empty fluid ingredient, matches nothing */
-  public static final FluidIngredient EMPTY = new Empty();
-  /** Fluid json serializer instance */
-  public static Serializer SERIALIZER = new Serializer();
+public abstract class FluidIngredient implements IAmLoadable {
+  /** Empty fluid ingredient, matching empty stacks. This ingredient does not parse from JSON, use use defaulting methods if you wish to use it */
+  public static final FluidMatch EMPTY = new FluidMatch(Fluids.EMPTY, 0);
+
+
+  /* Loadables */
+
+  /** Creates a builder with set and tag */
+  private static EitherLoadable.TypedBuilder<FluidIngredient> loadableBuilder() {
+    return EitherLoadable.<FluidIngredient>typed().key("fluid", FLUID_MATCH).key("tag", TAG_MATCH).key("name", NAME_MATCH);
+  }
+  /** Loadable for network writing of fluids */
+  private static final Loadable<FluidIngredient> NETWORK = FluidStackLoadable.REQUIRED_STACK.list(0).flatXmap(fluids -> FluidIngredient.of(fluids.stream().map(FluidIngredient::of).toList()), FluidIngredient::getFluids);
+  /** Loadable for fluid matches */
+  private static final RecordLoadable<FluidMatch> FLUID_MATCH = RecordLoadable.create(Loadables.FLUID.requiredField("fluid", i -> i.fluid), IntLoadable.FROM_ONE.requiredField("amount", i -> i.amount), FluidIngredient::of);
+  /** @deprecated Old key for fluid ingredients, remove sometime in 1.20 or 1.21 */
+  @Deprecated(forRemoval = true)
+  private static final RecordLoadable<FluidMatch> NAME_MATCH = RecordLoadable.create(Loadables.FLUID.requiredField("name", i -> i.fluid), IntLoadable.FROM_ONE.requiredField("amount", i -> i.amount), (fluid, amount) -> {
+    // TODO: is there a good way to get recipe context here? Cannot think of a way short of a global static context.
+    Mantle.logger.warn("Using deprecated key 'name' for fluid ingredient, use 'fluid' instead. This will be removed in the future");
+    return FluidIngredient.of(fluid, amount);
+  });
+  /** Loadable for tag matches */
+  private static final RecordLoadable<TagMatch> TAG_MATCH = RecordLoadable.create(Loadables.FLUID_TAG.requiredField("tag", i -> i.tag), IntLoadable.FROM_ONE.requiredField("amount", i -> i.amount), FluidIngredient::of);
+  /** Loadable for tag matches */
+  private static final Loadable<Compound> COMPOUND = loadableBuilder().build(NETWORK).list(2).flatXmap(Compound::new, c -> c.ingredients);
+  /** Loadable for any fluid ingredient */
+  public static final Loadable<FluidIngredient> LOADABLE = loadableBuilder().array(COMPOUND).build(NETWORK);
+
+
+  /* Constructors */
+
+  /**
+   * Creates a new ingredient using the given fluid and amount
+   * @param fluid   Fluid to check
+   * @param amount  Minimum fluid amount
+   * @return  Fluid ingredient for this fluid
+   */
+  public static FluidMatch of(Fluid fluid, int amount) {
+    if (fluid == Fluids.EMPTY || amount <= 0) {
+      return EMPTY;
+    }
+    return new FluidMatch(fluid, amount);
+  }
+
+  /**
+   * Creates a new ingredient using the given fluidstack
+   * @param stack  Fluid stack
+   * @return  Fluid ingredient for this fluid stack
+   */
+  public static FluidIngredient of(FluidStack stack) {
+    return of(stack.getFluid(), stack.getAmount());
+  }
+
+  /**
+   * Creates a new fluid ingredient from the given tag
+   * @param fluid   Fluid tag
+   * @param amount  Minimum fluid amount
+   * @return  Fluid ingredient from a tag
+   */
+  public static TagMatch of(TagKey<Fluid> fluid, int amount) {
+    return new TagMatch(fluid, amount);
+  }
+
+  /**
+   * Creates a new compound ingredient from the given list of ingredients
+   * @param ingredients  Ingredient list
+   * @return  Compound ingredient
+   */
+  public static FluidIngredient of(FluidIngredient... ingredients) {
+    return of(List.of(ingredients));
+  }
+
+  /**
+   * Creates a new compound ingredient from the given list of ingredients
+   * @param ingredients  Ingredient list
+   * @return  Compound ingredient
+   */
+  public static FluidIngredient of(List<FluidIngredient> ingredients) {
+    if (ingredients.size() == 1) {
+      return ingredients.get(0);
+    }
+    return new Compound(ingredients);
+  }
+
 
   /** Cached list of display fluids */
   private List<FluidStack> displayFluids;
@@ -91,135 +168,28 @@ public abstract class FluidIngredient {
    * Serializes the Fluid Ingredient into JSON
    * @return  FluidIngredient JSON
    */
-  public abstract JsonElement serialize();
+  public JsonElement serialize() {
+    return LOADABLE.serialize(this);
+  }
+
+  /** Gets the fluid ingredient from the parent and deserializes it */
+  public static FluidIngredient deserialize(JsonObject parent, String key) {
+    return LOADABLE.getIfPresent(parent, key);
+  }
+
+  /** @deprecated use {@link #LOADABLE} with {@link Loadable#convert(JsonElement, String)} */
+  @Deprecated
+  public static FluidIngredient deserialize(JsonElement element, String key) {
+    return LOADABLE.convert(element, key);
+  }
 
   /**
    * Writes the ingredient into the packet buffer
    * @param buffer Packet buffer instance
    */
   public void write(FriendlyByteBuf buffer) {
-    Collection<FluidStack> fluids = getAllFluids();
-    buffer.writeInt(fluids.size());
-    for (FluidStack stack : fluids) {
-      buffer.writeUtf(Registry.FLUID.getKey(stack.getFluid()).toString());
-      buffer.writeLong(stack.getAmount());
-    }
+    NETWORK.encode(buffer, this);
   }
-
-
-  /*
-   * Instance creation
-   */
-
-  /**
-   * Creates a new ingredient using the given fluid and amount
-   * @param fluid   Fluid to check
-   * @param amount  Minimum fluid amount
-   * @return  Fluid ingredient for this fluid
-   */
-  public static FluidIngredient of(Fluid fluid, long amount) {
-    return new FluidIngredient.FluidMatch(fluid, amount);
-  }
-
-  /**
-   * Creates a new ingredient using the given fluidstack
-   * @param stack  Fluid stack
-   * @return  Fluid ingredient for this fluid stack
-   */
-  public static FluidIngredient of(FluidStack stack) {
-    return of(stack.getFluid(), stack.getAmount());
-  }
-
-  /**
-   * Creates a new fluid ingredient from the given tag
-   * @param fluid   Fluid tag
-   * @param amount  Minimum fluid amount
-   * @return  Fluid ingredient from a tag
-   */
-  public static FluidIngredient of(TagKey<Fluid> fluid, long amount) {
-    return new FluidIngredient.TagMatch(fluid, amount);
-  }
-
-  /**
-   * Creates a new compound ingredient from the given list of ingredients
-   * @param ingredients  Ingredient list
-   * @return  Compound ingredient
-   */
-  public static FluidIngredient of(FluidIngredient... ingredients) {
-    return new FluidIngredient.Compound(ingredients);
-  }
-
-
-  /*
-   * JSON deserializing
-   */
-
-  /**
-   * Deserializes the fluid ingredient from JSON
-   * @param parent  Parent containing the fluid JSON
-   * @param name    Name of the key to fetch from the parent object
-   * @return  Fluid ingredient instance
-   * @throws JsonSyntaxException if syntax is invalid
-   */
-  public static FluidIngredient deserialize(JsonObject parent, String name) {
-    return deserialize(JsonHelper.getElement(parent, name), name);
-  }
-
-  /**
-   * Deserializes the fluid ingredient from JSON
-   * @param json  Json element instance
-   * @param name  Name of the object for error messages
-   * @return  Fluid ingredient instance
-   * @throws JsonSyntaxException if syntax is invalid
-   */
-  public static FluidIngredient deserialize(JsonElement json, String name) {
-    // single ingredient object
-    if (json.isJsonObject()) {
-      return deserializeObject(json.getAsJsonObject());
-    }
-
-    // array
-    if (json.isJsonArray()) {
-      return Compound.deserialize(json.getAsJsonArray(), name);
-    }
-
-    throw new JsonSyntaxException("Fluid ingredient " + name + " must be either an object or array");
-  }
-
-  /**
-   * Deserializes the fluid ingredient from JSON
-   * @param json  JSON object
-   * @return  Fluid Ingredient
-   * @throws JsonSyntaxException if syntax is invalid
-   */
-  private static FluidIngredient deserializeObject(JsonObject json) {
-    if (json.entrySet().isEmpty()) {
-      return EMPTY;
-    }
-
-    // fluid match
-    if (json.has("name")) {
-      // don't set both, obviously an error
-      if (json.has("tag")) {
-        throw new JsonSyntaxException("An ingredient entry is either a tag or an fluid, not both");
-      }
-
-      // parse a fluid
-      return FluidMatch.deserialize(json);
-    }
-
-    // tag match
-    if (json.has("tag")) {
-      return TagMatch.deserialize(json);
-    }
-
-    throw new JsonSyntaxException("An ingredient entry needs either a tag or an fluid");
-  }
-
-
-  /*
-   * Packet buffers
-   */
 
   /**
    * Reads a fluid ingredient from the packet buffer
@@ -227,61 +197,23 @@ public abstract class FluidIngredient {
    * @return  Fluid ingredient instance
    */
   public static FluidIngredient read(FriendlyByteBuf buffer) {
-    int count = buffer.readInt();
-    FluidIngredient[] ingredients = new FluidIngredient[count];
-    for (int i = 0; i < count; i++) {
-      Fluid fluid = BuiltInRegistries.FLUID.get(new ResourceLocation(buffer.readUtf(32767)));
-      if (fluid == null) {
-        fluid = Fluids.EMPTY;
-      }
-      long amount = buffer.readLong();
-      ingredients[i] = of(fluid, amount);
-    }
-    // if a single ingredient, do not wrap in compound
-    if (count == 1) {
-      return ingredients[0];
-    }
-    // compound for anything else
-    return of(ingredients);
+    return NETWORK.decode(buffer);
   }
 
-  /**
-   * Empty fluid ingredient, matches only empty fluid stacks
-   */
-  @NoArgsConstructor(access = AccessLevel.PRIVATE)
-  private static class Empty extends FluidIngredient {
-    @Override
-    public boolean test(Fluid fluid) {
-      return fluid == Fluids.EMPTY;
-    }
-    @Override
-    public boolean test(FluidStack fluid) {
-      return fluid.isEmpty();
-    }
-
-    @Override
-    public long getAmount(Fluid fluid) {
-      return 0;
-    }
-
-    @Override
-    public List<FluidStack> getAllFluids() {
-      return Collections.emptyList();
-    }
-
-    @Override
-    public JsonElement serialize() {
-      return new JsonObject();
-    }
-  }
 
   /**
    * Fluid ingredient that matches a single fluid
    */
   @AllArgsConstructor(access=AccessLevel.PRIVATE)
   private static class FluidMatch extends FluidIngredient {
+
     private final Fluid fluid;
     private final long amount;
+
+    @Override
+    public Loadable<?> loadable() {
+      return FLUID_MATCH;
+    }
 
     @Override
     public boolean test(Fluid fluid) {
@@ -297,47 +229,20 @@ public abstract class FluidIngredient {
     public List<FluidStack> getAllFluids() {
       return Collections.singletonList(new FluidStack(fluid, amount));
     }
-
-    @Override
-    public JsonElement serialize() {
-      JsonObject object = new JsonObject();
-      object.addProperty("name", Registry.FLUID.getKey(fluid).toString());
-      object.addProperty("amount", amount);
-      return object;
-    }
-
-    @Override
-    public void write(FriendlyByteBuf buffer) {
-      // count
-      buffer.writeInt(1);
-      // single fluid
-      buffer.writeUtf(Registry.FLUID.getKey(fluid).toString());
-      buffer.writeLong(amount);
-    }
-
-    /**
-     * Deserailizes the ingredient from JSON
-     * @param json  JSON object
-     * @return Fluid ingredient instance
-     */
-    private static FluidMatch deserialize(JsonObject json) {
-      String fluidName = GsonHelper.getAsString(json, "name");
-      Fluid fluid = BuiltInRegistries.FLUID.get(new ResourceLocation(fluidName));
-      if (fluid == null || fluid == Fluids.EMPTY) {
-        throw new JsonSyntaxException("Unknown fluid '" + fluidName + "'");
-      }
-      long amount = GsonHelper.getAsLong(json, "amount");
-      return new FluidMatch(fluid, amount);
-    }
   }
 
   /**
    * Fluid ingredient that matches a tag
    */
-  @AllArgsConstructor(access=AccessLevel.PRIVATE)
+  @AllArgsConstructor
   private static class TagMatch extends FluidIngredient {
     private final TagKey<Fluid> tag;
     private final long amount;
+
+    @Override
+    public Loadable<?> loadable() {
+      return TAG_MATCH;
+    }
 
     @Override
     public boolean test(Fluid fluid) {
@@ -351,58 +256,52 @@ public abstract class FluidIngredient {
 
     @Override
     public List<FluidStack> getAllFluids() {
-      return StreamSupport.stream(BuiltInRegistries.FLUID.getTagOrEmpty(tag).spliterator(), false)
-                          .filter(Holder::isBound)
-                          .map(fluid -> new FluidStack(fluid.value(), amount))
+      return RegistryHelper.getTagValueStream(BuiltInRegistries.FLUID, tag)
+                          .map(fluid -> new FluidStack(fluid, amount))
                           .toList();
-    }
-
-    @Override
-    public JsonElement serialize() {
-      JsonObject object = new JsonObject();
-      object.addProperty("tag", this.tag.location().toString());
-      object.addProperty("amount", amount);
-      return object;
-    }
-
-    /**
-     * Deseralizes the ingredient from JSON
-     * @param json  JSON object
-     * @return Fluid ingredient instance
-     */
-    private static TagMatch deserialize(JsonObject json) {
-      TagKey<Fluid> tag = TagKey.create(Registries.FLUID, JsonHelper.getResourceLocation(json, "tag"));
-      long amount = GsonHelper.getAsLong(json, "amount");
-      return new TagMatch(tag, amount);
     }
   }
 
   /**
    * Fluid ingredient that matches a list of ingredients
    */
+  @RequiredArgsConstructor
   private static class Compound extends FluidIngredient {
     private final List<FluidIngredient> ingredients;
-    private Compound(FluidIngredient[] ingredients) {
-      this.ingredients = Arrays.asList(ingredients);
+
+    @Override
+    public Loadable<?> loadable() {
+      return COMPOUND;
     }
 
     @Override
     public boolean test(Fluid fluid) {
-      return ingredients.stream().anyMatch(ingredient -> ingredient.test(fluid));
+      for (FluidIngredient ingredient : ingredients) {
+        if (ingredient.test(fluid)) {
+          return true;
+        }
+      }
+      return false;
     }
 
     @Override
     public boolean test(FluidStack stack) {
-      return ingredients.stream().anyMatch(ingredient -> ingredient.test(stack));
+      for (FluidIngredient ingredient : ingredients) {
+        if (ingredient.test(stack)) {
+          return true;
+        }
+      }
+      return false;
     }
 
     @Override
-    public long getAmount(Fluid fluid) {
-      return ingredients.stream()
-                        .filter(ingredient -> ingredient.test(fluid))
-                        .mapToLong(ingredient -> ingredient.getAmount(fluid))
-                        .findFirst()
-                        .orElse(0);
+    public int getAmount(Fluid fluid) {
+      for (FluidIngredient ingredient : ingredients) {
+        if (ingredient.test(fluid)) {
+          return ingredient.getAmount(fluid);
+        }
+      }
+      return 0;
     }
 
     @Override
@@ -410,50 +309,6 @@ public abstract class FluidIngredient {
       return ingredients.stream()
                         .flatMap(ingredient -> ingredient.getFluids().stream())
                         .collect(Collectors.toList());
-    }
-
-    @Override
-    public JsonElement serialize() {
-      return ingredients.stream()
-                        .map(FluidIngredient::serialize)
-                        .collect(JsonArray::new, JsonArray::add, JsonArray::addAll);
-    }
-
-    /**
-     * Deserializes a compound ingredient from JSON
-     * @param array  JSON array
-     * @param name   Array key
-     * @return  Compound fluid ingredient instance
-     */
-    private static Compound deserialize(JsonArray array, String name) {
-      // size must be valid
-      int size = array.size();
-      if (size == 0) {
-        throw new JsonSyntaxException("Fluid array cannot be empty, at least one fluid must be defined");
-      }
-
-      // parse all ingredients
-      FluidIngredient[] ingredients = new FluidIngredient[size];
-      for (int i = 0; i < size; i++) {
-        // no reason to an array in an array
-        ingredients[i] = deserializeObject(GsonHelper.convertToJsonObject(array.get(i), name + "[" + i + "]"));
-      }
-      return new Compound(ingredients);
-    }
-  }
-
-  /** Json serializer for fluids */
-  public static class Serializer implements JsonDeserializer<FluidIngredient>, JsonSerializer<FluidIngredient> {
-    private Serializer() {}
-
-    @Override
-    public FluidIngredient deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-      return FluidIngredient.deserialize(json, "ingredient");
-    }
-
-    @Override
-    public JsonElement serialize(FluidIngredient src, Type typeOfSrc, JsonSerializationContext context) {
-      return src.serialize();
     }
   }
 }

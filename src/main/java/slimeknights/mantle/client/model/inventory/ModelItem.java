@@ -2,10 +2,9 @@ package slimeknights.mantle.client.model.inventory;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
+import com.mojang.math.Vector3f;
 import lombok.Getter;
 import net.minecraft.util.GsonHelper;
-import net.minecraft.world.item.ItemDisplayContext;
-import org.joml.Vector3f;
 import slimeknights.mantle.client.model.util.ModelHelper;
 import slimeknights.mantle.util.JsonHelper;
 
@@ -81,16 +80,10 @@ public class ModelItem {
   /** Parses a transform type from a string */
   private static ItemDisplayContext parseTransformType(JsonObject json, String key) {
     String name = GsonHelper.getAsString(json, key, "none");
-    switch (name) {
-      case "none":   return ItemDisplayContext.NONE;
-      case "head":   return ItemDisplayContext.HEAD;
-      case "gui":    return ItemDisplayContext.GUI;
-      case "ground": return ItemDisplayContext.GROUND;
-      case "fixed":  return ItemDisplayContext.FIXED;
-      case "thirdperson_righthand": return ItemDisplayContext.THIRD_PERSON_RIGHT_HAND;
-      case "thirdperson_lefthand":  return ItemDisplayContext.THIRD_PERSON_LEFT_HAND;
-      case "firstperson_righthand": return ItemDisplayContext.FIRST_PERSON_RIGHT_HAND;
-      case "firstperson_lefthand":  return ItemDisplayContext.FIRST_PERSON_LEFT_HAND;
+    for (TransformType type : TransformType.values()) {
+      if (name.equals(type.getSerializeName())) {
+        return type;
+      }
     }
     throw new JsonSyntaxException("Unknown transform type " + name);
   }

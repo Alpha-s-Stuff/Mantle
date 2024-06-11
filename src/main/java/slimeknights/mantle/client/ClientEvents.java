@@ -52,6 +52,11 @@ import static net.minecraft.client.renderer.Sheets.SIGN_SHEET;
 public class ClientEvents implements ClientModInitializer {
   private static final Function<OffhandCooldownTracker,Float> COOLDOWN_TRACKER = OffhandCooldownTracker::getCooldown;
 
+  /** Called on construct to initiatlize things that need early entry */
+  public static void onConstruct() {
+    FluidTextureManager.init();
+  }
+
   static void registerEntityRenderers() {
     BlockEntityRenderers.register(MantleRegistrations.SIGN, SignRenderer::new);
   }
@@ -61,7 +66,6 @@ public class ClientEvents implements ClientModInitializer {
     ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new BookLoader());
     ResourceColorManager.init();
     FluidTooltipHandler.init();
-    FluidTextureManager.init(event);
   }
 
   @Override

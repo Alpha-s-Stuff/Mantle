@@ -18,23 +18,18 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import slimeknights.mantle.block.entity.MantleSignBlockEntity;
+import slimeknights.mantle.client.ClientEvents;
 import slimeknights.mantle.command.MantleCommand;
 import slimeknights.mantle.config.Config;
 import slimeknights.mantle.data.predicate.block.BlockPredicate;
 import slimeknights.mantle.data.predicate.block.BlockPropertiesPredicate;
-import slimeknights.mantle.data.predicate.block.SetBlockPredicate;
-import slimeknights.mantle.data.predicate.block.TagBlockPredicate;
 import slimeknights.mantle.data.predicate.damage.DamageSourcePredicate;
 import slimeknights.mantle.data.predicate.damage.SourceAttackerPredicate;
 import slimeknights.mantle.data.predicate.damage.SourceMessagePredicate;
-import slimeknights.mantle.data.predicate.entity.EntitySetPredicate;
 import slimeknights.mantle.data.predicate.entity.HasEnchantmentEntityPredicate;
 import slimeknights.mantle.data.predicate.entity.LivingEntityPredicate;
 import slimeknights.mantle.data.predicate.entity.MobTypePredicate;
-import slimeknights.mantle.data.predicate.entity.TagEntityPredicate;
 import slimeknights.mantle.data.predicate.item.ItemPredicate;
-import slimeknights.mantle.data.predicate.item.ItemSetPredicate;
-import slimeknights.mantle.data.predicate.item.ItemTagPredicate;
 import slimeknights.mantle.datagen.MantleFluidTagProvider;
 import slimeknights.mantle.datagen.MantleFluidTooltipProvider;
 import slimeknights.mantle.datagen.MantleTags;
@@ -87,6 +82,10 @@ public class Mantle implements ModInitializer {
     this.registerBlockEntities();
     MantleLoot.registerGlobalLootModifiers();
     UseBlockCallback.EVENT.register(LecternBookItem::interactWithBlock);
+
+    if (FMLEnvironment.dist == Dist.CLIENT) {
+      ClientEvents.onConstruct();
+    }
   }
 
   private void registerCapabilities() {
@@ -118,29 +117,15 @@ public class Mantle implements ModInitializer {
       // predicates
       {
         // block predicates
-        BlockPredicate.LOADER.register(getResource("and"), BlockPredicate.AND);
-        BlockPredicate.LOADER.register(getResource("or"), BlockPredicate.OR);
-        BlockPredicate.LOADER.register(getResource("inverted"), BlockPredicate.INVERTED);
-        BlockPredicate.LOADER.register(getResource("any"), BlockPredicate.ANY.getLoader());
         BlockPredicate.LOADER.register(getResource("requires_tool"), BlockPredicate.REQUIRES_TOOL.getLoader());
-        BlockPredicate.LOADER.register(getResource("set"), SetBlockPredicate.LOADER);
-        BlockPredicate.LOADER.register(getResource("tag"), TagBlockPredicate.LOADER);
         BlockPredicate.LOADER.register(getResource("block_properties"), BlockPropertiesPredicate.LOADER);
 
         // item predicates
-        ItemPredicate.LOADER.register(getResource("and"), ItemPredicate.AND);
-        ItemPredicate.LOADER.register(getResource("or"), ItemPredicate.OR);
-        ItemPredicate.LOADER.register(getResource("inverted"), ItemPredicate.INVERTED);
-        ItemPredicate.LOADER.register(getResource("any"), ItemPredicate.ANY.getLoader());
-        ItemPredicate.LOADER.register(getResource("set"), ItemSetPredicate.LOADER);
-        ItemPredicate.LOADER.register(getResource("tag"), ItemTagPredicate.LOADER);
+        //  make sure the item predicate registry is loaded, nothing to register here
+        ItemPredicate.ANY.getLoader();
 
         // entity predicates
-        LivingEntityPredicate.LOADER.register(getResource("and"), LivingEntityPredicate.AND);
-        LivingEntityPredicate.LOADER.register(getResource("or"), LivingEntityPredicate.OR);
-        LivingEntityPredicate.LOADER.register(getResource("inverted"), LivingEntityPredicate.INVERTED);
         // simple
-        LivingEntityPredicate.LOADER.register(getResource("any"), LivingEntityPredicate.ANY.getLoader());
         LivingEntityPredicate.LOADER.register(getResource("fire_immune"), LivingEntityPredicate.FIRE_IMMUNE.getLoader());
         LivingEntityPredicate.LOADER.register(getResource("water_sensitive"), LivingEntityPredicate.WATER_SENSITIVE.getLoader());
         LivingEntityPredicate.LOADER.register(getResource("on_fire"), LivingEntityPredicate.ON_FIRE.getLoader());
@@ -151,8 +136,6 @@ public class Mantle implements ModInitializer {
         LivingEntityPredicate.LOADER.register(getResource("underwater"), LivingEntityPredicate.UNDERWATER.getLoader());
         LivingEntityPredicate.LOADER.register(getResource("raining_at"), LivingEntityPredicate.RAINING.getLoader());
         // property
-        LivingEntityPredicate.LOADER.register(getResource("set"), EntitySetPredicate.LOADER);
-        LivingEntityPredicate.LOADER.register(getResource("tag"), TagEntityPredicate.LOADER);
         LivingEntityPredicate.LOADER.register(getResource("mob_type"), MobTypePredicate.LOADER);
         LivingEntityPredicate.LOADER.register(getResource("has_enchantment"), HasEnchantmentEntityPredicate.LOADER);
         // register mob types
@@ -163,10 +146,6 @@ public class Mantle implements ModInitializer {
         MobTypePredicate.MOB_TYPES.register(new ResourceLocation("water"), MobType.WATER);
 
         // damage predicates
-        DamageSourcePredicate.LOADER.register(getResource("and"), DamageSourcePredicate.AND);
-        DamageSourcePredicate.LOADER.register(getResource("or"), DamageSourcePredicate.OR);
-        DamageSourcePredicate.LOADER.register(getResource("inverted"), DamageSourcePredicate.INVERTED);
-        DamageSourcePredicate.LOADER.register(getResource("any"), DamageSourcePredicate.ANY.getLoader());
         // vanilla properties
         DamageSourcePredicate.LOADER.register(getResource("projectile"), DamageSourcePredicate.PROJECTILE.getLoader());
         DamageSourcePredicate.LOADER.register(getResource("explosion"), DamageSourcePredicate.EXPLOSION.getLoader());
@@ -174,6 +153,7 @@ public class Mantle implements ModInitializer {
         DamageSourcePredicate.LOADER.register(getResource("damage_helmet"), DamageSourcePredicate.DAMAGE_HELMET.getLoader());
         DamageSourcePredicate.LOADER.register(getResource("bypass_invulnerable"), DamageSourcePredicate.BYPASS_INVULNERABLE.getLoader());
         DamageSourcePredicate.LOADER.register(getResource("bypass_magic"), DamageSourcePredicate.BYPASS_MAGIC.getLoader());
+        DamageSourcePredicate.LOADER.register(getResource("bypass_enchantments"), DamageSourcePredicate.BYPASS_ENCHANTMENTS.getLoader());
         DamageSourcePredicate.LOADER.register(getResource("fire"), DamageSourcePredicate.FIRE.getLoader());
         DamageSourcePredicate.LOADER.register(getResource("magic"), DamageSourcePredicate.MAGIC.getLoader());
         DamageSourcePredicate.LOADER.register(getResource("fall"), DamageSourcePredicate.FALL.getLoader());
@@ -182,7 +162,6 @@ public class Mantle implements ModInitializer {
         DamageSourcePredicate.LOADER.register(getResource("melee"), DamageSourcePredicate.MELEE.getLoader());
         DamageSourcePredicate.LOADER.register(getResource("message"), SourceMessagePredicate.LOADER);
         DamageSourcePredicate.LOADER.register(getResource("attacker"), SourceAttackerPredicate.LOADER);
-
     }
   }
 

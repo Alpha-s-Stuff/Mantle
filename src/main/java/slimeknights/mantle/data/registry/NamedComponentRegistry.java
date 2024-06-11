@@ -2,39 +2,32 @@ package slimeknights.mantle.data.registry;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonSyntaxException;
-import io.netty.handler.codec.DecoderException;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
-import slimeknights.mantle.util.JsonHelper;
 
 import javax.annotation.Nullable;
+import java.util.Collection;
 
 /**
  * Generic registry of a component named by a resource location. Supports any arbitrary object without making any changes to it.
  * @param <T> Type of the component being registered.
  */
-public class NamedComponentRegistry<T> {
+public class NamedComponentRegistry<T> extends AbstractNamedComponentRegistry<T> {
   /** Registered box expansion types */
   private final BiMap<ResourceLocation,T> values = HashBiMap.create();
-  /** Name to make exceptions clearer */
-  private final String errorText;
-
   public NamedComponentRegistry(String errorText) {
-    this.errorText = errorText + " ";
+    super(errorText);
   }
 
   /** Registers the value with the given name */
-  public <V extends T> V register(ResourceLocation name, V value) {
+  public synchronized <V extends T> V register(ResourceLocation name, V value) {
     if (values.putIfAbsent(name, value) != null) {
       throw new IllegalArgumentException("Duplicate registration " + name);
     }
     return value;
   }
 
-  /** Gets a value or null if missing */
+  @Override
   @Nullable
   public T getValue(ResourceLocation name) {
     return values.get(name);
@@ -46,7 +39,7 @@ public class NamedComponentRegistry<T> {
     return values.inverse().get(value);
   }
 
-  /** Gets the key associated with a value */
+  @Override
   public ResourceLocation getKey(T value) {
     ResourceLocation key = getOptionalKey(value);
     if (key == null) {
@@ -55,68 +48,41 @@ public class NamedComponentRegistry<T> {
     return key;
   }
 
-
-  /* Json */
-
-  /** Shared logic for deserialize */
-  private T deserialize(ResourceLocation name) {
-    T value = getValue(name);
-    if (value == null) {
-      throw new JsonSyntaxException(errorText + name);
-    }
-    return value;
+  @Override
+  public Collection<ResourceLocation> getKeys() {
+    return values.keySet();
   }
 
-  /** Parse the value from JSON */
-  public T convert(JsonElement element, String key) {
-    return deserialize(JsonHelper.convertToResourceLocation(element, key));
-  }
-
-  /** Parse the value from JSON */
-  public T deserialize(JsonObject parent, String key) {
-    return deserialize(JsonHelper.getResourceLocation(parent, key));
+  @Override
+  public Collection<T> getValues() {
+    return values.values();
   }
 
 
-  /* Network */
+  /* Deprecated aliases */
 
-  /** Writes the value to the buffer */
-  public void toNetwork(T value, FriendlyByteBuf buffer) {
-    buffer.writeResourceLocation(getKey(value));
+  /** @deprecated use {@link #decode(FriendlyByteBuf)} */
+  @Deprecated(forRemoval = true)
+  public void toNetwork(T src, FriendlyByteBuf buffer) {
+    encode(buffer, src);
   }
 
-  /** Writes the value to the buffer */
-  public void toNetworkOptional(@Nullable T value, FriendlyByteBuf buffer) {
-    // if null, just write an empty string, that is not a valid resource location anyways and saves us a byte
-    if (value != null) {
-      buffer.writeUtf(getKey(value).toString());
-    } else {
-      buffer.writeUtf("");
-    }
-  }
-
-  /** Reads the given value from the network by resource location */
-  private T fromNetwork(ResourceLocation name) {
-    T value = getValue(name);
-    if (value == null) {
-      throw new DecoderException(errorText + name);
-    }
-    return value;
-  }
-
-  /** Parse the value from JSON */
+  /** @deprecated use {@link #decode(FriendlyByteBuf)} */
+  @Deprecated(forRemoval = true)
   public T fromNetwork(FriendlyByteBuf buffer) {
-    return fromNetwork(buffer.readResourceLocation());
+    return decode(buffer);
   }
 
-  /** Parse the value from JSON */
+  /** @deprecated use {@link #decode(FriendlyByteBuf)} */
+  @Deprecated(forRemoval = true)
+  public void toNetworkOptional(@Nullable T src, FriendlyByteBuf buffer) {
+    encodeOptional(buffer, src);
+  }
+
+  /** @deprecated use {@link #decode(FriendlyByteBuf)} */
   @Nullable
+  @Deprecated(forRemoval = true)
   public T fromNetworkOptional(FriendlyByteBuf buffer) {
-    // empty string is not a valid resource location, so its a nice value to use for null, saves us a byte
-    String key = buffer.readUtf(Short.MAX_VALUE);
-    if (key.isEmpty()) {
-      return null;
-    }
-    return fromNetwork(new ResourceLocation(key));
+    return decodeOptional(buffer);
   }
 }
