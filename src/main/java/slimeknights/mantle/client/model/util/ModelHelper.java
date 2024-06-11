@@ -172,4 +172,25 @@ public class ModelHelper {
       throw new JsonParseException("Invalid '" + key + "' " + i + " found, only 0/90/180/270 allowed");
     }
   }
+
+  /**
+   * Fully unwrap a model, i.e. return the innermost model.
+   */
+  public static <T extends BakedModel> BakedModel unwrap(BakedModel model, Class<T> modelClass) {
+    while (model instanceof WrapperBakedModel wrapper) {
+      if (modelClass.isAssignableFrom(model.getClass()))
+        return (T) model;
+      BakedModel wrapped = wrapper.getWrappedModel();
+
+      if (wrapped == null) {
+        return (T) model;
+      } else if (wrapped == model) {
+        throw new IllegalArgumentException("Model " + model + " is wrapping itself!");
+      } else {
+        model = wrapped;
+      }
+    }
+
+    return model;
+  }
 }
