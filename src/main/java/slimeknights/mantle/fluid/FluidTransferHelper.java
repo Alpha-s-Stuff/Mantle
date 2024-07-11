@@ -16,6 +16,7 @@ import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageUtil;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
+import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -91,7 +92,7 @@ public class FluidTransferHelper {
 
       // check how much can be extracted
       try (Transaction extractionTestTransaction = Transaction.openOuter()) {
-        maxExtracted = view.extract(resource, maxFill, extractionTestTransaction);
+        maxExtracted = input.extract(resource, maxFill, extractionTestTransaction);
         extractionTestTransaction.abort();
       }
 
@@ -100,7 +101,7 @@ public class FluidTransferHelper {
         long accepted = output.insert(resource, maxExtracted, transferTransaction);
 
         // extract it, or rollback if the amounts don't match
-        long drained = view.extract(resource, accepted, transferTransaction);
+        long drained = input.extract(resource, accepted, transferTransaction);
         if (drained != accepted) {
           Mantle.logger.error("Lost {} fluid during transfer", drained - accepted);
         }
@@ -210,12 +211,12 @@ public class FluidTransferHelper {
           if (!world.isClientSide) {
             Storage<FluidVariant> itemHandler = ContainerItemContext.forPlayerInteraction(player, hand).find(FluidStorage.ITEM);
             // first, try filling the TE from the item
-            FluidStack transferred = tryTransfer(itemHandler, teHandler, Long.MAX_VALUE);
+            FluidStack transferred = tryTransfer(itemHandler, teHandler, (itemHandler instanceof SingleSlotStorage ? ((SingleSlotStorage<FluidVariant>) itemHandler).getCapacity() : Long.MAX_VALUE));
             if (!transferred.isEmpty()) {
               playEmptySound(world, pos, player, transferred);
             } else {
               // if that failed, try filling the item handler from the TE
-              transferred = tryTransfer(teHandler, itemHandler, Integer.MAX_VALUE);
+              transferred = tryTransfer(teHandler, itemHandler, (itemHandler instanceof SingleSlotStorage ? ((SingleSlotStorage<FluidVariant>) itemHandler).getCapacity() : Integer.MAX_VALUE));
               if (!transferred.isEmpty()) {
                 playFillSound(world, pos, player, transferred);
               }
