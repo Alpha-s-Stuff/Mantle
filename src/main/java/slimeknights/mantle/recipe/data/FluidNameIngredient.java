@@ -1,12 +1,12 @@
 package slimeknights.mantle.recipe.data;
 
+import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraftforge.fluids.FluidStack;
 import slimeknights.mantle.data.loadable.Loadable;
 import slimeknights.mantle.data.loadable.Loadables;
-import slimeknights.mantle.data.loadable.primitive.IntLoadable;
+import slimeknights.mantle.data.loadable.primitive.LongLoadable;
 import slimeknights.mantle.data.loadable.record.RecordLoadable;
 import slimeknights.mantle.recipe.ingredient.FluidIngredient;
 
@@ -17,7 +17,7 @@ import java.util.List;
 public class FluidNameIngredient extends FluidIngredient {
   private static final RecordLoadable<FluidNameIngredient> LOADABLE = RecordLoadable.create(
     Loadables.RESOURCE_LOCATION.requiredField("fluid", i -> i.fluidName),
-    IntLoadable.FROM_ONE.requiredField("amount", i -> i.amount),
+    LongLoadable.FROM_ONE.requiredField("amount", i -> i.amount),
     FluidNameIngredient::new);
 
   private final ResourceLocation fluidName;

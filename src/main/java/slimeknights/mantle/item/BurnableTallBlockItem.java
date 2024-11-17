@@ -12,6 +12,6 @@ public class BurnableTallBlockItem extends DoubleHighBlockItem {
 
   public BurnableTallBlockItem(Block blockIn, Properties builder, int burnTime) {
     super(blockIn, builder);
-    FuelRegistry.INSTANCE.add(this, burnTime);
+    FuelRegistryEvents.INSTANCE.add(this, burnTime);
   }
 }

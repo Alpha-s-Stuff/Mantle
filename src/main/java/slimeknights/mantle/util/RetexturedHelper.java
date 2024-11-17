@@ -1,5 +1,6 @@
 package slimeknights.mantle.util;
 
+import io.github.fabricators_of_create.porting_lib.models.data.ModelProperty;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import net.minecraft.core.Registry;
@@ -11,7 +12,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import slimeknights.mantle.client.model.ModelProperty;
 
 import javax.annotation.Nullable;
 import java.util.Objects;
@@ -36,7 +36,7 @@ public final class RetexturedHelper {
    */
   public static Block getBlock(String name) {
     if (!name.isEmpty()) {
-      return BuiltInRegistries.BLOCK.get(new ResourceLocation(name));
+      return BuiltInRegistries.BLOCK.get(ResourceLocation.parse(name));
     }
     return Blocks.AIR;
   }
@@ -92,19 +92,5 @@ public final class RetexturedHelper {
       BlockState state = self.getBlockState();
       level.sendBlockUpdated(self.getBlockPos(), state, state, 0);
     }
-  }
-
-  /** Creates a builder with the block property as specified */
-  public static ModelData.Builder getModelDataBuilder(Block block) {
-    // cannot support air, saves a conditional on usage
-    if (block == Blocks.AIR) {
-      block = null;
-    }
-    return ModelData.builder().with(BLOCK_PROPERTY, block);
-  }
-
-  /** Creates model data with the block property as specified */
-  public static ModelData getModelData(Block block) {
-    return getModelDataBuilder(block).build();
   }
 }

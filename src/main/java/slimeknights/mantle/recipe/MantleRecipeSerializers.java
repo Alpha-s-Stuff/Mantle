@@ -10,8 +10,6 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class MantleRecipeSerializers {
-  @ObjectHolder(registryName = "minecraft:recipe_serializer", value = Mantle.modId+":crafting_shaped_fallback")
   public static RecipeSerializer<?> CRAFTING_SHAPED_FALLBACK;
-  @ObjectHolder(registryName = "minecraft:recipe_serializer", value = Mantle.modId+":crafting_shaped_retextured")
   public static RecipeSerializer<?> CRAFTING_SHAPED_RETEXTURED;
 }

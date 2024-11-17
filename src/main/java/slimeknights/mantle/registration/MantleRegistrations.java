@@ -9,6 +9,5 @@ import slimeknights.mantle.block.entity.MantleSignBlockEntity;
 public class MantleRegistrations {
   private MantleRegistrations() {}
 
-  @ObjectHolder(registryName = "minecraft:block_entity_type", value = Mantle.modId+":sign")
   public static BlockEntityType<MantleSignBlockEntity> SIGN;
 }

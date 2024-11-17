@@ -5,7 +5,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
-import net.fabricmc.fabric.api.resource.conditions.v1.ConditionJsonProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -42,6 +41,7 @@ import slimeknights.mantle.client.book.transformer.BookTransformer;
 import slimeknights.mantle.client.book.transformer.IndexTransformer;
 import slimeknights.mantle.data.gson.ResourceLocationSerializer;
 import slimeknights.mantle.network.MantleNetwork;
+import slimeknights.mantle.network.NetworkWrapper;
 import slimeknights.mantle.network.packet.UpdateHeldPagePacket;
 import slimeknights.mantle.network.packet.UpdateLecternPagePacket;
 
@@ -188,7 +188,7 @@ public class BookLoader implements SimpleSynchronousResourceReloadListener {
       ItemStack item = player.getItemInHand(hand);
       if (!item.isEmpty()) {
         BookHelper.writeSavedPageToBook(item, page);
-        MantleNetwork.INSTANCE.network.sendToServer(new UpdateHeldPagePacket(hand, page));
+        NetworkWrapper.sendToServer(new UpdateHeldPagePacket(hand, page));
       }
     }
   }
@@ -199,7 +199,7 @@ public class BookLoader implements SimpleSynchronousResourceReloadListener {
    * @param page    New page
    */
   public static void updateSavedPage(BlockPos pos, String page) {
-    MantleNetwork.INSTANCE.network.sendToServer(new UpdateLecternPagePacket(pos, page));
+    NetworkWrapper.sendToServer(new UpdateLecternPagePacket(pos, page));
   }
 
   public static Gson getGson() {

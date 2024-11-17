@@ -70,6 +70,7 @@ public class ClientEvents implements ClientModInitializer {
 
   @Override
   public void onInitializeClient() {
+    onConstruct();
     RegistrationHelper.forEachWoodType(woodType ->  {
       ResourceLocation location = new ResourceLocation(woodType.name());
       Sheets.SIGN_MATERIALS.put(woodType, new Material(SIGN_SHEET, new ResourceLocation(location.getNamespace(), "entity/signs/" + location.getPath())));

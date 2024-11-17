@@ -1,7 +1,7 @@
 package slimeknights.mantle.registration;
 
+import io.github.fabricators_of_create.porting_lib.fluids.BaseFlowingFluid;
 import io.github.fabricators_of_create.porting_lib.fluids.FluidType;
-import io.github.fabricators_of_create.porting_lib.util.SimpleFlowableFluid;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -86,8 +86,8 @@ public class FluidBuilder<T extends FluidBuilder<T>> {
    * @param flowing  Flowing supplier
    * @return  Forge fluid properties
    */
-  public SimpleFlowableFluid.Properties build(Supplier<? extends FluidType> type, Supplier<? extends Fluid> still, Supplier<? extends Fluid> flowing) {
-    return new SimpleFlowableFluid.Properties(type, still, flowing)
+  public BaseFlowingFluid.Properties build(Supplier<? extends FluidType> type, Supplier<? extends Fluid> still, Supplier<? extends Fluid> flowing) {
+    return new BaseFlowingFluid.Properties(type, still, flowing)
         .slopeFindDistance(this.slopeFindDistance)
         .levelDecreasePerBlock(this.levelDecreasePerBlock)
         .explosionResistance(this.explosionResistance)

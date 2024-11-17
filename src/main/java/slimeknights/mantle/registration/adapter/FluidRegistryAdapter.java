@@ -1,7 +1,7 @@
 package slimeknights.mantle.registration.adapter;
 
-import io.github.fabricators_of_create.porting_lib.util.SimpleFlowableFluid;
-import io.github.fabricators_of_create.porting_lib.util.SimpleFlowableFluid.Properties;
+import io.github.fabricators_of_create.porting_lib.fluids.BaseFlowingFluid;
+import io.github.fabricators_of_create.porting_lib.fluids.BaseFlowingFluid.Properties;
 import net.minecraft.core.Registry;
 import net.minecraft.world.level.material.Fluid;
 import slimeknights.mantle.registration.DelayedSupplier;
@@ -28,7 +28,7 @@ public class FluidRegistryAdapter extends RegistryAdapter<Fluid> {
    * @param <F>       Fluid type
    * @return  Still fluid instance
    */
-  public <F extends SimpleFlowableFluid> F register(FluidBuilder<?> builder, Function<Properties, F> still, Function<Properties,F> flowing, String name) {
+  public <F extends BaseFlowingFluid> F register(FluidBuilder<?> builder, Function<Properties, F> still, Function<Properties,F> flowing, String name) {
     // have to create still and flowing later, as the props need these suppliers
     DelayedSupplier<Fluid> stillDelayed = new DelayedSupplier<>();
     DelayedSupplier<Fluid> flowingDelayed = new DelayedSupplier<>();
@@ -53,7 +53,7 @@ public class FluidRegistryAdapter extends RegistryAdapter<Fluid> {
    * @param name     Fluid name
    * @return  Still fluid
    */
-  public SimpleFlowableFluid register(FluidBuilder<?> builder, String name) {
-    return register(builder, SimpleFlowableFluid.Still::new, SimpleFlowableFluid.Flowing::new, name);
+  public BaseFlowingFluid register(FluidBuilder<?> builder, String name) {
+    return register(builder, BaseFlowingFluid.Source::new, BaseFlowingFluid.Flowing::new, name);
   }
 }

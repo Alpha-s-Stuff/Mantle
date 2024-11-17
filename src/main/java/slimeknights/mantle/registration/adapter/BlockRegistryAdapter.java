@@ -1,8 +1,7 @@
 package slimeknights.mantle.registration.adapter;
 
-import net.fabricmc.fabric.api.object.builder.v1.block.type.BlockSetTypeRegistry;
-import net.fabricmc.fabric.api.object.builder.v1.block.type.WoodTypeRegistry;
-import net.minecraft.core.Registry;
+import net.fabricmc.fabric.api.object.builder.v1.block.type.BlockSetTypeBuilder;
+import net.fabricmc.fabric.api.object.builder.v1.block.type.WoodTypeBuilder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -10,9 +9,7 @@ import net.minecraft.world.level.block.ButtonBlock;
 import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.FenceBlock;
 import net.minecraft.world.level.block.FenceGateBlock;
-import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.PressurePlateBlock;
-import net.minecraft.world.level.block.PressurePlateBlock.Sensitivity;
 import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.StairBlock;
@@ -65,7 +62,7 @@ public class BlockRegistryAdapter extends EnumRegistryAdapter<Block> {
    * @return  Registered block
    */
   public <T extends Block> T registerOverride(Function<Properties, T> constructor, Block base) {
-    return register(constructor.apply(BlockBehaviour.Properties.copy(base)), base);
+    return register(constructor.apply(BlockBehaviour.Properties.ofFullCopy(base)), base);
   }
 
   /* Building */
@@ -82,8 +79,8 @@ public class BlockRegistryAdapter extends EnumRegistryAdapter<Block> {
   public BuildingBlockObject registerBuilding(Block block, String name) {
     return new BuildingBlockObject(
       this.register(block, name),
-      this.register(new SlabBlock(BlockBehaviour.Properties.copy(block)), name + "_slab"),
-      this.register(new StairBlock(block.defaultBlockState(), BlockBehaviour.Properties.copy(block)), name + "_stairs")
+      this.register(new SlabBlock(BlockBehaviour.Properties.ofFullCopy(block)), name + "_slab"),
+      this.register(new StairBlock(block.defaultBlockState(), BlockBehaviour.Properties.ofFullCopy(block)), name + "_stairs")
     );
   }
 
@@ -97,7 +94,7 @@ public class BlockRegistryAdapter extends EnumRegistryAdapter<Block> {
   public WallBuildingBlockObject registerWallBuilding(Block block, String name) {
     return new WallBuildingBlockObject(
       registerBuilding(block, name),
-      this.register(new WallBlock(BlockBehaviour.Properties.copy(block)), name + "_wall")
+      this.register(new WallBlock(BlockBehaviour.Properties.ofFullCopy(block)), name + "_wall")
     );
   }
 
@@ -111,7 +108,7 @@ public class BlockRegistryAdapter extends EnumRegistryAdapter<Block> {
   public FenceBuildingBlockObject registerFenceBuilding(Block block, String name) {
     return new FenceBuildingBlockObject(
       registerBuilding(block, name),
-      () -> this.register(new FenceBlock(BlockBehaviour.Properties.copy(block)), name + "_fence")
+      () -> this.register(new FenceBlock(BlockBehaviour.Properties.ofFullCopy(block)), name + "_fence")
     );
   }
 
@@ -123,29 +120,29 @@ public class BlockRegistryAdapter extends EnumRegistryAdapter<Block> {
    * @return Wood object
    */
   public WoodBlockObject registerWood(String name, Function<WoodVariant,BlockBehaviour.Properties> behaviorCreator) {
-    BlockSetType setType = BlockSetTypeRegistry.registerWood(getResource(name));
-    WoodType woodType = WoodTypeRegistry.register(getResource(name), setType);
+    BlockSetType setType = new BlockSetTypeBuilder().buttonActivatedByArrows(true).pressurePlateActivationRule(BlockSetType.PressurePlateSensitivity.EVERYTHING).register(getResource(name));
+    WoodType woodType = new WoodTypeBuilder().register(getResource(name), setType);
     RegistrationHelper.registerWoodType(woodType);
 
     // planks
     BlockBehaviour.Properties planksProps = behaviorCreator.apply(WoodVariant.PLANKS).strength(2.0f, 3.0f);
     BuildingBlockObject planks = registerBuilding(new Block(planksProps), name + "_planks");
-    FenceBlock fence = register(new FenceBlock(Properties.copy(planks.get())), name + "_fence");
+    FenceBlock fence = register(new FenceBlock(Properties.ofFullCopy(planks.get())), name + "_fence");
     // logs and wood
     Supplier<? extends RotatedPillarBlock> stripped = () -> new RotatedPillarBlock(behaviorCreator.apply(WoodVariant.PLANKS).strength(2.0f));
     RotatedPillarBlock strippedLog = register(stripped.get(), "stripped_" + name + "_log");
     RotatedPillarBlock strippedWood = register(stripped.get(), "stripped_" + name + "_wood");
-    RotatedPillarBlock log = register(new StrippableLogBlock(getHolder(Registry.BLOCK, strippedLog), behaviorCreator.apply(WoodVariant.LOG).strength(2.0f)), name + "_log");
-    RotatedPillarBlock wood = register(new StrippableLogBlock(getHolder(Registry.BLOCK, strippedWood), behaviorCreator.apply(WoodVariant.WOOD).strength(2.0f)), name + "_wood");
+    RotatedPillarBlock log = register(new StrippableLogBlock(getHolder(BuiltInRegistries.BLOCK, strippedLog), behaviorCreator.apply(WoodVariant.LOG).strength(2.0f)), name + "_log");
+    RotatedPillarBlock wood = register(new StrippableLogBlock(getHolder(BuiltInRegistries.BLOCK, strippedWood), behaviorCreator.apply(WoodVariant.WOOD).strength(2.0f)), name + "_wood");
 
     // doors
-    DoorBlock door = register(new WoodenDoorBlock(behaviorCreator.apply(WoodVariant.PLANKS).strength(3.0F).noOcclusion(), setType), name + "_door");
-    TrapDoorBlock trapdoor = register(new TrapDoorBlock(behaviorCreator.apply(WoodVariant.PLANKS).strength(3.0F).noOcclusion().isValidSpawn(Blocks::never), setType), name + "_trapdoor");
-    FenceGateBlock fenceGate = register(new FenceGateBlock(planksProps, woodType), name + "_fence_gate");
+    DoorBlock door = register(new WoodenDoorBlock(setType, behaviorCreator.apply(WoodVariant.PLANKS).strength(3.0F).noOcclusion()), name + "_door");
+    TrapDoorBlock trapdoor = register(new TrapDoorBlock(setType, behaviorCreator.apply(WoodVariant.PLANKS).strength(3.0F).noOcclusion().isValidSpawn(Blocks::never)), name + "_trapdoor");
+    FenceGateBlock fenceGate = register(new FenceGateBlock(woodType, planksProps), name + "_fence_gate");
     // redstone
     BlockBehaviour.Properties redstoneProps = behaviorCreator.apply(WoodVariant.PLANKS).noCollission().strength(0.5F);
-    PressurePlateBlock pressurePlate = register(new PressurePlateBlock(Sensitivity.EVERYTHING, redstoneProps, setType), name + "_pressure_plate");
-    ButtonBlock button = register(new ButtonBlock(redstoneProps, setType, 30, true), name + "_button");
+    PressurePlateBlock pressurePlate = register(new PressurePlateBlock(setType, redstoneProps), name + "_pressure_plate");
+    ButtonBlock button = register(new ButtonBlock(setType, 30, redstoneProps), name + "_button");
     // signs
     StandingSignBlock standingSign = register(new MantleStandingSignBlock(behaviorCreator.apply(WoodVariant.PLANKS).noCollission().strength(1.0F), woodType), name + "_sign");
     WallSignBlock wallSign = register(new MantleWallSignBlock(behaviorCreator.apply(WoodVariant.PLANKS).noCollission().strength(1.0F)/*.dropsLike(standingSign)*/, woodType), name + "_wall_sign");

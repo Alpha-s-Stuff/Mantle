@@ -1,7 +1,5 @@
 package slimeknights.mantle.client.screen.book;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import io.github.fabricators_of_create.porting_lib.util.client.ScreenUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -9,7 +7,6 @@ import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
-import org.joml.Matrix4f;
 import slimeknights.mantle.client.book.data.element.TextComponentData;
 
 import java.util.ArrayList;
@@ -111,11 +108,10 @@ public class TextComponentDataRenderer {
       if (item.tooltips != null && item.tooltips.length > 0) {
         // Uncomment to render bounding boxes for event handling
         if (BookScreen.debug) {
-          Matrix4f matrix = guiGraphics.pose().last().pose();
-          ScreenUtils.drawGradientRect(matrix, 0, box1X,  box1Y,  box1W,      box1H,      0xFF00FF00, 0xFF00FF00);
-          ScreenUtils.drawGradientRect(matrix, 0, box2X,  box2Y,  box2W,      box2H,      0xFFFF0000, 0xFFFF0000);
-          ScreenUtils.drawGradientRect(matrix, 0, box3X,  box3Y,  box3W,      box3H,      0xFF0000FF, 0xFF0000FF);
-          ScreenUtils.drawGradientRect(matrix, 0, mouseX, mouseY, mouseX + 5, mouseY + 5, 0xFFFF00FF, 0xFFFFFF00);
+          guiGraphics.fillGradient(0, box1X,  box1Y,  box1W,      box1H,      0xFF00FF00, 0xFF00FF00);
+          guiGraphics.fillGradient(0, box2X,  box2Y,  box2W,      box2H,      0xFFFF0000, 0xFFFF0000);
+          guiGraphics.fillGradient(0, box3X,  box3Y,  box3W,      box3H,      0xFF0000FF, 0xFF0000FF);
+          guiGraphics.fillGradient(0, mouseX, mouseY, mouseX + 5, mouseY + 5, 0xFFFF00FF, 0xFFFFFF00);
         }
 
         if (mouseCheck) {

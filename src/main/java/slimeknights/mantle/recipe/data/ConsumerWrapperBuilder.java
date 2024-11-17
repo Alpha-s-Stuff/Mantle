@@ -3,10 +3,9 @@ package slimeknights.mantle.recipe.data;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import net.fabricmc.fabric.api.resource.conditions.v1.ConditionJsonProvider;
+import net.fabricmc.fabric.api.resource.conditions.v1.ResourceCondition;
 import net.fabricmc.fabric.api.resource.conditions.v1.ResourceConditions;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 
@@ -21,7 +20,7 @@ import java.util.function.Consumer;
  */
 @SuppressWarnings("UnusedReturnValue")
 public class ConsumerWrapperBuilder {
-  private final List<ConditionJsonProvider> conditions = new ArrayList<>();
+  private final List<ResourceCondition> conditions = new ArrayList<>();
   @Nullable
   private final RecipeSerializer<?> override;
   @Nullable
@@ -63,7 +62,7 @@ public class ConsumerWrapperBuilder {
    * @param condition Condition to add
    * @return Added condition
    */
-  public ConsumerWrapperBuilder addCondition(ConditionJsonProvider condition) {
+  public ConsumerWrapperBuilder addCondition(ResourceCondition condition) {
     conditions.add(condition);
     return this;
   }
@@ -79,13 +78,13 @@ public class ConsumerWrapperBuilder {
 
   private static class Wrapped implements FinishedRecipe {
     private final FinishedRecipe original;
-    private final List<ConditionJsonProvider> conditions;
+    private final List<ResourceCondition> conditions;
     @Nullable
     private final RecipeSerializer<?> override;
     @Nullable
     private final ResourceLocation overrideName;
 
-    private Wrapped(FinishedRecipe original, List<ConditionJsonProvider> conditions, @Nullable RecipeSerializer<?> override, @Nullable ResourceLocation overrideName) {
+    private Wrapped(FinishedRecipe original, List<ResourceCondition> conditions, @Nullable RecipeSerializer<?> override, @Nullable ResourceLocation overrideName) {
       // if wrapping another wrapper result, merge the two together
       if (original instanceof Wrapped) {
         Wrapped toMerge = (Wrapped) original;

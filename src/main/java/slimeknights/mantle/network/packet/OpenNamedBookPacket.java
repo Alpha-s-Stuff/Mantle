@@ -1,28 +1,20 @@
 package slimeknights.mantle.network.packet;
 
-import lombok.AllArgsConstructor;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
+import slimeknights.mantle.Mantle;
 import slimeknights.mantle.client.book.BookLoader;
 import slimeknights.mantle.client.book.data.BookData;
 
-@AllArgsConstructor
-public class OpenNamedBookPacket implements IThreadsafePacket {
+public record OpenNamedBookPacket(ResourceLocation book) implements IThreadsafePacket {
+  public static final Type<OpenNamedBookPacket> TYPE = new Type<>(Mantle.getResource("open_named_book"));
+  public static final StreamCodec<RegistryFriendlyByteBuf, OpenNamedBookPacket> CODEC = StreamCodec.composite(ResourceLocation.STREAM_CODEC, OpenNamedBookPacket::book, OpenNamedBookPacket::new);
   private static final String BOOK_ERROR = "command.mantle.book_test.not_found";
-  private final ResourceLocation book;
-
-  public OpenNamedBookPacket(FriendlyByteBuf buffer) {
-    this.book = buffer.readResourceLocation();
-  }
-
-  @Override
-  public void encode(FriendlyByteBuf buf) {
-    buf.writeResourceLocation(book);
-  }
 
   @Override
   public void handleThreadsafe(ISimplePacket.Context context) {
@@ -32,6 +24,11 @@ public class OpenNamedBookPacket implements IThreadsafePacket {
     } else {
       ClientOnly.errorStatus(book);
     }
+  }
+
+  @Override
+  public Type<OpenNamedBookPacket> type() {
+    return TYPE;
   }
 
   static class ClientOnly {

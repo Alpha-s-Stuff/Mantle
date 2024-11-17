@@ -1,9 +1,6 @@
 package slimeknights.mantle.registration.deferred;
 
-import io.github.fabricators_of_create.porting_lib.util.LazyRegistrar;
-import net.minecraft.core.Registry;
-import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceKey;
+import io.github.fabricators_of_create.porting_lib.util.DeferredRegister;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.StringRepresentable;
 import slimeknights.mantle.registration.object.EnumObject;
@@ -16,19 +13,15 @@ import java.util.function.Supplier;
  * @param <T>  Registry type
  */
 @SuppressWarnings("WeakerAccess")
-public abstract class DeferredRegisterWrapper<T> {
+public abstract class DeferredRegisterWrapper<T, R extends DeferredRegister<T>> {
   /** Registry instance, use this to provide register methods */
-  protected final SynchronizedDeferredRegister<T> register;
+  protected final SynchronizedDeferredRegister<T, R> register;
   /** Mod ID for registration */
   protected final String modID;
 
-  protected DeferredRegisterWrapper(ResourceKey<Registry<T>> reg, String modID) {
-    this(LazyRegistrar.create(reg, modID), modID);
-  }
-
-  protected DeferredRegisterWrapper(LazyRegistrar<T> register, String modID) {
+  protected DeferredRegisterWrapper(R register) {
     this.register = SynchronizedDeferredRegister.create(register);
-    this.modID = modID;
+    this.modID = register.getNamespace();
   }
 
   /**
@@ -46,7 +39,7 @@ public abstract class DeferredRegisterWrapper<T> {
    * @return  Resource location string
    */
   protected ResourceLocation resource(String name) {
-    return new ResourceLocation(modID, name);
+    return ResourceLocation.fromNamespaceAndPath(modID, name);
   }
 
   /**

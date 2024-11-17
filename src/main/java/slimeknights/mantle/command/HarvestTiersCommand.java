@@ -32,7 +32,7 @@ import java.util.Objects;
 /** Command to dump global loot modifiers */
 public class HarvestTiersCommand {
   /** Resource location of the global loot manager "tag" */
-  protected static final ResourceLocation HARVEST_TIERS = new ResourceLocation("mantle", "item_tier_ordering.json");
+  protected static final ResourceLocation HARVEST_TIERS = ResourceLocation.fromNamespaceAndPath("mantle", "item_tier_ordering.json");
   /** Path for saving the loot modifiers */
   private static final String HARVEST_TIER_PATH = HARVEST_TIERS.getNamespace() + "/" + HARVEST_TIERS.getPath();
 
@@ -70,7 +70,7 @@ public class HarvestTiersCommand {
       for (Tier tier : sortedTiers) {
         output.append("\n* ");
         TagKey<Block> tag = TagUtil.getTagFromTier(tier);
-        ResourceLocation id = TierSortingRegistry.getName(tier);
+        ResourceLocation id = TierSortingRegistry.getName(tier.);
         if (tag != null) {
           output.append(Component.translatable("command.mantle.harvest_tiers.tag", id, getTagComponent(tag)));
         } else {

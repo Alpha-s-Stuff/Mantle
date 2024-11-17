@@ -1,8 +1,8 @@
 package slimeknights.mantle.loot.function;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonObject;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.storage.loot.LootContext;
@@ -16,6 +16,7 @@ import slimeknights.mantle.block.entity.IRetexturedBlockEntity;
 import slimeknights.mantle.item.RetexturedBlockItem;
 import slimeknights.mantle.loot.MantleLoot;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -23,19 +24,20 @@ import java.util.Set;
  */
 @SuppressWarnings("WeakerAccess")
 public class RetexturedLootFunction extends LootItemConditionalFunction {
-  public static final Serializer SERIALIZER = new Serializer();
+  public static final MapCodec<RetexturedLootFunction> CODEC = RecordCodecBuilder.mapCodec(instance ->
+    commonFields(instance).apply(instance, RetexturedLootFunction::new));
 
   /**
    * Creates a new instance from the given conditions
    * @param conditions Conditions list
    */
-  public RetexturedLootFunction(LootItemCondition[] conditions) {
+  public RetexturedLootFunction(List<LootItemCondition> conditions) {
     super(conditions);
   }
 
   /** Creates a new instance with no conditions */
   public RetexturedLootFunction() {
-    super(new LootItemCondition[0]);
+    super(List.of());
   }
 
   @Override
@@ -58,12 +60,5 @@ public class RetexturedLootFunction extends LootItemConditionalFunction {
   @Override
   public LootItemFunctionType getType() {
     return MantleLoot.RETEXTURED_FUNCTION;
-  }
-
-  private static class Serializer extends LootItemConditionalFunction.Serializer<RetexturedLootFunction> {
-    @Override
-    public RetexturedLootFunction deserialize(JsonObject json, JsonDeserializationContext ctx, LootItemCondition[] conditions) {
-      return new RetexturedLootFunction(conditions);
-    }
   }
 }

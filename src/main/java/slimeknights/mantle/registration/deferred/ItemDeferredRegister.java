@@ -1,5 +1,6 @@
 package slimeknights.mantle.registration.deferred;
 
+import io.github.fabricators_of_create.porting_lib.util.DeferredRegister;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.item.Item;
@@ -13,10 +14,10 @@ import java.util.function.Supplier;
  * Deferred register that registers items with wrappers
  */
 @SuppressWarnings("unused")
-public class ItemDeferredRegister extends DeferredRegisterWrapper<Item> {
+public class ItemDeferredRegister extends DeferredRegisterWrapper<Item, DeferredRegister.Items> {
 
   public ItemDeferredRegister(String modID) {
-    super(Registries.ITEM, modID);
+    super(DeferredRegister.createItems(modID));
   }
 
   /**

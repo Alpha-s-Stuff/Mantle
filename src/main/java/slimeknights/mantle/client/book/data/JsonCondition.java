@@ -2,7 +2,7 @@ package slimeknights.mantle.client.book.data;
 
 import com.google.gson.JsonObject;
 import lombok.Getter;
-import net.fabricmc.fabric.api.resource.conditions.v1.ConditionJsonProvider;
+import net.fabricmc.fabric.api.resource.conditions.v1.ResourceCondition;
 import net.fabricmc.fabric.api.resource.conditions.v1.ResourceConditions;
 import net.minecraft.resources.ResourceLocation;
 
@@ -10,13 +10,13 @@ import javax.annotation.Nullable;
 
 public class JsonCondition {
   @Getter
-  private final ConditionJsonProvider conditionJsonProvider;
+  private final ResourceCondition conditionJsonProvider;
   @Getter
   private final ResourceLocation conditionId;
   @Getter
   private final JsonObject object;
 
-  public JsonCondition(@Nullable ConditionJsonProvider conditionJsonProvider) {
+  public JsonCondition(@Nullable ResourceCondition conditionJsonProvider) {
     this.conditionJsonProvider = conditionJsonProvider;
     if (conditionJsonProvider != null)
       this.conditionId = conditionJsonProvider.getConditionId();
@@ -44,6 +44,6 @@ public class JsonCondition {
   public boolean test() {
     if (conditionId == null || object == null)
       return false;
-    return ResourceConditions.get(conditionId).test(object);
+    return conditionJsonProvider.test(object);
   }
 }

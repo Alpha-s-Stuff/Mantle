@@ -2,7 +2,7 @@ package slimeknights.mantle.fluid.texture;
 
 import io.github.fabricators_of_create.porting_lib.fluids.FluidType;
 import io.github.fabricators_of_create.porting_lib.fluids.PortingLibFluids;
-import io.github.fabricators_of_create.porting_lib.util.RegistryObject;
+import io.github.fabricators_of_create.porting_lib.util.DeferredHolder;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.minecraft.core.Registry;
 import net.minecraft.data.CachedOutput;
@@ -70,7 +70,7 @@ public abstract class AbstractFluidTextureProvider extends GenericDataProvider {
   }
 
   /** Create a new builder for the give fluid type */
-  public FluidTexture.Builder texture(RegistryObject<? extends FluidType> fluid) {
+  public FluidTexture.Builder texture(DeferredHolder<?, ? extends FluidType> fluid) {
     return texture(fluid.get());
   }
 
@@ -85,7 +85,7 @@ public abstract class AbstractFluidTextureProvider extends GenericDataProvider {
   }
 
   /** Marks the given fluid type to be ignored by this texture provider */
-  public void skip(RegistryObject<? extends FluidType> fluid) {
+  public void skip(DeferredHolder<?, ? extends FluidType> fluid) {
     skip(fluid.get());
   }
 }

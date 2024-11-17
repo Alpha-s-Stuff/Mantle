@@ -1,6 +1,5 @@
 package slimeknights.mantle.recipe.helper;
 
-import io.github.fabricators_of_create.porting_lib.event.common.TagsUpdatedCallback;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -23,7 +22,7 @@ import java.util.function.Function;
  */
 public class TagPreference {
   /** Just an alphabetically late RL to simplify null checks */
-  private static final ResourceLocation DEFAULT_ID = new ResourceLocation("zzzzz:zzzzz"); // simplfies null checks
+  private static final ResourceLocation DEFAULT_ID = ResourceLocation.parse("zzzzz:zzzzz"); // simplfies null checks
 
   /** Cache from any tag key to its value */
   private static final Map<TagKey<?>, Optional<?>> PREFERENCE_CACHE = new ConcurrentHashMap<>();

@@ -1,26 +1,25 @@
 package slimeknights.mantle.network;
 
 import io.github.fabricators_of_create.porting_lib.util.NetworkDirection;
-import me.pepperbell.simplenetworking.S2CPacket;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.Packet;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.chunk.LevelChunk;
 
-import me.pepperbell.simplenetworking.SimpleChannel;
 import slimeknights.mantle.network.packet.ISimplePacket;
 
 import javax.annotation.Nullable;
-import java.util.Optional;
+import java.util.ArrayList;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
 
 /**
  * A small network implementation/wrapper using AbstractPackets instead of IMessages.
@@ -28,43 +27,33 @@ import java.util.function.Supplier;
  */
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class NetworkWrapper {
-  /** Network instance */
-  public final SimpleChannel network;
-  private int id = 0;
   private static final String PROTOCOL_VERSION = Integer.toString(1);
 
   /**
-   * Creates a new network wrapper
-   * @param channelName  Unique packet channel name
-   */
-  public NetworkWrapper(ResourceLocation channelName) {
-    this.network = new SimpleChannel(channelName);
-  }
-
-  /**
    * Registers a new {@link ISimplePacket}
-   * @param clazz    Packet class
-   * @param decoder  Packet decoder, typically the constructor
+   * @param type   Packet type
+   * @param codec  Packet decoder, typically the constructor
    * @param <MSG>  Packet class type
    */
-  public <MSG extends ISimplePacket> void registerPacket(Class<MSG> clazz, Function<FriendlyByteBuf, MSG> decoder, @Nullable NetworkDirection direction) {
-    registerPacket(clazz, ISimplePacket::encode, decoder, ISimplePacket::handle, direction);
+  public static <MSG extends ISimplePacket> void registerPacket(CustomPacketPayload.Type<MSG> type, StreamCodec<RegistryFriendlyByteBuf, MSG> codec, @Nullable NetworkDirection direction) {
+    registerPacket(type, codec, ISimplePacket::handle, direction);
   }
 
   /**
    * Registers a new generic packet
-   * @param clazz      Packet class
-   * @param encoder    Encodes a packet to the buffer
-   * @param decoder    Packet decoder, typically the constructor
+   * @param type       Packet type
+   * @param codec      Packet decoder, typically the constructor
    * @param consumer   Logic to handle a packet
    * @param direction  Network direction for validation. Pass null for no direction
    * @param <MSG>  Packet class type
    */
-  public <MSG extends ISimplePacket> void registerPacket(Class<MSG> clazz, BiConsumer<MSG, FriendlyByteBuf> encoder, Function<FriendlyByteBuf, MSG> decoder, BiConsumer<MSG,Supplier<ISimplePacket.Context>> consumer, @Nullable NetworkDirection direction) {
+  public static <MSG extends ISimplePacket> void registerPacket(CustomPacketPayload.Type<MSG> type, StreamCodec<RegistryFriendlyByteBuf, MSG> codec, BiConsumer<MSG,ISimplePacket.Context> consumer, @Nullable NetworkDirection direction) {
     if (direction == NetworkDirection.PLAY_TO_CLIENT) {
-      this.network.registerS2CPacket(clazz, this.id++, decoder);
+      PayloadTypeRegistry.playS2C().register(type, codec);
+      ServerPlayNetworking.registerGlobalReceiver(type, (payload, context) -> new ISimplePacket.Context(context.server(), context.player(), context.responseSender()));
     } else {
-      this.network.registerC2SPacket(clazz, this.id++, decoder);
+      PayloadTypeRegistry.playC2S().register(type, codec);
+      ClientPlayNetworking.registerGlobalReceiver(type, (payload, context) -> new ISimplePacket.Context(context.client(), null, context.responseSender()));
     }
   }
 
@@ -75,8 +64,8 @@ public class NetworkWrapper {
    * Sends a packet to the server
    * @param msg  Packet to send
    */
-  public void sendToServer(ISimplePacket msg) {
-    this.network.sendToServer(msg);
+  public static void sendToServer(ISimplePacket msg) {
+    ClientPlayNetworking.send(msg);
   }
 
   /**
@@ -84,7 +73,7 @@ public class NetworkWrapper {
    * @param player  Player receiving the packet
    * @param packet  Packet
    */
-  public void sendVanillaPacket(Packet<?> packet, Entity player) {
+  public static void sendVanillaPacket(Packet<?> packet, Entity player) {
     if (player instanceof ServerPlayer sPlayer) {
       sPlayer.connection.send(packet);
     }
@@ -95,9 +84,9 @@ public class NetworkWrapper {
    * @param msg     Packet
    * @param player  Player to send
    */
-  public void sendTo(S2CPacket msg, Player player) {
+  public static void sendTo(CustomPacketPayload msg, Player player) {
     if (player instanceof ServerPlayer) {
-      this.network.sendToClient(msg, (ServerPlayer) player);
+      ServerPlayNetworking.send((ServerPlayer) player, msg);
     }
   }
 
@@ -106,10 +95,10 @@ public class NetworkWrapper {
    * @param msg     Packet
    * @param player  Player to send
    */
-  public void sendTo(ISimplePacket msg, ServerPlayer player) {
-//    if (!(player instanceof FakePlayer)) {
-      network.sendToClient(msg, player);
-//    }
+  public static void sendTo(ISimplePacket msg, ServerPlayer player) {
+    if (ServerPlayNetworking.canSend(player, msg.type())) {
+      ServerPlayNetworking.send(player, msg);
+    }
   }
 
   /**
@@ -118,8 +107,11 @@ public class NetworkWrapper {
    * @param serverWorld  World instance
    * @param position     Position within range
    */
-  public void sendToClientsAround(ISimplePacket msg, ServerLevel serverWorld, BlockPos position) {
-    network.sendToClientsTracking(msg, serverWorld, position);
+  public static void sendToClientsAround(ISimplePacket msg, ServerLevel serverWorld, BlockPos position) {
+    for (ServerPlayer player : PlayerLookup.tracking(serverWorld, position)) {
+      if (ServerPlayNetworking.canSend(player, msg.type()))
+        ServerPlayNetworking.send(player, msg);
+    }
   }
 
   /**
@@ -127,8 +119,16 @@ public class NetworkWrapper {
    * @param msg     Packet
    * @param entity  Entity to check
    */
-  public void sendToTrackingAndSelf(S2CPacket msg, Entity entity) {
-    this.network.sendToClientsTrackingAndSelf(msg, entity);
+  public static void sendToTrackingAndSelf(CustomPacketPayload msg, Entity entity) {
+    var players = PlayerLookup.tracking(entity);
+    if (entity instanceof ServerPlayer player && !players.contains(player)) {
+      players = new ArrayList<>(players);
+      players.add(player);
+    }
+    for (var player : players) {
+      if (ServerPlayNetworking.canSend(player, msg.type()))
+        ServerPlayNetworking.send(player, msg);
+    }
   }
 
   /**
@@ -136,7 +136,10 @@ public class NetworkWrapper {
    * @param msg     Packet
    * @param entity  Entity to check
    */
-  public void sendToTracking(ISimplePacket msg, Entity entity) {
-    this.network.sendToClientsTracking(msg, entity);
+  public static void sendToTracking(ISimplePacket msg, Entity entity) {
+    for (var player : PlayerLookup.tracking(entity)) {
+      if (ServerPlayNetworking.canSend(player, msg.type()))
+        ServerPlayNetworking.send(player, msg);
+    }
   }
 }

@@ -8,6 +8,7 @@ import com.google.gson.stream.JsonWriter;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.JsonOps;
 import lombok.RequiredArgsConstructor;
+import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.resources.ResourceLocation;
@@ -47,7 +48,7 @@ public abstract class GenericDataProvider implements DataProvider {
    */
   protected void saveJson(CachedOutput output, ResourceLocation location, Object object, @Nullable Comparator<String> keyComparator) {
     try {
-      Path path = this.generator.getOutputFolder().resolve(Paths.get(type.getDirectory(), location.getNamespace(), folder, location.getPath() + ".json"));
+      Path path = this.output.getOutputFolder().resolve(Paths.get(type.getDirectory(), location.getNamespace(), folder, location.getPath() + ".json"));
       saveStable(output, gson.toJsonTree(object), path, keyComparator);
     } catch (IOException e) {
       Mantle.logger.error("Couldn't create data for {}", location, e);
@@ -72,7 +73,7 @@ public abstract class GenericDataProvider implements DataProvider {
    * @param object     Object to save, will be converted using the passed codec
    */
   protected <T> void saveJson(CachedOutput output, ResourceLocation location, Codec<T> codec, T object) {
-    saveJson(output, location, codec.encodeStart(JsonOps.INSTANCE, object).getOrThrow(false, Mantle.logger::error));
+    saveJson(output, location, codec.encodeStart(JsonOps.INSTANCE, object).getOrThrow());
   }
 
   /** Recreation of {@link DataProvider#saveStable(CachedOutput, JsonElement, Path)} that allows swapping tke key comparator */

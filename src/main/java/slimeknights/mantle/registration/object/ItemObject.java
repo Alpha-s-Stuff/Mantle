@@ -1,6 +1,6 @@
 package slimeknights.mantle.registration.object;
 
-import io.github.fabricators_of_create.porting_lib.util.RegistryObject;
+import io.github.fabricators_of_create.porting_lib.util.DeferredHolder;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.minecraft.core.DefaultedRegistry;
@@ -39,9 +39,9 @@ public class ItemObject<I extends ItemLike> implements Supplier<I>, ItemLike, Id
    * Creates a new item object using the given registry object. This variant can resolve its name before the registry object entry resolves
    * @param object  Object base
    */
-  public ItemObject(RegistryObject<? extends I> object) {
+  public ItemObject(Supplier<? extends I> object) {
     this.entry = object;
-    this.id = object.getId();
+    this.id = ((DeferredHolder) object).getId();
   }
 
   /**

@@ -6,7 +6,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
-import io.github.fabricators_of_create.porting_lib.event.common.TagsUpdatedCallback;
+import io.github.fabricators_of_create.porting_lib.event.common.TagsUpdatedEvent;
 import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
 import lombok.extern.log4j.Log4j2;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
@@ -37,6 +37,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.function.BiConsumer;
 
 /** Handles fluid units displaying in tooltips */
@@ -86,7 +87,7 @@ public class FluidTooltipHandler extends SimpleJsonResourceReloadListener implem
   public static void init() {
     ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(INSTANCE);
     // clear the cache on tag reload, if the tags changed it might be wrong
-    TagsUpdatedCallback.EVENT.register(registries -> INSTANCE.listCache.clear());
+    TagsUpdatedEvent.EVENT.register(event -> INSTANCE.listCache.clear());
   }
 
   private FluidTooltipHandler() {
@@ -191,7 +192,7 @@ public class FluidTooltipHandler extends SimpleJsonResourceReloadListener implem
   public static List<Component> getFluidTooltip(FluidStack fluid, long amount) {
     List<Component> tooltip = new ArrayList<>();
     // fluid name, not sure if there is a cleaner way to do this
-    tooltip.add(fluid.getDisplayName().plainCopy().withStyle(ChatFormatting.WHITE));
+    tooltip.add(fluid.getFluidType().getDescription().plainCopy().withStyle(ChatFormatting.WHITE));
     // material
     appendMaterial(fluid.getFluid(), amount, tooltip);
     // add mod display name

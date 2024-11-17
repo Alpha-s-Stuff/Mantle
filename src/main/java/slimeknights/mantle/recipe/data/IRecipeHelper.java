@@ -1,12 +1,11 @@
 package slimeknights.mantle.recipe.data;
 
-import io.github.fabricators_of_create.porting_lib.util.RegistryObject;
-import net.fabricmc.fabric.api.resource.conditions.v1.ConditionJsonProvider;
-import net.fabricmc.fabric.api.resource.conditions.v1.DefaultResourceConditions;
+import io.github.fabricators_of_create.porting_lib.util.DeferredHolder;
+import net.fabricmc.fabric.api.resource.conditions.v1.ResourceCondition;
+import net.fabricmc.fabric.api.resource.conditions.v1.ResourceConditions;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
@@ -42,7 +41,7 @@ public interface IRecipeHelper extends LocationExtender {
    * @return  Location for the mod
    */
   default ResourceLocation location(String name) {
-    return new ResourceLocation(getModId(), name);
+    return ResourceLocation.fromNamespaceAndPath(getModId(), name);
   }
 
   /**
@@ -84,7 +83,7 @@ public interface IRecipeHelper extends LocationExtender {
    * @param suffix    Path suffix
    * @return  Location with the given prefix and suffix
    */
-  default ResourceLocation wrap(RegistryObject<?> location, String prefix, String suffix) {
+  default ResourceLocation wrap(DeferredHolder<?, ?> location, String prefix, String suffix) {
     return wrap(location.getId(), prefix, suffix);
   }
 
@@ -94,7 +93,7 @@ public interface IRecipeHelper extends LocationExtender {
    * @param prefix    Path prefix
    * @return  Location with the given prefix
    */
-  default ResourceLocation prefix(RegistryObject<?> location, String prefix) {
+  default ResourceLocation prefix(DeferredHolder<?, ?> location, String prefix) {
     return prefix(location.getId(), prefix);
   }
 
@@ -104,7 +103,7 @@ public interface IRecipeHelper extends LocationExtender {
    * @param suffix    Path suffix
    * @return  Location with the given suffix
    */
-  default ResourceLocation suffix(RegistryObject<?> location, String suffix) {
+  default ResourceLocation suffix(DeferredHolder<?, ?> location, String suffix) {
     return suffix(location.getId(), suffix);
   }
 
@@ -152,7 +151,7 @@ public interface IRecipeHelper extends LocationExtender {
    * @return  Tag instance
    */
   default TagKey<Item> getItemTag(String modId, String name) {
-    return TagKey.create(Registries.ITEM, new ResourceLocation(modId, name));
+    return TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(modId, name));
   }
 
   /**
@@ -162,7 +161,7 @@ public interface IRecipeHelper extends LocationExtender {
    * @return  Tag instance
    */
   default TagKey<Fluid> getFluidTag(String modId, String name) {
-    return TagKey.create(Registries.FLUID, new ResourceLocation(modId, name));
+    return TagKey.create(Registries.FLUID, ResourceLocation.fromNamespaceAndPath(modId, name));
   }
 
   /**
@@ -170,8 +169,8 @@ public interface IRecipeHelper extends LocationExtender {
    * @param name  Forge tag name
    * @return  Condition for tag existing
    */
-  default ConditionJsonProvider tagCondition(String name) {
-    return DefaultResourceConditions.tagsPopulated(getItemTag("c", name));
+  default ResourceCondition tagCondition(String name) {
+    return ResourceConditions.tagsPopulated(getItemTag("c", name));
   }
 
   /**
@@ -180,9 +179,9 @@ public interface IRecipeHelper extends LocationExtender {
    * @param conditions  Extra conditions
    * @return  Wrapped consumer
    */
-  default Consumer<FinishedRecipe> withCondition(Consumer<FinishedRecipe> consumer, ConditionJsonProvider... conditions) {
+  default Consumer<FinishedRecipe> withCondition(Consumer<FinishedRecipe> consumer, ResourceCondition... conditions) {
     ConsumerWrapperBuilder builder = ConsumerWrapperBuilder.wrap();
-    for (ConditionJsonProvider condition : conditions) {
+    for (ResourceCondition condition : conditions) {
       builder.addCondition(condition);
     }
     return builder.build(consumer);

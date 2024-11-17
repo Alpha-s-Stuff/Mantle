@@ -1,6 +1,6 @@
 package slimeknights.mantle.loot;
 
-import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.fabricators_of_create.porting_lib.loot.IGlobalLootModifier;
 import io.github.fabricators_of_create.porting_lib.loot.LootModifier;
@@ -24,21 +24,21 @@ import java.util.function.Consumer;
 
 /** Loot modifier to inject an additional loot entry into an existing table */
 public class AddEntryLootModifier extends LootModifier {
-  public static final Codec<AddEntryLootModifier> CODEC = RecordCodecBuilder.create(inst -> codecStart(inst).and(inst.group(
+  public static final MapCodec<AddEntryLootModifier> CODEC = RecordCodecBuilder.mapCodec(inst -> codecStart(inst).and(inst.group(
     ILootModifierCondition.CODEC.listOf().fieldOf("post_conditions").forGetter(m -> m.modifierConditions),
     MantleCodecs.LOOT_ENTRY.fieldOf("entry").forGetter(m -> m.entry),
-    MantleCodecs.LOOT_FUNCTIONS.fieldOf("functions").forGetter(m -> m.functions))).apply(inst, AddEntryLootModifier::new));
+    LootItemFunctions.TYPED_CODEC.listOf().fieldOf("functions").forGetter(m -> m.functions))).apply(inst, AddEntryLootModifier::new));
 
   /** Additional conditions that can consider the previously generated loot */
   private final List<ILootModifierCondition> modifierConditions;
   /** Entry for generating loot */
 	private final LootPoolEntryContainer entry;
   /** Functions to apply to the entry, allows adding functions to parented loot entries such as alternatives */
-	private final LootItemFunction[] functions;
+	private final List<LootItemFunction> functions;
   /** Functions merged into a single function for ease of use */
 	private final BiFunction<ItemStack, LootContext, ItemStack> combinedFunctions;
 
-	protected AddEntryLootModifier(LootItemCondition[] conditionsIn, List<ILootModifierCondition> modifierConditions, LootPoolEntryContainer entry, LootItemFunction[] functions) {
+	protected AddEntryLootModifier(LootItemCondition[] conditionsIn, List<ILootModifierCondition> modifierConditions, LootPoolEntryContainer entry, List<LootItemFunction> functions) {
 		super(conditionsIn);
     this.modifierConditions = modifierConditions;
     this.entry = entry;
@@ -72,7 +72,7 @@ public class AddEntryLootModifier extends LootModifier {
 	}
 
   @Override
-  public Codec<? extends IGlobalLootModifier> codec() {
+  public MapCodec<? extends IGlobalLootModifier> codec() {
     return CODEC;
   }
 
@@ -101,7 +101,7 @@ public class AddEntryLootModifier extends LootModifier {
 
     /** Builds the final modifier */
     public AddEntryLootModifier build() {
-      return new AddEntryLootModifier(getConditions(), modifierConditions, entry, functions.toArray(new LootItemFunction[0]));
+      return new AddEntryLootModifier(getConditions(), modifierConditions, entry, List.copyOf(functions));
     }
   }
 }

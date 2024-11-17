@@ -28,7 +28,7 @@ public class ClearBookCacheCommand {
    * Runs the book-test command for specific book
    * @param context  Command context
    * @return  Integer return
-   * @throws CommandSyntaxException if sender is not a player
+   * @throws CommandSyntaxException if player is not a player
    */
   private static int runBook(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
     ResourceLocation book = ResourceLocationArgument.getId(context, "id");
@@ -40,7 +40,7 @@ public class ClearBookCacheCommand {
    * Runs the book-test command
    * @param context  Command context
    * @return  Integer return
-   * @throws  CommandSyntaxException if sender is not a player
+   * @throws  CommandSyntaxException if player is not a player
    */
   private static int runAll(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
     MantleNetwork.INSTANCE.sendTo(new ClearBookCachePacket((ResourceLocation)null), context.getSource().getPlayerOrException());

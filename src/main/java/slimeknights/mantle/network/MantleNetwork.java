@@ -12,20 +12,17 @@ import slimeknights.mantle.network.packet.UpdateHeldPagePacket;
 import slimeknights.mantle.network.packet.UpdateLecternPagePacket;
 
 public class MantleNetwork {
-  /** Network instance */
-  public static final NetworkWrapper INSTANCE = new NetworkWrapper(Mantle.getResource("network"));
-
   /**
    * Registers packets into this network
    */
   public static void registerPackets() {
-    INSTANCE.registerPacket(OpenLecternBookPacket.class, OpenLecternBookPacket::new, NetworkDirection.PLAY_TO_CLIENT);
-    INSTANCE.registerPacket(UpdateHeldPagePacket.class, UpdateHeldPagePacket::new, NetworkDirection.PLAY_TO_SERVER);
-    INSTANCE.registerPacket(UpdateLecternPagePacket.class, UpdateLecternPagePacket::new, NetworkDirection.PLAY_TO_SERVER);
-    INSTANCE.registerPacket(DropLecternBookPacket.class, DropLecternBookPacket::new, NetworkDirection.PLAY_TO_SERVER);
-    INSTANCE.registerPacket(SwingArmPacket.class, SwingArmPacket::new, NetworkDirection.PLAY_TO_CLIENT);
-    INSTANCE.registerPacket(OpenNamedBookPacket.class, OpenNamedBookPacket::new, NetworkDirection.PLAY_TO_CLIENT);
-    INSTANCE.registerPacket(FluidContainerTransferPacket.class, FluidContainerTransferPacket::new, NetworkDirection.PLAY_TO_CLIENT);
-    INSTANCE.registerPacket(ClearBookCachePacket.class, ClearBookCachePacket::new, NetworkDirection.PLAY_TO_CLIENT);
+    NetworkWrapper.registerPacket(OpenLecternBookPacket.TYPE, OpenLecternBookPacket.CODEC, NetworkDirection.PLAY_TO_CLIENT);
+    NetworkWrapper.registerPacket(UpdateHeldPagePacket.TYPE, UpdateHeldPagePacket.CODEC, NetworkDirection.PLAY_TO_SERVER);
+    NetworkWrapper.registerPacket(UpdateLecternPagePacket.TYPE, UpdateLecternPagePacket.CODEC, NetworkDirection.PLAY_TO_SERVER);
+    NetworkWrapper.registerPacket(DropLecternBookPacket.TYPE, DropLecternBookPacket::new, NetworkDirection.PLAY_TO_SERVER);
+    NetworkWrapper.registerPacket(SwingArmPacket.TYPE, SwingArmPacket.CODEC, NetworkDirection.PLAY_TO_CLIENT);
+    NetworkWrapper.registerPacket(OpenNamedBookPacket.TYPE, OpenNamedBookPacket.CODEC, NetworkDirection.PLAY_TO_CLIENT);
+    NetworkWrapper.registerPacket(FluidContainerTransferPacket.TYPE, FluidContainerTransferPacket::new, NetworkDirection.PLAY_TO_CLIENT);
+    NetworkWrapper.registerPacket(ClearBookCachePacket.TYPE, ClearBookCachePacket::new, NetworkDirection.PLAY_TO_CLIENT);
   }
 }

@@ -1,24 +1,20 @@
 package slimeknights.mantle;
 
 import io.github.fabricators_of_create.porting_lib.config.ConfigRegistry;
-import io.github.fabricators_of_create.porting_lib.config.ConfigType;
+import io.github.fabricators_of_create.porting_lib.config.ModConfig;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.recipe.v1.ingredient.CustomIngredientSerializer;
 import net.minecraft.Util;
-import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.MobType;
+import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import slimeknights.mantle.block.entity.MantleSignBlockEntity;
-import slimeknights.mantle.client.ClientEvents;
 import slimeknights.mantle.command.MantleCommand;
 import slimeknights.mantle.config.Config;
 import slimeknights.mantle.data.predicate.block.BlockPredicate;
@@ -28,10 +24,7 @@ import slimeknights.mantle.data.predicate.damage.SourceAttackerPredicate;
 import slimeknights.mantle.data.predicate.damage.SourceMessagePredicate;
 import slimeknights.mantle.data.predicate.entity.HasEnchantmentEntityPredicate;
 import slimeknights.mantle.data.predicate.entity.LivingEntityPredicate;
-import slimeknights.mantle.data.predicate.entity.MobTypePredicate;
 import slimeknights.mantle.data.predicate.item.ItemPredicate;
-import slimeknights.mantle.datagen.MantleFluidTagProvider;
-import slimeknights.mantle.datagen.MantleFluidTooltipProvider;
 import slimeknights.mantle.datagen.MantleTags;
 import slimeknights.mantle.fluid.transfer.EmptyFluidContainerTransfer;
 import slimeknights.mantle.fluid.transfer.EmptyFluidWithNBTTransfer;
@@ -50,8 +43,6 @@ import slimeknights.mantle.registration.MantleRegistrations;
 import slimeknights.mantle.registration.adapter.BlockEntityTypeRegistryAdapter;
 import slimeknights.mantle.registration.adapter.RegistryAdapter;
 
-import java.util.Objects;
-
 /**
  * Mantle
  *
@@ -69,8 +60,8 @@ public class Mantle implements ModInitializer {
   /* Proxies for sides, used for graphics processing */
   @Override
   public void onInitialize() {
-    ConfigRegistry.registerConfig(modId, ConfigType.CLIENT, Config.CLIENT_SPEC);
-    ConfigRegistry.registerConfig(modId, ConfigType.SERVER, Config.SERVER_SPEC);
+    ConfigRegistry.registerConfig(modId, ModConfig.Type.CLIENT, Config.CLIENT_SPEC);
+    ConfigRegistry.registerConfig(modId, ModConfig.Type.SERVER, Config.SERVER_SPEC);
 
     FluidContainerTransferManager.INSTANCE.init();
     MantleTags.init();
@@ -82,10 +73,6 @@ public class Mantle implements ModInitializer {
     this.registerBlockEntities();
     MantleLoot.registerGlobalLootModifiers();
     UseBlockCallback.EVENT.register(LecternBookItem::interactWithBlock);
-
-    if (FMLEnvironment.dist == Dist.CLIENT) {
-      ClientEvents.onConstruct();
-    }
   }
 
   private void registerCapabilities() {
@@ -136,14 +123,12 @@ public class Mantle implements ModInitializer {
         LivingEntityPredicate.LOADER.register(getResource("underwater"), LivingEntityPredicate.UNDERWATER.getLoader());
         LivingEntityPredicate.LOADER.register(getResource("raining_at"), LivingEntityPredicate.RAINING.getLoader());
         // property
-        LivingEntityPredicate.LOADER.register(getResource("mob_type"), MobTypePredicate.LOADER);
         LivingEntityPredicate.LOADER.register(getResource("has_enchantment"), HasEnchantmentEntityPredicate.LOADER);
         // register mob types
-        MobTypePredicate.MOB_TYPES.register(new ResourceLocation("undefined"), MobType.UNDEFINED);
-        MobTypePredicate.MOB_TYPES.register(new ResourceLocation("undead"), MobType.UNDEAD);
-        MobTypePredicate.MOB_TYPES.register(new ResourceLocation("arthropod"), MobType.ARTHROPOD);
-        MobTypePredicate.MOB_TYPES.register(new ResourceLocation("illager"), MobType.ILLAGER);
-        MobTypePredicate.MOB_TYPES.register(new ResourceLocation("water"), MobType.WATER);
+        LivingEntityPredicate.LOADER.register(ResourceLocation.withDefaultNamespace("undead"), LivingEntityPredicate.tag(EntityTypeTags.UNDEAD).getLoader());
+        LivingEntityPredicate.LOADER.register(ResourceLocation.withDefaultNamespace("arthropod"), LivingEntityPredicate.tag(EntityTypeTags.ARTHROPOD).getLoader());
+        LivingEntityPredicate.LOADER.register(ResourceLocation.withDefaultNamespace("illager"), LivingEntityPredicate.tag(EntityTypeTags.ILLAGER).getLoader());
+        LivingEntityPredicate.LOADER.register(ResourceLocation.withDefaultNamespace("water"), LivingEntityPredicate.tag(EntityTypeTags.AQUATIC).getLoader());
 
         // damage predicates
         // vanilla properties
@@ -176,7 +161,7 @@ public class Mantle implements ModInitializer {
    * @return  Resource location instance
    */
   public static ResourceLocation getResource(String name) {
-    return new ResourceLocation(modId, name);
+    return ResourceLocation.fromNamespaceAndPath(modId, name);
   }
 
   /**

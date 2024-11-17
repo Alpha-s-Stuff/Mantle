@@ -26,7 +26,7 @@ public class MetalItemObject extends ItemObject<Block> {
     super(block);
     this.ingot = ingot;
     this.nugget = nugget;
-    this.blockTag = TagKey.create(Registries.BLOCK, new ResourceLocation("c", tagName + "_blocks"));
+    this.blockTag = TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath("c", "storage_blocks/" + tagName));
     this.blockItemTag = getTag(tagName + "_blocks");
     this.ingotTag = getTag(tagName + "_ingots");
     this.nuggetTag = getTag(tagName + "_nuggets");
@@ -48,6 +48,6 @@ public class MetalItemObject extends ItemObject<Block> {
    * @return  Tag
    */
   private static TagKey<Item> getTag(String name) {
-    return TagKey.create(Registries.ITEM, new ResourceLocation("c", name));
+    return TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", name));
   }
 }

@@ -1,5 +1,6 @@
 package slimeknights.mantle.data.predicate.entity;
 
+import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.enchantment.Enchantment;
@@ -11,7 +12,7 @@ import slimeknights.mantle.data.registry.GenericLoaderRegistry.IGenericLoader;
 /**
  * Predicate that checks if the given entity has the given enchantment on any of their equipment
  */
-public record HasEnchantmentEntityPredicate(Enchantment enchantment) implements LivingEntityPredicate {
+public record HasEnchantmentEntityPredicate(Holder<Enchantment> enchantment) implements LivingEntityPredicate {
   public static final RecordLoadable<HasEnchantmentEntityPredicate> LOADER = RecordLoadable.create(Loadables.ENCHANTMENT.requiredField("enchantment", HasEnchantmentEntityPredicate::enchantment), HasEnchantmentEntityPredicate::new);
 
   @Override

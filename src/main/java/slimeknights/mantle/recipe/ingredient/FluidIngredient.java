@@ -2,24 +2,22 @@ package slimeknights.mantle.recipe.ingredient;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraftforge.fluids.FluidStack;
 import slimeknights.mantle.Mantle;
 import slimeknights.mantle.data.loadable.IAmLoadable;
 import slimeknights.mantle.data.loadable.Loadable;
 import slimeknights.mantle.data.loadable.Loadables;
 import slimeknights.mantle.data.loadable.common.FluidStackLoadable;
 import slimeknights.mantle.data.loadable.mapping.EitherLoadable;
-import slimeknights.mantle.data.loadable.primitive.IntLoadable;
+import slimeknights.mantle.data.loadable.primitive.LongLoadable;
 import slimeknights.mantle.data.loadable.record.RecordLoadable;
 import slimeknights.mantle.util.RegistryHelper;
 
@@ -45,16 +43,16 @@ public abstract class FluidIngredient implements IAmLoadable {
   /** Loadable for network writing of fluids */
   private static final Loadable<FluidIngredient> NETWORK = FluidStackLoadable.REQUIRED_STACK.list(0).flatXmap(fluids -> FluidIngredient.of(fluids.stream().map(FluidIngredient::of).toList()), FluidIngredient::getFluids);
   /** Loadable for fluid matches */
-  private static final RecordLoadable<FluidMatch> FLUID_MATCH = RecordLoadable.create(Loadables.FLUID.requiredField("fluid", i -> i.fluid), IntLoadable.FROM_ONE.requiredField("amount", i -> i.amount), FluidIngredient::of);
+  private static final RecordLoadable<FluidMatch> FLUID_MATCH = RecordLoadable.create(Loadables.FLUID.requiredField("fluid", i -> i.fluid), LongLoadable.FROM_ONE.requiredField("amount", i -> i.amount), FluidIngredient::of);
   /** @deprecated Old key for fluid ingredients, remove sometime in 1.20 or 1.21 */
   @Deprecated(forRemoval = true)
-  private static final RecordLoadable<FluidMatch> NAME_MATCH = RecordLoadable.create(Loadables.FLUID.requiredField("name", i -> i.fluid), IntLoadable.FROM_ONE.requiredField("amount", i -> i.amount), (fluid, amount) -> {
+  private static final RecordLoadable<FluidMatch> NAME_MATCH = RecordLoadable.create(Loadables.FLUID.requiredField("name", i -> i.fluid), LongLoadable.FROM_ONE.requiredField("amount", i -> i.amount), (fluid, amount) -> {
     // TODO: is there a good way to get recipe context here? Cannot think of a way short of a global static context.
     Mantle.logger.warn("Using deprecated key 'name' for fluid ingredient, use 'fluid' instead. This will be removed in the future");
     return FluidIngredient.of(fluid, amount);
   });
   /** Loadable for tag matches */
-  private static final RecordLoadable<TagMatch> TAG_MATCH = RecordLoadable.create(Loadables.FLUID_TAG.requiredField("tag", i -> i.tag), IntLoadable.FROM_ONE.requiredField("amount", i -> i.amount), FluidIngredient::of);
+  private static final RecordLoadable<TagMatch> TAG_MATCH = RecordLoadable.create(Loadables.FLUID_TAG.requiredField("tag", i -> i.tag), LongLoadable.FROM_ONE.requiredField("amount", i -> i.amount), FluidIngredient::of);
   /** Loadable for tag matches */
   private static final Loadable<Compound> COMPOUND = loadableBuilder().build(NETWORK).list(2).flatXmap(Compound::new, c -> c.ingredients);
   /** Loadable for any fluid ingredient */
@@ -69,7 +67,7 @@ public abstract class FluidIngredient implements IAmLoadable {
    * @param amount  Minimum fluid amount
    * @return  Fluid ingredient for this fluid
    */
-  public static FluidMatch of(Fluid fluid, int amount) {
+  public static FluidMatch of(Fluid fluid, long amount) {
     if (fluid == Fluids.EMPTY || amount <= 0) {
       return EMPTY;
     }
@@ -91,7 +89,7 @@ public abstract class FluidIngredient implements IAmLoadable {
    * @param amount  Minimum fluid amount
    * @return  Fluid ingredient from a tag
    */
-  public static TagMatch of(TagKey<Fluid> fluid, int amount) {
+  public static TagMatch of(TagKey<Fluid> fluid, long amount) {
     return new TagMatch(fluid, amount);
   }
 
@@ -295,7 +293,7 @@ public abstract class FluidIngredient implements IAmLoadable {
     }
 
     @Override
-    public int getAmount(Fluid fluid) {
+    public long getAmount(Fluid fluid) {
       for (FluidIngredient ingredient : ingredients) {
         if (ingredient.test(fluid)) {
           return ingredient.getAmount(fluid);

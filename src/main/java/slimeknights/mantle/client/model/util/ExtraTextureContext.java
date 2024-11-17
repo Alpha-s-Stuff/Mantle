@@ -1,10 +1,10 @@
 package slimeknights.mantle.client.model.util;
 
 import com.google.common.collect.ImmutableMap;
+import io.github.fabricators_of_create.porting_lib.models.geometry.IGeometryBakingContext;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.InventoryMenu;
-import net.minecraftforge.client.model.geometry.IGeometryBakingContext;
 
 import java.util.Map;
 

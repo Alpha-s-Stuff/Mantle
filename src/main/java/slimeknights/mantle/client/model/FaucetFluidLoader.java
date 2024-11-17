@@ -6,10 +6,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import io.github.fabricators_of_create.porting_lib.mixin.accessors.client.accessor.ModelBakeryAccessor;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.model.BlockStateModelLoader;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -113,13 +113,13 @@ public class FaucetFluidLoader extends SimpleJsonResourceReloadListener implemen
         JsonObject json = GsonHelper.convertToJsonObject(entry.getValue(), "");
         JsonObject variants = GsonHelper.getAsJsonObject(json, "variants");
         Block block = BuiltInRegistries.BLOCK.get(location);
-        if(block != null && block != Blocks.AIR) {
+        if(block != Blocks.AIR) {
           StateDefinition<Block,BlockState> container = block.getStateDefinition();
           List<BlockState> validStates = container.getPossibleStates();
           for (Entry<String, JsonElement> variant : variants.entrySet()) {
             // parse fluid
             FaucetFluid fluid = FaucetFluid.fromJson(GsonHelper.convertToJsonObject(variant.getValue(), variant.getKey()), defaultFluid);
-            validStates.stream().filter(ModelBakeryAccessor.port_lib$predicate(container, variant.getKey())).forEach(state -> fluidMap.put(state, fluid));
+            validStates.stream().filter(BlockStateModelLoader.predicate(container, variant.getKey())).forEach(state -> fluidMap.put(state, fluid));
           }
         } else {
           Mantle.logger.debug("Skipping loading faucet fluid model '{}' as no coorsponding block exists", location);

@@ -1,14 +1,14 @@
 package slimeknights.mantle.loot;
 
 import com.google.gson.JsonDeserializer;
-import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import io.github.fabricators_of_create.porting_lib.loot.IGlobalLootModifier;
 import io.github.fabricators_of_create.porting_lib.loot.PortingLibLoot;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.storage.loot.Serializer;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunction;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
@@ -38,16 +38,16 @@ public class MantleLoot {
    * Called during serializer registration to register any relevant loot logic
    */
   public static void registerGlobalLootModifiers() {
-    RegistryAdapter<Codec<? extends IGlobalLootModifier>> adapter = new RegistryAdapter<>(Objects.requireNonNull(PortingLibLoot.GLOBAL_LOOT_MODIFIER_SERIALIZERS.get()), Mantle.modId);
+    RegistryAdapter<MapCodec<? extends IGlobalLootModifier>> adapter = new RegistryAdapter<>(Objects.requireNonNull(PortingLibLoot.GLOBAL_LOOT_MODIFIER_SERIALIZERS), Mantle.modId);
     adapter.register(AddEntryLootModifier.CODEC, "add_entry");
     adapter.register(ReplaceItemLootModifier.CODEC, "replace_item");
 
     // functions
-    RETEXTURED_FUNCTION = registerFunction("fill_retextured_block", RetexturedLootFunction.SERIALIZER);
-    SET_FLUID_FUNCTION = registerFunction("set_fluid", SetFluidLootFunction.SERIALIZER);
+    RETEXTURED_FUNCTION = registerFunction("fill_retextured_block", RetexturedLootFunction.CODEC);
+    SET_FLUID_FUNCTION = registerFunction("set_fluid", SetFluidLootFunction.CODEC);
 
     // conditions
-    BLOCK_TAG_CONDITION = registerCondition("block_tag", BlockTagLootCondition.SERIALIZER);
+    BLOCK_TAG_CONDITION = registerCondition("block_tag", BlockTagLootCondition.CODEC);
 
     // loot modifier conditions
     registerCondition(InvertedModifierLootCondition.ID, InvertedModifierLootCondition::deserialize);
@@ -61,8 +61,8 @@ public class MantleLoot {
    * @param serializer  Loot function serializer
    * @return  Registered loot function
    */
-  private static LootItemFunctionType registerFunction(String name, Serializer<? extends LootItemFunction> serializer) {
-    return Registry.register(Registry.LOOT_FUNCTION_TYPE, Mantle.getResource(name), new LootItemFunctionType(serializer));
+  private static LootItemFunctionType registerFunction(String name, MapCodec<? extends LootItemFunction> serializer) {
+    return Registry.register(BuiltInRegistries.LOOT_FUNCTION_TYPE, Mantle.getResource(name), new LootItemFunctionType(serializer));
   }
 
   /**
@@ -71,8 +71,8 @@ public class MantleLoot {
    * @param serializer  Loot function serializer
    * @return  Registered loot function
    */
-  private static LootItemConditionType registerCondition(String name, Serializer<? extends LootItemCondition> serializer) {
-    return Registry.register(Registry.LOOT_CONDITION_TYPE, Mantle.getResource(name), new LootItemConditionType(serializer));
+  private static LootItemConditionType registerCondition(String name, MapCodec<? extends LootItemCondition> serializer) {
+    return Registry.register(BuiltInRegistries.LOOT_CONDITION_TYPE, Mantle.getResource(name), new LootItemConditionType(serializer));
   }
 
   /**

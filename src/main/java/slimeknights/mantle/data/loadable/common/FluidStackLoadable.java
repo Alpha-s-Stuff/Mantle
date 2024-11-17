@@ -1,15 +1,15 @@
 package slimeknights.mantle.data.loadable.common;
 
+import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidType;
 import slimeknights.mantle.data.loadable.ErrorFactory;
 import slimeknights.mantle.data.loadable.Loadable;
 import slimeknights.mantle.data.loadable.Loadables;
 import slimeknights.mantle.data.loadable.field.LoadableField;
-import slimeknights.mantle.data.loadable.primitive.IntLoadable;
+import slimeknights.mantle.data.loadable.primitive.LongLoadable;
 import slimeknights.mantle.data.loadable.record.RecordLoadable;
 
 import javax.annotation.Nullable;
@@ -39,18 +39,18 @@ public class FluidStackLoadable {
   /** Field for an optional fluid */
   private static final LoadableField<Fluid,FluidStack> FLUID = Loadables.FLUID.defaultField("fluid", Fluids.EMPTY, false, FLUID_GETTER);
   /** Field for fluid stack count that allows empty */
-  private static final LoadableField<Integer,FluidStack> AMOUNT = IntLoadable.FROM_ZERO.requiredField("amount", FluidStack::getAmount);
+  private static final LoadableField<Long,FluidStack> AMOUNT = LongLoadable.FROM_ZERO.requiredField("amount", FluidStack::getAmount);
   /** Field for fluid stack count */
   private static final LoadableField<CompoundTag,FluidStack> NBT = NBTLoadable.ALLOW_STRING.nullableField("nbt", FluidStack::getTag);
 
 
   /* Optional */
-  /** Single item which may be empty with an amount of 1000 */
-  public static final Loadable<FluidStack> OPTIONAL_BUCKET = fixedSize(FluidType.BUCKET_VOLUME);
+  /** Single item which may be empty with an amount of 81000 */
+  public static final Loadable<FluidStack> OPTIONAL_BUCKET = fixedSize(FluidConstants.BUCKET);
   /** Loadable for a stack that may be empty with variable count */
   public static final RecordLoadable<FluidStack> OPTIONAL_STACK = RecordLoadable.create(FLUID, AMOUNT, (fluid, count) -> makeStack(fluid, count, null));
   /** Loadable for a stack that may be empty with NBT and an amount of 1000 */
-  public static final RecordLoadable<FluidStack> OPTIONAL_BUCKET_NBT = fixedSizeNBT(FluidType.BUCKET_VOLUME);
+  public static final RecordLoadable<FluidStack> OPTIONAL_BUCKET_NBT = fixedSizeNBT(FluidConstants.BUCKET);
   /** Loadable for a stack that may be empty with variable count and NBT */
   public static final RecordLoadable<FluidStack> OPTIONAL_STACK_NBT = RecordLoadable.create(FLUID, AMOUNT, NBT, FluidStackLoadable::makeStack);
 
@@ -69,7 +69,7 @@ public class FluidStackLoadable {
   /* Helpers */
 
   /** Makes an item stack from the given parameters */
-  private static FluidStack makeStack(Fluid fluid, int amount, @Nullable CompoundTag nbt) {
+  private static FluidStack makeStack(Fluid fluid, long amount, @Nullable CompoundTag nbt) {
     if (fluid == Fluids.EMPTY || amount <= 0) {
       return FluidStack.EMPTY;
     }
@@ -77,7 +77,7 @@ public class FluidStackLoadable {
   }
 
   /** Creates a loadable for a stack with a single item */
-  public static Loadable<FluidStack> fixedSize(int amount) {
+  public static Loadable<FluidStack> fixedSize(long amount) {
     if (amount <= 0) {
       throw new IllegalArgumentException("Count must be positive, received " + amount);
     }
@@ -85,7 +85,7 @@ public class FluidStackLoadable {
   }
 
   /** Creates a loadable for a stack with a single item */
-  public static RecordLoadable<FluidStack> fixedSizeNBT(int amount) {
+  public static RecordLoadable<FluidStack> fixedSizeNBT(long amount) {
     if (amount <= 0) {
       throw new IllegalArgumentException("Amount must be positive, received " + amount);
     }

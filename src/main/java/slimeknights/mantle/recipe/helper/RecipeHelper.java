@@ -2,7 +2,6 @@ package slimeknights.mantle.recipe.helper;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
-import io.github.fabricators_of_create.porting_lib.mixin.accessors.common.accessor.RecipeManagerAccessor;
 import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
 import io.netty.handler.codec.DecoderException;
 import lombok.AccessLevel;
@@ -15,6 +14,8 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeInput;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.ItemLike;
@@ -72,8 +73,8 @@ public class RecipeHelper {
    * @param <C>  Return type
    * @return  List of recipes from the manager
    */
-  public static <I extends Container, T extends Recipe<I>, C extends T> List<C> getRecipes(RecipeManager manager, RecipeType<T> type, Class<C> clazz) {
-    return ((RecipeManagerAccessor) manager).port_lib$byType(type).values().stream()
+  public static <I extends RecipeInput, T extends Recipe<I>, C extends T> List<C> getRecipes(RecipeManager manager, RecipeType<T> type, Class<C> clazz) {
+    return manager.getAllRecipesFor(type).stream()
                   .filter(clazz::isInstance)
                   .map(clazz::cast)
                   .collect(Collectors.toList());
@@ -90,12 +91,12 @@ public class RecipeHelper {
    * @param <C>  Return type
    * @return  Recipe list
    */
-  public static <I extends Container, T extends Recipe<I>, C extends T> List<C> getUIRecipes(RecipeManager manager, RecipeType<T> type, Class<C> clazz, Predicate<? super C> filter) {
-    return ((RecipeManagerAccessor) manager).port_lib$byType(type).values().stream()
-                  .filter(clazz::isInstance)
-                  .map(clazz::cast)
+  public static <I extends RecipeInput, T extends Recipe<I>, C extends T> List<RecipeHolder<C>> getUIRecipes(RecipeManager manager, RecipeType<T> type, Class<C> clazz, Predicate<RecipeHolder<? super C>> filter) {
+    return manager.getAllRecipesFor(type).stream()
+                  .filter(holder -> clazz.isInstance(holder.value()))
+                  .map(holder -> (RecipeHolder<C>) holder)
                   .filter(filter)
-                  .sorted(Comparator.comparing(Recipe::getId))
+                  .sorted(Comparator.comparing(RecipeHolder::id))
                   .collect(Collectors.toList());
   }
 
@@ -106,21 +107,21 @@ public class RecipeHelper {
    * @param <C>  Return type
    * @return  List of flattened recipes from the manager
    */
-  public static <C> List<C> getJEIRecipes(Stream<? extends Recipe<?>> recipes, Class<C> clazz) {
+  public static <C> List<C> getJEIRecipes(Stream<RecipeHolder<? extends Recipe<?>>> recipes, Class<C> clazz) {
     return recipes
         .sorted((r1, r2) -> {
           // if one is multi, and the other not, the multi recipe is larger
-          boolean m1 = r1 instanceof IMultiRecipe<?>;
-          boolean m2 = r2 instanceof IMultiRecipe<?>;
+          boolean m1 = r1.value() instanceof IMultiRecipe<?>;
+          boolean m2 = r2.value() instanceof IMultiRecipe<?>;
           if (m1 && !m2) return 1;
           if (!m1 && m2) return -1;
           // fall back to recipe ID
-          return r1.getId().compareTo(r2.getId());
+          return r1.id().compareTo(r2.id());
         })
         .flatMap((recipe) -> {
           // if its a multi recipe, extract child recipes and stream those
-          if (recipe instanceof IMultiRecipe<?>) {
-            return ((IMultiRecipe<?>)recipe).getRecipes().stream();
+          if (recipe.value() instanceof IMultiRecipe<?>) {
+            return ((IMultiRecipe<?>)recipe.value()).getRecipes().stream();
           }
           return Stream.of(recipe);
         })
@@ -137,8 +138,8 @@ public class RecipeHelper {
    * @param <C>  Return type
    * @return  List of flattened recipes from the manager
    */
-  public static <I extends Container, T extends Recipe<I>, C> List<C> getJEIRecipes(RecipeManager manager, RecipeType<T> type, Class<C> clazz) {
-    return getJEIRecipes(((RecipeManagerAccessor) manager).port_lib$byType(type).values().stream(), clazz);
+  public static <I extends RecipeInput, T extends Recipe<I>, C> List<C> getJEIRecipes(RecipeManager manager, RecipeType<T> type, Class<C> clazz) {
+    return getJEIRecipes(manager.getAllRecipesFor(type).stream(), clazz);
   }
 
 
@@ -164,7 +165,7 @@ public class RecipeHelper {
    */
   public static FluidStack deserializeFluidStack(JsonObject json) {
     String fluidName = GsonHelper.getAsString(json, "fluid");
-    Fluid fluid = BuiltInRegistries.FLUID.get(new ResourceLocation(fluidName));
+    Fluid fluid = BuiltInRegistries.FLUID.get(ResourceLocation.parse(fluidName));
     if (fluid == null || fluid == Fluids.EMPTY) {
       throw new JsonSyntaxException("Unknown fluid " + fluidName);
     }
@@ -182,7 +183,7 @@ public class RecipeHelper {
    * @throws JsonSyntaxException  If the key is missing, or the value is not the right class
    */
   public static <C> C deserializeItem(String name, String key, Class<C> clazz) {
-    Item item = BuiltInRegistries.ITEM.get(new ResourceLocation(name));
+    Item item = BuiltInRegistries.ITEM.get(ResourceLocation.parse(name));
     if (item == null) {
       throw new JsonSyntaxException("Invalid " + key + ": Unknown item " + name + "'");
     }
