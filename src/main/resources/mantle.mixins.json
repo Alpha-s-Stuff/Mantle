@@ -6,11 +6,9 @@
   "client": [
     "client.MinecraftMixin",
     "client.ModelLayersMixin",
-    "client.SheetsMixin",
-    "client.rei.DisplayRegistryMixin"
+    "client.SheetsMixin"
   ],
   "injectors": {
     "defaultRequire": 1
-  },
-  "plugin": "slimeknights.mantle.mixin.client.REIMixinPlugin"
+  }
 }
