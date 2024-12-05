@@ -3,7 +3,7 @@ package slimeknights.mantle.client.book.data;
 import com.google.common.collect.Sets;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import io.github.fabricators_of_create.porting_lib.util.TrueCondition;
+import io.github.fabricators_of_create.porting_lib.common.util.TrueCondition;
 import net.minecraft.advancements.AdvancementProgress;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;

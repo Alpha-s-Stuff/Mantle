@@ -16,7 +16,7 @@ import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.level.material.Fluid;
-import slimeknights.mantle.fluid.TextureFluidType;
+//import slimeknights.mantle.fluid.TextureFluidType;
 import slimeknights.mantle.fluid.UnplaceableFluid;
 import slimeknights.mantle.registration.DelayedSupplier;
 import slimeknights.mantle.registration.FluidBuilder;
@@ -104,7 +104,7 @@ public class FluidDeferredRegister extends DeferredRegisterWrapper<Fluid, Deferr
 
     /** Registers a fluid with the given properties, using the texture fluid type */
     public Builder type(FluidType.Properties properties) {
-      return type(() -> new TextureFluidType(properties));
+      return /*type(() -> new TextureFluidType(properties))*/this; // TODO: PORT
     }
 
     /** Registers a fluid with the given properties, using the texture fluid type */

@@ -2,13 +2,12 @@ package slimeknights.mantle.fluid.transfer;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.mojang.serialization.JsonOps;
 import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
-import net.fabricmc.fabric.api.resource.conditions.v1.ConditionJsonProvider;
 import net.fabricmc.fabric.api.resource.conditions.v1.ResourceCondition;
 import net.fabricmc.fabric.api.resource.conditions.v1.ResourceConditions;
 import net.minecraft.data.CachedOutput;
-import net.minecraft.data.DataGenerator;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.tags.TagKey;
@@ -19,9 +18,7 @@ import slimeknights.mantle.data.GenericDataProvider;
 import slimeknights.mantle.recipe.helper.ItemOutput;
 import slimeknights.mantle.recipe.ingredient.FluidIngredient;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
@@ -79,7 +76,7 @@ public abstract class AbstractFluidContainerTransferProvider extends GenericData
       if (conditions.length != 0) {
         JsonArray array = new JsonArray();
         for (ResourceCondition condition : conditions) {
-          array.add(condition.toJson());
+          array.add(ResourceCondition.CODEC.encodeStart(JsonOps.INSTANCE, condition).getOrThrow());
         }
         element.getAsJsonObject().add(ResourceConditions.CONDITIONS_KEY, array);
       }

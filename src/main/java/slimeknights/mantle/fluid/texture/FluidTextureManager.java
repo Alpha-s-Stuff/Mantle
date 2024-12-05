@@ -3,18 +3,14 @@ package slimeknights.mantle.fluid.texture;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import io.github.fabricators_of_create.porting_lib.fluids.FluidType;
+import io.github.fabricators_of_create.porting_lib.fluids.PortingLibFluids;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.GsonHelper;
-import net.minecraftforge.client.event.TextureStitchEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.fluids.FluidType;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.IForgeRegistry;
 import slimeknights.mantle.Mantle;
 import slimeknights.mantle.util.JsonHelper;
 
@@ -53,14 +49,14 @@ public class FluidTextureManager implements Consumer<TextureStitchEvent.Pre> {
       Map<FluidType, FluidTexture> map = new HashMap<>();
 
       ResourceManager manager = Minecraft.getInstance().getResourceManager();
-      IForgeRegistry<FluidType> fluidTypeRegistry = ForgeRegistries.FLUID_TYPES.get();
+      Registry<FluidType> fluidTypeRegistry = PortingLibFluids.FLUID_TYPES;
       for (Map.Entry<ResourceLocation,Resource> entry : manager.listResources(FOLDER, location -> location.getPath().endsWith(".json")).entrySet()) {
         ResourceLocation fullPath = entry.getKey();
         String path = fullPath.getPath();
         ResourceLocation id = JsonHelper.localize(fullPath, FOLDER, ".json");
         try (Reader reader = entry.getValue().openAsReader()) {
           // first step is to find the matching fluid type, if there is none ignore the file
-          FluidType type = fluidTypeRegistry.getValue(id);
+          FluidType type = fluidTypeRegistry.get(id);
           if (type == null || !id.equals(fluidTypeRegistry.getKey(type))) {
             Mantle.logger.debug("Ignoring fluid texture {} from {} as no fluid type exists with that name", id, fullPath);
           } else {
