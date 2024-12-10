@@ -3,7 +3,6 @@ package slimeknights.mantle.block.entity;
 import io.github.fabricators_of_create.porting_lib.transfer.item.SlottedStackStorage;
 import lombok.Getter;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
-import net.fabricmc.fabric.api.transfer.v1.storage.SlottedStorage;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SidedStorageBlockEntity;
 import net.minecraft.core.BlockPos;
@@ -16,17 +15,19 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.Container;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.Nameable;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
-import slimeknights.mantle.fabric.transfer.IInventoryStorage;
 import slimeknights.mantle.fabric.transfer.InventoryStorage;
 import slimeknights.mantle.util.ItemStackList;
 
 import javax.annotation.Nonnull;
+import java.util.Collections;
 
 // Updated version of InventoryLogic in Mantle. Also contains a few bugfixes DOES NOT OVERRIDE createMenu
 public abstract class InventoryBlockEntity extends NameableBlockEntity implements Container, MenuProvider, Nameable, SidedStorageBlockEntity {
@@ -176,9 +177,7 @@ public abstract class InventoryBlockEntity extends NameableBlockEntity implement
 
   @Override
   public void clearContent() {
-    for (int i = 0; i < this.inventory.size(); i++) {
-      this.inventory.set(i, ItemStack.EMPTY);
-    }
+    Collections.fill(this.inventory, ItemStack.EMPTY);
   }
 
   /* Supporting methods */
@@ -273,5 +272,12 @@ public abstract class InventoryBlockEntity extends NameableBlockEntity implement
     }
 
     return true;
+  }
+
+  public void dropStacks() {
+    if (this.level == null) return;
+    Vec3 pos = Vec3.atCenterOf(this.getBlockPos());
+    for (ItemStack stack : this.inventory)
+      this.level.addFreshEntity(new ItemEntity(this.level, pos.x, pos.y, pos.z, stack));
   }
 }

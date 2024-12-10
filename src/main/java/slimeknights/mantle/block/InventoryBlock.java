@@ -22,6 +22,7 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import slimeknights.mantle.block.entity.INameableMenuProvider;
+import slimeknights.mantle.block.entity.InventoryBlockEntity;
 import slimeknights.mantle.inventory.BaseContainerMenu;
 
 import javax.annotation.Nullable;
@@ -146,5 +147,12 @@ public abstract class InventoryBlock extends Block implements EntityBlock {
     super.triggerEvent(state, worldIn, pos, id, param);
     BlockEntity be = worldIn.getBlockEntity(pos);
     return be != null && be.triggerEvent(id, param);
+  }
+
+  @Override
+  public void playerDestroy(Level world, Player player, BlockPos pos, BlockState blockState, @Nullable BlockEntity blockEntity, ItemStack itemStack) {
+    super.playerDestroy(world, player, pos, blockState, blockEntity, itemStack);
+    if (blockEntity instanceof InventoryBlockEntity castingBlock)
+      castingBlock.dropStacks();
   }
 }
