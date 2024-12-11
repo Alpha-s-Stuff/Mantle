@@ -135,7 +135,7 @@ public abstract class InventoryBlock extends Block implements EntityBlock {
     double y = pos.getY();
     double z = pos.getZ();
     for(StorageView<ItemVariant> view : inventory) {
-      Containers.dropItemStack(world, x, y, z, view.getResource().toStack((int) Math.max(view.getResource().getItem().getMaxStackSize(), view.getAmount())));
+      Containers.dropItemStack(world, x, y, z, view.getResource().toStack((int) view.getAmount()));
     }
   }
 
