@@ -103,11 +103,11 @@ public abstract class InventoryBlock extends Block implements EntityBlock {
   @Override
   public void onRemove(BlockState state, Level worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
     if (state.getBlock() != newState.getBlock()) {
-      Storage<ItemVariant> inventory = ItemStorage.SIDED.find(worldIn, pos, null);
-      if (inventory != null)
+      Storage<ItemVariant> inventory = ItemStorage.SIDED.find(worldIn, pos, state, null, null);
+      if (inventory != null) {
         dropInventoryItems(state, worldIn, pos, inventory);
-      if (worldIn.getBlockEntity(pos) != null)
         worldIn.updateNeighbourForOutputSignal(pos, this);
+      }
     }
 
     super.onRemove(state, worldIn, pos, newState, isMoving);
