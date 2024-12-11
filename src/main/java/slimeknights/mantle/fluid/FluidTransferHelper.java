@@ -14,6 +14,7 @@ import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.storage.StorageUtil;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.core.BlockPos;
@@ -63,28 +64,25 @@ public class FluidTransferHelper {
    * @return  True if transfer succeeded
    */
   public static FluidStack tryTransfer(Storage<FluidVariant> input, Storage<FluidVariant> output, long maxFill) {
-    for (StorageView<FluidVariant> view : input) {
-      if (view.isResourceBlank()) continue;
-      FluidVariant resource = view.getResource();
-      long maxExtracted;
-
-      // check how much can be extracted
-      try (Transaction extractionTestTransaction = Transaction.openOuter()) {
-        maxExtracted = view.extract(resource, maxFill, extractionTestTransaction);
-        extractionTestTransaction.abort();
-      }
-
-      try (Transaction transferTransaction = Transaction.openOuter()) {
-        // check how much can be inserted
-        long accepted = output.insert(resource, maxExtracted, transferTransaction);
-
-        // extract it, or rollback if the amounts don't match
-        long drained = view.extract(resource, accepted, transferTransaction);
-        if (drained != accepted) {
-          Mantle.logger.error("Lost {} fluid during transfer", drained - accepted);
+    // first, figure out how much we can drain
+    FluidStack simulated = TransferUtil.simulateExtractAnyFluid(input, maxFill);
+    if (!simulated.isEmpty()) {
+      // next, find out how much we can fill
+      long simulatedFill = StorageUtil.simulateInsert(output, simulated.getType(), simulated.getAmount(), null);
+      if (simulatedFill > 0) {
+        // actually drain
+        try (Transaction tx = TransferUtil.getTransaction()) {
+          long drainedFluid = input.extract(simulated.getType(), simulatedFill, tx);
+          if (drainedFluid >= 0) {
+            // acutally fill
+            long actualFill = output.insert(simulated.getType(), drainedFluid, tx);
+            if (actualFill != drainedFluid) {
+              Mantle.logger.error("Lost {} fluid during transfer", drainedFluid - actualFill);
+            }
+          }
+          tx.commit();
+          return new FluidStack(simulated.getType(), drainedFluid);
         }
-        transferTransaction.commit();
-        return new FluidStack(resource, drained);
       }
     }
     return FluidStack.EMPTY;
@@ -163,8 +161,6 @@ public class FluidTransferHelper {
       // TE must have a capability
       Storage<FluidVariant> teHandler = FluidStorage.SIDED.find(world, pos, face);
       if (teHandler != null) {
-        ItemStack copy = ItemHandlerHelper.copyStackWithSize(stack, 1);
-
         // fallback to JSON based transfer
         if (FluidContainerTransferManager.INSTANCE.mayHaveTransfer(stack)) {
           // only actually transfer on the serverside, client just has items
@@ -196,7 +192,7 @@ public class FluidTransferHelper {
               playEmptySound(world, pos, player, transferred);
             } else {
               // if that failed, try filling the item handler from the TE
-              transferred = tryTransfer(teHandler, itemHandler, Integer.MAX_VALUE);
+              transferred = tryTransfer(teHandler, itemHandler, Long.MAX_VALUE);
               if (!transferred.isEmpty()) {
                 playFillSound(world, pos, player, transferred);
               }
