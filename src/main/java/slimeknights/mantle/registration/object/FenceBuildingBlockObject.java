@@ -1,7 +1,9 @@
 package slimeknights.mantle.registration.object;
 
+import net.minecraft.core.Registry;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.FenceBlock;
+import slimeknights.mantle.registration.RegistrationHelper;
 
 import java.util.Arrays;
 import java.util.List;
@@ -31,7 +33,7 @@ public class FenceBuildingBlockObject extends BuildingBlockObject {
 //   * @param fence   Fence entry
 //   */
 //  public FenceBuildingBlockObject(BuildingBlockObject object, Block fence) {
-//    this(object, castDelegate(fence.delegate));
+//    this(object, RegistrationHelper.getCastedHolder(Registry.BLOCK, fence));
 //  }
 
   /** Gets the fence for this block */

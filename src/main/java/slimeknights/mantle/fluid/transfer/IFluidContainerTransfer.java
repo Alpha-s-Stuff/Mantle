@@ -5,7 +5,7 @@ import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import slimeknights.mantle.data.GenericRegisteredSerializer.IJsonSerializable;
+import slimeknights.mantle.data.gson.GenericRegisteredSerializer.IJsonSerializable;
 
 import javax.annotation.Nullable;
 import java.util.function.Consumer;

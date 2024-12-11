@@ -24,9 +24,10 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkSource;
 import net.minecraft.world.level.dimension.BuiltinDimensionTypes;
-import net.minecraft.world.level.dimension.DimensionType;
+import net.minecraft.world.level.dimension.BuiltinDimensionTypes;
 import net.minecraft.world.level.entity.LevelEntityGetter;
 import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.level.gameevent.GameEvent.Context;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.StructureBlockInfo;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
@@ -64,8 +65,7 @@ public class TemplateLevel extends Level {
   }
 
   @Override
-  public void sendBlockUpdated(@Nonnull BlockPos pos, @Nonnull BlockState oldState, @Nonnull BlockState newState, int flags) {
-  }
+  public void sendBlockUpdated(@Nonnull BlockPos pos, @Nonnull BlockState oldState, @Nonnull BlockState newState, int flags) {}
 
   @Override
   public void playSeededSound(@org.jetbrains.annotations.Nullable Player player, double d, double e, double f, Holder<SoundEvent> holder, SoundSource soundSource, float g, float h, long l) {
@@ -83,12 +83,10 @@ public class TemplateLevel extends Level {
   }
 
   @Override
-  public void playSound(@Nullable Player player, double x, double y, double z, @Nonnull SoundEvent soundIn, @Nonnull SoundSource category, float volume, float pitch) {
-  }
+  public void playSeededSound(@Nullable Player pPlayer, double pX, double pY, double pZ, SoundEvent pSoundEvent, SoundSource pSoundSource, float pVolume, float pPitch, long pSeed) {}
 
   @Override
-  public void playSound(@Nullable Player playerIn, @Nonnull Entity entityIn, @Nonnull SoundEvent eventIn, @Nonnull SoundSource categoryIn, float volume, float pitch) {
-  }
+  public void playSeededSound(@Nullable Player pPlayer, Entity pEntity, SoundEvent pSoundEvent, SoundSource pSoundSource, float pVolume, float pPitch, long pSeed) {}
 
   @Override
   public String gatherChunkSourceStats() {
@@ -118,8 +116,7 @@ public class TemplateLevel extends Level {
   }
 
   @Override
-  public void destroyBlockProgress(int breakerId, @Nonnull BlockPos pos, int progress) {
-  }
+  public void destroyBlockProgress(int breakerId, @Nonnull BlockPos pos, int progress) {}
 
   @Nonnull
   @Override
@@ -163,7 +160,7 @@ public class TemplateLevel extends Level {
   public void gameEvent(GameEvent gameEvent, Vec3 vec3, GameEvent.Context context) {}
 
   @Override
-  public void gameEvent(@Nullable Entity pEntity, GameEvent pEvent, BlockPos pPos) {}
+  public void gameEvent(GameEvent pEvent, Vec3 pPosition, Context pContext) {}
 
   @Nonnull
   @Override

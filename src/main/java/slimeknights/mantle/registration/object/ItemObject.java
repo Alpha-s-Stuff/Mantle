@@ -2,10 +2,12 @@ package slimeknights.mantle.registration.object;
 
 import io.github.fabricators_of_create.porting_lib.util.RegistryObject;
 import lombok.AllArgsConstructor;
-import net.minecraft.core.registries.BuiltInRegistries;
+import lombok.Getter;
+import net.minecraft.core.DefaultedRegistry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
+import slimeknights.mantle.util.RegistryHelper;
 
 import javax.annotation.Nullable;
 import java.util.Objects;
@@ -17,19 +19,20 @@ import java.util.function.Supplier;
  */
 @SuppressWarnings({"unused", "WeakerAccess"})
 @AllArgsConstructor
-public class ItemObject<I extends ItemLike> implements Supplier<I>, ItemLike {
+public class ItemObject<I extends ItemLike> implements Supplier<I>, ItemLike, IdAwareObject {
   /** Supplier to the registry entry */
   private final Supplier<? extends I> entry;
-  /** Supplier to the registry name for this entry, allows fetching the name before the entry resolves if registry object is used */
-  private final ResourceLocation name;
+  /** Registry name for this entry, allows fetching the name before the entry resolves if registry object is used */
+  @Getter
+  private final ResourceLocation id;
 
   /**
    * Creates a new item object from a supplier instance. Registry name will be fetched from the supplier entry, so the entry must be present during construction
    * @param entry  Existing registry entry, typically a vanilla block or a registered block
    */
-  public ItemObject(I entry) {
-    this.entry = () -> entry;
-    this.name = Objects.requireNonNull(BuiltInRegistries.ITEM.getKey(entry.asItem()), () -> "Attempted to create an Item Object with an unregistered entry");
+  public ItemObject(DefaultedRegistry<I> registry, I entry) {
+    this.entry = RegistryHelper.getHolder(registry, entry);
+    this.id = registry.getKey(entry);
   }
 
   /**
@@ -38,7 +41,7 @@ public class ItemObject<I extends ItemLike> implements Supplier<I>, ItemLike {
    */
   public ItemObject(RegistryObject<? extends I> object) {
     this.entry = object;
-    this.name = object.getId();
+    this.id = object.getId();
   }
 
   /**
@@ -47,7 +50,7 @@ public class ItemObject<I extends ItemLike> implements Supplier<I>, ItemLike {
    */
   protected ItemObject(ItemObject<? extends I> object) {
     this.entry = object.entry;
-    this.name = object.name;
+    this.id = object.id;
   }
 
   /**
@@ -57,7 +60,7 @@ public class ItemObject<I extends ItemLike> implements Supplier<I>, ItemLike {
    */
   @Override
   public I get() {
-    return Objects.requireNonNull(entry.get(), () -> "Item Object not present " + name);
+    return Objects.requireNonNull(entry.get(), () -> "Item Object not present " + id);
   }
 
   /**
@@ -77,13 +80,5 @@ public class ItemObject<I extends ItemLike> implements Supplier<I>, ItemLike {
   @Override
   public Item asItem() {
     return get().asItem();
-  }
-
-  /**
-   * Gets the resource location for the given item
-   * @return  Resource location for the given item
-   */
-  public ResourceLocation getRegistryName() {
-    return name;
   }
 }

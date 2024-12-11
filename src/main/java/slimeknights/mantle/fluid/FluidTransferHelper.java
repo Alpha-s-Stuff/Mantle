@@ -1,10 +1,11 @@
 package slimeknights.mantle.fluid;
 
+import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
+import io.github.fabricators_of_create.porting_lib.fluids.sound.SoundAction;
+import io.github.fabricators_of_create.porting_lib.fluids.sound.SoundActions;
 import io.github.fabricators_of_create.porting_lib.mixin.accessors.common.accessor.BucketItemAccessor;
 import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
-import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
 import io.github.fabricators_of_create.porting_lib.transfer.item.ItemHandlerHelper;
-import io.github.fabricators_of_create.porting_lib.util.FluidTextUtil;
 import io.github.fabricators_of_create.porting_lib.util.FluidUnit;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -12,13 +13,15 @@ import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.storage.StorageUtil;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
+import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -39,7 +42,7 @@ import slimeknights.mantle.fluid.transfer.IFluidContainerTransfer.TransferResult
 /**
  * Alternative to {@link net.minecraftforge.fluids.FluidUtil} since no one has time to make the forge util not a buggy mess
  */
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "UnstableApiUsage"})
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class FluidTransferHelper {
   private static final String KEY_FILLED = Mantle.makeDescriptionId("block", "tank.filled");
@@ -53,6 +56,25 @@ public class FluidTransferHelper {
 
   public static String getKeyDrained() {
     return Config.FLUID_UNIT.get() == FluidUnit.MILLIBUCKETS ? KEY_DRAINED : KEY_DRAINED_DROPLET;
+  }
+
+  /** Gets the given sound from the fluid */
+  public static SoundEvent getSound(FluidStack fluid, SoundAction action, SoundEvent fallback) {
+    SoundEvent event = fluid.getFluid().getFluidType().getSound(fluid, action);
+    if (event == null) {
+      return fallback;
+    }
+    return event;
+  }
+
+  /** Gets the empty sound for a fluid */
+  public static SoundEvent getEmptySound(FluidStack fluid) {
+    return getSound(fluid, SoundActions.BUCKET_EMPTY, SoundEvents.BUCKET_EMPTY);
+  }
+
+  /** Gets the fill sound for a fluid */
+  public static SoundEvent getFillSound(FluidStack fluid) {
+    return getSound(fluid, SoundActions.BUCKET_FILL, SoundEvents.BUCKET_FILL);
   }
 
   /**
@@ -70,7 +92,7 @@ public class FluidTransferHelper {
 
       // check how much can be extracted
       try (Transaction extractionTestTransaction = Transaction.openOuter()) {
-        maxExtracted = view.extract(resource, maxFill, extractionTestTransaction);
+        maxExtracted = input.extract(resource, maxFill, extractionTestTransaction);
         extractionTestTransaction.abort();
       }
 
@@ -79,7 +101,7 @@ public class FluidTransferHelper {
         long accepted = output.insert(resource, maxExtracted, transferTransaction);
 
         // extract it, or rollback if the amounts don't match
-        long drained = view.extract(resource, accepted, transferTransaction);
+        long drained = input.extract(resource, accepted, transferTransaction);
         if (drained != accepted) {
           Mantle.logger.error("Lost {} fluid during transfer", drained - accepted);
         }
@@ -110,14 +132,15 @@ public class FluidTransferHelper {
           if (handler != null) {
               FluidStack fluidStack = new FluidStack(((BucketItemAccessor)bucket).port_lib$getContent(), FluidConstants.BUCKET);
               // must empty the whole bucket
-              if (handler.simulateInsert(fluidStack.getType(), fluidStack.getAmount(), null) == FluidConstants.BUCKET) {
+              if (StorageUtil.simulateInsert(handler, fluidStack.getType(), fluidStack.getAmount(), null) == FluidConstants.BUCKET) {
                 try (Transaction t = TransferUtil.getTransaction()) {
                   handler.insert(fluidStack.getType(), fluidStack.getAmount(), t);
                   t.commit();
                 }
+                SoundEvent sound = getEmptySound(fluidStack);
                 bucket.checkExtraContent(player, world, held, pos.relative(offset));
-                world.playSound(null, pos, FluidVariantAttributes.getEmptySound(FluidVariant.of(fluid)), SoundSource.BLOCKS, 1.0F, 1.0F);
-                player.displayClientMessage(Component.translatable(getKeyFilled(), FluidTextUtil.getUnicodeMillibuckets(FluidConstants.BUCKET, Config.FLUID_UNIT.get(), true), fluidStack.getDisplayName()), true);
+                world.playSound(null, pos, sound, SoundSource.BLOCKS, 1.0F, 1.0F);
+                player.displayClientMessage(Component.translatable(KEY_FILLED, FluidConstants.BUCKET, fluidStack.getDisplayName()), true);
                 if (!player.isCreative()) {
                   player.setItemInHand(hand, held.getRecipeRemainder());
                 }
@@ -131,17 +154,15 @@ public class FluidTransferHelper {
   }
 
   /** Plays the sound from filling a TE */
-  private static void playEmptySound(Level world, BlockPos pos, Player player, FluidStack transferred) {
-    world.playSound(null, pos, FluidVariantAttributes.getHandlerOrDefault(transferred.getFluid()).getEmptySound(transferred.getType()).orElse(SoundEvents.BUCKET_EMPTY), SoundSource.BLOCKS, 1.0F, 1.0F);
-    player.displayClientMessage(Component.translatable(getKeyFilled(), FluidTextUtil.getUnicodeMillibuckets(transferred.getAmount(), Config.FLUID_UNIT.get(), true), transferred.getDisplayName()), true);
+  public static void playEmptySound(Level world, BlockPos pos, Player player, FluidStack transferred) {
+    world.playSound(null, pos, getEmptySound(transferred), SoundSource.BLOCKS, 1.0F, 1.0F);
+    player.displayClientMessage(Component.translatable(KEY_FILLED, transferred.getAmount(), transferred.getDisplayName()), true);
   }
 
   /** Plays the sound from draining a TE */
-  private static void playFillSound(Level world, BlockPos pos, Player player, FluidStack transferred) {
-    world.playSound(null, pos, FluidVariantAttributes.getHandlerOrDefault(transferred.getFluid()).getFillSound(transferred.getType())
-      .or(() -> transferred.getFluid().getPickupSound())
-      .orElse(SoundEvents.BUCKET_FILL), SoundSource.BLOCKS, 1.0F, 1.0F);
-    player.displayClientMessage(Component.translatable(getKeyDrained(), FluidTextUtil.getUnicodeMillibuckets(transferred.getAmount(), Config.FLUID_UNIT.get(), true), transferred.getDisplayName()), true);
+  public static void playFillSound(Level world, BlockPos pos, Player player, FluidStack transferred) {
+    world.playSound(null, pos, getFillSound(transferred), SoundSource.BLOCKS, 1.0F, 1.0F);
+    player.displayClientMessage(Component.translatable(KEY_DRAINED, transferred.getAmount(), transferred.getDisplayName()), true);
   }
 
   /**
@@ -163,8 +184,6 @@ public class FluidTransferHelper {
       // TE must have a capability
       Storage<FluidVariant> teHandler = FluidStorage.SIDED.find(world, pos, face);
       if (teHandler != null) {
-        ItemStack copy = ItemHandlerHelper.copyStackWithSize(stack, 1);
-
         // fallback to JSON based transfer
         if (FluidContainerTransferManager.INSTANCE.mayHaveTransfer(stack)) {
           // only actually transfer on the serverside, client just has items
@@ -187,16 +206,17 @@ public class FluidTransferHelper {
         }
 
         // if the item has a capability, do a direct transfer
+        ItemStack copy = ItemHandlerHelper.copyStackWithSize(stack, 1);
         if (FluidStorage.ITEM.find(stack, ContainerItemContext.withConstant(stack)) != null) {
           if (!world.isClientSide) {
             Storage<FluidVariant> itemHandler = ContainerItemContext.forPlayerInteraction(player, hand).find(FluidStorage.ITEM);
             // first, try filling the TE from the item
-            FluidStack transferred = tryTransfer(itemHandler, teHandler, Long.MAX_VALUE);
+            FluidStack transferred = tryTransfer(itemHandler, teHandler, (itemHandler instanceof SingleSlotStorage ? ((SingleSlotStorage<FluidVariant>) itemHandler).getCapacity() : Long.MAX_VALUE));
             if (!transferred.isEmpty()) {
               playEmptySound(world, pos, player, transferred);
             } else {
               // if that failed, try filling the item handler from the TE
-              transferred = tryTransfer(teHandler, itemHandler, Integer.MAX_VALUE);
+              transferred = tryTransfer(teHandler, itemHandler, (itemHandler instanceof SingleSlotStorage ? ((SingleSlotStorage<FluidVariant>) itemHandler).getCapacity() : Integer.MAX_VALUE));
               if (!transferred.isEmpty()) {
                 playFillSound(world, pos, player, transferred);
               }

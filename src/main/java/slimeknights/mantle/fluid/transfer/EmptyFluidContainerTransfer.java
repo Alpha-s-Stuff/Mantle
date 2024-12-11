@@ -12,7 +12,7 @@ import lombok.RequiredArgsConstructor;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
-import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.Item;
@@ -62,7 +62,7 @@ public class EmptyFluidContainerTransfer implements IFluidContainerTransfer {
         long actual = handler.insert(contained.getType(), contained.getAmount(), t);
         if (actual > 0) {
           if (actual != this.fluid.getAmount()) {
-            Mantle.logger.error("Wrong amount filled from {}, expected {}, filled {}", BuiltInRegistries.ITEM.getKey(stack.getItem()), this.fluid.getAmount(), actual);
+            Mantle.logger.error("Wrong amount filled from {}, expected {}, filled {}", Registry.ITEM.getKey(stack.getItem()), this.fluid.getAmount(), actual);
           }
           return new TransferResult(filled.get().copy(), contained, false);
         }
@@ -77,7 +77,7 @@ public class EmptyFluidContainerTransfer implements IFluidContainerTransfer {
     JsonObject json = new JsonObject();
     json.addProperty("type", ID.toString());
     json.add("input", input.toJson());
-    json.add("filled", filled.serialize());
+    json.add("filled", filled.serialize(false));
     json.add("fluid", RecipeHelper.serializeFluidStack(fluid));
     return json;
   }
@@ -93,7 +93,7 @@ public class EmptyFluidContainerTransfer implements IFluidContainerTransfer {
     public T deserialize(JsonElement element, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
       JsonObject json = element.getAsJsonObject();
       Ingredient input = Ingredient.fromJson(JsonHelper.getElement(json, "input"));
-      ItemOutput filled = ItemOutput.fromJson(JsonHelper.getElement(json, "filled"));
+      ItemOutput filled = ItemOutput.Loadable.REQUIRED_ITEM.getIfPresent(json, "filled");
       FluidStack fluid = RecipeHelper.deserializeFluidStack(GsonHelper.getAsJsonObject(json, "fluid"));
       return factory.apply(input, filled, fluid);
     }

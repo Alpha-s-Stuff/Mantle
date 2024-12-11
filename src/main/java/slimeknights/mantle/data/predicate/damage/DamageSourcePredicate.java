@@ -3,17 +3,14 @@ package slimeknights.mantle.data.predicate.damage;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
-import slimeknights.mantle.data.GenericLoaderRegistry;
-import slimeknights.mantle.data.GenericLoaderRegistry.IGenericLoader;
-import slimeknights.mantle.data.predicate.AndJsonPredicate;
 import slimeknights.mantle.data.predicate.IJsonPredicate;
-import slimeknights.mantle.data.predicate.InvertedJsonPredicate;
-import slimeknights.mantle.data.predicate.NestedJsonPredicateLoader;
-import slimeknights.mantle.data.predicate.OrJsonPredicate;
+import slimeknights.mantle.data.predicate.PredicateRegistry;
+import slimeknights.mantle.data.registry.GenericLoaderRegistry.IGenericLoader;
 
+import java.util.List;
 import java.util.function.Predicate;
 
-import static slimeknights.mantle.data.GenericLoaderRegistry.SingletonLoader.singleton;
+import static slimeknights.mantle.data.registry.GenericLoaderRegistry.SingletonLoader.singleton;
 
 /**
  * Predicate testing for damage sources
@@ -22,13 +19,7 @@ public interface DamageSourcePredicate extends IJsonPredicate<DamageSource> {
   /** Predicate that matches all sources */
   DamageSourcePredicate ANY = simple(source -> true);
   /** Loader for item predicates */
-  GenericLoaderRegistry<IJsonPredicate<DamageSource>> LOADER = new GenericLoaderRegistry<>(ANY, true);
-  /** Loader for inverted conditions */
-  InvertedJsonPredicate.Loader<DamageSource> INVERTED = new InvertedJsonPredicate.Loader<>(LOADER, false);
-  /** Loader for and conditions */
-  NestedJsonPredicateLoader<DamageSource,AndJsonPredicate<DamageSource>> AND = AndJsonPredicate.createLoader(LOADER, INVERTED);
-  /** Loader for or conditions */
-  NestedJsonPredicateLoader<DamageSource,OrJsonPredicate<DamageSource>> OR = OrJsonPredicate.createLoader(LOADER, INVERTED);
+  PredicateRegistry<DamageSource> LOADER = new PredicateRegistry<>("Damage Source Predicate", ANY);
 
   /* Vanilla getters */
   DamageSourcePredicate PROJECTILE = simple(damageSource -> damageSource.is(DamageTypeTags.IS_PROJECTILE));
@@ -37,12 +28,13 @@ public interface DamageSourcePredicate extends IJsonPredicate<DamageSource> {
   DamageSourcePredicate DAMAGE_HELMET = simple(damageSource -> damageSource.is(DamageTypeTags.DAMAGES_HELMET));
   DamageSourcePredicate BYPASS_INVULNERABLE = simple(damageSource -> damageSource.is(DamageTypeTags.BYPASSES_INVULNERABILITY));
   DamageSourcePredicate BYPASS_MAGIC = simple(damageSource -> damageSource.is(DamageTypeTags.BYPASSES_EFFECTS));
+  DamageSourcePredicate BYPASS_ENCHANTMENTS = simple(DamageSource::isBypassEnchantments);
   DamageSourcePredicate FIRE = simple(damageSource -> damageSource.is(DamageTypeTags.IS_FIRE));
   DamageSourcePredicate MAGIC = simple(damageSource -> damageSource.is(DamageTypes.MAGIC));
   DamageSourcePredicate FALL = simple(damageSource -> damageSource.is(DamageTypeTags.IS_FALL));
 
   /** Damage that protection works against */
-  DamageSourcePredicate CAN_PROTECT = simple(source -> !source.is(DamageTypeTags.BYPASSES_EFFECTS) && !source.is(DamageTypeTags.BYPASSES_INVULNERABILITY));
+  DamageSourcePredicate CAN_PROTECT = simple(source -> !source.is(DamageTypeTags.BYPASSES_EFFECTS) && !source.isBypassEnchantments() && !source.is(DamageTypeTags.BYPASSES_INVULNERABILITY));
   /** Custom concept: damage dealt by non-projectile entities */
   DamageSourcePredicate MELEE = simple(source -> {
     if (source.is(DamageTypeTags.IS_PROJECTILE)) {
@@ -61,7 +53,7 @@ public interface DamageSourcePredicate extends IJsonPredicate<DamageSource> {
 
   @Override
   default IJsonPredicate<DamageSource> inverted() {
-    return INVERTED.create(this);
+    return LOADER.invert(this);
   }
 
   /** Creates a simple predicate with no parameters */
@@ -73,9 +65,24 @@ public interface DamageSourcePredicate extends IJsonPredicate<DamageSource> {
       }
 
       @Override
-      public IGenericLoader<? extends IJsonPredicate<DamageSource>> getLoader() {
+      public IGenericLoader<? extends DamageSourcePredicate> getLoader() {
         return loader;
       }
     });
+  }
+
+
+  /* Helper methods */
+
+  /** Creates an and predicate */
+  @SafeVarargs
+  static IJsonPredicate<DamageSource> and(IJsonPredicate<DamageSource>... predicates) {
+    return LOADER.and(List.of(predicates));
+  }
+
+  /** Creates an or predicate */
+  @SafeVarargs
+  static IJsonPredicate<DamageSource> or(IJsonPredicate<DamageSource>... predicates) {
+    return LOADER.or(List.of(predicates));
   }
 }

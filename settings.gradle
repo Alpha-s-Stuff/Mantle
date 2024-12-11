@@ -15,12 +15,12 @@ include 'shared'
 include 'api'
 include 'services:webservice'
 */
+
 pluginManagement {
     repositories {
+        gradlePluginPortal()
         maven { url = 'https://maven.fabricmc.net/' }
         maven { url = "https://maven.quiltmc.org/repository/release" }
-        mavenLocal()
-        gradlePluginPortal()
     }
 }
 rootProject.name = 'Mantle'

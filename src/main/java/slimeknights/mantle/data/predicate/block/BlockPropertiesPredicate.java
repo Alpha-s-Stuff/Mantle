@@ -16,9 +16,11 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
-import slimeknights.mantle.data.GenericLoaderRegistry.IGenericLoader;
-import slimeknights.mantle.data.predicate.IJsonPredicate;
+import slimeknights.mantle.data.loadable.Loadables;
+import slimeknights.mantle.data.loadable.record.RecordLoadable;
+import slimeknights.mantle.data.registry.GenericLoaderRegistry.IGenericLoader;
 import slimeknights.mantle.util.JsonHelper;
+import slimeknights.mantle.util.typed.TypedMap;
 
 import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
@@ -53,7 +55,7 @@ public record BlockPropertiesPredicate(Block block, List<Matcher> properties) im
   }
 
   @Override
-  public IGenericLoader<? extends IJsonPredicate<BlockState>> getLoader() {
+  public IGenericLoader<? extends BlockPredicate> getLoader() {
     return LOADER;
   }
 
@@ -66,10 +68,12 @@ public record BlockPropertiesPredicate(Block block, List<Matcher> properties) im
     return property;
   }
 
-  public static final IGenericLoader<BlockPropertiesPredicate> LOADER = new IGenericLoader<>() {
+  /** Loader instance */
+  public static final RecordLoadable<BlockPropertiesPredicate> LOADER = new RecordLoadable<>() {
     @Override
-    public BlockPropertiesPredicate deserialize(JsonObject json) {
-      Block block = JsonHelper.getAsEntry(BuiltInRegistries.BLOCK, json, "block");
+    public BlockPropertiesPredicate deserialize(JsonObject json, TypedMap context) {
+      Block block = Loadables.BLOCK.getIfPresent(json, "block");
+      // TODO: this is a bit of a unique case for matcher, as its parsing from a map into a list, think about whether we can do something generic
       ImmutableList.Builder<Matcher> builder = ImmutableList.builder();
       for (Entry<String, JsonElement> entry : GsonHelper.getAsJsonObject(json, "properties").entrySet()) {
         Property<?> property = parseProperty(block, entry.getKey(), JSON_EXCEPTION);
@@ -80,7 +84,7 @@ public record BlockPropertiesPredicate(Block block, List<Matcher> properties) im
 
     @Override
     public void serialize(BlockPropertiesPredicate object, JsonObject json) {
-      json.addProperty("block", Objects.requireNonNull(BuiltInRegistries.BLOCK.getKey(object.block)).toString());
+      json.add("block", Loadables.BLOCK.serialize(object.block));
       JsonObject properties = new JsonObject();
       for (Matcher matcher : object.properties) {
         properties.add(matcher.property().getName(), matcher.serialize());
@@ -89,8 +93,8 @@ public record BlockPropertiesPredicate(Block block, List<Matcher> properties) im
     }
 
     @Override
-    public BlockPropertiesPredicate fromNetwork(FriendlyByteBuf buffer) {
-      Block block = BuiltInRegistries.BLOCK.byId(buffer.readVarInt());
+    public BlockPropertiesPredicate decode(FriendlyByteBuf buffer, TypedMap context) {
+      Block block = Loadables.BLOCK.decode(buffer);
       int size = buffer.readVarInt();
       ImmutableList.Builder<Matcher> builder = ImmutableList.builder();
       for (int i = 0; i < size; i++) {
@@ -100,8 +104,8 @@ public record BlockPropertiesPredicate(Block block, List<Matcher> properties) im
     }
 
     @Override
-    public void toNetwork(BlockPropertiesPredicate object, FriendlyByteBuf buffer) {
-      buffer.writeVarInt(BuiltInRegistries.BLOCK.getId(object.block));
+    public void encode(FriendlyByteBuf buffer, BlockPropertiesPredicate object) {
+      Loadables.BLOCK.encode(buffer, object.block);
       buffer.writeVarInt(object.properties.size());
       for (Matcher matcher : object.properties) {
         matcher.toNetwork(buffer);

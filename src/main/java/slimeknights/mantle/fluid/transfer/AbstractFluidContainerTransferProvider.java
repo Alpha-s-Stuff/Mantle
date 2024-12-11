@@ -7,6 +7,7 @@ import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.resource.conditions.v1.ConditionJsonProvider;
 import net.fabricmc.fabric.api.resource.conditions.v1.ResourceConditions;
 import net.minecraft.data.CachedOutput;
+import net.minecraft.data.DataGenerator;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.tags.TagKey;
@@ -65,9 +66,7 @@ public abstract class AbstractFluidContainerTransferProvider extends GenericData
   @Override
   public CompletableFuture<?> run(CachedOutput cache) {
     addTransfers();
-    final List<CompletableFuture<?>> futures = new ArrayList<>();
-    allTransfers.forEach((id, data) -> futures.add(saveThing(cache, id, data.toJson())));
-    return CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new));
+    allTransfers.forEach((id, data) -> saveJson(cache, id, data.toJson()));
   }
 
   /** Json with transfer and condition */

@@ -31,9 +31,15 @@ repositories {
         name = "ModMaven"
         url = "https://modmaven.dev"
     }
+    // If you have mod jar dependencies in ./libs, you can declare them as a repository like so:
+    // flatDir {
+    //     dir 'libs'
+    // }
 }
 
 group = 'slimeknights.mantle'
+archivesBaseName = 'Mantle'
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 // sets version to the slimeKnights version format
 task buildInfo {
@@ -65,9 +71,7 @@ if (System.getenv().ARTIFACT_VERSION != null) {
 }
 
 version = "${minecraft_version}-${artifact_version}"
-
-sourceCompatibility = JavaVersion.VERSION_17
-targetCompatibility = JavaVersion.VERSION_17
+println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}, Version: ${version}"
 
 sourceSets {
     main {
@@ -228,4 +232,8 @@ publishing {
             authentication { basic(BasicAuthentication) }
         }
     }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
 }

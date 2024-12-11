@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Optional;
 
 /** Ingredient that matches a container of fluid */
+@SuppressWarnings("unused")  // API
 public class FluidContainerIngredient implements CustomIngredient {
   public static final ResourceLocation ID = Mantle.getResource("fluid_container");
   public static final Serializer SERIALIZER = new Serializer();
@@ -54,7 +55,7 @@ public class FluidContainerIngredient implements CustomIngredient {
 
   /** Creates an instance from a fluid ingredient with a display container */
   public static FluidContainerIngredient fromFluid(FluidObject<?> fluid, boolean forgeTag) {
-    return fromIngredient(FluidIngredient.of(forgeTag ? fluid.getForgeTag() : fluid.getLocalTag(), FluidConstants.BUCKET), Ingredient.of(fluid));
+    return fromIngredient(fluid.ingredient(FluidType.BUCKET_VOLUME, forgeTag), Ingredient.of(fluid));
   }
 
   @Override
@@ -76,7 +77,7 @@ public class FluidContainerIngredient implements CustomIngredient {
       long amount = fluidIngredient.getAmount(fluid);
       FluidStack drained = TransferUtil.extractAnyFluid(storage, amount);
       // we need an exact match, and we need the resulting container item to be the same as the item stack's container item
-      return drained.getFluid() == fluid && drained.getAmount() == amount && ItemStack.matches(stack.getItem().getCraftingRemainingItem().getDefaultInstance(), cap);
+      return drained.getFluid() == fluid && drained.getAmount() == amount && ItemStack.matches(stack.getCraftingRemainingItem(), cap.getContainer());
     }).isPresent();
   }
 
@@ -144,11 +145,11 @@ public class FluidContainerIngredient implements CustomIngredient {
     public FluidContainerIngredient read(JsonObject json) {
       json = json.getAsJsonObject("fluid");
       FluidIngredient fluidIngredient;
-      // if we have fluid, its a nested ingredient. Otherwise this object itself is the ingredient
-      if (json.has("fluid")) {
-        fluidIngredient = FluidIngredient.deserialize(json, "fluid");
+      // if we have fluid and its not a primitive, then its nested
+      if (json.has("fluid") && !json.get("fluid").isJsonPrimitive()) {
+        fluidIngredient = FluidIngredient.LOADABLE.getIfPresent(json, "fluid");
       } else {
-        fluidIngredient = FluidIngredient.deserialize((JsonElement) json, "fluid");
+        fluidIngredient = FluidIngredient.LOADABLE.convert(json, "fluid");
       }
       Ingredient display = null;
       if (json.has("display")) {
