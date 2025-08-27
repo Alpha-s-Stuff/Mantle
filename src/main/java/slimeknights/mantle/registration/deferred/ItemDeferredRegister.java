@@ -38,6 +38,15 @@ public class ItemDeferredRegister extends DeferredRegisterWrapper<Item> {
     return register(name, () -> new Item(props));
   }
 
+  /**
+   * Adds a new item to the list to be registered, with default item properties
+   * @param name   Item name
+   * @return  Item registry object
+   */
+  public ItemObject<Item> register(String name) {
+    return register(name, new Item.Properties());
+  }
+
 
   /* Specialty */
 

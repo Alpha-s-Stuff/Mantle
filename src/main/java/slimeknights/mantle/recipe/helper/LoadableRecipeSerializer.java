@@ -3,6 +3,7 @@ package slimeknights.mantle.recipe.helper;
 import com.google.gson.JsonObject;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.Recipe;
@@ -44,6 +45,11 @@ public class LoadableRecipeSerializer<T extends Recipe<?>> implements LoggingRec
   /** Creates a type aware serializer from a loadable */
   public static <T extends R, R extends Recipe<?>> TypeAwareRecipeSerializer<T> of(RecordLoadable<T> loadable, Supplier<? extends RecipeType<R>> type) {
     return new TypeAware<>(loadable, type);
+  }
+
+  /** Creates a serializer that is deprecated, logging a warning when used */
+  public static <T extends Recipe<?>> RecipeSerializer<T> deprecated(RecordLoadable<T> loadable, String replacement) {
+    return new Deprecated<>(loadable, replacement);
   }
 
   /** Builds a context for the given ID */
@@ -103,6 +109,22 @@ public class LoadableRecipeSerializer<T extends Recipe<?>> implements LoggingRec
         Mantle.logger.error("{}: Error reading recipe {} of type {} from packet using loadable {}", this.getClass().getSimpleName(), id, getType(), loadable, e);
         throw e;
       }
+    }
+  }
+
+  /** Helper class that logs a warning on recipe parse about planned removal */
+  private static class Deprecated<T extends Recipe<?>> extends LoadableRecipeSerializer<T> {
+    private final String replacement;
+    protected Deprecated(RecordLoadable<T> loadable, String replacement) {
+      super(loadable);
+      this.replacement = replacement;
+    }
+
+    @Override
+    public T fromJson(ResourceLocation id, JsonObject json) {
+      T recipe = super.fromJson(id, json);
+      Mantle.logger.warn("Using deprecated recipe serializer {} for recipe {}, {}", BuiltInRegistries.RECIPE_SERIALIZER.getKey(this), recipe.getId(), replacement);
+      return recipe;
     }
   }
 }

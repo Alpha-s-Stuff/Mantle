@@ -1,13 +1,11 @@
 package slimeknights.mantle.registration.object;
 
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.StairBlock;
 import slimeknights.mantle.registration.RegistrationHelper;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -17,7 +15,7 @@ import java.util.function.Supplier;
  * Object containing a block with slab and stairs variants
  */
 @SuppressWarnings("WeakerAccess")
-public class BuildingBlockObject extends ItemObject<Block> {
+public class BuildingBlockObject extends ItemObject<Block> implements MultiObject<Block> {
   private final Supplier<? extends SlabBlock> slab;
   private final Supplier<? extends StairBlock> stairs;
 
@@ -65,16 +63,13 @@ public class BuildingBlockObject extends ItemObject<Block> {
     return Objects.requireNonNull(stairs.get(), "Building Block Object missing stairs");
   }
 
-  /**
-   * Gets an array of the blocks in this object
-   * @return  Array of the blocks in this object
-   */
+  @Override
   public List<Block> values() {
-    return Arrays.asList(get(), getSlab(), getStairs());
+    return List.of(get(), getSlab(), getStairs());
   }
 
-  /** Runs the consumer on each element in the object */
-  public void forEach(Consumer<ItemLike> consumer) {
+  @Override
+  public void forEach(Consumer<? super Block> consumer) {
     consumer.accept(get());
     consumer.accept(getSlab());
     consumer.accept(getStairs());

@@ -4,10 +4,12 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 
 import javax.annotation.Nullable;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.function.BiConsumer;
@@ -20,9 +22,9 @@ import java.util.stream.Collectors;
  * @param <T>  Enum type
  * @param <I>  Entry type
  */
-@SuppressWarnings({"unused", "WeakerAccess", "ClassCanBeRecord"})
+@SuppressWarnings({"unused", "WeakerAccess"})
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class EnumObject<T extends Enum<T>, I> {
+public class EnumObject<T extends Enum<T>, I> implements MultiObject<I> {
   /** Singleton empty object, type does not matter as it has no items */
   @SuppressWarnings({"rawtypes", "unchecked"})
   private static final EnumObject EMPTY = new EnumObject(Collections.emptyMap());
@@ -82,10 +84,21 @@ public class EnumObject<T extends Enum<T>, I> {
     return this.map.values().stream().map(Supplier::get).anyMatch(value::equals);
   }
 
+  /** Gets all present keys for this object */
+  public Collection<T> keys() {
+    return this.map.keySet();
+  }
+
+  /** Gets the set of entries for this object */
+  public Collection<Entry<T,Supplier<? extends I>>> entries() {
+    return this.map.entrySet();
+  }
+
   /**
    * Gets a list of values in this enum object. Will error if a {@link net.minecraftforge.registries.RegistryObject} cannot be resolved, unlike {@link #forEach(Consumer)}
    * @return  List of values in the object
    */
+  @Override
   public List<I> values() {
     return this.map.values().stream().map(Supplier::get).filter(Objects::nonNull).collect(Collectors.toList());
   }
@@ -115,6 +128,7 @@ public class EnumObject<T extends Enum<T>, I> {
    * Will ignore any suppliers that have not yet resolved, to work around a Forge error with registry events failing.
    * @param consumer  Consumer passed each key value pair
    */
+  @Override
   public void forEach(Consumer<? super I> consumer) {
     forEach((k, v) -> consumer.accept(v));
   }

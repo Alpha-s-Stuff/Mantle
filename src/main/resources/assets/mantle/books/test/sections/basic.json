@@ -34,24 +34,24 @@
     "data": "basic/text_right_image.json"
   },
   {
-    "name": "crafting_sm_manual",
-    "type": "crafting",
-    "data": "basic/crafting_sm_manual.json"
-  },
-  {
     "name": "crafting_sm_auto",
     "type": "crafting",
     "data": "basic/crafting_sm_auto.json"
   },
   {
-    "name": "crafting_lg_manual",
+    "name": "crafting_sm_manual",
     "type": "crafting",
-    "data": "basic/crafting_lg_manual.json"
+    "data": "basic/crafting_sm_manual.json"
   },
   {
     "name": "crafting_lg_auto",
     "type": "crafting",
     "data": "basic/crafting_lg_auto.json"
+  },
+  {
+    "name": "crafting_lg_manual",
+    "type": "crafting",
+    "data": "basic/crafting_lg_manual.json"
   },
   {
     "name": "smelting_manual",

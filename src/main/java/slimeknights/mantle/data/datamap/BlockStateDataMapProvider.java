@@ -9,6 +9,7 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.data.PackOutput.Target;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.properties.Property;
 import slimeknights.mantle.data.GenericDataProvider;
 import slimeknights.mantle.data.loadable.Loadable;
 
@@ -120,6 +121,12 @@ public abstract class BlockStateDataMapProvider<D> extends GenericDataProvider {
     public class VariantBuilder extends StateVariantStringBuilder {
       protected VariantBuilder() {
         super(owner);
+      }
+
+      @Override
+      public <T extends Comparable<T>> VariantBuilder when(Property<T> prop, T value) {
+        super.when(prop, value);
+        return this;
       }
 
       /** Returns to the outer datamap */

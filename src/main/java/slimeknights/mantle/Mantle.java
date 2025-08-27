@@ -6,6 +6,8 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.recipe.v1.ingredient.CustomIngredientSerializer;
 import net.minecraft.Util;
+import net.minecraft.commands.synchronization.ArgumentTypeInfos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
@@ -21,6 +23,7 @@ import slimeknights.mantle.block.entity.MantleHangingSignBlockEntity;
 import slimeknights.mantle.block.entity.MantleSignBlockEntity;
 import slimeknights.mantle.client.ClientEvents;
 import slimeknights.mantle.command.MantleCommand;
+import slimeknights.mantle.command.argument.ResourceOrTagKeyArgument;
 import slimeknights.mantle.config.Config;
 import slimeknights.mantle.data.predicate.block.BlockPredicate;
 import slimeknights.mantle.data.predicate.block.BlockPropertiesPredicate;
@@ -28,15 +31,21 @@ import slimeknights.mantle.data.predicate.damage.DamageSourcePredicate;
 import slimeknights.mantle.data.predicate.damage.DamageTypePredicate;
 import slimeknights.mantle.data.predicate.damage.SourceAttackerPredicate;
 import slimeknights.mantle.data.predicate.damage.SourceMessagePredicate;
+import slimeknights.mantle.data.predicate.entity.BlockAtEntityPredicate;
 import slimeknights.mantle.data.predicate.entity.HasEnchantmentEntityPredicate;
+import slimeknights.mantle.data.predicate.entity.HasMobEffectPredicate;
 import slimeknights.mantle.data.predicate.entity.LivingEntityPredicate;
 import slimeknights.mantle.data.predicate.entity.MobTypePredicate;
 import slimeknights.mantle.data.predicate.item.ItemPredicate;
+import slimeknights.mantle.datagen.MantleBlockTagProvider;
 import slimeknights.mantle.datagen.MantleFluidTagProvider;
 import slimeknights.mantle.datagen.MantleFluidTooltipProvider;
+import slimeknights.mantle.datagen.MantleFluidTransferProvider;
+import slimeknights.mantle.datagen.MantleMenuTagProvider;
 import slimeknights.mantle.datagen.MantleTags;
 import slimeknights.mantle.fluid.transfer.EmptyFluidContainerTransfer;
 import slimeknights.mantle.fluid.transfer.EmptyFluidWithNBTTransfer;
+import slimeknights.mantle.fluid.transfer.EmptyPotionTransfer;
 import slimeknights.mantle.fluid.transfer.FillFluidContainerTransfer;
 import slimeknights.mantle.fluid.transfer.FillFluidWithNBTTransfer;
 import slimeknights.mantle.fluid.transfer.FluidContainerTransferManager;
@@ -44,19 +53,20 @@ import slimeknights.mantle.item.LecternBookItem;
 import slimeknights.mantle.loot.LootTableInjector;
 import slimeknights.mantle.loot.MantleLoot;
 import slimeknights.mantle.network.MantleNetwork;
+import slimeknights.mantle.recipe.MantleRecipes;
 import slimeknights.mantle.recipe.condition.TagCombinationCondition;
 import slimeknights.mantle.recipe.condition.TagEmptyCondition;
 import slimeknights.mantle.recipe.condition.TagFilledCondition;
-import slimeknights.mantle.recipe.crafting.ShapedFallbackRecipe;
-import slimeknights.mantle.recipe.crafting.ShapedRetexturedRecipe;
 import slimeknights.mantle.recipe.helper.TagPreference;
 import slimeknights.mantle.recipe.ingredient.FluidContainerIngredient;
-import slimeknights.mantle.registration.MantleRegistrations;
+import slimeknights.mantle.recipe.ingredient.PotionIngredient;
+import slimeknights.mantle.registration.RegistrationHelper;
 import slimeknights.mantle.registration.adapter.BlockEntityTypeRegistryAdapter;
-import slimeknights.mantle.registration.adapter.RegistryAdapter;
+import slimeknights.mantle.util.OffhandCooldownTracker;
 
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Mantle
@@ -89,6 +99,7 @@ public class Mantle implements ModInitializer {
     bus.addListener(EventPriority.NORMAL, false, RegisterCapabilitiesEvent.class, this::registerCapabilities);
     bus.addListener(EventPriority.NORMAL, false, GatherDataEvent.class, this::gatherData);
     bus.addListener(EventPriority.NORMAL, false, RegisterEvent.class, this::register);
+    MantleRecipes.init(bus);
     MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, PlayerInteractEvent.RightClickBlock.class, LecternBookItem::interactWithBlock);
 
     if (FMLEnvironment.dist == Dist.CLIENT) {
@@ -109,33 +120,34 @@ public class Mantle implements ModInitializer {
     LootTableInjector.init();
   }
 
+  @SuppressWarnings("deprecation")
   private void register(RegisterEvent event) {
     ResourceKey<?> key = event.getRegistryKey();
     if (key == Registries.RECIPE_SERIALIZER) {
-      RegistryAdapter<RecipeSerializer<?>> adapter = new RegistryAdapter<>(Objects.requireNonNull(event.getForgeRegistry()));
-      adapter.register(new ShapedFallbackRecipe.Serializer(), "crafting_shaped_fallback");
-      adapter.register(new ShapedRetexturedRecipe.Serializer(), "crafting_shaped_retextured");
-
       CraftingHelper.register(TagEmptyCondition.SERIALIZER);
       CraftingHelper.register(TagFilledCondition.SERIALIZER);
       CraftingHelper.register(TagCombinationCondition.SERIALIZER);
       CraftingHelper.register(FluidContainerIngredient.ID, FluidContainerIngredient.SERIALIZER);
+      CraftingHelper.register(getResource("potion"), PotionIngredient.SERIALIZER);
 
       // fluid container transfer
       FluidContainerTransferManager.TRANSFER_LOADERS.registerDeserializer(EmptyFluidContainerTransfer.ID, EmptyFluidContainerTransfer.DESERIALIZER);
       FluidContainerTransferManager.TRANSFER_LOADERS.registerDeserializer(FillFluidContainerTransfer.ID, FillFluidContainerTransfer.DESERIALIZER);
       FluidContainerTransferManager.TRANSFER_LOADERS.registerDeserializer(EmptyFluidWithNBTTransfer.ID, EmptyFluidWithNBTTransfer.DESERIALIZER);
       FluidContainerTransferManager.TRANSFER_LOADERS.registerDeserializer(FillFluidWithNBTTransfer.ID, FillFluidWithNBTTransfer.DESERIALIZER);
+      FluidContainerTransferManager.TRANSFER_LOADERS.registerDeserializer(EmptyPotionTransfer.ID, EmptyPotionTransfer.DESERIALIZER);
 
       // predicates
       {
         // block predicates
         BlockPredicate.LOADER.register(getResource("requires_tool"), BlockPredicate.REQUIRES_TOOL.getLoader());
+        BlockPredicate.LOADER.register(getResource("blocks_motion"), BlockPredicate.BLOCKS_MOTION.getLoader());
+        BlockPredicate.LOADER.register(getResource("can_be_replaced"), BlockPredicate.CAN_BE_REPLACED.getLoader());
         BlockPredicate.LOADER.register(getResource("block_properties"), BlockPropertiesPredicate.LOADER);
 
         // item predicates
-        //  make sure the item predicate registry is loaded, nothing to register here
-        ItemPredicate.ANY.getLoader();
+        ItemPredicate.LOADER.register(getResource("has_container"), ItemPredicate.MAY_HAVE_TRANSFER.getLoader());
+        ItemPredicate.LOADER.register(getResource("may_have_transfer"), ItemPredicate.MAY_HAVE_TRANSFER.getLoader());
 
         // entity predicates
         // simple
@@ -147,6 +159,9 @@ public class Mantle implements ModInitializer {
         LivingEntityPredicate.LOADER.register(getResource("is_in_powdered_snow"), LivingEntityPredicate.IS_IN_POWDERED_SNOW.getLoader());
         LivingEntityPredicate.LOADER.register(getResource("on_ground"), LivingEntityPredicate.ON_GROUND.getLoader());
         LivingEntityPredicate.LOADER.register(getResource("crouching"), LivingEntityPredicate.CROUCHING.getLoader());
+        LivingEntityPredicate.LOADER.register(getResource("sprinting"), LivingEntityPredicate.SPRINTING.getLoader());
+        LivingEntityPredicate.LOADER.register(getResource("has_effect"), HasMobEffectPredicate.LOADER);
+        LivingEntityPredicate.LOADER.register(getResource("block_at_entity"), BlockAtEntityPredicate.LOADER);
         LivingEntityPredicate.LOADER.register(getResource("eyes_in_water"), LivingEntityPredicate.EYES_IN_WATER.getLoader());
         LivingEntityPredicate.LOADER.register(getResource("feet_in_water"), LivingEntityPredicate.FEET_IN_WATER.getLoader());
         LivingEntityPredicate.LOADER.register(getResource("underwater"), LivingEntityPredicate.UNDERWATER.getLoader());
@@ -183,7 +198,12 @@ public class Mantle implements ModInitializer {
         adapter.register(MantleHangingSignBlockEntity::new, signs, "hanging_sign");
       }
     }
-    else if (key == ForgeRegistries.Keys.GLOBAL_LOOT_MODIFIER_SERIALIZERS) {
+    else if (key == Registries.COMMAND_ARGUMENT_TYPE) {
+      ResourceOrTagKeyArgument.Info<?> info = new ResourceOrTagKeyArgument.Info<>();
+      ForgeRegistries.COMMAND_ARGUMENT_TYPES.register(getResource("resource_or_tag_key"), info);
+      ArgumentTypeInfos.registerByClass(RegistrationHelper.genericArgumentType(ResourceOrTagKeyArgument.class), info);
+    }
+    else {
       MantleLoot.registerGlobalLootModifiers(event);
     }
   }
@@ -193,7 +213,12 @@ public class Mantle implements ModInitializer {
     boolean server = event.includeServer();
     boolean client = event.includeClient();
     PackOutput packOutput = generator.getPackOutput();
-    generator.addProvider(server, new MantleFluidTagProvider(packOutput, event.getLookupProvider(), event.getExistingFileHelper()));
+    CompletableFuture<HolderLookup.Provider> lookupProvider = event.getLookupProvider();
+    ExistingFileHelper existingFileHelper = event.getExistingFileHelper();
+    generator.addProvider(server, new MantleBlockTagProvider(packOutput, lookupProvider, existingFileHelper));
+    generator.addProvider(server, new MantleFluidTagProvider(packOutput, lookupProvider, existingFileHelper));
+    generator.addProvider(server, new MantleMenuTagProvider(packOutput, lookupProvider, existingFileHelper));
+    generator.addProvider(server, new MantleFluidTransferProvider(packOutput));
     generator.addProvider(client, new MantleFluidTooltipProvider(packOutput));
   }
 
@@ -233,5 +258,16 @@ public class Mantle implements ModInitializer {
    */
   public static MutableComponent makeComponent(String base, String name) {
     return Component.translatable(makeDescriptionId(base, name));
+  }
+
+  /**
+   * Makes a translation text component for the given name
+   * @param base  Base name, such as "block" or "gui"
+   * @param name  Object name
+   * @param args  Additional arguments to format strings
+   * @return  Translation key
+   */
+  public static MutableComponent makeComponent(String base, String name, Object... args) {
+    return Component.translatable(makeDescriptionId(base, name), args);
   }
 }

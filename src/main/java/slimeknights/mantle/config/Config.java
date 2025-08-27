@@ -1,8 +1,9 @@
 package slimeknights.mantle.config;
 
 import io.github.fabricators_of_create.porting_lib.config.ModConfigSpec;
-import io.github.fabricators_of_create.porting_lib.config.ModConfigSpec.BooleanValue;
 import io.github.fabricators_of_create.porting_lib.config.ModConfigSpec.ConfigValue;
+import io.github.fabricators_of_create.porting_lib.config.ModConfigSpec.EnumValue;
+import org.jetbrains.annotations.ApiStatus.Internal;
 import io.github.fabricators_of_create.porting_lib.config.ModConfigSpec.EnumValue;
 import io.github.fabricators_of_create.porting_lib.util.FluidUnit;
 
@@ -12,14 +13,19 @@ import java.util.List;
 /**
  * Base class for all Mantle specific config options
  */
+@Internal
 public class Config {
-	/** If true, enables the heart renderer */
-	public static final BooleanValue EXTRA_HEART_RENDERER;
+  public enum HeartRenderer {
+    DISABLE, NO_MAX, WITH_MAX
+  }
+
+	/** Heart renderer mode */
+  public static final EnumValue<HeartRenderer> HEART_RENDERER;
 
   public static final EnumValue<FluidUnit> FLUID_UNIT;
 
 	/** List of preferences for tag outputs */
-	private static final List<String> DEFAULT_TAG_PREFERENCES = Arrays.asList("minecraft", "tconstruct", "tmechworks", "create", "immersiveengineering", "mekanism", "thermal");
+	private static final List<String> DEFAULT_TAG_PREFERENCES = Arrays.asList("minecraft", "tconstruct", "tmechworks", "metalborn", "embers", "create", "immersiveengineering", "mekanism", "thermal");
 	public static final ConfigValue<List<? extends String>> TAG_PREFERENCES;
 
 	public static final ModConfigSpec CLIENT_SPEC, SERVER_SPEC;
@@ -29,12 +35,14 @@ public class Config {
     ModConfigSpec.Builder server = new ModConfigSpec.Builder();
 
 		// client options
-		EXTRA_HEART_RENDERER = client
+    HEART_RENDERER = client
       .comment(
-        "If true, enables the Mantle heart renderer, which stacks hearts by changing the color instead of vertically stacking them.",
+        "If not DISABLE, enables the Mantle heart renderer, which stacks hearts by changing the color instead of vertically stacking them.",
+        "WITH_MAX will show the max health in colored containers behind the health bar. NO_MAX will show just the health bar",
+        "If DISABLE, uses the Forge heart renderer.",
         "Mod authors: this config is not meant for compatibility with your heart renderer, cancel the RenderGameOverlayEvent.Pre event and our logic won't run")
       .translation("config.mantle.extraHeartRenderer")
-      .define("extraHeartRenderer", true);
+      .defineEnum("heartRenderer", HeartRenderer.WITH_MAX);
 
     FLUID_UNIT = client
       .comment("Determines what Fluid Unit should be used to display fluids.")

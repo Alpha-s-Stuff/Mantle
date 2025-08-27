@@ -17,6 +17,15 @@ public record EnumLoadable<E extends Enum<E>>(Class<E> enumClass, E[] allowedVal
     this(enumClass, enumClass.getEnumConstants());
   }
 
+  /** Creates a loadable from the given list of values */
+  @SafeVarargs
+  public static <E extends Enum<E>> EnumLoadable<E> of(E... values) {
+    if (values.length == 0) {
+      throw new IllegalArgumentException("Must have at least 1 value for an enum loadable");
+    }
+    return new EnumLoadable<>(values[0].getDeclaringClass(), values);
+  }
+
   @Override
   public E parseString(String name, String key, TypedMap context) {
     for (E value : allowedValues) {

@@ -36,6 +36,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 
 /** Handles fluid units displaying in tooltips */
@@ -147,7 +148,7 @@ public class FluidTooltipHandler extends SimpleJsonResourceReloadListener implem
   }
 
   /** Gets the unit list for the given fluid */
-  private FluidUnitList getUnitList(Fluid fluid) {
+  public FluidUnitList getUnitList(Fluid fluid) {
     FluidUnitList cached = listCache.get(fluid);
     if (cached != null) {
       return cached;
@@ -179,6 +180,23 @@ public class FluidTooltipHandler extends SimpleJsonResourceReloadListener implem
     return getFluidTooltip(fluid, fluid.getAmount());
   }
 
+  /** Appends the ID in advanced tooltips */
+  public static void appendAdvanced(ResourceLocation id, List<Component> tooltip) {
+    if (SafeClientAccess.isAdvancedTooltip()) {
+      tooltip.add(Component.literal(id.toString()).withStyle(ChatFormatting.DARK_GRAY));
+    }
+  }
+
+  /** Gets the mod name for display in the tooltip */
+  public static <T> Component formatModName(ResourceLocation key) {
+    String name = key.getNamespace();
+    Optional<? extends ModContainer> mod = ModList.get().getModContainerById(name);
+    if (mod.isPresent()) {
+      name = mod.get().getModInfo().getDisplayName();
+    }
+    return Component.literal(name).withStyle(ChatFormatting.BLUE, ChatFormatting.ITALIC);
+  }
+
   /**
    * Gets the tooltip for a fluid stack
    * @param fluid  Fluid stack instance
@@ -188,14 +206,15 @@ public class FluidTooltipHandler extends SimpleJsonResourceReloadListener implem
   @SuppressWarnings("deprecation")
   public static List<Component> getFluidTooltip(FluidStack fluid, long amount) {
     List<Component> tooltip = new ArrayList<>();
+    ResourceLocation key = BuiltInRegistries.FLUID.getKey(fluid.getFluid());
     // fluid name, not sure if there is a cleaner way to do this
-    tooltip.add(fluid.getDisplayName().plainCopy().withStyle(ChatFormatting.WHITE));
+    tooltip.add(fluid.getDisplayName());
+    // add ID if advanced
+    appendAdvanced(key, tooltip);
     // material
     appendMaterial(fluid.getFluid(), amount, tooltip);
     // add mod display name
-    FabricLoader.getInstance().getModContainer(Objects.requireNonNull(BuiltInRegistries.FLUID.getKey(fluid.getFluid())).getNamespace())
-           .map(container -> container.getMetadata().getName())
-           .ifPresent(name -> tooltip.add(Component.literal(name).withStyle(ChatFormatting.BLUE, ChatFormatting.ITALIC)));
+    tooltip.add(formatModName(key));
     return tooltip;
   }
 
@@ -221,6 +240,21 @@ public class FluidTooltipHandler extends SimpleJsonResourceReloadListener implem
   }
 
   /**
+   * Adds fluid speciifc tooltip information, ignoring the tooltip key
+   * @param fluid      Input fluid
+   * @param original   Input amount
+   * @param tooltip    Tooltip to append information
+   * @return  True if the amount is not in buckets
+   */
+  public static boolean appendMaterialNoFallback(Fluid fluid, int original, List<Component> tooltip) {
+    int amount = original;
+    FluidUnitList unitList = INSTANCE.getUnitList(fluid);
+    amount = unitList.getText(tooltip, amount);
+    MILLIBUCKET.getText(tooltip, amount);
+    return unitList != INSTANCE.fallback;
+  }
+
+  /**
    * Adds information for the tooltip based on material units, does not show "hold shift for buckets"
    * @param fluid      Input fluid
    * @param original   Input amount
@@ -230,10 +264,7 @@ public class FluidTooltipHandler extends SimpleJsonResourceReloadListener implem
   public static boolean appendMaterialNoShift(Fluid fluid, long original, List<Component> tooltip) {
     // if holding shift, skip specific units
     if (SafeClientAccess.getTooltipKey() != TooltipKey.SHIFT) {
-      long amount = original;
-      amount = INSTANCE.getUnitList(fluid).getText(tooltip, amount);
-      MILLIBUCKET.getText(tooltip, amount);
-      return INSTANCE.listCache.get(fluid) != INSTANCE.fallback;
+      return appendMaterialNoFallback(fluid, original, tooltip);
     } else {
       // standard display stuff: bucket amounts
       appendBuckets(original, tooltip);

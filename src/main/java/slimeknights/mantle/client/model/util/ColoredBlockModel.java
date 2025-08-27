@@ -39,6 +39,7 @@ import slimeknights.mantle.util.LogicHelper;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.function.Function;
 
 import static net.minecraft.client.renderer.block.model.BlockModel.FACE_BAKERY;
@@ -85,8 +86,8 @@ public class ColoredBlockModel extends SimpleBlockModel {
    * @param location         Model location
    */
   public static void bakePart(Builder builder, IGeometryBakingContext owner, BlockElement part, int emissivity, Function<Material,TextureAtlasSprite> spriteGetter, Transformation transform, IQuadTransformer quadTransformer, boolean uvlock, ResourceLocation location) {
-    for (Direction direction : part.faces.keySet()) {
-      BlockElementFace face = part.faces.get(direction);
+    for (Entry<Direction, BlockElementFace> entry : part.faces.entrySet()) {
+      BlockElementFace face = entry.getValue();
       // ensure the name is not prefixed (it always is)
       String texture = face.texture;
       if (texture.charAt(0) == '#') {
@@ -94,7 +95,7 @@ public class ColoredBlockModel extends SimpleBlockModel {
       }
       // bake the face with the extra colors
       TextureAtlasSprite sprite = spriteGetter.apply(owner.getMaterial(texture));
-      BakedQuad quad = bakeFace(part, face, sprite, direction, transform, uvlock, emissivity, location);
+      BakedQuad quad = bakeFace(part, face, sprite, entry.getKey(), transform, uvlock, emissivity, location);
       quadTransformer.processInPlace(quad);
       // apply cull face
       //noinspection ConstantConditions  the annotation is a liar

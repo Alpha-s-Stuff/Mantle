@@ -326,7 +326,8 @@ public class SimpleBlockModel implements IUnbakedGeometry<SimpleBlockModel> {
   public static List<BlockElement> getModelElements(JsonDeserializationContext context, JsonElement element, String name) {
     // if just one element, array is optional
     if (element.isJsonObject()) {
-      return List.of(context.deserialize(element.getAsJsonObject(), BlockElement.class));
+      // cast ensures we call List.of(BlockElement) instead of List.of(BlockElement[]) as the type is vague
+      return List.of((BlockElement)context.deserialize(element.getAsJsonObject(), BlockElement.class));
     }
     // if an array, get array of elements
     if (element.isJsonArray()) {

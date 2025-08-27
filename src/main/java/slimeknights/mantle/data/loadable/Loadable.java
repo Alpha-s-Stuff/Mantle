@@ -174,6 +174,7 @@ public interface Loadable<T> extends JsonDeserializer<T>, JsonSerializer<T>, Str
     return array(constructor, allowNull, minSize, Integer.MAX_VALUE);
   }
 
+  // TODO 1.21: switch return type to ArrayLoadable
   /** Makes a list of this loadable */
   default Loadable<List<T>> list(int minSize) {
     return new ListLoadable<>(this, minSize);
@@ -200,7 +201,7 @@ public interface Loadable<T> extends JsonDeserializer<T>, JsonSerializer<T>, Str
   }
 
   /** Makes a map from this loadable with this as keys using the getter to determine map values */
-  default  <V> Loadable<Map<T,V>> mapWithValues(int minSize, Function<T,V> valueGetter) {
+  default <V> Loadable<Map<T,V>> mapWithValues(int minSize, Function<T,V> valueGetter) {
     return AnyCollectionLoadable.setBacked(this, minSize).mapWithValues(valueGetter);
   }
 

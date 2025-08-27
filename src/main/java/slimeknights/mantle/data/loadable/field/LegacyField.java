@@ -3,6 +3,7 @@ package slimeknights.mantle.data.loadable.field;
 import com.google.gson.JsonObject;
 import net.minecraft.network.FriendlyByteBuf;
 import slimeknights.mantle.Mantle;
+import slimeknights.mantle.data.loadable.LegacyLoadable;
 import slimeknights.mantle.util.typed.TypedMap;
 
 /**
@@ -26,9 +27,7 @@ public record LegacyField<T,P>(LoadableField<T,P> base, String fallback) impleme
   public T get(JsonObject json, String key, TypedMap context) {
     // prioritize loading from the main key, but use the fallback if main is absent
     if (json.has(fallback) && !json.has(key)) {
-      String debug = context.get(ContextKey.DEBUG);
-      debug = debug != null ? " while parsing " + debug : "";
-      Mantle.logger.warn("Using deprecated JSON key '{}'{}, switch to current name of '{}'", fallback, debug, key);
+      Mantle.logger.warn("Using deprecated JSON key '{}'{}, switch to current name of '{}'", fallback, LegacyLoadable.whileParsing(context), key);
       return base.get(json, fallback, context);
     }
     // if the fallback is missing, we may still be missing main, up to the base field to figure out

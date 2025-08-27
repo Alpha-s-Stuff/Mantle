@@ -28,7 +28,7 @@ public interface DamageSourcePredicate extends IJsonPredicate<DamageSource> {
   /** Damage that is caused by an entity */
   DamageSourcePredicate HAS_ENTITY = simple(source -> source.getEntity() != null);
   /** Damage that protection works against */
-  DamageSourcePredicate CAN_PROTECT = simple(source -> !source.is(DamageTypeTags.BYPASSES_ENCHANTMENTS) && !source.is(DamageTypeTags.BYPASSES_INVULNERABILITY));
+  DamageSourcePredicate CAN_PROTECT = simple(source -> !source.is(DamageTypeTags.BYPASSES_EFFECTS) && !source.is(DamageTypeTags.BYPASSES_ENCHANTMENTS) && !source.is(DamageTypeTags.BYPASSES_INVULNERABILITY));
 
   @Override
   default IJsonPredicate<DamageSource> inverted() {

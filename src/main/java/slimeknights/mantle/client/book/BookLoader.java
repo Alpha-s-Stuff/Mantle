@@ -43,6 +43,7 @@ import slimeknights.mantle.client.book.transformer.IndexTransformer;
 import slimeknights.mantle.data.gson.ResourceLocationSerializer;
 import slimeknights.mantle.network.MantleNetwork;
 import slimeknights.mantle.network.packet.UpdateHeldPagePacket;
+import slimeknights.mantle.network.packet.UpdateInventoryPagePacket;
 import slimeknights.mantle.network.packet.UpdateLecternPagePacket;
 
 import javax.annotation.Nullable;
@@ -196,6 +197,22 @@ public class BookLoader implements SimpleSynchronousResourceReloadListener {
       if (!item.isEmpty()) {
         BookHelper.writeSavedPageToBook(item, page);
         MantleNetwork.INSTANCE.network.sendToServer(new UpdateHeldPagePacket(hand, page));
+      }
+    }
+  }
+
+  /**
+   * Updates the saved page of a held book
+   * @param player  Player instance
+   * @param slot    Player inventory slot index
+   * @param page    New page
+   */
+  public static void updateSavedPage(@Nullable Player player, int slot, String page) {
+    if (player != null && slot >= 0) {
+      ItemStack item = player.getInventory().getItem(slot);
+      if (!item.isEmpty()) {
+        BookHelper.writeSavedPageToBook(item, page);
+        MantleNetwork.INSTANCE.network.sendToServer(new UpdateInventoryPagePacket(slot, page));
       }
     }
   }

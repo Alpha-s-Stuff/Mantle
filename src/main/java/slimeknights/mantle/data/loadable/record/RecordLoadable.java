@@ -513,4 +513,373 @@ public interface RecordLoadable<T> extends Loadable<T> {
       constructor
     );
   }
+
+
+  /* Helpers to create the final loadable with the loader as an argument */
+
+  /** Creates a loadable with 1 parameters including the loader */
+  static <R> RecordLoadable<R> withLoader(
+    Function<RecordLoadable<R>,R> constructor) {
+    return new SingletonLoader<>(constructor);
+  }
+
+  /** Creates a loadable with 2 parameters including the loader */
+  static <A,R> RecordLoadable<R> withLoader(
+    RecordField<A,? super R> fieldA,
+    BiFunction<A,RecordLoadable<R>,R> constructor) {
+    return new RecordWithLoader1<>(
+      fieldA,
+      constructor
+    );
+  }
+
+  /** Creates a loadable with 3 parameters including the loader */
+  static <A,B,R> RecordLoadable<R> withLoader(
+    RecordField<A,? super R> fieldA,
+    RecordField<B,? super R> fieldB,
+    Function3<A,B,RecordLoadable<R>,R> constructor) {
+    return new RecordWithLoader2<>(
+      fieldA,
+      fieldB,
+      constructor
+    );
+  }
+
+  /** Creates a loadable with 4 parameters including the loader */
+  static <A,B,C,R> RecordLoadable<R> withLoader(
+    RecordField<A,? super R> fieldA,
+    RecordField<B,? super R> fieldB,
+    RecordField<C,? super R> fieldC,
+    Function4<A,B,C,RecordLoadable<R>,R> constructor) {
+    return new RecordWithLoader3<>(
+      fieldA,
+      fieldB,
+      fieldC,
+      constructor
+    );
+  }
+
+  /** Creates a loadable with 5 parameters including the loader */
+  static <A,B,C,D,R> RecordLoadable<R> withLoader(
+    RecordField<A,? super R> fieldA,
+    RecordField<B,? super R> fieldB,
+    RecordField<C,? super R> fieldC,
+    RecordField<D,? super R> fieldD,
+    Function5<A,B,C,D,RecordLoadable<R>,R> constructor) {
+    return new RecordWithLoader4<>(
+      fieldA,
+      fieldB,
+      fieldC,
+      fieldD,
+      constructor
+    );
+  }
+
+  /** Creates a loadable with 6 parameters including the loader */
+  static <A,B,C,D,E,R> RecordLoadable<R> withLoader(
+    RecordField<A,? super R> fieldA,
+    RecordField<B,? super R> fieldB,
+    RecordField<C,? super R> fieldC,
+    RecordField<D,? super R> fieldD,
+    RecordField<E,? super R> fieldE,
+    Function6<A,B,C,D,E,RecordLoadable<R>,R> constructor) {
+    return new RecordWithLoader5<>(
+      fieldA,
+      fieldB,
+      fieldC,
+      fieldD,
+      fieldE,
+      constructor
+    );
+  }
+
+  /** Creates a loadable with 7 parameters including the loader */
+  static <A,B,C,D,E,F,R> RecordLoadable<R> withLoader(
+    RecordField<A,? super R> fieldA,
+    RecordField<B,? super R> fieldB,
+    RecordField<C,? super R> fieldC,
+    RecordField<D,? super R> fieldD,
+    RecordField<E,? super R> fieldE,
+    RecordField<F,? super R> fieldF,
+    Function7<A,B,C,D,E,F,RecordLoadable<R>,R> constructor) {
+    return new RecordWithLoader6<>(
+      fieldA,
+      fieldB,
+      fieldC,
+      fieldD,
+      fieldE,
+      fieldF,
+      constructor
+    );
+  }
+
+  /** Creates a loadable with 8 parameters including the loader */
+  static <A,B,C,D,E,F,G,R> RecordLoadable<R> withLoader(
+    RecordField<A,? super R> fieldA,
+    RecordField<B,? super R> fieldB,
+    RecordField<C,? super R> fieldC,
+    RecordField<D,? super R> fieldD,
+    RecordField<E,? super R> fieldE,
+    RecordField<F,? super R> fieldF,
+    RecordField<G,? super R> fieldG,
+    Function8<A,B,C,D,E,F,G,RecordLoadable<R>,R> constructor) {
+    return new RecordWithLoader7<>(
+      fieldA,
+      fieldB,
+      fieldC,
+      fieldD,
+      fieldE,
+      fieldF,
+      fieldG,
+      constructor
+    );
+  }
+
+  /** Creates a loadable with 9 parameters including the loader */
+  static <A,B,C,D,E,F,G,H,R> RecordLoadable<R> withLoader(
+    RecordField<A,? super R> fieldA,
+    RecordField<B,? super R> fieldB,
+    RecordField<C,? super R> fieldC,
+    RecordField<D,? super R> fieldD,
+    RecordField<E,? super R> fieldE,
+    RecordField<F,? super R> fieldF,
+    RecordField<G,? super R> fieldG,
+    RecordField<H,? super R> fieldH,
+    Function9<A,B,C,D,E,F,G,H,RecordLoadable<R>,R> constructor) {
+    return new RecordWithLoader8<>(
+      fieldA,
+      fieldB,
+      fieldC,
+      fieldD,
+      fieldE,
+      fieldF,
+      fieldG,
+      fieldH,
+      constructor
+    );
+  }
+
+  /** Creates a loadable with 10 parameters including the loader */
+  static <A,B,C,D,E,F,G,H,I,R> RecordLoadable<R> withLoader(
+    RecordField<A,? super R> fieldA,
+    RecordField<B,? super R> fieldB,
+    RecordField<C,? super R> fieldC,
+    RecordField<D,? super R> fieldD,
+    RecordField<E,? super R> fieldE,
+    RecordField<F,? super R> fieldF,
+    RecordField<G,? super R> fieldG,
+    RecordField<H,? super R> fieldH,
+    RecordField<I,? super R> fieldI,
+    Function10<A,B,C,D,E,F,G,H,I,RecordLoadable<R>,R> constructor) {
+    return new RecordWithLoader9<>(
+      fieldA,
+      fieldB,
+      fieldC,
+      fieldD,
+      fieldE,
+      fieldF,
+      fieldG,
+      fieldH,
+      fieldI,
+      constructor
+    );
+  }
+
+  /** Creates a loadable with 11 parameters including the loader */
+  static <A,B,C,D,E,F,G,H,I,J,R> RecordLoadable<R> withLoader(
+    RecordField<A,? super R> fieldA,
+    RecordField<B,? super R> fieldB,
+    RecordField<C,? super R> fieldC,
+    RecordField<D,? super R> fieldD,
+    RecordField<E,? super R> fieldE,
+    RecordField<F,? super R> fieldF,
+    RecordField<G,? super R> fieldG,
+    RecordField<H,? super R> fieldH,
+    RecordField<I,? super R> fieldI,
+    RecordField<J,? super R> fieldJ,
+    Function11<A,B,C,D,E,F,G,H,I,J,RecordLoadable<R>,R> constructor) {
+    return new RecordWithLoader10<>(
+      fieldA,
+      fieldB,
+      fieldC,
+      fieldD,
+      fieldE,
+      fieldF,
+      fieldG,
+      fieldH,
+      fieldI,
+      fieldJ,
+      constructor
+    );
+  }
+
+  /** Creates a loadable with 12 parameters including the loader */
+  static <A,B,C,D,E,F,G,H,I,J,K,R> RecordLoadable<R> withLoader(
+    RecordField<A,? super R> fieldA,
+    RecordField<B,? super R> fieldB,
+    RecordField<C,? super R> fieldC,
+    RecordField<D,? super R> fieldD,
+    RecordField<E,? super R> fieldE,
+    RecordField<F,? super R> fieldF,
+    RecordField<G,? super R> fieldG,
+    RecordField<H,? super R> fieldH,
+    RecordField<I,? super R> fieldI,
+    RecordField<J,? super R> fieldJ,
+    RecordField<K,? super R> fieldK,
+    Function12<A,B,C,D,E,F,G,H,I,J,K,RecordLoadable<R>,R> constructor) {
+    return new RecordWithLoader11<>(
+      fieldA,
+      fieldB,
+      fieldC,
+      fieldD,
+      fieldE,
+      fieldF,
+      fieldG,
+      fieldH,
+      fieldI,
+      fieldJ,
+      fieldK,
+      constructor
+    );
+  }
+
+  /** Creates a loadable with 13 parameters including the loader */
+  static <A,B,C,D,E,F,G,H,I,J,K,L,R> RecordLoadable<R> withLoader(
+    RecordField<A,? super R> fieldA,
+    RecordField<B,? super R> fieldB,
+    RecordField<C,? super R> fieldC,
+    RecordField<D,? super R> fieldD,
+    RecordField<E,? super R> fieldE,
+    RecordField<F,? super R> fieldF,
+    RecordField<G,? super R> fieldG,
+    RecordField<H,? super R> fieldH,
+    RecordField<I,? super R> fieldI,
+    RecordField<J,? super R> fieldJ,
+    RecordField<K,? super R> fieldK,
+    RecordField<L,? super R> fieldL,
+    Function13<A,B,C,D,E,F,G,H,I,J,K,L,RecordLoadable<R>,R> constructor) {
+    return new RecordWithLoader12<>(
+      fieldA,
+      fieldB,
+      fieldC,
+      fieldD,
+      fieldE,
+      fieldF,
+      fieldG,
+      fieldH,
+      fieldI,
+      fieldJ,
+      fieldK,
+      fieldL,
+      constructor
+    );
+  }
+
+  /** Creates a loadable with 14 parameters including the loader */
+  static <A,B,C,D,E,F,G,H,I,J,K,L,M,R> RecordLoadable<R> withLoader(
+    RecordField<A,? super R> fieldA,
+    RecordField<B,? super R> fieldB,
+    RecordField<C,? super R> fieldC,
+    RecordField<D,? super R> fieldD,
+    RecordField<E,? super R> fieldE,
+    RecordField<F,? super R> fieldF,
+    RecordField<G,? super R> fieldG,
+    RecordField<H,? super R> fieldH,
+    RecordField<I,? super R> fieldI,
+    RecordField<J,? super R> fieldJ,
+    RecordField<K,? super R> fieldK,
+    RecordField<L,? super R> fieldL,
+    RecordField<M,? super R> fieldM,
+    Function14<A,B,C,D,E,F,G,H,I,J,K,L,M,RecordLoadable<R>,R> constructor) {
+    return new RecordWithLoader13<>(
+      fieldA,
+      fieldB,
+      fieldC,
+      fieldD,
+      fieldE,
+      fieldF,
+      fieldG,
+      fieldH,
+      fieldI,
+      fieldJ,
+      fieldK,
+      fieldL,
+      fieldM,
+      constructor
+    );
+  }
+
+  /** Creates a loadable with 15 parameters including the loader */
+  static <A,B,C,D,E,F,G,H,I,J,K,L,M,N,R> RecordLoadable<R> withLoader(
+    RecordField<A,? super R> fieldA,
+    RecordField<B,? super R> fieldB,
+    RecordField<C,? super R> fieldC,
+    RecordField<D,? super R> fieldD,
+    RecordField<E,? super R> fieldE,
+    RecordField<F,? super R> fieldF,
+    RecordField<G,? super R> fieldG,
+    RecordField<H,? super R> fieldH,
+    RecordField<I,? super R> fieldI,
+    RecordField<J,? super R> fieldJ,
+    RecordField<K,? super R> fieldK,
+    RecordField<L,? super R> fieldL,
+    RecordField<M,? super R> fieldM,
+    RecordField<N,? super R> fieldN,
+    Function15<A,B,C,D,E,F,G,H,I,J,K,L,M,N,RecordLoadable<R>,R> constructor) {
+    return new RecordWithLoader14<>(
+      fieldA,
+      fieldB,
+      fieldC,
+      fieldD,
+      fieldE,
+      fieldF,
+      fieldG,
+      fieldH,
+      fieldI,
+      fieldJ,
+      fieldK,
+      fieldL,
+      fieldM,
+      fieldN,
+      constructor
+    );
+  }
+
+  /** Creates a loadable with 16 parameters including the loader */
+  static <A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,R> RecordLoadable<R> withLoader(
+    RecordField<A,? super R> fieldA,
+    RecordField<B,? super R> fieldB,
+    RecordField<C,? super R> fieldC,
+    RecordField<D,? super R> fieldD,
+    RecordField<E,? super R> fieldE,
+    RecordField<F,? super R> fieldF,
+    RecordField<G,? super R> fieldG,
+    RecordField<H,? super R> fieldH,
+    RecordField<I,? super R> fieldI,
+    RecordField<J,? super R> fieldJ,
+    RecordField<K,? super R> fieldK,
+    RecordField<L,? super R> fieldL,
+    RecordField<M,? super R> fieldM,
+    RecordField<N,? super R> fieldN,
+    RecordField<O,? super R> fieldO,
+    Function16<A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,RecordLoadable<R>,R> constructor) {
+    return new RecordWithLoader15<>(
+      fieldA,
+      fieldB,
+      fieldC,
+      fieldD,
+      fieldE,
+      fieldF,
+      fieldG,
+      fieldH,
+      fieldI,
+      fieldJ,
+      fieldK,
+      fieldL,
+      fieldM,
+      fieldN,
+      fieldO,
+      constructor
+    );
+  }
 }

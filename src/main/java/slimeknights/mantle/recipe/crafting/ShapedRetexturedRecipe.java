@@ -3,7 +3,6 @@ package slimeknights.mantle.recipe.crafting;
 import com.google.gson.JsonObject;
 import lombok.Getter;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.CraftingContainer;
@@ -12,10 +11,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.ShapedRecipe;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
-import slimeknights.mantle.item.RetexturedBlockItem;
-import slimeknights.mantle.recipe.MantleRecipeSerializers;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraftforge.common.crafting.CraftingHelper;
+import slimeknights.mantle.recipe.MantleRecipes;
 import slimeknights.mantle.recipe.helper.LoggingRecipeSerializer;
 import slimeknights.mantle.util.JsonHelper;
 import slimeknights.mantle.util.RetexturedHelper;
@@ -94,14 +93,14 @@ public class ShapedRetexturedRecipe extends ShapedRecipe {
 
   @Override
   public RecipeSerializer<?> getSerializer() {
-    return MantleRecipeSerializers.CRAFTING_SHAPED_RETEXTURED;
+    return MantleRecipes.CRAFTING_SHAPED_RETEXTURED.get();
   }
 
   public static class Serializer implements LoggingRecipeSerializer<ShapedRetexturedRecipe> {
     @Override
     public ShapedRetexturedRecipe fromJson(ResourceLocation recipeId, JsonObject json) {
       ShapedRecipe recipe = SHAPED_RECIPE.fromJson(recipeId, json);
-      Ingredient texture = Ingredient.fromJson(JsonHelper.getElement(json, "texture"), false);
+      Ingredient texture = CraftingHelper.getIngredient(JsonHelper.getElement(json, "texture"), false);
       boolean matchAll = false;
       if (json.has("match_all")) {
         matchAll = json.get("match_all").getAsBoolean();

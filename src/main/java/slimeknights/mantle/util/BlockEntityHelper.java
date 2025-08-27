@@ -1,7 +1,5 @@
 package slimeknights.mantle.util;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -18,8 +16,9 @@ import java.util.Optional;
  * Utilities to help in handling of tile entities
  */
 @SuppressWarnings("WeakerAccess")
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class BlockEntityHelper {
+  private BlockEntityHelper() {}
+
   /**
    * Gets a tile entity if present and the right type
    * @param clazz  Tile entity class
@@ -27,7 +26,9 @@ public class BlockEntityHelper {
    * @param pos    Tile entity position
    * @param <T>    Tile entity type
    * @return  Optional of the tile entity, empty if missing or wrong class
+   * @deprecated use pattern matching instanceof with {@link Level#getBlockEntity(BlockPos)}
    */
+  @Deprecated
   public static <T> Optional<T> get(Class<T> clazz, @Nullable BlockGetter world, BlockPos pos) {
     return get(clazz, world, pos, false);
   }
@@ -40,7 +41,9 @@ public class BlockEntityHelper {
    * @param logWrongType  If true, logs a warning if the type is wrong
    * @param <T>    Tile entity type
    * @return  Optional of the tile entity, empty if missing or wrong class
+   * @deprecated use pattern matching instanceof with {@link Level#getBlockEntity(BlockPos)}
    */
+  @Deprecated
   public static <T> Optional<T> get(Class<T> clazz, @Nullable BlockGetter world, BlockPos pos, boolean logWrongType) {
     if (!isBlockLoaded(world, pos)) {
       return Optional.empty();

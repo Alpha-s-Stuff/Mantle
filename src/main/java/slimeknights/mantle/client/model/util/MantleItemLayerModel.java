@@ -428,7 +428,7 @@ public class MantleItemLayerModel implements IUnbakedGeometry<MantleItemLayerMod
    * @param color        Color for the sprite in AARRGGBB format
    * @param luminosity Extra light to add to the quad between 0 and 15
    */
-  protected static void buildQuad(QuadBakingVertexConsumer builder, VertexConsumer consumer, Direction side, int color, int luminosity,
+  public static void buildQuad(QuadBakingVertexConsumer builder, VertexConsumer consumer, Direction side, int color, int luminosity,
                                      float x0, float y0, float z0, float u0, float v0,
                                      float x1, float y1, float z1, float u1, float v1,
                                      float x2, float y2, float z2, float u2, float v2,
@@ -494,7 +494,7 @@ public class MantleItemLayerModel implements IUnbakedGeometry<MantleItemLayerMod
    * Class holding details about a single layer in the model
    */
   public record LayerData(int color, int luminosity, boolean noTint, @Nullable ResourceLocation renderType) {
-    private static final LayerData DEFAULT = new LayerData(-1, 0, false, null);
+    public static final LayerData DEFAULT = new LayerData(-1, 0, false, null);
     public static final RecordLoadable<LayerData> LOADABLE = RecordLoadable.create(
       ColorLoadable.ALPHA.defaultField("color", false, LayerData::color),
       // TODO: rename this field?
@@ -529,6 +529,6 @@ public class MantleItemLayerModel implements IUnbakedGeometry<MantleItemLayerMod
 
   /** Deserializes this model from JSON */
   public static MantleItemLayerModel deserialize(JsonObject json, JsonDeserializationContext context) {
-    return new MantleItemLayerModel(LayerData.LIST_LOADABLE.getIfPresent(json, "layers"));
+    return new MantleItemLayerModel(LayerData.LIST_LOADABLE.getOrDefault(json, "layers", List.of()));
   }
 }

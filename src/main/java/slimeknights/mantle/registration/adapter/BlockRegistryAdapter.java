@@ -34,6 +34,7 @@ import slimeknights.mantle.block.StrippableLogBlock;
 import slimeknights.mantle.block.entity.MantleHangingSignBlockEntity;
 import slimeknights.mantle.block.entity.MantleSignBlockEntity;
 import slimeknights.mantle.registration.RegistrationHelper;
+import slimeknights.mantle.registration.deferred.FluidDeferredRegister;
 import slimeknights.mantle.registration.object.BuildingBlockObject;
 import slimeknights.mantle.registration.object.FenceBuildingBlockObject;
 import slimeknights.mantle.registration.object.WallBuildingBlockObject;
@@ -177,8 +178,6 @@ public class BlockRegistryAdapter extends EnumRegistryAdapter<Block> {
    * @return  Fluid block instance
    */
   public LiquidBlock registerFluidBlock(Supplier<? extends ForgeFlowingFluid> fluid, MapColor color, int lightLevel, String name) {
-    return register(
-        new LiquidBlock(fluid, BlockBehaviour.Properties.of().mapColor(color).noCollission().strength(100.0F).noLootTable().lightLevel((state) -> lightLevel)),
-        name + "_fluid");
+    return register(new LiquidBlock(fluid, FluidDeferredRegister.createProperties(color, lightLevel)), name + "_fluid");
   }
 }

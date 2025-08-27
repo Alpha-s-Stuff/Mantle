@@ -5,7 +5,6 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.ButtonBlock;
 import net.minecraft.world.level.block.CeilingHangingSignBlock;
@@ -19,7 +18,6 @@ import net.minecraft.world.level.block.WallHangingSignBlock;
 import net.minecraft.world.level.block.WallSignBlock;
 import net.minecraft.world.level.block.state.properties.WoodType;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -179,7 +177,7 @@ public class WoodBlockObject extends FenceBuildingBlockObject {
 
   @Override
   public List<Block> values() {
-    return Arrays.asList(
+    return List.of(
       get(), getSlab(), getStairs(), getFence(),
       getLog(), getStrippedLog(), getWood(), getStrippedWood(),
       getFenceGate(), getDoor(), getTrapdoor(),
@@ -188,7 +186,7 @@ public class WoodBlockObject extends FenceBuildingBlockObject {
   }
 
   @Override
-  public void forEach(Consumer<ItemLike> consumer) {
+  public void forEach(Consumer<? super Block> consumer) {
     super.forEach(consumer);
     consumer.accept(getFenceGate());
     consumer.accept(getLog());

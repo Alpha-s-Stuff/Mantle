@@ -1,7 +1,5 @@
 package slimeknights.mantle.network;
 
-import io.github.fabricators_of_create.porting_lib.util.NetworkDirection;
-import me.pepperbell.simplenetworking.S2CPacket;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
@@ -11,14 +9,18 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.chunk.LevelChunk;
-
-import me.pepperbell.simplenetworking.SimpleChannel;
+import net.minecraftforge.common.util.FakePlayer;
+import net.minecraftforge.network.NetworkDirection;
+import net.minecraftforge.network.NetworkEvent;
+import net.minecraftforge.network.NetworkRegistry;
+import net.minecraftforge.network.PacketDistributor;
+import net.minecraftforge.network.simple.SimpleChannel;
+import slimeknights.mantle.Mantle;
 import slimeknights.mantle.network.packet.ISimplePacket;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -31,14 +33,24 @@ public class NetworkWrapper {
   /** Network instance */
   public final SimpleChannel network;
   private int id = 0;
-  private static final String PROTOCOL_VERSION = Integer.toString(1);
 
   /**
    * Creates a new network wrapper
    * @param channelName  Unique packet channel name
+   * @deprecated Give your channel a version number.
    */
+  @Deprecated
   public NetworkWrapper(ResourceLocation channelName) {
-    this.network = new SimpleChannel(channelName);
+    this(channelName, "1");
+  }
+
+  public NetworkWrapper(ResourceLocation channelName, String version) {
+    this.network = NetworkRegistry.ChannelBuilder
+      .named(channelName)
+      .clientAcceptedVersions(version::equals)
+      .serverAcceptedVersions(version::equals)
+      .networkProtocolVersion(() -> version)
+      .simpleChannel();
   }
 
   /**
@@ -60,12 +72,33 @@ public class NetworkWrapper {
    * @param direction  Network direction for validation. Pass null for no direction
    * @param <MSG>  Packet class type
    */
-  public <MSG extends ISimplePacket> void registerPacket(Class<MSG> clazz, BiConsumer<MSG, FriendlyByteBuf> encoder, Function<FriendlyByteBuf, MSG> decoder, BiConsumer<MSG,Supplier<ISimplePacket.Context>> consumer, @Nullable NetworkDirection direction) {
-    if (direction == NetworkDirection.PLAY_TO_CLIENT) {
-      this.network.registerS2CPacket(clazz, this.id++, decoder);
-    } else {
-      this.network.registerC2SPacket(clazz, this.id++, decoder);
-    }
+  public <MSG> void registerPacket(Class<MSG> clazz, BiConsumer<MSG, FriendlyByteBuf> encoder, Function<FriendlyByteBuf, MSG> decoder, BiConsumer<MSG,Supplier<NetworkEvent.Context>> consumer, @Nullable NetworkDirection direction) {
+    registerPacketNoLogger(clazz, encoder, wrapLogger(clazz, decoder), consumer, direction);
+  }
+
+  /**
+   * Registers a new packet without the automatic logging if the decoder fails
+   * @param clazz      Packet class
+   * @param encoder    Encodes a packet to the buffer
+   * @param decoder    Packet decoder, typically the constructor
+   * @param consumer   Logic to handle a packet
+   * @param direction  Network direction for validation. Pass null for no direction
+   * @param <MSG>  Packet class type
+   */
+  public <MSG> void registerPacketNoLogger(Class<MSG> clazz, BiConsumer<MSG, FriendlyByteBuf> encoder, Function<FriendlyByteBuf, MSG> decoder, BiConsumer<MSG,Supplier<NetworkEvent.Context>> consumer, @Nullable NetworkDirection direction) {
+    this.network.registerMessage(this.id++, clazz, encoder, decoder, consumer, Optional.ofNullable(direction));
+  }
+
+  /** Wraps the given decoder function */
+  private static <MSG> Function<FriendlyByteBuf,MSG> wrapLogger(Class<MSG> clazz, Function<FriendlyByteBuf,MSG> decoder) {
+    return buffer -> {
+      try {
+        return decoder.apply(buffer);
+      } catch (Exception e) {
+        Mantle.logger.error("Exception while decoding packet of class {}", clazz.getName(), e);
+        throw e;
+      }
+    };
   }
 
 
@@ -75,8 +108,17 @@ public class NetworkWrapper {
    * Sends a packet to the server
    * @param msg  Packet to send
    */
-  public void sendToServer(ISimplePacket msg) {
+  public void sendToServer(Object msg) {
     this.network.sendToServer(msg);
+  }
+
+  /**
+   * Sends a packet to the given packet distributor
+   * @param target   Packet target
+   * @param message  Packet to send
+   */
+  public void send(PacketDistributor.PacketTarget target, Object message) {
+    network.send(target, message);
   }
 
   /**
@@ -95,9 +137,9 @@ public class NetworkWrapper {
    * @param msg     Packet
    * @param player  Player to send
    */
-  public void sendTo(S2CPacket msg, Player player) {
+  public void sendTo(Object msg, Player player) {
     if (player instanceof ServerPlayer) {
-      this.network.sendToClient(msg, (ServerPlayer) player);
+      sendTo(msg, (ServerPlayer) player);
     }
   }
 
@@ -106,10 +148,10 @@ public class NetworkWrapper {
    * @param msg     Packet
    * @param player  Player to send
    */
-  public void sendTo(ISimplePacket msg, ServerPlayer player) {
-//    if (!(player instanceof FakePlayer)) {
-      network.sendToClient(msg, player);
-//    }
+  public void sendTo(Object msg, ServerPlayer player) {
+    if (!(player instanceof FakePlayer)) {
+      network.sendTo(msg, player.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+    }
   }
 
   /**
@@ -118,8 +160,9 @@ public class NetworkWrapper {
    * @param serverWorld  World instance
    * @param position     Position within range
    */
-  public void sendToClientsAround(ISimplePacket msg, ServerLevel serverWorld, BlockPos position) {
-    network.sendToClientsTracking(msg, serverWorld, position);
+  public void sendToClientsAround(Object msg, ServerLevel serverWorld, BlockPos position) {
+    LevelChunk chunk = serverWorld.getChunkAt(position);
+    network.send(PacketDistributor.TRACKING_CHUNK.with(() -> chunk), msg);
   }
 
   /**
@@ -127,8 +170,8 @@ public class NetworkWrapper {
    * @param msg     Packet
    * @param entity  Entity to check
    */
-  public void sendToTrackingAndSelf(S2CPacket msg, Entity entity) {
-    this.network.sendToClientsTrackingAndSelf(msg, entity);
+  public void sendToTrackingAndSelf(Object msg, Entity entity) {
+    this.network.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> entity), msg);
   }
 
   /**
@@ -136,7 +179,7 @@ public class NetworkWrapper {
    * @param msg     Packet
    * @param entity  Entity to check
    */
-  public void sendToTracking(ISimplePacket msg, Entity entity) {
-    this.network.sendToClientsTracking(msg, entity);
+  public void sendToTracking(Object msg, Entity entity) {
+    this.network.send(PacketDistributor.TRACKING_ENTITY.with(() -> entity), msg);
   }
 }

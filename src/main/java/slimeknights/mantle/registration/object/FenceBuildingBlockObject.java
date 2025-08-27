@@ -1,12 +1,10 @@
 package slimeknights.mantle.registration.object;
 
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.FenceBlock;
 import slimeknights.mantle.registration.RegistrationHelper;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -45,11 +43,11 @@ public class FenceBuildingBlockObject extends BuildingBlockObject {
 
   @Override
   public List<Block> values() {
-    return Arrays.asList(get(), getSlab(), getStairs(), getFence());
+    return List.of(get(), getSlab(), getStairs(), getFence());
   }
 
   @Override
-  public void forEach(Consumer<ItemLike> consumer) {
+  public void forEach(Consumer<? super Block> consumer) {
     super.forEach(consumer);
     consumer.accept(getFence());
   }

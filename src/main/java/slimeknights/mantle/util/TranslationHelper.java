@@ -8,7 +8,10 @@ import net.minecraft.world.item.ItemStack;
 import io.github.fabricators_of_create.porting_lib.util.ForgeI18n;
 
 import javax.annotation.Nullable;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Helpers for working with translations
@@ -16,6 +19,8 @@ import java.util.List;
 @SuppressWarnings("WeakerAccess")
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class TranslationHelper {
+  /** Formats a number separated by commas every 3 digits (i.e. US standard) */
+  public static final DecimalFormat COMMA_FORMAT = new DecimalFormat("#,###,###.##", DecimalFormatSymbols.getInstance(Locale.US));
 
   /**
    * Checks if a key can be translated

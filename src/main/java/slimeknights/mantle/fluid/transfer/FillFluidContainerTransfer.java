@@ -31,7 +31,7 @@ public class FillFluidContainerTransfer implements IFluidContainerTransfer.WithD
   public static final ResourceLocation ID = Mantle.getResource("fill_item");
 
   private final Ingredient input;
-  private final ItemOutput filled;
+  private final ItemOutput result;
   private final FluidIngredient fluid;
 
   @Override
@@ -48,7 +48,7 @@ public class FillFluidContainerTransfer implements IFluidContainerTransfer.WithD
 
   /** Gets the output filled with the given fluid */
   protected ItemStack getFilled(FluidStack drained) {
-    return this.filled.get().copy();
+    return this.result.get().copy();
   }
 
   @Nullable
@@ -75,7 +75,9 @@ public class FillFluidContainerTransfer implements IFluidContainerTransfer.WithD
     JsonObject json = new JsonObject();
     json.addProperty("type", ID.toString());
     json.add("input", input.toJson());
-    json.add("filled", filled.serialize(false));
+    if (!result.isEmpty()) {
+      json.add("result", result.serialize(false));
+    }
     json.add("fluid", fluid.serialize());
     return json;
   }
@@ -90,9 +92,9 @@ public class FillFluidContainerTransfer implements IFluidContainerTransfer.WithD
     public T deserialize(JsonElement element, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
       JsonObject json = element.getAsJsonObject();
       Ingredient input = Ingredient.fromJson(JsonHelper.getElement(json, "input"));
-      ItemOutput filled = ItemOutput.Loadable.REQUIRED_ITEM.getIfPresent(json, "filled");
+      ItemOutput result = EmptyFluidContainerTransfer.getResult(json);
       FluidIngredient fluid = FluidIngredient.LOADABLE.getIfPresent(json, "fluid");
-      return factory.apply(input, filled, fluid);
+      return factory.apply(input, result, fluid);
     }
   }
 }

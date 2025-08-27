@@ -1,0 +1,18 @@
+{
+  "type": "mantle:empty_item",
+  "conditions": [
+    {
+      "type": "mantle:tag_filled",
+      "registry": "minecraft:fluid",
+      "tag": "forge:honey"
+    }
+  ],
+  "fluid": {
+    "amount": 250,
+    "tag": "forge:honey"
+  },
+  "input": {
+    "item": "minecraft:honey_bottle"
+  },
+  "result": "minecraft:glass_bottle"
+}

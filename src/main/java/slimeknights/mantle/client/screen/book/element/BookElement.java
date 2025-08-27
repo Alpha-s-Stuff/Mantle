@@ -3,16 +3,20 @@ package slimeknights.mantle.client.screen.book.element;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.FormattedText;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions.FontContext;
+import org.joml.Vector2i;
 import slimeknights.mantle.client.screen.book.BookScreen;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Stream;
 
 public abstract class BookElement {
 
@@ -56,15 +60,62 @@ public abstract class BookElement {
     this.drawTooltip(graphics, list, x, y, font);
   }
 
-  public void drawTooltip(GuiGraphics graphics, List<Component> textLines, int x, int y, Font font) {
-    // GuiUtils.drawHoveringText(matrixStack, textLines, x, y, this.parent.width, this.parent.height, -1, font);
-    // GuiUtils.drawHoveringText(matrixStack, textLines, x, y, BookScreen.PAGE_WIDTH, BookScreen.PAGE_HEIGHT, BookScreen.PAGE_WIDTH, font);
-    int oldWidth = parent.width;
-    int oldHeight = parent.height;
-    parent.width = BookScreen.PAGE_WIDTH;
-    parent.height = BookScreen.PAGE_HEIGHT;
-    graphics.renderTooltip(font, textLines, Optional.empty(), x, y);
-    parent.width = oldWidth;
-    parent.height = oldHeight;
+
+  private static Stream<ClientTooltipComponent> splitLine(FormattedText text, Font font, int maxWidth) {
+    if (text instanceof Component component) {
+      if (component.getString().isEmpty()) {
+        return Stream.of(component.getVisualOrderText()).map(ClientTooltipComponent::create);
+      }
+    }
+    return font.split(text, maxWidth).stream().map(ClientTooltipComponent::create);
+  }
+
+  /** Tooltip positioner to keep the tooltip within the page for the relative mouse positions */
+  private static final ClientTooltipPositioner POSITIONER = (screenWidth, screenHeight, mouseX, mouseY, tooltipWidth, tooltipHeight) -> {
+    Vector2i pos = (new Vector2i(mouseX, mouseY)).add(12, -12);
+    if (pos.x + tooltipWidth > BookScreen.PAGE_WIDTH) {
+      pos.x = Math.max(pos.x - 24 - tooltipWidth, 4);
+    }
+    tooltipHeight += 3;
+    if (pos.y + tooltipHeight > BookScreen.PAGE_HEIGHT) {
+      pos.y = BookScreen.PAGE_HEIGHT - tooltipHeight;
+    }
+    return pos;
+  };
+
+  /**
+   * Renders a tooltip in a book.
+   * Based on {@link net.minecraftforge.client.ForgeHooksClient#gatherTooltipComponents(ItemStack, List, int, int, int, Font)}, but with three notable changes:
+   * Uses the book page size (since mouseX and mouseY tend to be page relative), actually uses the updated tooltipX position, and drops the unused non-text component code.
+   */
+  @SuppressWarnings("UnstableApiUsage")  // this is a javadoc my dude
+  public void drawTooltip(GuiGraphics graphics, List<Component> textLines, int mouseX, int mouseY, Font font) {
+    // find max width of the tooltip
+    int tooltipTextWidth = textLines.stream().mapToInt(font::width).max().orElse(0);
+    boolean needsWrap = false;
+    int tooltipX = mouseX + 12;
+    // if the max width plus the position is too wide, need to fix
+    if (tooltipX + tooltipTextWidth + 4 > BookScreen.PAGE_WIDTH) {
+      // if repositioning fails, we will need to wrap the tooltip
+      tooltipX = mouseX - 16 - tooltipTextWidth;
+      if (tooltipX < 4) {
+        if (mouseX > BookScreen.PAGE_WIDTH / 2) {
+          tooltipTextWidth = mouseX - 12 - 8;
+        } else {
+          tooltipTextWidth = BookScreen.PAGE_WIDTH - 16 - mouseX;
+        }
+
+        needsWrap = true;
+      }
+    }
+
+    // map to client tooltips, wrapping if needed
+    int tooltipTextWidthF = tooltipTextWidth;
+    List<ClientTooltipComponent> components = needsWrap
+      ? textLines.stream().flatMap(text -> splitLine(text, font, tooltipTextWidthF)).toList()
+      : textLines.stream().map(text -> ClientTooltipComponent.create(text.getVisualOrderText())).toList();
+
+    // render the tooltip
+    graphics.renderTooltipInternal(font, components, mouseX, mouseY, POSITIONER);
   }
 }

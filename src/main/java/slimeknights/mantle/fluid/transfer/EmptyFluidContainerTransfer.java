@@ -16,6 +16,7 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
 import org.apache.commons.lang3.function.TriFunction;
+import org.jetbrains.annotations.Nullable;
 import slimeknights.mantle.Mantle;
 import slimeknights.mantle.recipe.helper.FluidOutput;
 import slimeknights.mantle.recipe.helper.ItemOutput;
@@ -29,14 +30,14 @@ import java.util.function.Consumer;
 public class EmptyFluidContainerTransfer implements IFluidContainerTransfer.WithDirection {
   public static final ResourceLocation ID = Mantle.getResource("empty_item");
 
-  private final Ingredient input;
-  private final ItemOutput filled;
+  protected final Ingredient input;
+  protected final ItemOutput result;
   protected final FluidOutput fluid;
 
   /** @deprecated use {@link #EmptyFluidContainerTransfer(Ingredient, ItemOutput, FluidOutput)} */
   @Deprecated(forRemoval = true)
-  public EmptyFluidContainerTransfer(Ingredient input, ItemOutput filled, FluidStack fluid) {
-    this(input, filled, FluidOutput.fromStack(fluid));
+  public EmptyFluidContainerTransfer(Ingredient input, ItemOutput result, FluidStack fluid) {
+    this(input, result, FluidOutput.fromStack(fluid));
   }
 
   @Override
@@ -56,6 +57,7 @@ public class EmptyFluidContainerTransfer implements IFluidContainerTransfer.With
     return fluid.get();
   }
 
+  @Nullable
   @Override
   public TransferResult transfer(ItemStack stack, FluidStack fluid, IFluidHandler handler, TransferDirection direction) {
     if (!direction.canEmpty()) {
@@ -69,7 +71,7 @@ public class EmptyFluidContainerTransfer implements IFluidContainerTransfer.With
         if (actual != this.fluid.getAmount()) {
           Mantle.logger.error("Wrong amount filled from {}, expected {}, filled {}", BuiltInRegistries.ITEM.getKey(stack.getItem()), this.fluid.getAmount(), actual);
         }
-        return new TransferResult(filled.copy(), contained, false);
+        return new TransferResult(result.copy(), contained, false);
       }
     }
     return null;
@@ -80,13 +82,25 @@ public class EmptyFluidContainerTransfer implements IFluidContainerTransfer.With
     JsonObject json = new JsonObject();
     json.addProperty("type", ID.toString());
     json.add("input", input.toJson());
-    json.add("filled", filled.serialize(false));
+    if (!result.isEmpty()) {
+      json.add("result", result.serialize(false));
+    }
     json.add("fluid", FluidOutput.Loadable.REQUIRED.serialize(fluid));
     return json;
   }
 
   /** Unique loader instance */
   public static final JsonDeserializer<EmptyFluidContainerTransfer> DESERIALIZER = new Deserializer<>(EmptyFluidContainerTransfer::new);
+
+  /** Gets the result for the fluid transfer. */
+  static ItemOutput getResult(JsonObject json) {
+    String key = "result";
+    if (!json.has(key) && json.has("filled")) {
+      Mantle.logger.warn("Using deprecated field 'filled' for fluid container transfer, use 'result' instead.");
+      key = "filled";
+    }
+    return ItemOutput.Loadable.OPTIONAL_ITEM.getOrEmpty(json, key);
+  }
 
   /**
    * Generic deserializer
@@ -96,9 +110,9 @@ public class EmptyFluidContainerTransfer implements IFluidContainerTransfer.With
     public T deserialize(JsonElement element, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
       JsonObject json = element.getAsJsonObject();
       Ingredient input = Ingredient.fromJson(JsonHelper.getElement(json, "input"));
-      ItemOutput filled = ItemOutput.Loadable.REQUIRED_ITEM.getIfPresent(json, "filled");
+      ItemOutput result = getResult(json);
       FluidOutput fluid = FluidOutput.Loadable.REQUIRED.getIfPresent(json, "fluid");
-      return factory.apply(input, filled, fluid);
+      return factory.apply(input, result, fluid);
     }
   }
 }

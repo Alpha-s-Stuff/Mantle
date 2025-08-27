@@ -48,6 +48,11 @@ public class SafeClientAccess {
     return null;
   }
 
+  /** Checks if its advanced tooltips */
+  public static boolean isAdvancedTooltip() {
+    return FMLEnvironment.dist == Dist.CLIENT && ClientOnly.isAdvancedTooltip();
+  }
+
   /** This class is only loaded on the client, so is safe to reference client only methods */
   private static class ClientOnly {
     /** Gets the currently pressed key modifier for tooltips */
@@ -74,6 +79,11 @@ public class SafeClientAccess {
     @Nullable
     public static Level getClientLevel() {
       return Minecraft.getInstance().level;
+    }
+
+    /** Checks if its advanced tooltips */
+    public static boolean isAdvancedTooltip() {
+      return Minecraft.getInstance().options.advancedItemTooltips;
     }
   }
 }

@@ -29,6 +29,7 @@ public class EdibleItem extends Item {
   @Override
   public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
     TranslationHelper.addOptionalTooltip(stack, tooltip);
+    // TODO: use ContainerFoodItem helper for more potion like effects?
     for (Pair<MobEffectInstance, Float> pair : Objects.requireNonNull(stack.getItem().getFoodProperties(stack, null)).getEffects()) {
       if (pair.getFirst() != null) {
         tooltip.add(Component.literal(I18n.get(pair.getFirst().getDescriptionId()).trim()).withStyle(ChatFormatting.GRAY));

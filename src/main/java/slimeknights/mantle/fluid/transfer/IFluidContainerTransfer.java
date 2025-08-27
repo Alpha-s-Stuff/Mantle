@@ -1,11 +1,10 @@
 package slimeknights.mantle.fluid.transfer;
 
-import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
-import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import slimeknights.mantle.data.gson.GenericRegisteredSerializer.IJsonSerializable;
+import slimeknights.mantle.fluid.FluidTransferHelper;
 
 import javax.annotation.Nullable;
 import java.util.function.Consumer;
@@ -52,9 +51,14 @@ public interface IFluidContainerTransfer extends IJsonSerializable {
    * Result after transferring a fluid
    * @param stack    Item stack result, may be modified
    * @param fluid    Fluid, generally should not be modified
-   * @param didFill  If true, the item stack was filled. If false, it was draine
+   * @param didFill  If true, the item stack was filled. If false, it was drained
    */
-  record TransferResult(ItemStack stack, FluidStack fluid, boolean didFill) {}
+  record TransferResult(ItemStack stack, FluidStack fluid, boolean didFill) {
+    /** Gets the sound for this result */
+    public SoundEvent getSound() {
+      return didFill ? FluidTransferHelper.getFillSound(fluid) : FluidTransferHelper.getEmptySound(fluid);
+    }
+  }
 
   /** Represents the direction to allow transfer */
   enum TransferDirection {
@@ -80,10 +84,12 @@ public interface IFluidContainerTransfer extends IJsonSerializable {
 
   /** Temporary interface to make it easier to work with the method deprecation */
   interface WithDirection extends IFluidContainerTransfer {
+    @Nullable
     @Override
     TransferResult transfer(ItemStack stack, FluidStack fluid, IFluidHandler handler, TransferDirection direction);
 
     @SuppressWarnings("removal")
+    @Nullable
     @Override
     @Deprecated(forRemoval = true)
     default TransferResult transfer(ItemStack stack, FluidStack fluid, IFluidHandler handler) {
