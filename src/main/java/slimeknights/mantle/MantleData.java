@@ -9,7 +9,6 @@ public class MantleData implements DataGeneratorEntrypoint {
   @Override
   public void onInitializeDataGenerator(FabricDataGenerator generator) {
     FabricDataGenerator.Pack pack = generator.createPack();
-    pack.addProvider(MantleFluidTagProvider::new);
-    pack.addProvider(MantleFluidTooltipProvider::new);
+    Mantle.gatherData(pack);
   }
 }

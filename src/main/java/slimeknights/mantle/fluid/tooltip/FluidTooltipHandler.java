@@ -11,6 +11,7 @@ import lombok.extern.log4j.Log4j2;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -190,9 +191,9 @@ public class FluidTooltipHandler extends SimpleJsonResourceReloadListener implem
   /** Gets the mod name for display in the tooltip */
   public static <T> Component formatModName(ResourceLocation key) {
     String name = key.getNamespace();
-    Optional<? extends ModContainer> mod = ModList.get().getModContainerById(name);
+    Optional<? extends ModContainer> mod = FabricLoader.getInstance().getModContainer(name);
     if (mod.isPresent()) {
-      name = mod.get().getModInfo().getDisplayName();
+      name = mod.get().getMetadata().getName();
     }
     return Component.literal(name).withStyle(ChatFormatting.BLUE, ChatFormatting.ITALIC);
   }
@@ -246,8 +247,8 @@ public class FluidTooltipHandler extends SimpleJsonResourceReloadListener implem
    * @param tooltip    Tooltip to append information
    * @return  True if the amount is not in buckets
    */
-  public static boolean appendMaterialNoFallback(Fluid fluid, int original, List<Component> tooltip) {
-    int amount = original;
+  public static boolean appendMaterialNoFallback(Fluid fluid, long original, List<Component> tooltip) {
+    long amount = original;
     FluidUnitList unitList = INSTANCE.getUnitList(fluid);
     amount = unitList.getText(tooltip, amount);
     MILLIBUCKET.getText(tooltip, amount);

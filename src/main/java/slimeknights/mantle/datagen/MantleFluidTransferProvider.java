@@ -1,5 +1,6 @@
 package slimeknights.mantle.datagen;
 
+import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.minecraft.data.PackOutput;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
@@ -27,8 +28,8 @@ import javax.annotation.Nullable;
 /** Adds fluid transfer for base fluid. Use {@link AbstractFluidContainerTransferProvider} for mods. */
 @Internal
 public class MantleFluidTransferProvider extends AbstractFluidContainerTransferProvider {
-  public MantleFluidTransferProvider(PackOutput packOutput) {
-    super(packOutput, Mantle.modId);
+  public MantleFluidTransferProvider(FabricDataOutput packOutput) {
+    super(packOutput);
   }
 
   @Override

@@ -29,7 +29,7 @@ public class DefaultRetexturedBlockEntity extends MantleBlockEntity implements I
 
   @Nonnull
   @Override
-  public ModelData getModelData() {
+  public ModelData getRenderData() {
     return RetexturedHelper.getModelData(texture);
   }
 

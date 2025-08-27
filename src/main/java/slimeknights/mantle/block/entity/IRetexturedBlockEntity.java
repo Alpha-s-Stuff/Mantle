@@ -47,7 +47,4 @@ public interface IRetexturedBlockEntity extends RenderDataBlockEntity {
       RetexturedHelper.onTextureUpdated((BlockEntity)this);
     }
   }
-
-  @Override
-  @Nullable IModelData getRenderData();
 }

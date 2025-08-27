@@ -17,8 +17,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.client.model.data.ModelData;
-import net.minecraftforge.client.model.data.ModelProperty;
+import slimeknights.mantle.client.model.ModelProperty;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -151,24 +150,20 @@ public final class RetexturedHelper {
     // update the texture in BE data
     Level level = self.getLevel();
     if (level != null && level.isClientSide) {
-      self.requestModelDataUpdate();
+//      self.requestModelDataUpdate();
       BlockState state = self.getBlockState();
       level.sendBlockUpdated(self.getBlockPos(), state, state, 0);
     }
   }
 
-  /** Creates a builder with the block property as specified */
-  public static ModelData.Builder getModelDataBuilder(Block block) {
+  /** returns the block property as specified */
+  @Nullable
+  public static Block getModelData(Block block) {
     // cannot support air, saves a conditional on usage
     if (block == Blocks.AIR) {
       block = null;
     }
-    return ModelData.builder().with(BLOCK_PROPERTY, block);
-  }
-
-  /** Creates model data with the block property as specified */
-  public static ModelData getModelData(Block block) {
-    return getModelDataBuilder(block).build();
+    return block;
   }
 
 

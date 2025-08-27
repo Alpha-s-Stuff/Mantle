@@ -2,6 +2,8 @@ package slimeknights.mantle.fluid.transfer;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
+import net.fabricmc.fabric.api.resource.conditions.v1.ConditionJsonProvider;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.PackOutput.Target;
@@ -10,8 +12,6 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraftforge.common.crafting.CraftingHelper;
-import net.minecraftforge.common.crafting.conditions.ICondition;
 import slimeknights.mantle.data.GenericDataProvider;
 import slimeknights.mantle.recipe.helper.FluidOutput;
 import slimeknights.mantle.recipe.helper.ItemOutput;
@@ -28,16 +28,16 @@ public abstract class AbstractFluidContainerTransferProvider extends GenericData
   private final Map<ResourceLocation,TransferJson> allTransfers = new HashMap<>();
   private final String modId;
 
-  public AbstractFluidContainerTransferProvider(PackOutput packOutput, String modId) {
+  public AbstractFluidContainerTransferProvider(FabricDataOutput packOutput) {
     super(packOutput, Target.DATA_PACK, FluidContainerTransferManager.FOLDER, FluidContainerTransferManager.GSON);
-    this.modId = modId;
+    this.modId = packOutput.getModId();
   }
 
   /** Function to add all relevant transfers */
   protected abstract void addTransfers();
 
   /** Adds a transfer to be saved */
-  protected void addTransfer(ResourceLocation id, IFluidContainerTransfer transfer, ICondition... conditions) {
+  protected void addTransfer(ResourceLocation id, IFluidContainerTransfer transfer, ConditionJsonProvider... conditions) {
     TransferJson previous = allTransfers.putIfAbsent(id, new TransferJson(transfer, conditions));
     if (previous != null) {
       throw new IllegalArgumentException("Duplicate fluid container transfer " + id);
@@ -45,12 +45,12 @@ public abstract class AbstractFluidContainerTransferProvider extends GenericData
   }
 
   /** Adds a transfer to be saved */
-  protected void addTransfer(String name, IFluidContainerTransfer transfer, ICondition... conditions) {
+  protected void addTransfer(String name, IFluidContainerTransfer transfer, ConditionJsonProvider... conditions) {
     addTransfer(new ResourceLocation(modId, name), transfer, conditions);
   }
 
   /** Adds generic fill and empty for a container */
-  protected void addFillEmpty(String prefix, ItemLike item, ItemLike container, FluidOutput fill, FluidIngredient drain, boolean nbt, ICondition... conditions) {
+  protected void addFillEmpty(String prefix, ItemLike item, ItemLike container, FluidOutput fill, FluidIngredient drain, boolean nbt, ConditionJsonProvider... conditions) {
     if (nbt) {
       addTransfer(prefix + "empty", new EmptyFluidWithNBTTransfer(Ingredient.of(item), ItemOutput.fromItem(container), fill), conditions);
       addTransfer(prefix + "fill", new FillFluidWithNBTTransfer(Ingredient.of(container), ItemOutput.fromItem(item), drain), conditions);
@@ -61,29 +61,29 @@ public abstract class AbstractFluidContainerTransferProvider extends GenericData
   }
 
   /** Adds generic fill and empty for a container */
-  protected void addFillEmpty(String prefix, ItemLike item, ItemLike container, Fluid fluid, TagKey<Fluid> tag, int amount, boolean nbt, ICondition... conditions) {
+  protected void addFillEmpty(String prefix, ItemLike item, ItemLike container, Fluid fluid, TagKey<Fluid> tag, int amount, boolean nbt, ConditionJsonProvider... conditions) {
     addFillEmpty(prefix, item, container, FluidOutput.fromFluid(fluid, amount), FluidIngredient.of(tag, amount), nbt, conditions);
   }
 
   /** Adds generic fill and empty for a container */
-  protected void addFillEmpty(String prefix, ItemLike item, ItemLike container, TagKey<Fluid> tag, int amount, boolean nbt, ICondition... conditions) {
+  protected void addFillEmpty(String prefix, ItemLike item, ItemLike container, TagKey<Fluid> tag, int amount, boolean nbt, ConditionJsonProvider... conditions) {
     addFillEmpty(prefix, item, container, FluidOutput.fromTag(tag, amount), FluidIngredient.of(tag, amount), nbt, conditions);
   }
 
   /** Adds generic fill and empty for a container */
-  protected void addFillEmpty(String prefix, ItemLike item, ItemLike container, FluidObject<?> fluid, int amount, boolean nbt, ICondition... conditions) {
+  protected void addFillEmpty(String prefix, ItemLike item, ItemLike container, FluidObject<?> fluid, int amount, boolean nbt, ConditionJsonProvider... conditions) {
     addFillEmpty(prefix, item, container, fluid.result(amount), fluid.ingredient(amount), nbt, conditions);
   }
 
-  /** @deprecated use {@link #addFillEmpty(String, ItemLike, ItemLike, Fluid, TagKey, int, boolean, ICondition...)} */
+  /** @deprecated use {@link #addFillEmpty(String, ItemLike, ItemLike, Fluid, TagKey, int, boolean, ConditionJsonProvider...)} */
   @Deprecated(forRemoval = true)
-  protected void addFillEmpty(String prefix, ItemLike item, ItemLike container, Fluid fluid, TagKey<Fluid> tag, int amount, ICondition... conditions) {
+  protected void addFillEmpty(String prefix, ItemLike item, ItemLike container, Fluid fluid, TagKey<Fluid> tag, int amount, ConditionJsonProvider... conditions) {
     addFillEmpty(prefix, item, container, fluid, tag, amount, false, conditions);
   }
 
-  /** @deprecated use {@link #addFillEmpty(String, ItemLike, ItemLike, Fluid, TagKey, int, boolean, ICondition...)} */
+  /** @deprecated use {@link #addFillEmpty(String, ItemLike, ItemLike, Fluid, TagKey, int, boolean, ConditionJsonProvider...)} */
   @Deprecated(forRemoval = true)
-  protected void addFillEmptyNBT(String prefix, ItemLike item, ItemLike container, Fluid fluid, TagKey<Fluid> tag, int amount, ICondition... conditions) {
+  protected void addFillEmptyNBT(String prefix, ItemLike item, ItemLike container, Fluid fluid, TagKey<Fluid> tag, int amount, ConditionJsonProvider... conditions) {
     addFillEmpty(prefix, item, container, fluid, tag, amount, true, conditions);
   }
 
@@ -94,14 +94,14 @@ public abstract class AbstractFluidContainerTransferProvider extends GenericData
   }
 
   /** Json with transfer and condition */
-  private record TransferJson(IFluidContainerTransfer transfer, ICondition[] conditions) {
+  private record TransferJson(IFluidContainerTransfer transfer, ConditionJsonProvider[] conditions) {
     /** Serializes this to JSON */
     public JsonElement toJson() {
       JsonElement element = FluidContainerTransferManager.GSON.toJsonTree(transfer, IFluidContainerTransfer.class);
       assert element.isJsonObject();
       if (conditions.length != 0) {
         JsonArray array = new JsonArray();
-        for (ICondition condition : conditions) {
+        for (ConditionJsonProvider condition : conditions) {
           array.add(CraftingHelper.serialize(condition));
         }
         element.getAsJsonObject().add("conditions", array);

@@ -1,10 +1,9 @@
 package slimeknights.mantle.recipe;
 
+import io.github.fabricators_of_create.porting_lib.util.LazyRegistrar;
+import io.github.fabricators_of_create.porting_lib.util.RegistryObject;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.RegistryObject;
 import slimeknights.mantle.Mantle;
 import slimeknights.mantle.recipe.cooking.BlastingResultRecipe;
 import slimeknights.mantle.recipe.cooking.CampfireResultRecipe;
@@ -16,13 +15,13 @@ import slimeknights.mantle.recipe.helper.LoadableRecipeSerializer;
 
 /** Handles any custom recipes added by Mantle */
 public class MantleRecipes {
-  private static final DeferredRegister<RecipeSerializer<?>> RECIPES = DeferredRegister.create(Registries.RECIPE_SERIALIZER, Mantle.modId);
+  private static final LazyRegistrar<RecipeSerializer<?>> RECIPES = LazyRegistrar.create(Registries.RECIPE_SERIALIZER, Mantle.modId);
 
   private MantleRecipes() {}
 
   /** Registers this to the bus */
-  public static void init(IEventBus bus) {
-    RECIPES.register(bus);
+  public static void init() {
+    RECIPES.register();
   }
 
   // crafting

@@ -8,6 +8,7 @@ import com.google.gson.stream.JsonWriter;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.JsonOps;
 import lombok.RequiredArgsConstructor;
+import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.minecraft.Util;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataGenerator;
@@ -37,20 +38,12 @@ public abstract class GenericDataProvider implements DataProvider {
   protected final PackOutput.PathProvider pathProvider;
   private final Gson gson;
 
-  public GenericDataProvider(PackOutput output, Target type, String folder, Gson gson) {
+  public GenericDataProvider(FabricDataOutput output, Target type, String folder, Gson gson) {
     this(output.createPathProvider(type, folder), gson);
   }
 
-  public GenericDataProvider(DataGenerator generator, Target type, String folder, Gson gson) {
-    this(generator.getPackOutput(), type, folder, gson);
-  }
-
-  public GenericDataProvider(PackOutput output, Target type, String folder) {
+  public GenericDataProvider(FabricDataOutput output, Target type, String folder) {
     this(output, type, folder, JsonHelper.DEFAULT_GSON);
-  }
-
-  public GenericDataProvider(DataGenerator generator, Target type, String folder) {
-    this(generator, type, folder, JsonHelper.DEFAULT_GSON);
   }
 
   /**
