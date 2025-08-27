@@ -4,6 +4,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 
@@ -33,6 +34,16 @@ public class SafeClientAccess {
   public static Level getLevel() {
     if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
       return ClientOnly.getClientLevel();
+    }
+    return null;
+  }
+
+  /** Gets the registry access client side */
+  @Nullable
+  public static RegistryAccess getRegistryAccess() {
+    Level level = getLevel();
+    if (level != null) {
+      return level.registryAccess();
     }
     return null;
   }

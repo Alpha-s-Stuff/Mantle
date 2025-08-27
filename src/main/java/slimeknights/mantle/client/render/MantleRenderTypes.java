@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableMap;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat.Mode;
-import com.mojang.blaze3d.vertex.VertexFormatElement;
 import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
 import slimeknights.mantle.Mantle;
@@ -42,7 +41,14 @@ public class MantleRenderTypes extends RenderType {
   /**
    * Render type used for the structure renderer
    */
-  public static final VertexFormat BLOCK_WITH_OVERLAY = new VertexFormat(ImmutableMap.<String, VertexFormatElement>builder().put("Position", ELEMENT_POSITION).put("Color", ELEMENT_COLOR).put("UV0", ELEMENT_UV0).put("UV1", ELEMENT_UV1).put("UV2", ELEMENT_UV2).put("Normal", ELEMENT_NORMAL).put("Padding", ELEMENT_PADDING).build());
+  public static final VertexFormat BLOCK_WITH_OVERLAY = new VertexFormat(ImmutableMap.of(
+    "Position", ELEMENT_POSITION,
+    "Color", ELEMENT_COLOR,
+    "UV0", ELEMENT_UV0,
+    "UV1", ELEMENT_UV1,
+    "UV2", ELEMENT_UV2,
+    "Normal", ELEMENT_NORMAL,
+    "Padding", ELEMENT_PADDING));
 
   public static final RenderType TRANSLUCENT_FULLBRIGHT = create(
     Mantle.modId + ":translucent_fullbright",

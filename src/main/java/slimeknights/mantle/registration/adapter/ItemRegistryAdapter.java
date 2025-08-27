@@ -1,28 +1,28 @@
 package slimeknights.mantle.registration.adapter;
 
-import io.github.fabricators_of_create.porting_lib.util.LazySpawnEggItem;
-import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
-import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.models.blockstates.PropertyDispatch.TriFunction;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.BucketItem;
-import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.DoubleHighBlockItem;
+import net.minecraft.world.item.HangingSignItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Item.Properties;
 import net.minecraft.world.item.SignItem;
 import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Fluid;
+import net.minecraftforge.common.ForgeSpawnEggItem;
+import net.minecraftforge.registries.IForgeRegistry;
 import slimeknights.mantle.item.BlockTooltipItem;
 import slimeknights.mantle.item.BurnableBlockItem;
+import slimeknights.mantle.item.BurnableHangingSignItem;
 import slimeknights.mantle.item.BurnableSignItem;
 import slimeknights.mantle.item.BurnableTallBlockItem;
 import slimeknights.mantle.item.TooltipItem;
-import slimeknights.mantle.registration.ItemProperties;
+import slimeknights.mantle.registration.RegistrationHelper;
 import slimeknights.mantle.registration.object.BuildingBlockObject;
 import slimeknights.mantle.registration.object.EnumObject;
 import slimeknights.mantle.registration.object.FenceBuildingBlockObject;
@@ -46,8 +46,8 @@ public class ItemRegistryAdapter extends EnumRegistryAdapter<Item> {
    * Registers a new item registry adapter with default mod ID and item properties
    * @param registry  Item registry instance
    */
-  public ItemRegistryAdapter() {
-    this(null);
+  public ItemRegistryAdapter(IForgeRegistry<Item> registry) {
+    this(registry, null);
   }
 
   /**
@@ -55,8 +55,8 @@ public class ItemRegistryAdapter extends EnumRegistryAdapter<Item> {
    * @param registry      Item registry instance
    * @param defaultProps  Default item properties
    */
-  public ItemRegistryAdapter(@Nullable Item.Properties defaultProps) {
-    super(BuiltInRegistries.ITEM);
+  public ItemRegistryAdapter(IForgeRegistry<Item> registry, @Nullable Item.Properties defaultProps) {
+    super(registry);
     this.defaultProps = Objects.requireNonNullElseGet(defaultProps, Properties::new);
   }
 
@@ -66,8 +66,8 @@ public class ItemRegistryAdapter extends EnumRegistryAdapter<Item> {
    * @param modid         Mod ID override
    * @param defaultProps  Default item properties
    */
-  public ItemRegistryAdapter(String modid, @Nullable Item.Properties defaultProps) {
-    super(BuiltInRegistries.ITEM, modid);
+  public ItemRegistryAdapter(IForgeRegistry<Item> registry, String modid, @Nullable Item.Properties defaultProps) {
+    super(registry, modid);
     this.defaultProps = Objects.requireNonNullElseGet(defaultProps, Properties::new);
   }
 
@@ -105,6 +105,11 @@ public class ItemRegistryAdapter extends EnumRegistryAdapter<Item> {
 
 
   /* Standard block items */
+
+  /** Registers a block item using the passed block as the name */
+  protected  <I extends BlockItem> I register(I entry, Block name) {
+    return this.register(entry, Objects.requireNonNull(BuiltInRegistries.BLOCK.getKey(name)));
+  }
 
   /**
    * Registers a generic item block for a block.
@@ -183,20 +188,22 @@ public class ItemRegistryAdapter extends EnumRegistryAdapter<Item> {
    * Registers block items for all entries in a fence building block object
    * @param object  Building block object instance
    */
-  @SuppressWarnings("ConstantConditions")
   public void registerDefaultBlockItem(WoodBlockObject object, boolean isBurnable) {
     // many of these are already burnable via tags, but simplier to set them all here
     BiFunction<? super Block, Integer, ? extends BlockItem> burnableItem;
     Function<? super Block, ? extends BlockItem> burnableTallItem;
     TriFunction<Item.Properties, ? super Block, ? super Block, ? extends BlockItem> burnableSignItem;
+    TriFunction<Item.Properties, ? super Block, ? super Block, ? extends BlockItem> burnableHangingSignItem;
     if (isBurnable) {
       burnableItem     = (block, burnTime) -> new BurnableBlockItem(block, defaultProps, burnTime);
       burnableTallItem = (block) -> new BurnableTallBlockItem(block, defaultProps, 200);
       burnableSignItem = (props, standing, wall) -> new BurnableSignItem(props, standing, wall, 200);
+      burnableHangingSignItem = (props, standing, wall) -> new BurnableHangingSignItem(props, standing, wall, 200);
     } else {
       burnableItem = (block, burnTime) -> new BlockItem(block, defaultProps);
       burnableTallItem = (block) -> new DoubleHighBlockItem(block, defaultProps);
       burnableSignItem = SignItem::new;
+      burnableHangingSignItem = (props, ceiling, wall) -> new HangingSignItem(ceiling, wall, props);
     }
 
     // planks
@@ -218,6 +225,7 @@ public class ItemRegistryAdapter extends EnumRegistryAdapter<Item> {
     registerBlockItem(burnableItem.apply(object.getButton(), 100));
     // sign
     registerBlockItem(burnableSignItem.apply(new Item.Properties().stacksTo(16), object.getSign(), object.getWallSign()));
+    registerBlockItem(burnableHangingSignItem.apply(new Item.Properties().stacksTo(16), object.getHangingSign(), object.getWallHangingSign()));
   }
 
   /**
@@ -256,7 +264,7 @@ public class ItemRegistryAdapter extends EnumRegistryAdapter<Item> {
    * @return  Bucket instance
    */
   public BucketItem registerBucket(Supplier<? extends Fluid> fluid, String baseName) {
-    return register(new BucketItem(fluid.get(), ItemProperties.BUCKET_PROPS), baseName + "_bucket");
+    return register(new BucketItem(fluid, RegistrationHelper.BUCKET_PROPS), baseName + "_bucket");
   }
 
   /**
@@ -268,8 +276,6 @@ public class ItemRegistryAdapter extends EnumRegistryAdapter<Item> {
    * @return  Spawn egg item instance
    */
   public SpawnEggItem registerSpawnEgg(Supplier<? extends EntityType<? extends Mob>> type, int primary, int secondary, String baseName) {
-    SpawnEggItem spawnEgg = register(new LazySpawnEggItem(type, primary, secondary, new Properties()), baseName + "_spawn_egg");
-    ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.SPAWN_EGGS).register(entries -> entries.accept(spawnEgg));
-    return spawnEgg;
+    return register(new ForgeSpawnEggItem(type, primary, secondary, new Properties()), baseName + "_spawn_egg");
   }
 }

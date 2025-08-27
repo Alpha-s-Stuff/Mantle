@@ -1,11 +1,15 @@
 package slimeknights.mantle.registration.object;
 
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.FenceBlock;
+import slimeknights.mantle.registration.RegistrationHelper;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
@@ -25,14 +29,14 @@ public class FenceBuildingBlockObject extends BuildingBlockObject {
     this.fence = fence;
   }
 
-//  /**
-//   * Creates a new object from a building block object plus a fence entry
-//   * @param object  Previous building block object
-//   * @param fence   Fence entry
-//   */
-//  public FenceBuildingBlockObject(BuildingBlockObject object, Block fence) {
-//    this(object, castDelegate(fence.delegate));
-//  }
+  /**
+   * Creates a new object from a building block object plus a fence entry
+   * @param object  Previous building block object
+   * @param fence   Fence entry
+   */
+  public FenceBuildingBlockObject(BuildingBlockObject object, Block fence) {
+    this(object, RegistrationHelper.getCastedHolder(BuiltInRegistries.BLOCK, fence));
+  }
 
   /** Gets the fence for this block */
   public FenceBlock getFence() {
@@ -42,5 +46,11 @@ public class FenceBuildingBlockObject extends BuildingBlockObject {
   @Override
   public List<Block> values() {
     return Arrays.asList(get(), getSlab(), getStairs(), getFence());
+  }
+
+  @Override
+  public void forEach(Consumer<ItemLike> consumer) {
+    super.forEach(consumer);
+    consumer.accept(getFence());
   }
 }

@@ -1,13 +1,15 @@
 package slimeknights.mantle.registration.object;
 
 import lombok.Getter;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 
 import java.util.function.Supplier;
+
+import static slimeknights.mantle.Mantle.commonResource;
 
 /** Object wrapper containing ingots, nuggets, and blocks */
 public class MetalItemObject extends ItemObject<Block> {
@@ -26,10 +28,10 @@ public class MetalItemObject extends ItemObject<Block> {
     super(block);
     this.ingot = ingot;
     this.nugget = nugget;
-    this.blockTag = TagKey.create(Registries.BLOCK, new ResourceLocation("c", tagName + "_blocks"));
-    this.blockItemTag = getTag(tagName + "_blocks");
-    this.ingotTag = getTag(tagName + "_ingots");
-    this.nuggetTag = getTag(tagName + "_nuggets");
+    this.blockTag = BlockTags.create(commonResource("storage_blocks/" + tagName));
+    this.blockItemTag = getTag("storage_blocks/" + tagName);
+    this.ingotTag = getTag("ingots/" + tagName);
+    this.nuggetTag = getTag("nuggets/" + tagName);
   }
 
   /** Gets the ingot for this object */
@@ -48,6 +50,6 @@ public class MetalItemObject extends ItemObject<Block> {
    * @return  Tag
    */
   private static TagKey<Item> getTag(String name) {
-    return TagKey.create(Registries.ITEM, new ResourceLocation("c", name));
+    return ItemTags.create(commonResource(name));
   }
 }

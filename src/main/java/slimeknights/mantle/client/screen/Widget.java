@@ -1,7 +1,6 @@
 package slimeknights.mantle.client.screen;
 
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.resources.ResourceLocation;
 
 public abstract class Widget {
 
@@ -10,7 +9,7 @@ public abstract class Widget {
   public int height;
   public int width;
 
-  public abstract void draw(GuiGraphics guiGraphics, ResourceLocation texture);
+  public abstract void draw(GuiGraphics graphics);
 
   /**
    * Where the part will be drawn. Upper left corner.

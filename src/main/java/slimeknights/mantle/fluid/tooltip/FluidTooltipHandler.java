@@ -1,6 +1,5 @@
 package slimeknights.mantle.fluid.tooltip;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
@@ -26,7 +25,7 @@ import net.minecraft.world.level.material.Fluid;
 import slimeknights.mantle.Mantle;
 import slimeknights.mantle.client.SafeClientAccess;
 import slimeknights.mantle.client.TooltipKey;
-import slimeknights.mantle.data.TagKeySerializer;
+import slimeknights.mantle.data.gson.TagKeySerializer;
 import slimeknights.mantle.recipe.ingredient.FluidIngredient;
 import slimeknights.mantle.util.JsonHelper;
 
@@ -37,7 +36,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Objects;
 import java.util.function.BiConsumer;
 
 /** Handles fluid units displaying in tooltips */
@@ -49,9 +47,10 @@ public class FluidTooltipHandler extends SimpleJsonResourceReloadListener implem
   /** Folder for saving the logic */
   public static final String FOLDER = "mantle/fluid_tooltips";
   /** GSON instance */
+  // TODO: do we even need GSON here? I feel a classical serializer is sufficient as this class is pretty simple
   public static final Gson GSON = (new GsonBuilder())
     .registerTypeAdapter(ResourceLocation.class, new ResourceLocation.Serializer())
-    .registerTypeAdapter(FluidIngredient.class, FluidIngredient.SERIALIZER)
+    .registerTypeAdapter(FluidIngredient.class, FluidIngredient.LOADABLE)
     .registerTypeAdapter(TagKey.class, new TagKeySerializer<>(Registries.FLUID))
     .setPrettyPrinting()
     .disableHtmlEscaping()
@@ -107,7 +106,7 @@ public class FluidTooltipHandler extends SimpleJsonResourceReloadListener implem
   @Override
   protected void apply(Map<ResourceLocation,JsonElement> splashList, ResourceManager manager, ProfilerFiller profiler) {
     long time = System.nanoTime();
-    ImmutableMap.Builder<ResourceLocation,FluidUnitList> builder = ImmutableMap.builder();
+    Map<ResourceLocation,FluidUnitList> builder = new HashMap<>();
     Map<ResourceLocation,ResourceLocation> redirects = new HashMap<>();
     for (Entry<ResourceLocation,JsonElement> entry : splashList.entrySet()) {
       ResourceLocation key = entry.getKey();
@@ -129,9 +128,7 @@ public class FluidTooltipHandler extends SimpleJsonResourceReloadListener implem
       }
     }
     // process redirects
-    Map<ResourceLocation,FluidUnitList> mapBeforeRedirects = builder.build();
-    builder = ImmutableMap.builder();
-    builder.putAll(mapBeforeRedirects);
+    Map<ResourceLocation,FluidUnitList> mapBeforeRedirects = Map.copyOf(builder);
     for (Entry<ResourceLocation,ResourceLocation> entry : redirects.entrySet()) {
       ResourceLocation from = entry.getKey();
       ResourceLocation to = entry.getValue();
@@ -143,10 +140,10 @@ public class FluidTooltipHandler extends SimpleJsonResourceReloadListener implem
       }
     }
     // find the fallback
-    unitLists = builder.build();
+    unitLists = Map.copyOf(builder);
     fallback = this.unitLists.getOrDefault(DEFAULT_ID, DEFAULT_LIST);
     listCache.clear();
-    log.info("Loaded {} fluid unit lists in {} ms", listCache.size(), (System.nanoTime() - time) / 1000000f);
+    log.info("Loaded {} fluid unit lists in {} ms", unitLists.size(), (System.nanoTime() - time) / 1000000f);
   }
 
   /** Gets the unit list for the given fluid */
@@ -188,6 +185,7 @@ public class FluidTooltipHandler extends SimpleJsonResourceReloadListener implem
    * @param amount Amount override
    * @return  Fluid tooltip
    */
+  @SuppressWarnings("deprecation")
   public static List<Component> getFluidTooltip(FluidStack fluid, long amount) {
     List<Component> tooltip = new ArrayList<>();
     // fluid name, not sure if there is a cleaner way to do this

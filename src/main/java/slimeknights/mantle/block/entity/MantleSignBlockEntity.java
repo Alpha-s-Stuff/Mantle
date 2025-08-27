@@ -1,6 +1,5 @@
 package slimeknights.mantle.block.entity;
 
-import com.google.common.collect.ImmutableSet;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -10,7 +9,9 @@ import slimeknights.mantle.registration.MantleRegistrations;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 /** Sign block entity to make it easier for signs to be registered, as the vanilla block entity has a closed set of blocks */
 public class MantleSignBlockEntity extends SignBlockEntity {
@@ -36,7 +37,7 @@ public class MantleSignBlockEntity extends SignBlockEntity {
   }
 
   /** Builds the list of sign blocks for TE registration */
-  public static void buildSignBlocks(ImmutableSet.Builder<Block> builder) {
-    SIGN_BLOCKS.forEach(block -> builder.add(block.get()));
+  public static Set<Block> buildSignBlocks() {
+    return SIGN_BLOCKS.stream().map(Supplier::get).collect(Collectors.toSet());
   }
 }

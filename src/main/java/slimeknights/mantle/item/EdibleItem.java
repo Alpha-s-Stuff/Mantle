@@ -14,33 +14,25 @@ import slimeknights.mantle.util.TranslationHelper;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Objects;
 
 public class EdibleItem extends Item {
-
-  /** if false, does not display effects of food in tooltip */
-  private boolean displayEffectsTooltip;
-
   public EdibleItem(FoodProperties foodIn) {
-    this(foodIn, true);
+    this(new Properties().food(foodIn));
   }
 
-  public EdibleItem(FoodProperties foodIn, boolean displayEffectsTooltip) {
-    super(new Properties().food(foodIn));
-    this.displayEffectsTooltip = displayEffectsTooltip;
+  public EdibleItem(Item.Properties properties) {
+    super(properties);
+    Objects.requireNonNull(foodProperties, "Must set food to make an EdibleItem");
   }
 
   @Override
   public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
     TranslationHelper.addOptionalTooltip(stack, tooltip);
-
-    if (this.displayEffectsTooltip) {
-      for (Pair<MobEffectInstance, Float> pair : stack.getItem().getFoodProperties().getEffects()) {
-        if (pair.getFirst() != null) {
-          tooltip.add(Component.literal(I18n.get(pair.getFirst().getDescriptionId()).trim()).withStyle(ChatFormatting.GRAY));
-        }
+    for (Pair<MobEffectInstance, Float> pair : Objects.requireNonNull(stack.getItem().getFoodProperties(stack, null)).getEffects()) {
+      if (pair.getFirst() != null) {
+        tooltip.add(Component.literal(I18n.get(pair.getFirst().getDescriptionId()).trim()).withStyle(ChatFormatting.GRAY));
       }
     }
-
-    super.appendHoverText(stack, worldIn, tooltip, flagIn);
   }
 }

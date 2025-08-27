@@ -2,19 +2,18 @@ package slimeknights.mantle.client.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
-import net.fabricmc.fabric.api.transfer.v1.client.fluid.FluidVariantRendering;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidType;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
-import slimeknights.mantle.client.model.fluid.FluidCuboid;
-import slimeknights.mantle.client.model.fluid.FluidCuboid.FluidFace;
+import slimeknights.mantle.client.render.FluidCuboid.FluidFace;
 
 import java.util.List;
 
@@ -255,11 +254,13 @@ public class FluidRenderer {
     }
 
     // fluid attributes, fetch once for all fluids to save effort
-    TextureAtlasSprite still = FluidVariantRendering.getSprite(fluid.getType());
-    TextureAtlasSprite flowing = FluidVariantRendering.getSprites(fluid.getType())[1];
-    int color = FluidVariantRendering.getColor(fluid.getType());
-    light = withBlockLight(light, FluidVariantAttributes.getLuminance(fluid.getType()));
-    boolean isGas = FluidVariantAttributes.isLighterThanAir(fluid.getType());
+    IClientFluidTypeExtensions clientFluid = IClientFluidTypeExtensions.of(fluid.getFluid());
+    TextureAtlasSprite still = getBlockSprite(clientFluid.getStillTexture(fluid));
+    TextureAtlasSprite flowing = getBlockSprite(clientFluid.getFlowingTexture(fluid));
+    int color = clientFluid.getTintColor(fluid);
+    FluidType type = fluid.getFluid().getFluidType();
+    light = withBlockLight(light, type.getLightLevel(fluid));
+    boolean isGas = type.isLighterThanAir();
 
     // render all given cuboids
     for (FluidCuboid cube : cubes) {
@@ -301,17 +302,20 @@ public class FluidRenderer {
    * @param cube      Fluid cuboid instance
    * @param flipGas   If true, flips gas cubes
    */
-  public static void renderScaledCuboid(PoseStack matrices, MultiBufferSource buffer, FluidCuboid cube, FluidStack fluid, float offset, long capacity, int light, boolean flipGas) {
+  public static void renderScaledCuboid(PoseStack matrices, MultiBufferSource buffer, FluidCuboid cube, FluidStack fluid, float offset, int capacity, int light, boolean flipGas) {
     // nothing to render
     if (fluid.isEmpty() || capacity <= 0) {
       return;
     }
 
     // fluid attributes
-    TextureAtlasSprite still = FluidVariantRendering.getSprite(fluid.getType());
-    TextureAtlasSprite flowing = FluidVariantRendering.getSprites(fluid.getType())[1];
-    boolean isGas = FluidVariantAttributes.isLighterThanAir(fluid.getType());
-    light = withBlockLight(light, FluidVariantAttributes.getLuminance(fluid.getType()));
+    IClientFluidTypeExtensions clientFluid = IClientFluidTypeExtensions.of(fluid.getFluid());
+    TextureAtlasSprite still = getBlockSprite(clientFluid.getStillTexture(fluid));
+    TextureAtlasSprite flowing = getBlockSprite(clientFluid.getFlowingTexture(fluid));
+    FluidType type = fluid.getFluid().getFluidType();
+    boolean isGas = type.isLighterThanAir();
+    int color = clientFluid.getTintColor(fluid);
+    light = withBlockLight(light, type.getLightLevel(fluid));
 
     // determine height based on fluid amount
     Vector3f from = cube.getFromScaled();
@@ -329,6 +333,6 @@ public class FluidRenderer {
     }
 
     // draw cuboid
-    renderCuboid(matrices, buffer.getBuffer(MantleRenderTypes.FLUID), cube, still, flowing, from, to, FluidVariantRendering.getColor(fluid.getType()), light, isGas);
+    renderCuboid(matrices, buffer.getBuffer(MantleRenderTypes.FLUID), cube, still, flowing, from, to, color, light, isGas);
   }
 }

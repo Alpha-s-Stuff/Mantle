@@ -19,7 +19,7 @@ public interface ICustomOutputRecipe<C extends Container> extends ICommonRecipe<
   /** @deprecated Item stack output not supported */
   @Override
   @Deprecated
-  default ItemStack assemble(C inv, RegistryAccess registryAccess) {
+  default ItemStack assemble(C inv, RegistryAccess access) {
     return ItemStack.EMPTY;
   }
 }

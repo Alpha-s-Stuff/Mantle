@@ -41,5 +41,5 @@ public class FakeEntityGetter implements LevelEntityGetter<Entity> {
   public void get(AABB aabb, Consumer<Entity> successConsumer) {}
 
   @Override
-  public <U extends Entity> void get(EntityTypeTest<Entity,U> typeTest, AABB aabb, AbortableIterationConsumer<U> successConsumer) {}
+  public <U extends Entity> void get(EntityTypeTest<Entity,U> typeTest, AABB bounds, AbortableIterationConsumer<U> successConsumer) {}
 }

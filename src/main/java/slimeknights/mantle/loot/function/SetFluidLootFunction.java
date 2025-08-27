@@ -17,9 +17,6 @@ import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.minecraft.util.GsonHelper;
 import slimeknights.mantle.loot.MantleLoot;
-import slimeknights.mantle.recipe.helper.RecipeHelper;
-
-import net.minecraft.world.level.storage.loot.functions.LootItemConditionalFunction.Builder;
 
 /**
  * Loot function to set the fluid on a dropped item
@@ -67,12 +64,12 @@ public class SetFluidLootFunction extends LootItemConditionalFunction {
     @Override
     public void serialize(JsonObject json, SetFluidLootFunction loot, JsonSerializationContext context) {
       super.serialize(json, loot, context);
-      json.add("fluid", RecipeHelper.serializeFluidStack(loot.fluid));
+      json.add("fluid", FluidStackLoadable.REQUIRED_STACK_NBT.serialize(loot.fluid));
     }
 
     @Override
     public SetFluidLootFunction deserialize(JsonObject object, JsonDeserializationContext context, LootItemCondition[] conditions) {
-      FluidStack fluid = RecipeHelper.deserializeFluidStack(GsonHelper.getAsJsonObject(object, "fluid"));
+      FluidStack fluid = FluidStackLoadable.REQUIRED_STACK_NBT.getIfPresent(object, "fluid");
       return new SetFluidLootFunction(conditions, fluid);
     }
   }

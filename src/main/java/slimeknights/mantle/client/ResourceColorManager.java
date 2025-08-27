@@ -12,7 +12,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.ResourceManager;
 import slimeknights.mantle.Mantle;
-import slimeknights.mantle.data.ISafeManagerReloadListener;
+import slimeknights.mantle.data.listener.ISafeManagerReloadListener;
 import slimeknights.mantle.util.JsonHelper;
 
 import javax.annotation.Nullable;
@@ -30,8 +30,6 @@ import java.util.Map.Entry;
 public class ResourceColorManager implements ISafeManagerReloadListener, IdentifiableResourceReloadListener {
   /** Modifier file to load, has merging behavior but forge prevents multiple mods from loading the same file */
   private static final String COLORS_PATH = "mantle/colors.json";
-  /** Modifier file to load, has merging behavior but forge prevents multiple mods from loading the same file */
-  private static final String FALLBACK_PATH = "tinkering/colors.json";
   /** Default color so the getter can be nonnull */
   public static final TextColor WHITE = TextColor.fromRgb(-1);
   /** Instance of this manager */
@@ -81,12 +79,6 @@ public class ResourceColorManager implements ISafeManagerReloadListener, Identif
 
     // get a list of files from all namespaces
     List<JsonObject> jsonFiles = JsonHelper.getFileInAllDomainsAndPacks(manager, COLORS_PATH, null);
-    // first object is bottom most pack, so upper resource packs will replace it
-    for (int i = jsonFiles.size() - 1; i >= 0; i--) {
-      parseRecursive("", jsonFiles.get(i), colors);
-    }
-    // load in fallback files second, so mantle files take precedence
-    jsonFiles = JsonHelper.getFileInAllDomainsAndPacks(manager, FALLBACK_PATH, COLORS_PATH);
     // first object is bottom most pack, so upper resource packs will replace it
     for (int i = jsonFiles.size() - 1; i >= 0; i--) {
       parseRecursive("", jsonFiles.get(i), colors);

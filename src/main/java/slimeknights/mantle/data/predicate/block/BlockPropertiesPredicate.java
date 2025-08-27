@@ -1,7 +1,5 @@
 package slimeknights.mantle.data.predicate.block;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -16,11 +14,13 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
-import slimeknights.mantle.data.GenericLoaderRegistry.IGenericLoader;
-import slimeknights.mantle.data.predicate.IJsonPredicate;
+import slimeknights.mantle.data.loadable.Loadables;
+import slimeknights.mantle.data.loadable.record.RecordLoadable;
 import slimeknights.mantle.util.JsonHelper;
+import slimeknights.mantle.util.typed.TypedMap;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,7 +53,7 @@ public record BlockPropertiesPredicate(Block block, List<Matcher> properties) im
   }
 
   @Override
-  public IGenericLoader<? extends IJsonPredicate<BlockState>> getLoader() {
+  public RecordLoadable<BlockPropertiesPredicate> getLoader() {
     return LOADER;
   }
 
@@ -66,21 +66,23 @@ public record BlockPropertiesPredicate(Block block, List<Matcher> properties) im
     return property;
   }
 
-  public static final IGenericLoader<BlockPropertiesPredicate> LOADER = new IGenericLoader<>() {
+  /** Loader instance */
+  public static final RecordLoadable<BlockPropertiesPredicate> LOADER = new RecordLoadable<>() {
     @Override
-    public BlockPropertiesPredicate deserialize(JsonObject json) {
-      Block block = JsonHelper.getAsEntry(BuiltInRegistries.BLOCK, json, "block");
-      ImmutableList.Builder<Matcher> builder = ImmutableList.builder();
-      for (Entry<String, JsonElement> entry : GsonHelper.getAsJsonObject(json, "properties").entrySet()) {
+    public BlockPropertiesPredicate deserialize(JsonObject json, TypedMap context) {
+      Block block = Loadables.BLOCK.getIfPresent(json, "block", context);
+      Set<Entry<String,JsonElement>> properties = GsonHelper.getAsJsonObject(json, "properties").entrySet();
+      List<Matcher> builder = new ArrayList<>(properties.size());
+      for (Entry<String, JsonElement> entry : properties) {
         Property<?> property = parseProperty(block, entry.getKey(), JSON_EXCEPTION);
         builder.add(Matcher.deserialize(property, entry.getValue()));
       }
-      return new BlockPropertiesPredicate(block, builder.build());
+      return new BlockPropertiesPredicate(block, List.copyOf(builder));
     }
 
     @Override
     public void serialize(BlockPropertiesPredicate object, JsonObject json) {
-      json.addProperty("block", Objects.requireNonNull(BuiltInRegistries.BLOCK.getKey(object.block)).toString());
+      json.add("block", Loadables.BLOCK.serialize(object.block));
       JsonObject properties = new JsonObject();
       for (Matcher matcher : object.properties) {
         properties.add(matcher.property().getName(), matcher.serialize());
@@ -89,19 +91,19 @@ public record BlockPropertiesPredicate(Block block, List<Matcher> properties) im
     }
 
     @Override
-    public BlockPropertiesPredicate fromNetwork(FriendlyByteBuf buffer) {
-      Block block = BuiltInRegistries.BLOCK.byId(buffer.readVarInt());
+    public BlockPropertiesPredicate decode(FriendlyByteBuf buffer, TypedMap context) {
+      Block block = Loadables.BLOCK.decode(buffer, context);
       int size = buffer.readVarInt();
-      ImmutableList.Builder<Matcher> builder = ImmutableList.builder();
+      List<Matcher> builder = new ArrayList<>(size);
       for (int i = 0; i < size; i++) {
         builder.add(Matcher.fromNetwork(block, buffer));
       }
-      return new BlockPropertiesPredicate(block, builder.build());
+      return new BlockPropertiesPredicate(block, List.copyOf(builder));
     }
 
     @Override
-    public void toNetwork(BlockPropertiesPredicate object, FriendlyByteBuf buffer) {
-      buffer.writeVarInt(BuiltInRegistries.BLOCK.getId(object.block));
+    public void encode(FriendlyByteBuf buffer, BlockPropertiesPredicate object) {
+      Loadables.BLOCK.encode(buffer, object.block);
       buffer.writeVarInt(object.properties.size());
       for (Matcher matcher : object.properties) {
         matcher.toNetwork(buffer);
@@ -146,7 +148,7 @@ public record BlockPropertiesPredicate(Block block, List<Matcher> properties) im
       }
       // if an array, set match
       if (element.isJsonArray()) {
-        return new SetMatcher<>(property, ImmutableSet.copyOf(JsonHelper.parseList(
+        return new SetMatcher<>(property, Set.copyOf(JsonHelper.parseList(
           element.getAsJsonArray(), property.getName(),(e, key) -> parseValue(property, GsonHelper.convertToString(e, key), JSON_EXCEPTION)))
         );
       }
@@ -206,11 +208,11 @@ public record BlockPropertiesPredicate(Block block, List<Matcher> properties) im
         }
         return new RangeMatcher<>(property, min, max);
       } else {
-        ImmutableSet.Builder<T> builder = ImmutableSet.builder();
+        List<T> builder = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {
           builder.add(parseValue(property, buffer.readUtf(Short.MAX_VALUE), DECODER_EXCEPTION));
         }
-        return new SetMatcher<>(property, builder.build());
+        return new SetMatcher<>(property, Set.copyOf(builder));
       }
     }
   }
@@ -386,7 +388,7 @@ public record BlockPropertiesPredicate(Block block, List<Matcher> properties) im
       if (matchers.isEmpty()) {
         throw new IllegalArgumentException("Must have at least one property");
       }
-      return new BlockPropertiesPredicate(block, ImmutableList.copyOf(matchers.values()));
+      return new BlockPropertiesPredicate(block, List.copyOf(matchers.values()));
     }
   }
 }

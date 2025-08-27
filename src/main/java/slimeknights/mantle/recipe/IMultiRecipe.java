@@ -1,5 +1,7 @@
 package slimeknights.mantle.recipe;
 
+import net.minecraft.core.RegistryAccess;
+
 import java.util.List;
 
 /**
@@ -10,6 +12,7 @@ public interface IMultiRecipe<T> {
   /**
    * Gets a list of recipes for display in JEI
    * @return  List of recipes
+   * @param access  Registry access instance
    */
-  List<T> getRecipes();
+  List<T> getRecipes(RegistryAccess access);
 }

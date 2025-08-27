@@ -40,7 +40,7 @@ import slimeknights.mantle.client.book.data.element.IngredientData;
 import slimeknights.mantle.client.book.repository.BookRepository;
 import slimeknights.mantle.client.book.transformer.BookTransformer;
 import slimeknights.mantle.client.book.transformer.IndexTransformer;
-import slimeknights.mantle.data.ResourceLocationSerializer;
+import slimeknights.mantle.data.gson.ResourceLocationSerializer;
 import slimeknights.mantle.network.MantleNetwork;
 import slimeknights.mantle.network.packet.UpdateHeldPagePacket;
 import slimeknights.mantle.network.packet.UpdateLecternPagePacket;
@@ -175,6 +175,13 @@ public class BookLoader implements SimpleSynchronousResourceReloadListener {
   @Nullable
   public static BookData getBook(ResourceLocation id) {
     return books.getOrDefault(id, null);
+  }
+
+  /**
+   * Gets the resource location of all registered books
+   */
+  public static Iterable<ResourceLocation> getRegisteredBooks() {
+    return books.keySet();
   }
 
   /**

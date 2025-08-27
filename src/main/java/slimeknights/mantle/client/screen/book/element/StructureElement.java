@@ -7,11 +7,16 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
+import net.minecraftforge.client.model.data.ModelData;
+import org.joml.AxisAngle4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import slimeknights.mantle.client.book.structure.StructureInfo;
@@ -55,13 +60,13 @@ public class StructureElement extends SizedBookElement {
     this.transX = x + width / 2F;
     this.transY = y + height / 2F;
 
-    this.additionalTransform = new Transformation(null, new Quaternionf().rotationXYZ(25 * (float) (Math.PI / 180.0), 0, 0), null, new Quaternionf().rotationXYZ(0, -45 * (float) (Math.PI / 180.0), 0));
+    this.additionalTransform = new Transformation(null, new Quaternionf().rotateYXZ(0, (float)(25 * Math.PI / 180f), 0), null, new Quaternionf().rotateYXZ((float)(-45 * Math.PI / 180f), 0, 0));
   }
 
   @Override
-  public void draw(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks, Font fontRenderer) {
+  public void draw(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks, Font fontRenderer) {
     MultiBufferSource.BufferSource buffer = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
-    PoseStack transform = guiGraphics.pose();
+    PoseStack transform = graphics.pose();
     PoseStack.Pose lastEntryBeforeTry = transform.last();
 
     try {
@@ -89,7 +94,7 @@ public class StructureElement extends SizedBookElement {
       transform.translate(this.transX, this.transY, Math.max(structureHeight, Math.max(structureWidth, structureLength)));
       transform.scale(this.scale, -this.scale, 1);
       transform.pushTransformation(this.additionalTransform);
-      transform.mulPose(new Quaternionf());
+      transform.mulPose(new Quaternionf().rotateYXZ(0, 0, 0));
 
       transform.translate(structureLength / -2f, structureHeight / -2f, structureWidth / -2f);
 
@@ -110,11 +115,21 @@ public class StructureElement extends SizedBookElement {
               else
                 overlay = OverlayTexture.NO_OVERLAY;
 
-              blockRender.getModelRenderer().tesselateBlock(
-                structureWorld, blockRender.getBlockModel(state), state, pos, transform,
-                buffer.getBuffer(MantleRenderTypes.TRANSLUCENT_FULLBRIGHT), false, structureWorld.random, state.getSeed(pos),
-                overlay
-              );
+              ModelData modelData = ModelData.EMPTY;
+              BlockEntity te = structureWorld.getBlockEntity(pos);
+
+              if (te != null) {
+                modelData = te.getModelData();
+              }
+
+              // TODO: verify that we should be using all types here
+              BakedModel model = blockRender.getBlockModel(state);
+              for (RenderType renderType : model.getRenderTypes(state, structureWorld.random, modelData)) {
+                blockRender.getModelRenderer().tesselateBlock(
+                  structureWorld, blockRender.getBlockModel(state), state, pos, transform,
+                  buffer.getBuffer(MantleRenderTypes.TRANSLUCENT_FULLBRIGHT), false, structureWorld.random, state.getSeed(pos),
+                  overlay, modelData, renderType);
+              }
 
               transform.popPose();
             }
@@ -159,10 +174,13 @@ public class StructureElement extends SizedBookElement {
 
   private Transformation forRotation(double rX, double rY) {
     Vector3f axis = new Vector3f((float) rY, (float) rX, 0);
-    float angle = (float) Math.sqrt(axis.dot(axis));
+    float dot = axis.dot(axis);
+    if (dot < Float.MIN_NORMAL) {
+      return Transformation.identity();
+    }
 
+    float angle = (float) (Math.sqrt(axis.dot(axis)) * Math.PI / 180f);
     axis.normalize();
-
-    return new Transformation(null, new Quaternionf().setAngleAxis(angle, axis.x(), axis.y(), axis.z()), null, null);
+    return new Transformation(null, new Quaternionf(new AxisAngle4f(angle, axis)), null, null);
   }
 }

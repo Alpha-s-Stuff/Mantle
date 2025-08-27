@@ -6,17 +6,15 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
-import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
-import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
 import lombok.RequiredArgsConstructor;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
-import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
-import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
 import org.apache.commons.lang3.function.TriFunction;
 import org.jetbrains.annotations.Nullable;
 import slimeknights.mantle.Mantle;
@@ -29,7 +27,7 @@ import java.util.function.Consumer;
 
 /** Fluid transfer info that fills a fluid into an item */
 @RequiredArgsConstructor
-public class FillFluidContainerTransfer implements IFluidContainerTransfer {
+public class FillFluidContainerTransfer implements IFluidContainerTransfer.WithDirection {
   public static final ResourceLocation ID = Mantle.getResource("fill_item");
 
   private final Ingredient input;
@@ -55,17 +53,17 @@ public class FillFluidContainerTransfer implements IFluidContainerTransfer {
 
   @Nullable
   @Override
-  public TransferResult transfer(ItemStack stack, FluidStack fluid, Storage<FluidVariant> handler) {
-    long amount = this.fluid.getAmount(fluid.getFluid());
+  public TransferResult transfer(ItemStack stack, FluidStack fluid, IFluidHandler handler, TransferDirection direction) {
+    if (!direction.canFill()) {
+      return null;
+    }
+    int amount = this.fluid.getAmount(fluid.getFluid());
     FluidStack toDrain = new FluidStack(fluid, amount);
-    long simulated = handler.simulateExtract(toDrain.getType(), toDrain.getAmount(), null);
-    if (simulated == amount) {
-      try (Transaction t = TransferUtil.getTransaction()) {
-        long actual = handler.extract(toDrain.getType(), toDrain.getAmount(), t);
-        if (actual != amount) {
-          Mantle.logger.error("Wrong amount drained from {}, expected {}, filled {}", BuiltInRegistries.ITEM.getKey(stack.getItem()), fluid.getAmount(), actual);
-        }
-        t.commit();
+    FluidStack simulated = handler.drain(toDrain.copy(), FluidAction.SIMULATE);
+    if (simulated.getAmount() == amount) {
+      FluidStack actual = handler.drain(toDrain.copy(), FluidAction.EXECUTE);
+      if (actual.getAmount() != amount) {
+        Mantle.logger.error("Wrong amount drained from {}, expected {}, filled {}", BuiltInRegistries.ITEM.getKey(stack.getItem()), fluid.getAmount(), actual.getAmount());
       }
       return new TransferResult(getFilled(toDrain), toDrain, true);
     }
@@ -77,7 +75,7 @@ public class FillFluidContainerTransfer implements IFluidContainerTransfer {
     JsonObject json = new JsonObject();
     json.addProperty("type", ID.toString());
     json.add("input", input.toJson());
-    json.add("filled", filled.serialize());
+    json.add("filled", filled.serialize(false));
     json.add("fluid", fluid.serialize());
     return json;
   }
@@ -92,8 +90,8 @@ public class FillFluidContainerTransfer implements IFluidContainerTransfer {
     public T deserialize(JsonElement element, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
       JsonObject json = element.getAsJsonObject();
       Ingredient input = Ingredient.fromJson(JsonHelper.getElement(json, "input"));
-      ItemOutput filled = ItemOutput.fromJson(JsonHelper.getElement(json, "filled"));
-      FluidIngredient fluid = FluidIngredient.deserialize(json, "fluid");
+      ItemOutput filled = ItemOutput.Loadable.REQUIRED_ITEM.getIfPresent(json, "filled");
+      FluidIngredient fluid = FluidIngredient.LOADABLE.getIfPresent(json, "fluid");
       return factory.apply(input, filled, fluid);
     }
   }

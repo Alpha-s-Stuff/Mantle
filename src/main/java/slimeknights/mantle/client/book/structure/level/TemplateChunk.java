@@ -35,7 +35,6 @@ public class TemplateChunk extends EmptyLevelChunk {
     for (StructureBlockInfo info : blocksInChunk) {
       this.blocksInChunk.put(info.pos(), info);
 
-      //noinspection ConstantConditions wrong nullability annotations
       if (info.nbt() != null) {
         BlockEntity tile = BlockEntity.loadStatic(info.pos(), info.state(), info.nbt());
 

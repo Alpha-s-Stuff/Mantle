@@ -13,8 +13,8 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.fabricmc.api.EnvType;
-import io.github.fabricators_of_create.porting_lib.util.EnvExecutor;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.DistExecutor;
 import slimeknights.mantle.util.BlockEntityHelper;
 
 import javax.annotation.Nullable;
@@ -50,9 +50,9 @@ public class BaseContainerMenu<TILE extends BlockEntity> extends AbstractContain
         continue;
       }
 
-      if (player.containerMenu instanceof BaseContainerMenu) {
-        if (this.sameGui((BaseContainerMenu) player.containerMenu)) {
-          this.syncWithOtherContainer((BaseContainerMenu) player.containerMenu, playerOpened);
+      if (player.containerMenu instanceof BaseContainerMenu<?> baseMenu) {
+        if (this.sameGui(baseMenu)) {
+          this.syncWithOtherContainer(baseMenu, playerOpened);
           return;
         }
       }
@@ -66,7 +66,7 @@ public class BaseContainerMenu<TILE extends BlockEntity> extends AbstractContain
    * Called when the container is opened and another player already has a container for this tile open
    * Sync to the same state here.
    */
-  protected void syncWithOtherContainer(BaseContainerMenu otherContainer, ServerPlayer player) {
+  protected void syncWithOtherContainer(BaseContainerMenu<?> otherContainer, ServerPlayer player) {
   }
 
   /**
@@ -76,7 +76,7 @@ public class BaseContainerMenu<TILE extends BlockEntity> extends AbstractContain
   protected void syncNewContainer(ServerPlayer player) {
   }
 
-  public boolean sameGui(BaseContainerMenu otherContainer) {
+  public boolean sameGui(BaseContainerMenu<?> otherContainer) {
     if (this.tile == null) {
       return false;
     }
@@ -232,7 +232,7 @@ public class BaseContainerMenu<TILE extends BlockEntity> extends AbstractContain
         slot = this.slots.get(k);
         itemstack1 = slot.getItem();
 
-        if (!itemstack1.isEmpty() && itemstack1.getItem() == stack.getItem() && ItemStack.isSameItemSameTags(stack, itemstack1) && this.canTakeItemForPickAll(stack, slot)) {
+        if (!itemstack1.isEmpty() && ItemStack.isSameItemSameTags(stack, itemstack1) && this.canTakeItemForPickAll(stack, slot)) {
           int l = itemstack1.getCount() + stack.getCount();
           int limit = Math.min(stack.getMaxStackSize(), slot.getMaxStackSize(stack));
 
@@ -322,6 +322,6 @@ public class BaseContainerMenu<TILE extends BlockEntity> extends AbstractContain
     if (buf == null) {
       return null;
     }
-    return EnvExecutor.callWhenOn(EnvType.CLIENT, () -> () -> BlockEntityHelper.get(type, Minecraft.getInstance().level, buf.readBlockPos()).orElse(null));
+    return DistExecutor.unsafeCallWhenOn(Dist.CLIENT, () -> () -> BlockEntityHelper.get(type, Minecraft.getInstance().level, buf.readBlockPos()).orElse(null));
   }
 }

@@ -2,26 +2,27 @@ package slimeknights.mantle.recipe.data;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.mojang.serialization.JsonOps;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtOps;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.common.crafting.CraftingHelper;
+import net.minecraftforge.common.crafting.StrictNBTIngredient;
 
 import javax.annotation.Nullable;
-import java.util.stream.Stream;
+import java.util.Objects;
+
+import net.minecraftforge.common.crafting.StrictNBTIngredient.Serializer;
 
 /**
  * Ingredient for a NBT sensitive item from another mod, should never be used outside datagen
  */
-public class NBTNameIngredient extends Ingredient {
+public class NBTNameIngredient extends StrictNBTIngredient {
   private final ResourceLocation name;
   @Nullable
   private final CompoundTag nbt;
 
   protected NBTNameIngredient(ResourceLocation name, @Nullable CompoundTag nbt) {
-    super(Stream.empty());
+    super(ItemStack.EMPTY);
     this.name = name;
     this.nbt = nbt;
   }
@@ -53,17 +54,11 @@ public class NBTNameIngredient extends Ingredient {
   @Override
   public JsonElement toJson() {
     JsonObject json = new JsonObject();
-    json.addProperty("fabric:type", "fabric:nbt");
-    JsonObject item = new JsonObject();
-    item.addProperty("item", name.toString());
-
-    json.add("base", item);
-    json.addProperty("strict", true);
-
+    json.addProperty("type", Objects.requireNonNull(CraftingHelper.getID(Serializer.INSTANCE)).toString());
+    json.addProperty("item", name.toString());
     if (nbt != null) {
-      json.add("nbt", NbtOps.INSTANCE.convertTo(JsonOps.INSTANCE, nbt));
+      json.addProperty("nbt", nbt.toString());
     }
-
     return json;
   }
 }

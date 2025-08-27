@@ -37,14 +37,14 @@ public class TextComponentElement extends SizedBookElement {
   }
 
   @Override
-  public void draw(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks, Font fontRenderer) {
-    lastAction = TextComponentDataRenderer.drawText(guiGraphics, this.x, this.y, this.width, this.height, this.text, mouseX, mouseY, fontRenderer, this.tooltip);
+  public void draw(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks, Font fontRenderer) {
+    lastAction = TextComponentDataRenderer.drawText(graphics, this.x, this.y, this.width, this.height, this.text, mouseX, mouseY, fontRenderer, this.tooltip);
   }
 
   @Override
-  public void drawOverlay(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks, Font fontRenderer) {
+  public void drawOverlay(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks, Font fontRenderer) {
     if (this.tooltip.size() > 0) {
-      drawTooltip(guiGraphics, this.tooltip, mouseX, mouseY, fontRenderer);
+      drawTooltip(graphics, this.tooltip, mouseX, mouseY, fontRenderer);
       this.tooltip.clear();
     }
   }

@@ -1,25 +1,24 @@
 package slimeknights.mantle.recipe.crafting;
 
-import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonObject;
-import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.NonNullList;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.CraftingRecipe;
-import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.ShapedRecipe;
 import net.minecraft.world.item.crafting.ShapelessRecipe;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.util.GsonHelper;
-import net.minecraft.core.NonNullList;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
+import slimeknights.mantle.data.loadable.Loadables;
 import slimeknights.mantle.recipe.MantleRecipeSerializers;
 import slimeknights.mantle.util.JsonHelper;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -35,7 +34,6 @@ public class ShapedFallbackRecipe extends ShapedRecipe {
    * Main constructor, creates a recipe from all parameters
    * @param id             Recipe ID
    * @param group          Recipe group
-   * @param category       Recipe category
    * @param width          Recipe width
    * @param height         Recipe height
    * @param ingredients    Recipe input ingredients
@@ -53,7 +51,8 @@ public class ShapedFallbackRecipe extends ShapedRecipe {
    * @param alternatives  List of recipe names to fail this match if they match
    */
   public ShapedFallbackRecipe(ShapedRecipe base, List<ResourceLocation> alternatives) {
-    this(base.getId(), base.getGroup(), base.category(), base.getWidth(), base.getHeight(), base.getIngredients(), base.getResultItem(RegistryAccess.EMPTY), alternatives);
+    super(base.getId(), base.getGroup(), base.category(), base.getWidth(), base.getHeight(), base.getIngredients(), base.result, base.showNotification());
+    this.alternatives = alternatives;
   }
 
   @Override
@@ -91,20 +90,19 @@ public class ShapedFallbackRecipe extends ShapedRecipe {
     @Override
     public ShapedFallbackRecipe fromJson(ResourceLocation id, JsonObject json) {
       ShapedRecipe base = super.fromJson(id, json);
-      List<ResourceLocation> alternatives = JsonHelper.parseList(json, "alternatives", (element, name) -> new ResourceLocation(GsonHelper.convertToString(element, name)));
+      List<ResourceLocation> alternatives = JsonHelper.parseList(json, "alternatives", Loadables.RESOURCE_LOCATION);
       return new ShapedFallbackRecipe(base, alternatives);
     }
 
     @Override
     public ShapedFallbackRecipe fromNetwork(ResourceLocation id, FriendlyByteBuf buffer) {
       ShapedRecipe base = super.fromNetwork(id, buffer);
-      assert base != null;
       int size = buffer.readVarInt();
-      ImmutableList.Builder<ResourceLocation> builder = ImmutableList.builder();
+      List<ResourceLocation> builder = new ArrayList<>(size);
       for (int i = 0; i < size; i++) {
         builder.add(buffer.readResourceLocation());
       }
-      return new ShapedFallbackRecipe(base, builder.build());
+      return new ShapedFallbackRecipe(base, List.copyOf(builder));
     }
 
     @Override

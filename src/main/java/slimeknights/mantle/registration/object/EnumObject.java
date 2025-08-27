@@ -160,9 +160,9 @@ public class EnumObject<T extends Enum<T>, I> {
      * @param value  Registry delegate
      * @return  Builder instance
      */
-    @SuppressWarnings("unchecked")
-    public Builder<T,I> putDelegate(T key, I value) {
-      this.map.put(key, () -> (I) value);
+    public Builder<T,I> put(T key, I value) {
+      // TODO: should we use holders? is there a practical way to fetch one?
+      this.map.put(key, () -> value);
       return this;
     }
 

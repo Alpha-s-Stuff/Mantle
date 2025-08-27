@@ -3,19 +3,22 @@ package slimeknights.mantle.recipe.crafting;
 import com.google.gson.JsonObject;
 import lombok.Getter;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.ShapedRecipe;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import slimeknights.mantle.item.RetexturedBlockItem;
 import slimeknights.mantle.recipe.MantleRecipeSerializers;
+import slimeknights.mantle.recipe.helper.LoggingRecipeSerializer;
 import slimeknights.mantle.util.JsonHelper;
+import slimeknights.mantle.util.RetexturedHelper;
 
 import javax.annotation.Nullable;
 
@@ -33,7 +36,7 @@ public class ShapedRetexturedRecipe extends ShapedRecipe {
    * @param matchAll   If true, all inputs must match for the recipe to match
    */
   protected ShapedRetexturedRecipe(ShapedRecipe orig, Ingredient texture, boolean matchAll) {
-    super(orig.getId(), orig.getGroup(), orig.category(), orig.getWidth(), orig.getHeight(), orig.getIngredients(), orig.getResultItem(RegistryAccess.EMPTY));
+    super(orig.getId(), orig.getGroup(), orig.category(), orig.getWidth(), orig.getHeight(), orig.getIngredients(), orig.result);
     this.texture = texture;
     this.matchAll = matchAll;
   }
@@ -43,13 +46,13 @@ public class ShapedRetexturedRecipe extends ShapedRecipe {
    * @param texture  Texture to use
    * @return  Output with texture. Will be blank if the input is not a block
    */
-  public ItemStack getRecipeOutput(Item texture) {
-    return RetexturedBlockItem.setTexture(getResultItem(RegistryAccess.EMPTY).copy(), Block.byItem(texture));
+  public ItemStack getResultItem(Item texture, RegistryAccess access) {
+    return RetexturedHelper.setTexture(getResultItem(access).copy(), Block.byItem(texture));
   }
 
   @Override
-  public ItemStack assemble(CraftingContainer craftMatrix, RegistryAccess registryAccess) {
-    ItemStack result = super.assemble(craftMatrix, registryAccess);
+  public ItemStack assemble(CraftingContainer craftMatrix, RegistryAccess access) {
+    ItemStack result = super.assemble(craftMatrix, access);
     Block currentTexture = null;
     for (int i = 0; i < craftMatrix.getContainerSize(); i++) {
       ItemStack stack = craftMatrix.getItem(i);
@@ -57,7 +60,7 @@ public class ShapedRetexturedRecipe extends ShapedRecipe {
         // if the item is the same as the result, copy the texture over
         Block block;
         if (stack.getItem() == result.getItem()) {
-          block = RetexturedBlockItem.getTexture(stack);
+          block = RetexturedHelper.getTexture(stack);
         } else {
           block = Block.byItem(stack.getItem());
         }
@@ -84,7 +87,7 @@ public class ShapedRetexturedRecipe extends ShapedRecipe {
 
     // set the texture if found. No texture will use the fallback
     if (currentTexture != null) {
-      return RetexturedBlockItem.setTexture(result, currentTexture);
+      return RetexturedHelper.setTexture(result, currentTexture);
     }
     return result;
   }
@@ -94,11 +97,11 @@ public class ShapedRetexturedRecipe extends ShapedRecipe {
     return MantleRecipeSerializers.CRAFTING_SHAPED_RETEXTURED;
   }
 
-  public static class Serializer implements RecipeSerializer<ShapedRetexturedRecipe> {
+  public static class Serializer implements LoggingRecipeSerializer<ShapedRetexturedRecipe> {
     @Override
     public ShapedRetexturedRecipe fromJson(ResourceLocation recipeId, JsonObject json) {
       ShapedRecipe recipe = SHAPED_RECIPE.fromJson(recipeId, json);
-      Ingredient texture = Ingredient.fromJson(JsonHelper.getElement(json, "texture"));
+      Ingredient texture = Ingredient.fromJson(JsonHelper.getElement(json, "texture"), false);
       boolean matchAll = false;
       if (json.has("match_all")) {
         matchAll = json.get("match_all").getAsBoolean();
@@ -108,13 +111,13 @@ public class ShapedRetexturedRecipe extends ShapedRecipe {
 
     @Nullable
     @Override
-    public ShapedRetexturedRecipe fromNetwork(ResourceLocation recipeId, FriendlyByteBuf buffer) {
+    public ShapedRetexturedRecipe fromNetworkSafe(ResourceLocation recipeId, FriendlyByteBuf buffer) {
       ShapedRecipe recipe = SHAPED_RECIPE.fromNetwork(recipeId, buffer);
       return recipe == null ? null : new ShapedRetexturedRecipe(recipe, Ingredient.fromNetwork(buffer), buffer.readBoolean());
     }
 
     @Override
-    public void toNetwork(FriendlyByteBuf buffer, ShapedRetexturedRecipe recipe) {
+    public void toNetworkSafe(FriendlyByteBuf buffer, ShapedRetexturedRecipe recipe) {
       SHAPED_RECIPE.toNetwork(buffer, recipe);
       recipe.texture.toNetwork(buffer);
       buffer.writeBoolean(recipe.matchAll);

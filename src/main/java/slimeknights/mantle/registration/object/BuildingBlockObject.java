@@ -1,12 +1,16 @@
 package slimeknights.mantle.registration.object;
 
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.StairBlock;
+import slimeknights.mantle.registration.RegistrationHelper;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
@@ -24,9 +28,9 @@ public class BuildingBlockObject extends ItemObject<Block> {
    * @param stairs  Stairs block, should be an instance of StairsBlock
    */
   public BuildingBlockObject(Block block, Block slab, Block stairs) {
-    super(block);
-    this.slab = () -> (SlabBlock) slab;
-    this.stairs = () -> (StairBlock) stairs;
+    super(BuiltInRegistries.BLOCK, block);
+    this.slab = RegistrationHelper.getCastedHolder(BuiltInRegistries.BLOCK, slab);
+    this.stairs = RegistrationHelper.getCastedHolder(BuiltInRegistries.BLOCK, stairs);
   }
 
   /**
@@ -67,5 +71,12 @@ public class BuildingBlockObject extends ItemObject<Block> {
    */
   public List<Block> values() {
     return Arrays.asList(get(), getSlab(), getStairs());
+  }
+
+  /** Runs the consumer on each element in the object */
+  public void forEach(Consumer<ItemLike> consumer) {
+    consumer.accept(get());
+    consumer.accept(getSlab());
+    consumer.accept(getStairs());
   }
 }

@@ -1,35 +1,34 @@
 package slimeknights.mantle.fluid.tooltip;
 
-import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonObject;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.minecraft.Util;
 import net.minecraft.data.CachedOutput;
+import net.minecraft.data.PackOutput;
+import net.minecraft.data.PackOutput.Target;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.PackType;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.material.Fluid;
 import slimeknights.mantle.data.GenericDataProvider;
 
 import javax.annotation.Nullable;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Stream;
 
 /** Provider for fluid tooltip information */
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "SameParameterValue"})  // API
 public abstract class AbstractFluidTooltipProvider extends GenericDataProvider {
-  private final Map<ResourceLocation,ResourceLocation> redirects = new HashMap<>();;
+  private final Map<ResourceLocation,ResourceLocation> redirects = new HashMap<>();
   private final Map<ResourceLocation,FluidUnitListBuilder> builders = new HashMap<>();
   private final String modId;
 
-  public AbstractFluidTooltipProvider(FabricDataOutput generator, String modId) {
-    super(generator, PackType.CLIENT_RESOURCES, FluidTooltipHandler.FOLDER, FluidTooltipHandler.GSON);
+  public AbstractFluidTooltipProvider(PackOutput output, String modId) {
+    super(output, Target.RESOURCE_PACK, FluidTooltipHandler.FOLDER, FluidTooltipHandler.GSON);
     this.modId = modId;
   }
 
@@ -39,14 +38,13 @@ public abstract class AbstractFluidTooltipProvider extends GenericDataProvider {
   @Override
   public final CompletableFuture<?> run(CachedOutput cache) {
     addFluids();
-    final List<CompletableFuture<?>> futures = new ArrayList<>();
-    builders.forEach((key, builder) -> futures.add(saveThing(cache, key, builder.build())));
-    redirects.forEach((key, target) -> {
+    return allOf(Stream.concat(
+      builders.entrySet().stream().map(entry -> saveJson(cache, entry.getKey(), entry.getValue().build())),
+      redirects.entrySet().stream().map(entry -> {
       JsonObject json = new JsonObject();
-      json.addProperty("redirect", target.toString());
-      futures.add(saveThing(cache, key, json));
-    });
-    return CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new));
+      json.addProperty("redirect", entry.getValue().toString());
+      return saveJson(cache, entry.getKey(), json);
+    })));
   }
 
 
@@ -107,27 +105,27 @@ public abstract class AbstractFluidTooltipProvider extends GenericDataProvider {
   protected class FluidUnitListBuilder {
     @Nullable
     private final TagKey<Fluid> tag;
-    private final ImmutableList.Builder<FluidUnit> units = ImmutableList.builder();
+    private final List<FluidUnit> units = new ArrayList<>();
 
     /** Adds a unit with a full translation key */
-    public FluidUnitListBuilder addUnitRaw(String key, long amount) {
+    public FluidUnitListBuilder addUnitRaw(String key, int amount) {
       units.add(new FluidUnit(key, amount));
       return this;
     }
 
     /** Adds a unit local to the current mod */
-    public FluidUnitListBuilder addUnit(String key, long amount) {
+    public FluidUnitListBuilder addUnit(String key, int amount) {
       return addUnitRaw(Util.makeDescriptionId("gui", id("fluid." + key)), amount);
     }
 
     /** Adds a unit local to the given mod */
-    public FluidUnitListBuilder addUnit(String key, String domain, long amount) {
+    public FluidUnitListBuilder addUnit(String key, String domain, int amount) {
       return addUnitRaw(Util.makeDescriptionId("gui", new ResourceLocation(domain, "fluid." + key)), amount);
     }
 
     /** Builds the final instance */
     private FluidUnitList build() {
-      return new FluidUnitList(tag, units.build());
+      return new FluidUnitList(tag, List.copyOf(units));
     }
   }
 }

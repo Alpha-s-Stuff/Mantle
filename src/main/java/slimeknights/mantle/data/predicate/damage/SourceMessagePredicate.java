@@ -1,13 +1,12 @@
 package slimeknights.mantle.data.predicate.damage;
 
 import net.minecraft.world.damagesource.DamageSource;
-import slimeknights.mantle.data.GenericLoaderRegistry.IGenericLoader;
-import slimeknights.mantle.data.loader.StringLoader;
-import slimeknights.mantle.data.predicate.IJsonPredicate;
+import slimeknights.mantle.data.loadable.primitive.StringLoadable;
+import slimeknights.mantle.data.loadable.record.RecordLoadable;
 
 /** Predicate that matches a named source */
 public record SourceMessagePredicate(String message) implements DamageSourcePredicate {
-  public static final IGenericLoader<SourceMessagePredicate> LOADER = new StringLoader<>("message", SourceMessagePredicate::new, SourceMessagePredicate::message);
+  public static final RecordLoadable<SourceMessagePredicate> LOADER = RecordLoadable.create(StringLoadable.DEFAULT.requiredField("message", SourceMessagePredicate::message), SourceMessagePredicate::new);
 
   public SourceMessagePredicate(DamageSource source) {
     this(source.getMsgId());
@@ -19,7 +18,7 @@ public record SourceMessagePredicate(String message) implements DamageSourcePred
   }
 
   @Override
-  public IGenericLoader<? extends IJsonPredicate<DamageSource>> getLoader() {
+  public RecordLoadable<SourceMessagePredicate> getLoader() {
     return LOADER;
   }
 }

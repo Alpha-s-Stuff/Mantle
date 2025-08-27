@@ -19,6 +19,7 @@ import java.util.function.Supplier;
 /**
  * Deferred register to register tile entity instances
  */
+@SuppressWarnings("unused")  // API
 public class BlockEntityTypeDeferredRegister extends DeferredRegisterWrapper<BlockEntityType<?>> {
   public BlockEntityTypeDeferredRegister(String modID) {
     super(Registries.BLOCK_ENTITY_TYPE, modID);
@@ -71,7 +72,7 @@ public class BlockEntityTypeDeferredRegister extends DeferredRegisterWrapper<Blo
   @SuppressWarnings("ConstantConditions")
   public <T extends BlockEntity> RegistryObject<BlockEntityType<T>> register(String name, BlockEntitySupplier<? extends T> factory, Consumer<ImmutableSet.Builder<Block>> blockCollector) {
     return register.register(name, () ->  {
-      ImmutableSet.Builder<Block> blocks = new ImmutableSet.Builder<>();
+      ImmutableSet.Builder<Block> blocks = ImmutableSet.builder();
       blockCollector.accept(blocks);
       return new BlockEntityType<>(factory, blocks.build(), getType(name));
     });

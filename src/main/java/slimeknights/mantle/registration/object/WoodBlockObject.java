@@ -1,26 +1,31 @@
 package slimeknights.mantle.registration.object;
 
 import lombok.Getter;
-import net.minecraft.core.registries.Registries;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.ButtonBlock;
+import net.minecraft.world.level.block.CeilingHangingSignBlock;
 import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.FenceBlock;
 import net.minecraft.world.level.block.FenceGateBlock;
 import net.minecraft.world.level.block.PressurePlateBlock;
 import net.minecraft.world.level.block.StandingSignBlock;
 import net.minecraft.world.level.block.TrapDoorBlock;
+import net.minecraft.world.level.block.WallHangingSignBlock;
 import net.minecraft.world.level.block.WallSignBlock;
 import net.minecraft.world.level.block.state.properties.WoodType;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import static slimeknights.mantle.registration.RegistrationHelper.castDelegate;
+import static slimeknights.mantle.registration.RegistrationHelper.getCastedHolder;
+import static slimeknights.mantle.util.RegistryHelper.getHolder;
 
 /** Extension of the fence object with all other wood blocks */
 public class WoodBlockObject extends FenceBuildingBlockObject {
@@ -41,6 +46,8 @@ public class WoodBlockObject extends FenceBuildingBlockObject {
   // signs
   private final Supplier<? extends StandingSignBlock> sign;
   private final Supplier<? extends WallSignBlock> wallSign;
+  private final Supplier<? extends CeilingHangingSignBlock> hangingSign;
+  private final Supplier<? extends WallHangingSignBlock> wallHangingSign;
   // tags
   @Getter
   private final TagKey<Block> logBlockTag;
@@ -51,7 +58,8 @@ public class WoodBlockObject extends FenceBuildingBlockObject {
                          Supplier<? extends Block> log, Supplier<? extends Block> strippedLog, Supplier<? extends Block> wood, Supplier<? extends Block> strippedWood,
                          Supplier<? extends FenceBlock> fence, Supplier<? extends FenceGateBlock> fenceGate, Supplier<? extends DoorBlock> door, Supplier<? extends TrapDoorBlock> trapdoor,
                          Supplier<? extends PressurePlateBlock> pressurePlate, Supplier<? extends ButtonBlock> button,
-                         Supplier<? extends StandingSignBlock> sign, Supplier<? extends WallSignBlock> wallSign) {
+                         Supplier<? extends StandingSignBlock> sign, Supplier<? extends WallSignBlock> wallSign,
+                         Supplier<? extends CeilingHangingSignBlock> hangingSign, Supplier<? extends WallHangingSignBlock> wallHangingSign) {
     super(planks, fence);
     this.woodType = woodType;
     this.log = log;
@@ -65,28 +73,34 @@ public class WoodBlockObject extends FenceBuildingBlockObject {
     this.button = button;
     this.sign = sign;
     this.wallSign = wallSign;
+    this.hangingSign = hangingSign;
+    this.wallHangingSign = wallHangingSign;
     ResourceLocation tagName = new ResourceLocation(name.getNamespace(), name.getPath() + "_logs");
     this.logBlockTag = TagKey.create(Registries.BLOCK, tagName);
     this.logItemTag = TagKey.create(Registries.ITEM, tagName);
   }
 
+  @SuppressWarnings("deprecation")
   public WoodBlockObject(ResourceLocation name, WoodType woodType, BuildingBlockObject planks,
                          Block log, Block strippedLog, Block wood, Block strippedWood,
                          Block fence, Block fenceGate, Block door, Block trapdoor,
-                         Block pressurePlate, Block button, Block sign, Block wallSign) {
+                         Block pressurePlate, Block button,
+                         Block sign, Block wallSign, Block hangingSign, Block wallHangingSign) {
     super(planks, () -> (FenceBlock) fence);
     this.woodType = woodType;
-    this.log = castDelegate(log);
-    this.strippedLog = castDelegate(strippedLog);
-    this.wood = castDelegate(wood);
-    this.strippedWood = castDelegate(strippedWood);
-    this.fenceGate = castDelegate((FenceGateBlock) fenceGate);
-    this.door = castDelegate((DoorBlock) door);
-    this.trapdoor = castDelegate((TrapDoorBlock) trapdoor);
-    this.pressurePlate = castDelegate((PressurePlateBlock) pressurePlate);
-    this.button = castDelegate((ButtonBlock) button);
-    this.sign = castDelegate((StandingSignBlock) sign);
-    this.wallSign = castDelegate((WallSignBlock) wallSign);
+    this.log = getHolder(BuiltInRegistries.BLOCK, log);
+    this.strippedLog = getHolder(BuiltInRegistries.BLOCK, strippedLog);
+    this.wood = getHolder(BuiltInRegistries.BLOCK, wood);
+    this.strippedWood = getHolder(BuiltInRegistries.BLOCK, strippedWood);
+    this.fenceGate = getCastedHolder(BuiltInRegistries.BLOCK, fenceGate);
+    this.door = getCastedHolder(BuiltInRegistries.BLOCK, door);
+    this.trapdoor = getCastedHolder(BuiltInRegistries.BLOCK, trapdoor);
+    this.pressurePlate = getCastedHolder(BuiltInRegistries.BLOCK, pressurePlate);
+    this.button = getCastedHolder(BuiltInRegistries.BLOCK, button);
+    this.sign = getCastedHolder(BuiltInRegistries.BLOCK, sign);
+    this.wallSign = getCastedHolder(BuiltInRegistries.BLOCK, wallSign);
+    this.hangingSign = getCastedHolder(BuiltInRegistries.BLOCK, hangingSign);
+    this.wallHangingSign = getCastedHolder(BuiltInRegistries.BLOCK, wallHangingSign);
     ResourceLocation tagName = new ResourceLocation(name.getNamespace(), name.getPath() + "_logs");
     this.logBlockTag = TagKey.create(Registries.BLOCK, tagName);
     this.logItemTag = TagKey.create(Registries.ITEM, tagName);
@@ -153,13 +167,40 @@ public class WoodBlockObject extends FenceBuildingBlockObject {
     return wallSign.get();
   }
 
+  /* Gets the hanging sign for this wood type */
+  public CeilingHangingSignBlock getHangingSign() {
+    return hangingSign.get();
+  }
+
+  /* Gets the wall hanging sign for this wood type */
+  public WallHangingSignBlock getWallHangingSign() {
+    return wallHangingSign.get();
+  }
+
   @Override
   public List<Block> values() {
     return Arrays.asList(
       get(), getSlab(), getStairs(), getFence(),
       getLog(), getStrippedLog(), getWood(), getStrippedWood(),
       getFenceGate(), getDoor(), getTrapdoor(),
-      getPressurePlate(), getButton(), getSign(), getWallSign());
+      getPressurePlate(), getButton(),
+      getSign(), getWallSign(), getHangingSign(), getWallHangingSign());
+  }
+
+  @Override
+  public void forEach(Consumer<ItemLike> consumer) {
+    super.forEach(consumer);
+    consumer.accept(getFenceGate());
+    consumer.accept(getLog());
+    consumer.accept(getStrippedLog());
+    consumer.accept(getWood());
+    consumer.accept(getStrippedWood());
+    consumer.accept(getDoor());
+    consumer.accept(getTrapdoor());
+    consumer.accept(getPressurePlate());
+    consumer.accept(getButton());
+    consumer.accept(getSign());
+    consumer.accept(getHangingSign());
   }
 
   /** Variants of wood for the register function */

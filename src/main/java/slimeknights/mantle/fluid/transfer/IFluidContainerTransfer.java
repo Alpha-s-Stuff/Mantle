@@ -5,7 +5,7 @@ import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import slimeknights.mantle.data.GenericRegisteredSerializer.IJsonSerializable;
+import slimeknights.mantle.data.gson.GenericRegisteredSerializer.IJsonSerializable;
 
 import javax.annotation.Nullable;
 import java.util.function.Consumer;
@@ -31,8 +31,22 @@ public interface IFluidContainerTransfer extends IJsonSerializable {
    * @param handler  Handler either receiving or giving fluid
    * @return  container after the transfer and the fluid transferred, null if the transfer failed
    */
+  @Deprecated(forRemoval = true)
   @Nullable
   TransferResult transfer(ItemStack stack, FluidStack fluid, Storage<FluidVariant> handler);
+
+  /**
+   * Performs the actual transfer into or out of the handler
+   * @param stack      Stack to transfer
+   * @param fluid      Current fluid the handler allows draining. Does not mean the handler may not accept other fluids
+   * @param handler    Handler either receiving or giving fluid
+   * @param direction  Determines whether to try and fill or empty the container
+   * @return  container after the transfer and the fluid transferred, null if the transfer failed
+   */
+  @Nullable
+  default TransferResult transfer(ItemStack stack, FluidStack fluid, IFluidHandler handler, TransferDirection direction) {
+    return transfer(stack, fluid, handler);
+  }
 
   /**
    * Result after transferring a fluid
@@ -41,4 +55,39 @@ public interface IFluidContainerTransfer extends IJsonSerializable {
    * @param didFill  If true, the item stack was filled. If false, it was draine
    */
   record TransferResult(ItemStack stack, FluidStack fluid, boolean didFill) {}
+
+  /** Represents the direction to allow transfer */
+  enum TransferDirection {
+    /** Attempts to empty the item. If that fails, attempts to fill the item. */
+    AUTO,
+    /** Empties the item into the tank */
+    EMPTY_ITEM,
+    /** Fills the item from the tank */
+    FILL_ITEM,
+    /** Attempts to fill the item. If that fails, attempts to empty the item. */
+    REVERSE;
+
+    /** If true, may fill the item */
+    public boolean canEmpty() {
+      return this != FILL_ITEM;
+    }
+
+    /** If true, may empty the item */
+    public boolean canFill() {
+      return this != EMPTY_ITEM;
+    }
+  }
+
+  /** Temporary interface to make it easier to work with the method deprecation */
+  interface WithDirection extends IFluidContainerTransfer {
+    @Override
+    TransferResult transfer(ItemStack stack, FluidStack fluid, IFluidHandler handler, TransferDirection direction);
+
+    @SuppressWarnings("removal")
+    @Override
+    @Deprecated(forRemoval = true)
+    default TransferResult transfer(ItemStack stack, FluidStack fluid, IFluidHandler handler) {
+      return transfer(stack, fluid, handler, TransferDirection.AUTO);
+    }
+  }
 }

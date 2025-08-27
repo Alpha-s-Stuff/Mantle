@@ -11,8 +11,8 @@ import net.minecraft.world.item.crafting.Recipe;
  */
 public interface ICommonRecipe<C extends Container> extends Recipe<C> {
   @Override
-  default ItemStack assemble(C inv, RegistryAccess registryAccess) {
-    return getResultItem(registryAccess).copy();
+  default ItemStack assemble(C inv) {
+    return getResultItem().copy();
   }
 
   /** @deprecated Means nothing outside of crafting tables */

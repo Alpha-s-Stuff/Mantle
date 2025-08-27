@@ -1,6 +1,5 @@
 package slimeknights.mantle.client.book.data.content;
 
-import com.google.common.collect.ImmutableList;
 import lombok.Getter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.NonNullList;
@@ -10,6 +9,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.AbstractCookingRecipe;
 import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import org.apache.commons.lang3.StringUtils;
 import slimeknights.mantle.Mantle;
@@ -25,6 +25,7 @@ import slimeknights.mantle.client.screen.book.element.TextElement;
 import slimeknights.mantle.client.screen.book.element.TooltipElement;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static slimeknights.mantle.client.screen.book.Textures.TEX_SMELTING;
 
@@ -67,7 +68,7 @@ public class ContentSmelting extends PageContent {
     }
 
     list.add(new ImageElement(x, y, IMG_SMELTING.width, IMG_SMELTING.height, IMG_SMELTING, book.appearance.slotColor));
-    list.add(new TooltipElement(ImmutableList.of(Component.translatable("mantle:tooltip.cooktime", this.cookTime / 20)), x + 7, y + 42, 60, 28));
+    list.add(new TooltipElement(List.of(Component.translatable("mantle:tooltip.cooktime", this.cookTime / 20)), x + 7, y + 42, 60, 28));
 
     if (this.input != null && !this.input.getItems().isEmpty()) {
       list.add(new ItemElement(x + INPUT_X, y + INPUT_Y, ITEM_SCALE, this.input.getItems(), this.input.action));
@@ -98,12 +99,14 @@ public class ContentSmelting extends PageContent {
     super.load();
 
     if (!StringUtils.isEmpty(this.recipe) && ResourceLocation.isValidResourceLocation(this.recipe)) {
-      Recipe<?> recipe = Minecraft.getInstance().level.getRecipeManager().byKey(new ResourceLocation(this.recipe)).orElse(null);
+      Level level = Minecraft.getInstance().level;
+      assert level != null;
+      Recipe<?> recipe = level.getRecipeManager().byKey(new ResourceLocation(this.recipe)).orElse(null);
 
       if (recipe instanceof AbstractCookingRecipe) {
         this.input = IngredientData.getItemStackData(NonNullList.of(ItemStack.EMPTY, recipe.getIngredients().get(0).getItems()));
         this.cookTime = ((AbstractCookingRecipe) recipe).getCookingTime();
-        this.result = IngredientData.getItemStackData(recipe.getResultItem(Minecraft.getInstance().level.registryAccess()));
+        this.result = IngredientData.getItemStackData(recipe.getResultItem(level.registryAccess()));
       }
     }
   }

@@ -1,7 +1,6 @@
 package slimeknights.mantle.registration.adapter;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.ImmutableSet.Builder;
 import com.mojang.datafixers.types.Type;
 import net.minecraft.Util;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -14,6 +13,8 @@ import slimeknights.mantle.Mantle;
 import slimeknights.mantle.registration.object.EnumObject;
 
 import javax.annotation.Nullable;
+import java.util.Collection;
+import java.util.Set;
 import java.util.function.Consumer;
 
 /**
@@ -55,6 +56,19 @@ public class BlockEntityTypeRegistryAdapter extends RegistryAdapter<BlockEntityT
   }
 
   /**
+   * Registers a tile entity type for a single block
+   * @param factory  Tile entity factory
+   * @param blocks   Blocks to add
+   * @param name     Tile entity name
+   * @param <T>      Tile entity type
+   * @return  Registry object instance
+   */
+  @SuppressWarnings("ConstantConditions")
+  public <T extends BlockEntity> BlockEntityType<T> register(BlockEntitySupplier<? extends T> factory, Collection<? extends Block> blocks, String name) {
+    return register(new BlockEntityType<>(factory, Set.copyOf(blocks), getType(name)), name);
+  }
+
+  /**
    * Registers a new tile entity type using a tile entity factory and an enum object
    * @param name     Tile entity name
    * @param factory  Tile entity factory
@@ -62,9 +76,8 @@ public class BlockEntityTypeRegistryAdapter extends RegistryAdapter<BlockEntityT
    * @param <T>      Tile entity type
    * @return  Tile entity type registry object
    */
-  @SuppressWarnings("ConstantConditions")
   public <T extends BlockEntity> BlockEntityType<T> register(BlockEntitySupplier<? extends T> factory, EnumObject<?, ? extends Block> blocks, String name) {
-    return register(new BlockEntityType<>(factory, ImmutableSet.copyOf(blocks.values()), getType(name)), name);
+    return register(factory, blocks.values(), name);
   }
 
   /**
@@ -75,10 +88,9 @@ public class BlockEntityTypeRegistryAdapter extends RegistryAdapter<BlockEntityT
    * @param <T>              Tile entity type
    * @return  Tile entity type registry object
    */
-  @SuppressWarnings("ConstantConditions")
-  public <T extends BlockEntity> BlockEntityType<T> register(BlockEntitySupplier<? extends T> factory, String name, Consumer<Builder<Block>> blockCollector) {
-    ImmutableSet.Builder<Block> blocks = new ImmutableSet.Builder<>();
+  public <T extends BlockEntity> BlockEntityType<T> register(BlockEntitySupplier<? extends T> factory, String name, Consumer<ImmutableSet.Builder<Block>> blockCollector) {
+    ImmutableSet.Builder<Block> blocks = ImmutableSet.builder();
     blockCollector.accept(blocks);
-    return register(new BlockEntityType<>(factory, blocks.build(), getType(name)), name);
+    return register(factory, blocks.build(), name);
   }
 }

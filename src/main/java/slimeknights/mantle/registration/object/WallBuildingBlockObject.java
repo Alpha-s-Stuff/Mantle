@@ -1,11 +1,15 @@
 package slimeknights.mantle.registration.object;
 
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.WallBlock;
+import slimeknights.mantle.registration.RegistrationHelper;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
@@ -31,12 +35,18 @@ public class WallBuildingBlockObject extends BuildingBlockObject {
    * @param wall    Wall entry
    */
   public WallBuildingBlockObject(BuildingBlockObject object, Block wall) {
-    this(object, () -> (WallBlock) wall);
+    this(object, RegistrationHelper.getCastedHolder(BuiltInRegistries.BLOCK, wall));
   }
 
   /** Gets the wall for this block */
   public WallBlock getWall() {
     return Objects.requireNonNull(wall.get(), "Wall Building Block Object missing wall");
+  }
+
+  @Override
+  public void forEach(Consumer<ItemLike> consumer) {
+    super.forEach(consumer);
+    consumer.accept(getWall());
   }
 
   @Override

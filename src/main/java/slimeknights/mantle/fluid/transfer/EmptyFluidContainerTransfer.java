@@ -6,22 +6,19 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
-import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
-import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
 import lombok.RequiredArgsConstructor;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
-import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
-import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
 import org.apache.commons.lang3.function.TriFunction;
 import slimeknights.mantle.Mantle;
+import slimeknights.mantle.recipe.helper.FluidOutput;
 import slimeknights.mantle.recipe.helper.ItemOutput;
-import slimeknights.mantle.recipe.helper.RecipeHelper;
 import slimeknights.mantle.util.JsonHelper;
 
 import java.lang.reflect.Type;
@@ -29,12 +26,18 @@ import java.util.function.Consumer;
 
 /** Fluid transfer info that empties a fluid from an item */
 @RequiredArgsConstructor
-public class EmptyFluidContainerTransfer implements IFluidContainerTransfer {
+public class EmptyFluidContainerTransfer implements IFluidContainerTransfer.WithDirection {
   public static final ResourceLocation ID = Mantle.getResource("empty_item");
 
   private final Ingredient input;
   private final ItemOutput filled;
-  protected final FluidStack fluid;
+  protected final FluidOutput fluid;
+
+  /** @deprecated use {@link #EmptyFluidContainerTransfer(Ingredient, ItemOutput, FluidOutput)} */
+  @Deprecated(forRemoval = true)
+  public EmptyFluidContainerTransfer(Ingredient input, ItemOutput filled, FluidStack fluid) {
+    this(input, filled, FluidOutput.fromStack(fluid));
+  }
 
   @Override
   public void addRepresentativeItems(Consumer<Item> consumer) {
@@ -50,23 +53,23 @@ public class EmptyFluidContainerTransfer implements IFluidContainerTransfer {
 
   /** Gets the contained fluid in the given stack */
   protected FluidStack getFluid(ItemStack stack) {
-    return fluid;
+    return fluid.get();
   }
 
   @Override
-  public TransferResult transfer(ItemStack stack, FluidStack fluid, Storage<FluidVariant> handler) {
+  public TransferResult transfer(ItemStack stack, FluidStack fluid, IFluidHandler handler, TransferDirection direction) {
+    if (!direction.canEmpty()) {
+      return null;
+    }
     FluidStack contained = getFluid(stack);
-    long simulated = handler.simulateInsert(contained.getType(), contained.getAmount(), null);
-    if (simulated == this.fluid.getAmount()) {
-      try (Transaction t = TransferUtil.getTransaction()) {
-        long actual = handler.insert(contained.getType(), contained.getAmount(), t);
-        if (actual > 0) {
-          if (actual != this.fluid.getAmount()) {
-            Mantle.logger.error("Wrong amount filled from {}, expected {}, filled {}", BuiltInRegistries.ITEM.getKey(stack.getItem()), this.fluid.getAmount(), actual);
-          }
-          return new TransferResult(filled.get().copy(), contained, false);
+    int simulated = handler.fill(contained.copy(), FluidAction.SIMULATE);
+    if (simulated == contained.getAmount()) {
+      int actual = handler.fill(contained.copy(), FluidAction.EXECUTE);
+      if (actual > 0) {
+        if (actual != this.fluid.getAmount()) {
+          Mantle.logger.error("Wrong amount filled from {}, expected {}, filled {}", BuiltInRegistries.ITEM.getKey(stack.getItem()), this.fluid.getAmount(), actual);
         }
-        t.commit();
+        return new TransferResult(filled.copy(), contained, false);
       }
     }
     return null;
@@ -77,8 +80,8 @@ public class EmptyFluidContainerTransfer implements IFluidContainerTransfer {
     JsonObject json = new JsonObject();
     json.addProperty("type", ID.toString());
     json.add("input", input.toJson());
-    json.add("filled", filled.serialize());
-    json.add("fluid", RecipeHelper.serializeFluidStack(fluid));
+    json.add("filled", filled.serialize(false));
+    json.add("fluid", FluidOutput.Loadable.REQUIRED.serialize(fluid));
     return json;
   }
 
@@ -88,13 +91,13 @@ public class EmptyFluidContainerTransfer implements IFluidContainerTransfer {
   /**
    * Generic deserializer
    */
-  public record Deserializer<T extends EmptyFluidContainerTransfer>(TriFunction<Ingredient,ItemOutput,FluidStack,T> factory) implements JsonDeserializer<T> {
+  public record Deserializer<T extends EmptyFluidContainerTransfer>(TriFunction<Ingredient,ItemOutput,FluidOutput,T> factory) implements JsonDeserializer<T> {
     @Override
     public T deserialize(JsonElement element, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
       JsonObject json = element.getAsJsonObject();
       Ingredient input = Ingredient.fromJson(JsonHelper.getElement(json, "input"));
-      ItemOutput filled = ItemOutput.fromJson(JsonHelper.getElement(json, "filled"));
-      FluidStack fluid = RecipeHelper.deserializeFluidStack(GsonHelper.getAsJsonObject(json, "fluid"));
+      ItemOutput filled = ItemOutput.Loadable.REQUIRED_ITEM.getIfPresent(json, "filled");
+      FluidOutput fluid = FluidOutput.Loadable.REQUIRED.getIfPresent(json, "fluid");
       return factory.apply(input, filled, fluid);
     }
   }

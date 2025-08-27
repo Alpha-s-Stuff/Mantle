@@ -1,14 +1,10 @@
 package slimeknights.mantle.client;
 
-import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -17,9 +13,14 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
+import net.minecraftforge.client.event.RenderGuiOverlayEvent;
+import net.minecraftforge.client.gui.overlay.ForgeGui;
+import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.eventbus.api.EventPriority;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import slimeknights.mantle.Mantle;
 import slimeknights.mantle.config.Config;
-import io.github.fabricators_of_create.porting_lib.event.client.OverlayRenderCallback.Types;
 
 import java.util.Random;
 
@@ -38,54 +39,31 @@ public class ExtraHeartRenderHandler {
 
   private int regen;
 
-  /**
-   * Draws a texture to the screen
-   * @param guiGraphics  gui graphics instance
-   * @param texture      The texture to draw
-   * @param x            X position
-   * @param y            Y position
-   * @param textureX     Texture X
-   * @param textureY     Texture Y
-   * @param width        Width to draw
-   * @param height       Height to draw
-   */
-  private void blit(GuiGraphics guiGraphics, ResourceLocation texture, int x, int y, int textureX, int textureY, int width, int height) {
-    guiGraphics.blit(texture, x, y, textureX, textureY, width, height);
-  }
-
   /* HUD */
 
   /**
    * Event listener
-   * @param guiGraphics  Event instance
+   * @param event  Event instance
    */
-  public boolean renderHealthbar(GuiGraphics guiGraphics, float partialTicks, Window window, Types type) {
-    if (!Config.EXTRA_HEART_RENDERER.get() || type != Types.PLAYER_HEALTH) {
-      return false;
+  @SubscribeEvent(priority = EventPriority.LOW)
+  public void renderHealthbar(RenderGuiOverlayEvent.Pre event) {
+    if (event.isCanceled() || !Config.EXTRA_HEART_RENDERER.get() || event.getOverlay() != VanillaGuiOverlay.PLAYER_HEALTH.type()) {
+      return;
     }
     // ensure its visible
-    if (mc.options.hideGui || !(mc.gameMode.canHurtPlayer() && mc.getCameraEntity() instanceof Player)) {
-      return false;
+    if (!(mc.gui instanceof ForgeGui gui) || mc.options.hideGui || !gui.shouldDrawSurvivalElements()) {
+      return;
     }
     Entity renderViewEnity = this.mc.getCameraEntity();
     if (!(renderViewEnity instanceof Player player)) {
-      return false;
+      return;
     }
-    RenderSystem.enableBlend();
-    RenderSystem.defaultBlendFunc();
-    RenderSystem.disableDepthTest();
-    RenderSystem.setShaderTexture(0, Gui.GUI_ICONS_LOCATION);
-
-    RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-    RenderSystem.setShader(GameRenderer::getPositionTexShader);
+    gui.setupOverlayRenderState(true, false);
 
     this.mc.getProfiler().push("health");
 
     // extra setup stuff from us
-    int left_height = 39;
-    if (FabricLoader.getInstance().getObjectShare().get("raised:hud") instanceof Integer distance) {
-      left_height += distance;
-    }
+    int left_height = gui.leftHeight;
     int width = this.mc.getWindow().getGuiScaledWidth();
     int height = this.mc.getWindow().getGuiScaledHeight();
     int updateCounter = this.mc.gui.getGuiTicks();
@@ -147,6 +125,7 @@ public class ExtraHeartRenderHandler {
     else if (player.hasEffect(MobEffects.WITHER)) MARGIN += 72;
     float absorbRemaining = absorb;
 
+    GuiGraphics graphics = event.getGuiGraphics();
     for (int i = Mth.ceil((healthMax + absorb) / 2.0F) - 1; i >= 0; --i) {
       int row = Mth.ceil((float) (i + 1) / 10.0F) - 1;
       int x = left + i % 10 * 8;
@@ -155,48 +134,51 @@ public class ExtraHeartRenderHandler {
       if (health <= 4) y += this.rand.nextInt(2);
       if (i == this.regen) y -= 2;
 
-      this.blit(guiGraphics, Gui.GUI_ICONS_LOCATION, x, y, BACKGROUND, TOP, 9, 9);
+      graphics.blit(ICON_VANILLA, x, y, BACKGROUND, TOP, 9, 9);
 
       if (highlight) {
         if (i * 2 + 1 < healthLast) {
-          this.blit(guiGraphics, Gui.GUI_ICONS_LOCATION, x, y, MARGIN + 54, TOP, 9, 9); //6
+          graphics.blit(ICON_VANILLA, x, y, MARGIN + 54, TOP, 9, 9); //6
         }
         else if (i * 2 + 1 == healthLast) {
-          this.blit(guiGraphics, Gui.GUI_ICONS_LOCATION, x, y, MARGIN + 63, TOP, 9, 9); //7
+          graphics.blit(ICON_VANILLA, x, y, MARGIN + 63, TOP, 9, 9); //7
         }
       }
 
       if (absorbRemaining > 0.0F) {
         if (absorbRemaining == absorb && absorb % 2.0F == 1.0F) {
-          this.blit(guiGraphics, Gui.GUI_ICONS_LOCATION, x, y, MARGIN + 153, TOP, 9, 9); //17
+          graphics.blit(ICON_VANILLA, x, y, MARGIN + 153, TOP, 9, 9); //17
           absorbRemaining -= 1.0F;
         }
         else {
-          this.blit(guiGraphics, Gui.GUI_ICONS_LOCATION, x, y, MARGIN + 144, TOP, 9, 9); //16
+          graphics.blit(ICON_VANILLA, x, y, MARGIN + 144, TOP, 9, 9); //16
           absorbRemaining -= 2.0F;
         }
       }
       else {
         if (i * 2 + 1 < health) {
-          this.blit(guiGraphics, Gui.GUI_ICONS_LOCATION, x, y, MARGIN + 36, TOP, 9, 9); //4
+          graphics.blit(ICON_VANILLA, x, y, MARGIN + 36, TOP, 9, 9); //4
         }
         else if (i * 2 + 1 == health) {
-          this.blit(guiGraphics, Gui.GUI_ICONS_LOCATION, x, y, MARGIN + 45, TOP, 9, 9); //5
+          graphics.blit(ICON_VANILLA, x, y, MARGIN + 45, TOP, 9, 9); //5
         }
       }
     }
 
-    this.renderExtraHearts(guiGraphics, left, top, player);
-    this.renderExtraAbsorption(guiGraphics, left, top - rowHeight, player);
+    this.renderExtraHearts(graphics, left, top, player);
+    this.renderExtraAbsorption(graphics, left, top - rowHeight, player);
 
-    left_height += 10;
+    RenderSystem.setShaderTexture(0, ICON_VANILLA);
+    gui.leftHeight += 10;
     if (absorb > 0) {
-      left_height += 10;
+      gui.leftHeight += 10;
     }
 
+    event.setCanceled(true);
     RenderSystem.disableBlend();
     this.mc.getProfiler().pop();
-    return true;
+    //noinspection UnstableApiUsage  I do what I want (more accurately, we override the renderer but want to let others still respond in post)
+    MinecraftForge.EVENT_BUS.post(new RenderGuiOverlayEvent.Post(event.getWindow(), graphics, event.getPartialTick(), VanillaGuiOverlay.PLAYER_HEALTH.type()));
   }
 
   /**
@@ -223,32 +205,34 @@ public class ExtraHeartRenderHandler {
 
   /**
    * Renders the health above 10 hearts
-   * @param guiGraphics  Gui graphics instance
+   * @param graphics     Graphics instance
    * @param xBasePos     Health bar top corner
    * @param yBasePos     Health bar top corner
    * @param player       Player instance
    */
-  private void renderExtraHearts(GuiGraphics guiGraphics, int xBasePos, int yBasePos, Player player) {
+  private void renderExtraHearts(GuiGraphics graphics, int xBasePos, int yBasePos, Player player) {
     int potionOffset = this.getPotionOffset(player);
 
     // Extra hearts
+//    RenderSystem.setShaderTexture(0, ICON_HEARTS);
     int hp = Mth.ceil(player.getHealth());
-    this.renderCustomHearts(guiGraphics, ICON_HEARTS, xBasePos, yBasePos, potionOffset, hp, false);
+    this.renderCustomHearts(graphics, ICON_HEARTS, xBasePos, yBasePos, potionOffset, hp, false);
   }
 
   /**
    * Renders the absorption health above 10 hearts
-   * @param guiGraphics  Gui graphics instance
+   * @param graphics     Graphics instance
    * @param xBasePos     Health bar top corner
    * @param yBasePos     Health bar top corner
    * @param player       Player instance
    */
-  private void renderExtraAbsorption(GuiGraphics guiGraphics, int xBasePos, int yBasePos, Player player) {
+  private void renderExtraAbsorption(GuiGraphics graphics, int xBasePos, int yBasePos, Player player) {
     int potionOffset = this.getPotionOffset(player);
 
     // Extra hearts
+//    RenderSystem.setShaderTexture(0, ICON_ABSORB);
     int absorb = Mth.ceil(player.getAbsorptionAmount());
-    this.renderCustomHearts(guiGraphics, ICON_ABSORB, xBasePos, yBasePos, potionOffset, absorb, true);
+    this.renderCustomHearts(graphics, ICON_ABSORB, xBasePos, yBasePos, potionOffset, absorb, true);
   }
 
   /**
@@ -262,15 +246,15 @@ public class ExtraHeartRenderHandler {
 
   /**
    * Shared logic to render custom hearts
-   * @param guiGraphics  Gui graphics instance
-   * @param texture      Texture to draw
+   * @param graphics     Graphics instance
+   * @param texture      Texture for drawing the hearts
    * @param xBasePos     Health bar top corner
    * @param yBasePos     Health bar top corner
    * @param potionOffset Offset from the potion effect
    * @param count        Number to render
    * @param absorb       If true, render absorption hearts
    */
-  private void renderCustomHearts(GuiGraphics guiGraphics, ResourceLocation texture, int xBasePos, int yBasePos, int potionOffset, int count, boolean absorb) {
+  private void renderCustomHearts(GuiGraphics graphics, ResourceLocation texture, int xBasePos, int yBasePos, int potionOffset, int count, boolean absorb) {
     int regenOffset = absorb ? 10 : 0;
     for (int iter = 0; iter < count / 20; iter++) {
       int renderHearts = (count - 20 * (iter + 1)) / 2;
@@ -281,16 +265,16 @@ public class ExtraHeartRenderHandler {
       for (int i = 0; i < renderHearts; i++) {
         int y = this.getYRegenOffset(i, regenOffset);
         if (absorb) {
-          this.blit(guiGraphics, texture, xBasePos + 8 * i, yBasePos + y, 0, 54, 9, 9);
+          graphics.blit(texture, xBasePos + 8 * i, yBasePos + y, 0, 54, 9, 9);
         }
-        this.blit(guiGraphics, texture, xBasePos + 8 * i, yBasePos + y, 18 * heartIndex, potionOffset, 9, 9);
+        graphics.blit(texture, xBasePos + 8 * i, yBasePos + y, 18 * heartIndex, potionOffset, 9, 9);
       }
       if (count % 2 == 1 && renderHearts < 10) {
         int y = this.getYRegenOffset(renderHearts, regenOffset);
         if (absorb) {
-          this.blit(guiGraphics, texture, xBasePos + 8 * renderHearts, yBasePos + y, 0, 54, 9, 9);
+          graphics.blit(texture, xBasePos + 8 * renderHearts, yBasePos + y, 0, 54, 9, 9);
         }
-        this.blit(guiGraphics, texture, xBasePos + 8 * renderHearts, yBasePos + y, 9 + 18 * heartIndex, potionOffset, 9, 9);
+        graphics.blit(texture, xBasePos + 8 * renderHearts, yBasePos + y, 9 + 18 * heartIndex, potionOffset, 9, 9);
       }
     }
   }

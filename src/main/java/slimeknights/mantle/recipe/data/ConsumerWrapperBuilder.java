@@ -1,6 +1,6 @@
 package slimeknights.mantle.recipe.data;
 
-import com.google.common.collect.ImmutableList;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import net.fabricmc.fabric.api.resource.conditions.v1.ConditionJsonProvider;
@@ -9,17 +9,19 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.RecipeSerializer;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 /**
  * Builds a recipe consumer wrapper, which adds some extra properties to wrap the result of another recipe
  */
-@SuppressWarnings("UnusedReturnValue")
+@SuppressWarnings("unused")  // API
 public class ConsumerWrapperBuilder {
   private final List<ConditionJsonProvider> conditions = new ArrayList<>();
   @Nullable
@@ -63,6 +65,7 @@ public class ConsumerWrapperBuilder {
    * @param condition Condition to add
    * @return Added condition
    */
+  @CanIgnoreReturnValue
   public ConsumerWrapperBuilder addCondition(ConditionJsonProvider condition) {
     conditions.add(condition);
     return this;
@@ -87,10 +90,9 @@ public class ConsumerWrapperBuilder {
 
     private Wrapped(FinishedRecipe original, List<ConditionJsonProvider> conditions, @Nullable RecipeSerializer<?> override, @Nullable ResourceLocation overrideName) {
       // if wrapping another wrapper result, merge the two together
-      if (original instanceof Wrapped) {
-        Wrapped toMerge = (Wrapped) original;
+      if (original instanceof Wrapped toMerge) {
         this.original = toMerge.original;
-        this.conditions = ImmutableList.<ConditionJsonProvider>builder().addAll(toMerge.conditions).addAll(conditions).build();
+        this.conditions = Stream.concat(toMerge.conditions.stream(), conditions.stream()).toList();
         // consumer wrappers are processed inside out, so the innermost wrapped recipe is the one with the most recent serializer override
         if (toMerge.override != null || toMerge.overrideName != null) {
           this.override = toMerge.override;

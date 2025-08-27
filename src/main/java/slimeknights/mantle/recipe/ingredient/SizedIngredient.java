@@ -1,17 +1,17 @@
 package slimeknights.mantle.recipe.ingredient;
 
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.tags.TagKey;
-import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
-import slimeknights.mantle.util.JsonHelper;
+import slimeknights.mantle.data.loadable.common.IngredientLoadable;
+import slimeknights.mantle.data.loadable.primitive.IntLoadable;
+import slimeknights.mantle.data.loadable.record.RecordLoadable;
 
 import java.lang.ref.WeakReference;
 import java.util.Arrays;
@@ -26,6 +26,11 @@ import java.util.stream.Collectors;
 public class SizedIngredient implements Predicate<ItemStack> {
   /** Empty sized ingredient wrapper. Matches only the empty stack of size 0 */
   public static final SizedIngredient EMPTY = of(Ingredient.EMPTY, 0);
+
+  public static final RecordLoadable<SizedIngredient> LOADABLE = RecordLoadable.create(
+    IngredientLoadable.DISALLOW_EMPTY.tryDirectField("ingredient", SizedIngredient::getIngredient, "amount_needed"),
+    IntLoadable.FROM_ONE.defaultField("amount_needed", 1, SizedIngredient::getAmountNeeded),
+    SizedIngredient::new);
 
   /** Ingredient to use in recipe match */
   @Getter
@@ -95,7 +100,7 @@ public class SizedIngredient implements Predicate<ItemStack> {
    * Checks if the ingredient has no matching stacks
    * @return  True if the ingredient has no matching stacks
    */
-  public boolean hasNoMatchingStacks() {
+  public boolean isEmpty() {
     return ingredient.isEmpty();
   }
 
@@ -119,69 +124,29 @@ public class SizedIngredient implements Predicate<ItemStack> {
     return matchingStacks;
   }
 
-  /**
-   * Writes this ingredient to the packet buffer
-   * @param buffer  Buffer instance
-   */
+  /** use {@link #LOADABLE} with {@link slimeknights.mantle.data.loadable.Loadable#encode(FriendlyByteBuf, Object)} */
+  @Deprecated(forRemoval = true)
   public void write(FriendlyByteBuf buffer) {
-    buffer.writeVarInt(amountNeeded);
-    ingredient.toNetwork(buffer);
+    LOADABLE.encode(buffer, this);
   }
 
-  /**
-   * Writes this sized ingredient to a JSON object
-   * @return  JsonObject of sized ingredient
-   */
+  /** @deprecated use {@link #LOADABLE} with {@link slimeknights.mantle.data.loadable.Loadable#serialize(Object)} or {@link RecordLoadable#serialize(Object, JsonObject)} */
+  @Deprecated(forRemoval = true)
   public JsonObject serialize() {
-    JsonElement ingredient = this.ingredient.toJson();
-    JsonObject json = null;
-    // try using the object itself as our JSON
-    if (ingredient.isJsonObject()) {
-      json = ingredient.getAsJsonObject();
-      // if it has a property conflict, do nested
-      if (json.has("ingredient") || json.has("amount_needed")) {
-        json = null;
-      }
-    }
-    // if we could not use the ingredient, nest it
-    if (json == null) {
-      json = new JsonObject();
-      json.add("ingredient", ingredient);
-    }
-    // add amount needed and return
-    if (amountNeeded != 1) {
-      json.addProperty("amount_needed", amountNeeded);
-    }
+    JsonObject json = new JsonObject();
+    LOADABLE.serialize(this, json);
     return json;
   }
 
-  /**
-   * Reads a sized ingredient from the packet buffer
-   * @param buffer  Buffer instance
-   * @return  Sized ingredient
-   */
+  /** @deprecated use {@link #LOADABLE} with {@link slimeknights.mantle.data.loadable.Loadable#decode(FriendlyByteBuf)}  */
+  @Deprecated(forRemoval = true)
   public static SizedIngredient read(FriendlyByteBuf buffer) {
-    int amountNeeded = buffer.readVarInt();
-    Ingredient ingredient = Ingredient.fromNetwork(buffer);
-    return of(ingredient, amountNeeded);
+    return LOADABLE.decode(buffer);
   }
 
-  /**
-   * Reads a sized ingredient from JSON
-   * @param json  JSON instance
-   * @return  Sized ingredient
-   */
+  /** @deprecated use {@link #LOADABLE} with {@link RecordLoadable#deserialize(JsonObject)} */
+  @Deprecated(forRemoval = true)
   public static SizedIngredient deserialize(JsonObject json) {
-    int amountNeeded = GsonHelper.getAsInt(json, "amount_needed", 1);
-    // if we have a nested value, read as nested
-    Ingredient ingredient;
-    if (json.has("ingredient")) {
-      ingredient = Ingredient.fromJson(JsonHelper.getElement(json, "ingredient"));
-    } else {
-      ingredient = Ingredient.fromJson(json);
-    }
-
-    // return ingredient
-    return of(ingredient, amountNeeded);
+    return LOADABLE.deserialize(json);
   }
 }

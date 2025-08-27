@@ -2,13 +2,10 @@
 // See: https://github.com/BluSunrize/ImmersiveEngineering/blob/1.18/src/main/java/blusunrize/immersiveengineering/common/util/fakeworld/TemplateWorld.java
 package slimeknights.mantle.client.book.structure.level;
 
-import com.google.common.collect.ImmutableList;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
-import net.minecraft.core.Registry;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
@@ -24,9 +21,9 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkSource;
 import net.minecraft.world.level.dimension.BuiltinDimensionTypes;
-import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.entity.LevelEntityGetter;
 import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.level.gameevent.GameEvent.Context;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.StructureBlockInfo;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
@@ -52,11 +49,11 @@ public class TemplateLevel extends Level {
   private final Scoreboard scoreboard = new Scoreboard();
   private final RecipeManager recipeManager = new RecipeManager();
   private final TemplateChunkSource chunkSource;
-  private final RegistryAccess registries = Objects.requireNonNull(Minecraft.getInstance().level).registryAccess();
 
   public TemplateLevel(List<StructureBlockInfo> blocks, Predicate<BlockPos> shouldShow) {
     super(
-      new FakeLevelData(), Level.OVERWORLD, Minecraft.getInstance().level.registryAccess(), Objects.requireNonNull(Minecraft.getInstance().level).registryAccess().registryOrThrow(Registries.DIMENSION_TYPE).getHolderOrThrow(BuiltinDimensionTypes.OVERWORLD),
+      new FakeLevelData(), Level.OVERWORLD, Objects.requireNonNull(Minecraft.getInstance().level).registryAccess(),
+      Objects.requireNonNull(Minecraft.getInstance().level).registryAccess().registryOrThrow(Registries.DIMENSION_TYPE).getHolderOrThrow(BuiltinDimensionTypes.OVERWORLD),
       () -> InactiveProfiler.INSTANCE, true, false, 0, 0
     );
 
@@ -64,31 +61,13 @@ public class TemplateLevel extends Level {
   }
 
   @Override
-  public void sendBlockUpdated(@Nonnull BlockPos pos, @Nonnull BlockState oldState, @Nonnull BlockState newState, int flags) {
-  }
+  public void sendBlockUpdated(@Nonnull BlockPos pos, @Nonnull BlockState oldState, @Nonnull BlockState newState, int flags) {}
 
   @Override
-  public void playSeededSound(@org.jetbrains.annotations.Nullable Player player, double d, double e, double f, Holder<SoundEvent> holder, SoundSource soundSource, float g, float h, long l) {
-
-  }
+  public void playSeededSound(@Nullable Player pPlayer, double pX, double pY, double pZ, Holder<SoundEvent> pSound, SoundSource pSource, float pVolume, float pPitch, long pSeed) {}
 
   @Override
-  public void playSeededSound(@org.jetbrains.annotations.Nullable Player player, double d, double e, double f, SoundEvent soundEvent, SoundSource soundSource, float g, float h, long l) {
-
-  }
-
-  @Override
-  public void playSeededSound(@org.jetbrains.annotations.Nullable Player player, Entity entity, Holder<SoundEvent> soundEventHolder, SoundSource soundSource, float f, float g, long l) {
-
-  }
-
-  @Override
-  public void playSound(@Nullable Player player, double x, double y, double z, @Nonnull SoundEvent soundIn, @Nonnull SoundSource category, float volume, float pitch) {
-  }
-
-  @Override
-  public void playSound(@Nullable Player playerIn, @Nonnull Entity entityIn, @Nonnull SoundEvent eventIn, @Nonnull SoundSource categoryIn, float volume, float pitch) {
-  }
+  public void playSeededSound(@Nullable Player pPlayer, Entity pEntity, Holder<SoundEvent> pSound, SoundSource pCategory, float pVolume, float pPitch, long pSeed) {}
 
   @Override
   public String gatherChunkSourceStats() {
@@ -118,8 +97,7 @@ public class TemplateLevel extends Level {
   }
 
   @Override
-  public void destroyBlockProgress(int breakerId, @Nonnull BlockPos pos, int progress) {
-  }
+  public void destroyBlockProgress(int breakerId, @Nonnull BlockPos pos, int progress) {}
 
   @Nonnull
   @Override
@@ -160,16 +138,7 @@ public class TemplateLevel extends Level {
   public void levelEvent(@Nullable Player player, int type, @Nonnull BlockPos pos, int data) {}
 
   @Override
-  public void gameEvent(GameEvent gameEvent, Vec3 vec3, GameEvent.Context context) {}
-
-  @Override
-  public void gameEvent(@Nullable Entity pEntity, GameEvent pEvent, BlockPos pPos) {}
-
-  @Nonnull
-  @Override
-  public RegistryAccess registryAccess() {
-    return this.registries;
-  }
+  public void gameEvent(GameEvent pEvent, Vec3 pPosition, Context pContext) {}
 
   @Override
   public FeatureFlagSet enabledFeatures() {
@@ -184,12 +153,12 @@ public class TemplateLevel extends Level {
   @Nonnull
   @Override
   public List<? extends Player> players() {
-    return ImmutableList.of();
+    return List.of();
   }
 
   @Nonnull
   @Override
   public Holder<Biome> getUncachedNoiseBiome(int x, int y, int z) {
-    return registries.registryOrThrow(Registries.BIOME).getHolderOrThrow(Biomes.PLAINS);
+    return registryAccess().registryOrThrow(Registries.BIOME).getHolderOrThrow(Biomes.PLAINS);
   }
 }

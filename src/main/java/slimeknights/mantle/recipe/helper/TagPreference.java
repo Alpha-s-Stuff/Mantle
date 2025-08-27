@@ -2,6 +2,8 @@ package slimeknights.mantle.recipe.helper;
 
 import io.github.fabricators_of_create.porting_lib.event.common.TagsUpdatedCallback;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -10,11 +12,12 @@ import slimeknights.mantle.util.LogicHelper;
 import slimeknights.mantle.util.RegistryHelper;
 
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 
 /**
  * Utility that helps get the preferred item from a tag based on mod ID.
@@ -23,11 +26,13 @@ public class TagPreference {
   /** Just an alphabetically late RL to simplify null checks */
   private static final ResourceLocation DEFAULT_ID = new ResourceLocation("zzzzz:zzzzz"); // simplfies null checks
 
-  /** Specific cache to this tag preference class type */
-  private static final Map<ResourceLocation, Optional<?>> PREFERENCE_CACHE = new HashMap<>();
-
-  /** Specific cache to this tag preference class type */
-  private static final Map<ResourceKey<?>, RegistryComparator<?>> COMPARATOR_CACHE = new HashMap<>();
+  /** Cache from any tag key to its value */
+  private static final Map<TagKey<?>, Optional<?>> PREFERENCE_CACHE = new ConcurrentHashMap<>();
+  /** Cache of comparator instances, concurrent as hash map optimizations means the whole compute if absent method is not entirely synchronized */
+  private static final Map<ResourceKey<?>, Comparator<?>> COMPARATOR_CACHE = new ConcurrentHashMap<>();
+  static {
+    COMPARATOR_CACHE.put(Registries.FLUID, FluidComparator.INSTANCE);
+  }
 
   /** Registers the listener with the event bus */
   public static void init() {
@@ -48,8 +53,11 @@ public class TagPreference {
     }
     // streams have a lovely function to get the minimum element based on a comparator
     // if the tag is empty, stream is empty so returns empty
-    return RegistryHelper.getTagValueStream(tag).min(getComparator(registry));
+    return RegistryHelper.getTagValueStream(registry, tag).min(getComparator(registry));
   }
+
+  /** Don't create a new lambda instance every time we call {@link #getPreference(TagKey)} */
+  private static final Function<TagKey<?>,Optional<?>> PREFERENCE_LOOKUP = TagPreference::getUncachedPreference;
 
   /**
    * Gets the preferred value from a tag based on mod ID
@@ -59,7 +67,7 @@ public class TagPreference {
   @SuppressWarnings("unchecked")
   public static <T> Optional<T> getPreference(TagKey<T> tag) {
     // fetch cached value if we have one
-    return (Optional<T>) PREFERENCE_CACHE.computeIfAbsent(tag.location(), name -> getUncachedPreference(tag));
+    return (Optional<T>) PREFERENCE_CACHE.computeIfAbsent(tag, PREFERENCE_LOOKUP);
   }
 
   /** Logic to compare two registry values */
@@ -79,6 +87,23 @@ public class TagPreference {
       }
       // for stability, fallback to registry name compare
       return idA.compareNamespaced(idB);
+    }
+  }
+
+  /** Special casing comparator to ensure flowing fluids are sorted last after fluid sources. */
+  private enum FluidComparator implements Comparator<Fluid> {
+    INSTANCE;
+
+    /** Base logic after comparing source */
+    private final Comparator<Fluid> preference = new RegistryComparator<>(BuiltInRegistries.FLUID);
+
+    @Override
+    public int compare(Fluid fluid1, Fluid fluid2) {
+      boolean isSource1 = fluid1.isSource(fluid1.defaultFluidState());
+      if (isSource1 != fluid2.isSource(fluid2.defaultFluidState())) {
+        return isSource1 ? -1 : 1;
+      }
+      return preference.compare(fluid1, fluid2);
     }
   }
 }

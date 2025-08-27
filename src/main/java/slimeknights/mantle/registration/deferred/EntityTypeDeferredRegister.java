@@ -1,18 +1,14 @@
 package slimeknights.mantle.registration.deferred;
 
-import io.github.fabricators_of_create.porting_lib.util.LazyRegistrar;
-import io.github.fabricators_of_create.porting_lib.util.LazySpawnEggItem;
-import io.github.fabricators_of_create.porting_lib.util.RegistryObject;
-import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
-import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
-import slimeknights.mantle.registration.ItemProperties;
+import net.minecraftforge.common.ForgeSpawnEggItem;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.registries.RegistryObject;
+import slimeknights.mantle.registration.object.EntityObject;
 
 import java.util.function.Supplier;
 
@@ -29,9 +25,9 @@ public class EntityTypeDeferredRegister extends DeferredRegisterWrapper<EntityTy
   }
 
   @Override
-  public void register() {
-    super.register();
-    itemRegistry.register();
+  public void register(IEventBus bus) {
+    super.register(bus);
+    itemRegistry.register(bus);
   }
 
   /**
@@ -41,8 +37,8 @@ public class EntityTypeDeferredRegister extends DeferredRegisterWrapper<EntityTy
    * @param <T>   Entity class type
    * @return  Entity registry object
    */
-  public <T extends Entity> RegistryObject<EntityType<T>> register(String name, Supplier<FabricEntityTypeBuilder<T>> sup) {
-    return register.register(name, () -> sup.get().build());
+  public <T extends Entity> RegistryObject<EntityType<T>> register(String name, Supplier<EntityType.Builder<T>> sup) {
+    return register.register(name, () -> sup.get().build(resourceName(name)));
   }
 
   /**
@@ -54,10 +50,8 @@ public class EntityTypeDeferredRegister extends DeferredRegisterWrapper<EntityTy
    * @param <T>   Entity class type
    * @return  Entity registry object
    */
-  public <T extends Mob> RegistryObject<EntityType<T>> registerWithEgg(String name, Supplier<FabricEntityTypeBuilder<T>> sup, int primary, int secondary) {
+  public <T extends Mob> EntityObject<T> registerWithEgg(String name, Supplier<EntityType.Builder<T>> sup, int primary, int secondary) {
     RegistryObject<EntityType<T>> object = register(name, sup);
-    var spawnEgg = itemRegistry.register(name + "_spawn_egg", () -> new LazySpawnEggItem(object, primary, secondary, new Item.Properties()));
-    ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.SPAWN_EGGS).register(entries -> entries.accept(spawnEgg.get()));
-    return object;
+    return new EntityObject<>(object, itemRegistry.register(name + "_spawn_egg", () -> new ForgeSpawnEggItem(object, primary, secondary, new Item.Properties())));
   }
 }

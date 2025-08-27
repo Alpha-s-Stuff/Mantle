@@ -1,6 +1,5 @@
 package slimeknights.mantle.fluid.transfer;
 
-import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
@@ -23,11 +22,12 @@ import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import slimeknights.mantle.Mantle;
-import slimeknights.mantle.data.GenericRegisteredSerializer;
+import slimeknights.mantle.data.gson.GenericRegisteredSerializer;
 import slimeknights.mantle.network.MantleNetwork;
 import slimeknights.mantle.util.JsonHelper;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -69,12 +69,12 @@ public class FluidContainerTransferManager extends SimpleJsonResourceReloadListe
   /** Lazily initializes the set of container items */
   protected Set<Item> getContainerItems() {
     if (this.containerItems == null) {
-      ImmutableSet.Builder<Item> builder = ImmutableSet.builder();
+      List<Item> builder = new ArrayList<>();
       Consumer<Item> consumer = builder::add;
       for (IFluidContainerTransfer transfer : transfers) {
         transfer.addRepresentativeItems(consumer);
       }
-      this.containerItems = builder.build();
+      this.containerItems = Set.copyOf(builder);
     }
     return this.containerItems;
   }

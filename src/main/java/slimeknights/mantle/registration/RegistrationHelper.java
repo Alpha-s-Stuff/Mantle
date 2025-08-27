@@ -1,14 +1,19 @@
 package slimeknights.mantle.registration;
 
-import com.mojang.datafixers.DataFixerBuilder;
-import com.mojang.datafixers.schemas.Schema;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import net.fabricmc.fabric.api.object.builder.v1.block.type.WoodTypeRegistry;
-import net.minecraft.util.datafix.DataFixers;
-import net.minecraft.util.datafix.fixes.BlockRenameFix;
+import net.minecraft.core.DefaultedRegistry;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.state.properties.WoodType;
+import net.minecraftforge.registries.MissingMappingsEvent;
+import net.minecraftforge.registries.MissingMappingsEvent.Mapping;
+import slimeknights.mantle.util.RegistryHelper;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -20,16 +25,31 @@ public class RegistrationHelper {
   /** Wood types to register with the texture atlas */
   private static final List<WoodType> WOOD_TYPES = new ArrayList<>();
 
+  /** Properties for a standard bucket item */
+  public static final Item.Properties BUCKET_PROPS = new Item.Properties().craftRemainder(Items.BUCKET).stacksTo(1);
+
   /**
-   * Creates a supplier for a specific registry entry instance based on the delegate to a general instance.
-   * Note that this performs an unchecked cast, be certain that the right type is returned
-   * @param delegate  Delegate instance
-   * @param <I>  Forge registry type
-   * @return  Supplier for the given instance
+   * Used to mark injected registry objects, as despite being set to null they will be nonnull at runtime.
+   * @param <T>  Class type
+   * @return  Null, its a lie
    */
-  @SuppressWarnings("unchecked")
-  public static <I> Supplier<I> castDelegate(I delegate) {
-    return () -> delegate;
+  @SuppressWarnings("ConstantConditions")
+  public static <T> T injected() {
+    return null;
+  }
+
+  /**
+   * Gets a holder for a registry object
+   * @param registry  Registry instance
+   * @param entry     Entry to fetch holder
+   * @param <T>       Registry type
+   * @param <R>       Return type, typically but not strictly registry type
+   * @return  Supplier for the given registry casted to the requested type
+   */
+  @SuppressWarnings("unchecked")  // we know the entry is the given type
+  public static <T, R extends T> Supplier<R> getCastedHolder(DefaultedRegistry<T> registry, T entry) {
+    Supplier<T> holder = RegistryHelper.getHolder(registry, entry);
+    return () -> (R) holder.get();
   }
 
   /**
@@ -38,23 +58,24 @@ public class RegistrationHelper {
    * @param handler  Mapping handler
    * @param <T>      Event type
    */
-  public static void handleMissingMappingsBlock(DataFixerBuilder builder, Function<String, String> handler) {
-    Schema schema = builder.addSchema(0, DataFixers.SAME_NAMESPACED);
-    builder.addFixer(BlockRenameFix.create(schema, "Mantle Data Fixer", handler));
-//    for (Mapping<T> mapping : event.getAllMappings()) {
-//      if (modID.equals(mapping.key.getNamespace())) {
-//        @Nullable T value = handler.apply(mapping.key.getPath());
-//        if (value != null) {
-//          mapping.remap(value);
-//        }
-//      }
-//    }
+  public static <T> void handleMissingMappings(MissingMappingsEvent event, String modID, ResourceKey<? extends Registry<T>> registry, Function<String, T> handler) {
+    // event is kinda nice, automatically filters mappings to the registry type via the key
+    for (Mapping<T> mapping : event.getAllMappings(registry)) {
+      ResourceLocation id = mapping.getKey();
+      if (modID.equals(id.getNamespace())) {
+        @Nullable T value = handler.apply(id.getPath());
+        if (value != null) {
+          mapping.remap(value);
+        }
+      }
+    }
   }
 
   /** Registers a wood type to be injected into the atlas, should be called before client setup */
   public static void registerWoodType(WoodType type) {
     synchronized (WOOD_TYPES) {
       WOOD_TYPES.add(type);
+      WoodType.register(type);
     }
   }
 

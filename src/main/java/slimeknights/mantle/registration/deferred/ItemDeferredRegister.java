@@ -1,7 +1,6 @@
 package slimeknights.mantle.registration.deferred;
 
 import net.minecraft.core.registries.Registries;
-import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.item.Item;
 import slimeknights.mantle.registration.object.EnumObject;
 import slimeknights.mantle.registration.object.ItemObject;
@@ -49,7 +48,7 @@ public class ItemDeferredRegister extends DeferredRegisterWrapper<Item> {
    * @param mapper   Function to get a item for the given enum value
    * @return  EnumObject mapping between different item types
    */
-  public <T extends Enum<T> & StringRepresentable, I extends Item> EnumObject<T,I> registerEnum(T[] values, String name, Function<T,? extends I> mapper) {
+  public <T extends Enum<T>, I extends Item> EnumObject<T,I> registerEnum(T[] values, String name, Function<T,? extends I> mapper) {
     return registerEnum(values, name, (fullName, type) -> register(fullName, () -> mapper.apply(type)));
   }
 
@@ -60,7 +59,7 @@ public class ItemDeferredRegister extends DeferredRegisterWrapper<Item> {
    * @param mapper   Function to get a item for the given enum value
    * @return  EnumObject mapping between different item types
    */
-  public <T extends Enum<T> & StringRepresentable, I extends Item> EnumObject<T,I> registerEnum(String name, T[] values, Function<T,? extends I> mapper) {
+  public <T extends Enum<T>, I extends Item> EnumObject<T,I> registerEnum(String name, T[] values, Function<T,? extends I> mapper) {
     return registerEnum(name, values, (fullName, type) -> register(fullName, () -> mapper.apply(type)));
   }
 }

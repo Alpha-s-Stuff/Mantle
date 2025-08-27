@@ -1,6 +1,5 @@
 package slimeknights.mantle.client.book.data.content;
 
-import com.google.common.collect.ImmutableSet;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.resources.ResourceLocation;
 import slimeknights.mantle.Mantle;
@@ -41,14 +40,12 @@ public class ContentIndex extends ContentListing {
     if (!loaded) {
       loaded = true;
       // "hidden" is always hidden, plus whatever we are told to hide
-      Set<String> hiddenSet = hidden == null
-                              ? ImmutableSet.of("hidden")
-                              : ImmutableSet.<String>builder().add("hidden").add(hidden).build();
+      Set<String> hiddenSet = hidden == null ? Set.of() : Set.of(hidden);
       // allow performing other operations, adding group headers and breaks
       Operation[] operations = Objects.requireNonNullElse(this.operations, new Operation[0]);
       parent.parent.pages.forEach(page -> {
         // no support for splitting into multiple indexes, if you need two, just create two pages and tell it to hide everything from the other
-        if (page != parent && !IndexTransformer.isPageHidden(page) && !hiddenSet.contains(page.name)) {
+        if (page != parent && !IndexTransformer.isPageHidden(page) && !"hidden".equals(page.name) && !hiddenSet.contains(page.name)) {
           // perform extra action if anything happens before this page
           for (Operation operation : operations) {
             if (page.name.equals(operation.before)) {
