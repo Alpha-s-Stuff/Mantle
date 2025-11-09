@@ -35,6 +35,9 @@
     ],
     "jei_mod_plugin": [
       "slimeknights.mantle.plugin.jei.JEIPlugin"
+    ],
+    "emi": [
+      "slimeknights.mantle.plugin.emi.EMIPlugin"
     ]
   },
   "accessWidener": "mantle.accesswidener",
