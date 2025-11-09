@@ -95,11 +95,6 @@ public class ItemElement extends SizedBookElement {
       matrixStack.translate(x, y, 0);
       matrixStack.scale(scale, scale, 1.0F);
 
-      // Matrix stack -> old system
-      PoseStack poses = RenderSystem.getModelViewStack();
-      poses.pushPose();
-      poses.mulPoseMatrix(matrixStack.last().pose());
-
       ItemStack stack = this.itemCycle.get(this.currentItem);
       guiGraphics.renderItem(stack, 0, 0);
       Font font = fontRenderer;//net.minecraftforge.client.RenderProperties.get(stack).getFont(stack);
@@ -107,8 +102,6 @@ public class ItemElement extends SizedBookElement {
       guiGraphics.renderItemDecorations(font, stack, 0, 0, null);
 
       matrixStack.popPose();
-      poses.popPose();
-      RenderSystem.applyModelViewMatrix();
       // Lighting.turnOff(); TODO: still needed?
     }
   }
