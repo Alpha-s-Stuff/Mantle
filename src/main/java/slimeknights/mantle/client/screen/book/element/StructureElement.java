@@ -12,6 +12,7 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
+import org.joml.AxisAngle4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import slimeknights.mantle.client.book.structure.StructureInfo;
@@ -159,10 +160,13 @@ public class StructureElement extends SizedBookElement {
 
   private Transformation forRotation(double rX, double rY) {
     Vector3f axis = new Vector3f((float) rY, (float) rX, 0);
-    float angle = (float) Math.sqrt(axis.dot(axis));
+    float dot = axis.dot(axis);
+    if (dot < Float.MIN_NORMAL) {
+      return Transformation.identity();
+    }
 
+    float angle = (float) (Math.sqrt(axis.dot(axis)) * Math.PI / 180f);
     axis.normalize();
-
-    return new Transformation(null, new Quaternionf().setAngleAxis(angle, axis.x(), axis.y(), axis.z()), null, null);
+    return new Transformation(null, new Quaternionf(new AxisAngle4f(angle, axis)), null, null);
   }
 }
