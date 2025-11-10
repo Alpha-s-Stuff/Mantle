@@ -239,11 +239,13 @@ public class BaseContainerMenu<TILE extends BlockEntity> extends AbstractContain
           if (l <= limit) {
             stack.setCount(0);
             itemstack1.setCount(l);
+            slot.set(itemstack1); // Fabric: the item returned by getItem is a copy so we have to set it again
             slot.setChanged();
             flag1 = true;
           } else if (itemstack1.getCount() < limit) {
             stack.shrink(limit - itemstack1.getCount());
             itemstack1.setCount(limit);
+            slot.set(itemstack1); // Fabric: the item returned by getItem is a copy so we have to set it again
             slot.setChanged();
             flag1 = true;
           }
