@@ -43,6 +43,7 @@ public interface ISimplePacket extends S2CPacket, C2SPacket {
     handle(new Context(server, handler, player, channel));
   }
 
+  @Environment(EnvType.CLIENT)
   @Override
   default void handle(Minecraft client, ClientPacketListener listener, PacketSender responseSender, SimpleChannel channel) {
     handle(new Context(client, listener, null, channel));
