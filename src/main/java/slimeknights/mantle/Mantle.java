@@ -6,6 +6,8 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.recipe.v1.ingredient.CustomIngredientSerializer;
+import net.fabricmc.fabric.api.resource.conditions.v1.ResourceConditions;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.Util;
 import net.minecraft.commands.synchronization.ArgumentTypeInfos;
 import net.minecraft.core.HolderLookup;
@@ -62,6 +64,7 @@ import slimeknights.mantle.recipe.condition.TagFilledCondition;
 import slimeknights.mantle.recipe.helper.TagPreference;
 import slimeknights.mantle.recipe.ingredient.FluidContainerIngredient;
 import slimeknights.mantle.recipe.ingredient.PotionIngredient;
+import slimeknights.mantle.registration.MantleRegistrations;
 import slimeknights.mantle.registration.RegistrationHelper;
 import slimeknights.mantle.registration.adapter.BlockEntityTypeRegistryAdapter;
 import slimeknights.mantle.util.OffhandCooldownTracker;
@@ -101,10 +104,6 @@ public class Mantle implements ModInitializer {
     this.register();
     MantleRecipes.init();
     UseBlockCallback.EVENT.register(LecternBookItem::interactWithBlock);
-
-    if (FMLEnvironment.dist == Dist.CLIENT) {
-      ClientEvents.onConstruct();
-    }
   }
 
   private void registerCapabilities() {
@@ -122,10 +121,10 @@ public class Mantle implements ModInitializer {
 
   @SuppressWarnings("deprecation")
   private void register() {
-    CraftingHelper.register(TagEmptyCondition.SERIALIZER);
-    CraftingHelper.register(TagFilledCondition.SERIALIZER);
-    CraftingHelper.register(TagCombinationCondition.SERIALIZER);
-    CraftingHelper.register(FluidContainerIngredient.ID, FluidContainerIngredient.SERIALIZER);
+    ResourceConditions.register(TagEmptyCondition.ID, TagEmptyCondition.SERIALIZER::test);
+    ResourceConditions.register(TagFilledCondition.ID, TagEmptyCondition.SERIALIZER::test);
+    ResourceConditions.register(TagCombinationCondition.ID, TagCombinationCondition::test);
+    CustomIngredientSerializer.register(FluidContainerIngredient.SERIALIZER);
     CustomIngredientSerializer.register(PotionIngredient.SERIALIZER);
 
     // fluid container transfer
@@ -187,11 +186,11 @@ public class Mantle implements ModInitializer {
     BlockEntityTypeRegistryAdapter adapter = new BlockEntityTypeRegistryAdapter();
     Set<Block> signs = MantleSignBlockEntity.buildSignBlocks();
     if (!signs.isEmpty()) {
-      adapter.register(MantleSignBlockEntity::new, signs, "sign");
+      MantleRegistrations.SIGN = adapter.register(MantleSignBlockEntity::new, signs, "sign");
     }
     signs = MantleHangingSignBlockEntity.buildSignBlocks();
     if (!signs.isEmpty()) {
-      adapter.register(MantleHangingSignBlockEntity::new, signs, "hanging_sign");
+      MantleRegistrations.HANGING_SIGN = adapter.register(MantleHangingSignBlockEntity::new, signs, "hanging_sign");
     }
 
     ResourceOrTagKeyArgument.Info<?> info = new ResourceOrTagKeyArgument.Info<>();

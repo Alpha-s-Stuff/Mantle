@@ -10,8 +10,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.state.properties.WoodType;
-import net.minecraftforge.registries.MissingMappingsEvent;
-import net.minecraftforge.registries.MissingMappingsEvent.Mapping;
 import slimeknights.mantle.util.RegistryHelper;
 
 import javax.annotation.Nullable;
@@ -53,24 +51,24 @@ public class RegistrationHelper {
     return () -> (R) holder.get();
   }
 
-  /**
-   * Handles missing mappings for the given registry
-   * @param event    Mappings event
-   * @param handler  Mapping handler
-   * @param <T>      Event type
-   */
-  public static <T> void handleMissingMappings(MissingMappingsEvent event, String modID, ResourceKey<? extends Registry<T>> registry, Function<String, T> handler) {
-    // event is kinda nice, automatically filters mappings to the registry type via the key
-    for (Mapping<T> mapping : event.getAllMappings(registry)) {
-      ResourceLocation id = mapping.getKey();
-      if (modID.equals(id.getNamespace())) {
-        @Nullable T value = handler.apply(id.getPath());
-        if (value != null) {
-          mapping.remap(value);
-        }
-      }
-    }
-  }
+//  /** Fabric use data fixers instead please
+//   * Handles missing mappings for the given registry
+//   * @param event    Mappings event
+//   * @param handler  Mapping handler
+//   * @param <T>      Event type
+//   */
+//  public static <T> void handleMissingMappings(MissingMappingsEvent event, String modID, ResourceKey<? extends Registry<T>> registry, Function<String, T> handler) {
+//    // event is kinda nice, automatically filters mappings to the registry type via the key
+//    for (Mapping<T> mapping : event.getAllMappings(registry)) {
+//      ResourceLocation id = mapping.getKey();
+//      if (modID.equals(id.getNamespace())) {
+//        @Nullable T value = handler.apply(id.getPath());
+//        if (value != null) {
+//          mapping.remap(value);
+//        }
+//      }
+//    }
+//  }
 
   /** Registers a wood type to be injected into the atlas, should be called before client setup */
   public static void registerWoodType(WoodType type) {

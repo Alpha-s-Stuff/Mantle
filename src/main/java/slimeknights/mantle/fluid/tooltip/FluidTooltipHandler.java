@@ -84,8 +84,8 @@ public class FluidTooltipHandler extends SimpleJsonResourceReloadListener implem
   /**
    * Initializes this manager, registering it with the resource manager
    */
-  public static void init() {
-    ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(INSTANCE);
+  public static void init(ResourceManagerHelper helper) {
+    helper.registerReloadListener(INSTANCE);
     // clear the cache on tag reload, if the tags changed it might be wrong
     TagsUpdatedCallback.EVENT.register(registries -> INSTANCE.listCache.clear());
   }

@@ -22,7 +22,7 @@
       "slimeknights.mantle.Mantle"
     ],
     "client": [
-      "slimeknights.mantle.client.ClientEvents"
+      "slimeknights.mantle.client.ClientEvents::onConstruct"
     ],
     "fabric-datagen": [
       "slimeknights.mantle.MantleData"

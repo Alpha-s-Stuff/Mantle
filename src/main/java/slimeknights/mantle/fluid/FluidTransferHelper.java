@@ -1,5 +1,8 @@
 package slimeknights.mantle.fluid;
 
+import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
+import io.github.fabricators_of_create.porting_lib.fluids.sound.SoundAction;
+import io.github.fabricators_of_create.porting_lib.fluids.sound.SoundActions;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import net.minecraft.core.BlockPos;
@@ -21,17 +24,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraftforge.common.SoundAction;
-import net.minecraftforge.common.SoundActions;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidType;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
-import net.minecraftforge.fluids.capability.IFluidHandlerItem;
-import net.minecraftforge.fluids.capability.templates.EmptyFluidHandler;
-import net.minecraftforge.items.ItemHandlerHelper;
 import slimeknights.mantle.Mantle;
 import slimeknights.mantle.fluid.transfer.FluidContainerTransferManager;
 import slimeknights.mantle.fluid.transfer.IFluidContainerTransfer;

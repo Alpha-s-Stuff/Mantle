@@ -8,11 +8,13 @@ import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.minecraft.world.level.storage.loot.predicates.LootItemConditionType;
 import slimeknights.mantle.Mantle;
+import slimeknights.mantle.fabric.tags.TagContextHelper;
 import slimeknights.mantle.loot.MantleLoot;
 
 /** Condition that checks when a tag is empty. Same as {@link net.minecraftforge.common.crafting.conditions.TagEmptyCondition} but for any registry */
 public class TagEmptyCondition<T> extends TagCondition<T> implements LootItemCondition {
-  public static final Serializer<TagEmptyCondition<?>> SERIALIZER = new Serializer<>(Mantle.getResource("tag_empty"), TagEmptyCondition::new);
+  public static final ResourceLocation ID = Mantle.getResource("tag_empty");
+  public static final Serializer<TagEmptyCondition<?>> SERIALIZER = new Serializer<>(ID, TagEmptyCondition::new);
 
   public TagEmptyCondition(TagKey<T> tag) {
     super(tag);
@@ -23,7 +25,7 @@ public class TagEmptyCondition<T> extends TagCondition<T> implements LootItemCon
   }
 
   @Override
-  public ResourceLocation getID() {
+  public ResourceLocation getConditionId() {
     return SERIALIZER.getID();
   }
 
@@ -33,8 +35,8 @@ public class TagEmptyCondition<T> extends TagCondition<T> implements LootItemCon
   }
 
   @Override
-  public boolean test(IContext context) {
-    return context.getTag(tag).isEmpty();
+  public boolean test() {
+    return TagContextHelper.getTag(tag).isEmpty();
   }
 
   @Override

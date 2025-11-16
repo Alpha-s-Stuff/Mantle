@@ -18,7 +18,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import slimeknights.mantle.fluid.attributes.FluidAttributes;
-import slimeknights.mantle.util.SimpleFlowableFluid;
+import slimeknights.mantle.util.SimpleFlowingFluid;
 
 import javax.annotation.Nullable;
 import java.util.function.Supplier;
@@ -114,7 +114,7 @@ public abstract class SimpleDirectionalFluid extends StarFluid {
     return fluid == still.get() || fluid == flowing.get();
   }
 
-  public static class Flowing extends SimpleFlowableFluid {
+  public static class Flowing extends SimpleFlowingFluid {
     public Flowing(Properties properties) {
       super(properties);
       registerDefaultState(getStateDefinition().any().setValue(LEVEL, 7));
@@ -137,7 +137,7 @@ public abstract class SimpleDirectionalFluid extends StarFluid {
     }
   }
 
-  public static class Still extends SimpleFlowableFluid {
+  public static class Still extends SimpleFlowingFluid {
     public Still(Properties properties) {
       super(properties);
     }

@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import net.fabricmc.fabric.api.resource.conditions.v1.ConditionJsonProvider;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
@@ -20,7 +21,7 @@ import java.util.function.Function;
 
 /** Common logic for {@link TagEmptyCondition} and {@link TagFilledCondition} */
 @RequiredArgsConstructor
-public abstract class TagCondition<T> {
+public abstract class TagCondition<T> implements ConditionJsonProvider {
   @Getter
   protected final TagKey<T> tag;
   @Nullable
@@ -44,9 +45,16 @@ public abstract class TagCondition<T> {
     return getClass().getSimpleName() + "(\"" + tag + "\")";
   }
 
+  public abstract boolean test();
+
+  @Override
+  public void writeParameters(JsonObject json) {
+      Serializer.write(json, this);
+  }
+
   /** Serializer logic for tag keys */
   public record Serializer<C extends TagCondition<?>>(ResourceLocation getID, Function<TagKey<?>,C> constructor) implements net.minecraft.world.level.storage.loot.Serializer<C> {
-    public void write(JsonObject json, C value) {
+    public static <C extends TagCondition<?>> void write(JsonObject json, C value) {
       TagKey<?> tag = value.getTag();
       // save some space in JSON by not setting registry if item (most common)
       if (!Registries.ITEM.equals(tag.registry())) {
@@ -60,6 +68,10 @@ public abstract class TagCondition<T> {
         // default to item registry if registry is unset
         ResourceKey.createRegistryKey(JsonHelper.getResourceLocation(json, "registry", Registries.ITEM.location())),
         JsonHelper.getResourceLocation(json, "tag")));
+    }
+
+    public boolean test(JsonObject json) {
+      return read(json).test();
     }
 
     @Override

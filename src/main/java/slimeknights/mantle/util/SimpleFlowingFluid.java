@@ -3,6 +3,7 @@ package slimeknights.mantle.util;
 import java.util.Optional;
 
 import io.github.fabricators_of_create.porting_lib.fluids.FluidType;
+import io.github.fabricators_of_create.porting_lib.fluids.extensions.ConvertToSourceFluid;
 import io.github.fabricators_of_create.porting_lib.fluids.sound.SoundActions;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.level.Level;
@@ -27,7 +28,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Supplier;
 
-public abstract class ForgeFlowingFluid extends FlowingFluid {
+public abstract class SimpleFlowingFluid extends FlowingFluid implements ConvertToSourceFluid {
   private final Supplier<? extends FluidType> fluidType;
   private final Supplier<? extends Fluid> flowing;
   private final Supplier<? extends Fluid> still;
@@ -40,7 +41,7 @@ public abstract class ForgeFlowingFluid extends FlowingFluid {
   private final float explosionResistance;
   private final int tickRate;
 
-  protected ForgeFlowingFluid(Properties properties) {
+  protected SimpleFlowingFluid(Properties properties) {
     this.fluidType = properties.fluidType;
     this.flowing = properties.flowing;
     this.still = properties.still;
@@ -132,7 +133,7 @@ public abstract class ForgeFlowingFluid extends FlowingFluid {
     return Optional.ofNullable(getFluidType().getSound(SoundActions.BUCKET_FILL));
   }
 
-  public static class Flowing extends ForgeFlowingFluid {
+  public static class Flowing extends SimpleFlowingFluid {
 
     public Flowing(Properties properties) {
       super(properties);
@@ -153,7 +154,7 @@ public abstract class ForgeFlowingFluid extends FlowingFluid {
     }
   }
 
-  public static class Source extends ForgeFlowingFluid {
+  public static class Source extends SimpleFlowingFluid {
 
     public Source(Properties properties) {
       super(properties);

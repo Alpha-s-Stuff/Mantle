@@ -1,5 +1,7 @@
 package slimeknights.mantle.registration.adapter;
 
+import net.fabricmc.fabric.api.object.builder.v1.block.type.BlockSetTypeBuilder;
+import net.fabricmc.fabric.api.object.builder.v1.block.type.WoodTypeBuilder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.block.Block;
@@ -39,6 +41,7 @@ import slimeknights.mantle.registration.object.FenceBuildingBlockObject;
 import slimeknights.mantle.registration.object.WallBuildingBlockObject;
 import slimeknights.mantle.registration.object.WoodBlockObject;
 import slimeknights.mantle.registration.object.WoodBlockObject.WoodVariant;
+import slimeknights.mantle.util.SimpleFlowingFluid;
 
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -87,7 +90,7 @@ public class BlockRegistryAdapter extends EnumRegistryAdapter<Block> {
     return new BuildingBlockObject(
       this.register(block, name),
       this.register(new SlabBlock(BlockBehaviour.Properties.copy(block)), name + "_slab"),
-      this.register(new StairBlock(block::defaultBlockState, BlockBehaviour.Properties.copy(block)), name + "_stairs")
+      this.register(new StairBlock(block.defaultBlockState(), BlockBehaviour.Properties.copy(block)), name + "_stairs")
     );
   }
 
@@ -127,10 +130,10 @@ public class BlockRegistryAdapter extends EnumRegistryAdapter<Block> {
    * @return Wood object
    */
   public WoodBlockObject registerWood(String name, Function<WoodVariant,BlockBehaviour.Properties> behaviorCreator) {
-    BlockSetType setType = new BlockSetType(resourceName(name));
-    WoodType woodType = new WoodType(resourceName(name), setType);
-    BlockSetType.register(setType);
-    WoodType.register(woodType);
+    BlockSetTypeBuilder setTypeBuilder = new BlockSetTypeBuilder();
+    WoodTypeBuilder woodTypeBuilder = new WoodTypeBuilder();
+    BlockSetType setType = setTypeBuilder.register(getResource(name));
+    WoodType woodType = woodTypeBuilder.register(getResource(name), setType);
     RegistrationHelper.registerWoodType(woodType);
 
     // planks
@@ -176,7 +179,7 @@ public class BlockRegistryAdapter extends EnumRegistryAdapter<Block> {
    * @param name        Fluid name, unfortunately no way to fetch from the fluid as it does not exist yet
    * @return  Fluid block instance
    */
-  public LiquidBlock registerFluidBlock(Supplier<? extends ForgeFlowingFluid> fluid, MapColor color, int lightLevel, String name) {
-    return register(new LiquidBlock(fluid, FluidDeferredRegister.createProperties(color, lightLevel)), name + "_fluid");
+  public LiquidBlock registerFluidBlock(Supplier<? extends SimpleFlowingFluid> fluid, MapColor color, int lightLevel, String name) {
+    return register(new LiquidBlock(fluid.get(), FluidDeferredRegister.createProperties(color, lightLevel)), name + "_fluid");
   }
 }

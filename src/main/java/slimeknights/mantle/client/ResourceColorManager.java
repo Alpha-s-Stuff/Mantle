@@ -41,8 +41,8 @@ public class ResourceColorManager implements ISafeManagerReloadListener, Identif
   /**
    * Initializes this manager, registering it with the resource manager
    */
-  public static void init() {
-    ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(INSTANCE);
+  public static void init(ResourceManagerHelper helper) {
+    helper.registerReloadListener(INSTANCE);
   }
 
   /** Recursively parses the given objects */

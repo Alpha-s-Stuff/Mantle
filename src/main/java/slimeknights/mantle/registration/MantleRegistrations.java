@@ -14,9 +14,7 @@ import static slimeknights.mantle.registration.RegistrationHelper.injected;
 public class MantleRegistrations {
   private MantleRegistrations() {}
 
-  @ObjectHolder(registryName = "minecraft:block_entity_type", value = Mantle.modId+":sign")
-  public static final BlockEntityType<MantleSignBlockEntity> SIGN = injected();
+  public static BlockEntityType<MantleSignBlockEntity> SIGN = injected();
 
-  @ObjectHolder(registryName = "minecraft:block_entity_type", value = Mantle.modId+":hanging_sign")
-  public static final BlockEntityType<MantleHangingSignBlockEntity> HANGING_SIGN = injected();
+  public static BlockEntityType<MantleHangingSignBlockEntity> HANGING_SIGN = injected();
 }

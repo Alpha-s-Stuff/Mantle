@@ -8,11 +8,13 @@ import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.minecraft.world.level.storage.loot.predicates.LootItemConditionType;
 import slimeknights.mantle.Mantle;
+import slimeknights.mantle.fabric.tags.TagContextHelper;
 import slimeknights.mantle.loot.MantleLoot;
 
 /** Inverted form of {@link TagEmptyCondition} as filled is way more common a desire than empty. */
 public class TagFilledCondition<T> extends TagCondition<T> implements LootItemCondition {
-  public static final Serializer<TagFilledCondition<?>> SERIALIZER = new Serializer<>(Mantle.getResource("tag_filled"), TagFilledCondition::new);
+  public static final ResourceLocation ID = Mantle.getResource("tag_filled");
+  public static final Serializer<TagFilledCondition<?>> SERIALIZER = new Serializer<>(ID, TagFilledCondition::new);
 
   public TagFilledCondition(TagKey<T> tag) {
     super(tag);
@@ -23,8 +25,18 @@ public class TagFilledCondition<T> extends TagCondition<T> implements LootItemCo
   }
 
   @Override
+  public ResourceLocation getConditionId() {
+    return SERIALIZER.getID();
+  }
+
+  @Override
   public LootItemConditionType getType() {
     return MantleLoot.TAG_FILLED;
+  }
+
+  @Override
+  public boolean test() {
+    return !TagContextHelper.getTag(tag).isEmpty();
   }
 
   @Override

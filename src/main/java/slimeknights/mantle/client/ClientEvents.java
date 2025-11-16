@@ -2,6 +2,9 @@ package slimeknights.mantle.client;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
+import io.github.fabricators_of_create.porting_lib.models.geometry.IGeometryLoader;
+import io.github.fabricators_of_create.porting_lib.models.geometry.RegisterGeometryLoadersCallback;
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.AttackIndicatorStatus;
 import net.minecraft.client.Minecraft;
@@ -10,6 +13,7 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.ChatScreen;
 import net.minecraft.client.renderer.Sheets;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.blockentity.HangingSignRenderer;
 import net.minecraft.client.renderer.blockentity.SignRenderer;
 import net.minecraft.core.BlockPos;
@@ -17,6 +21,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.PackType;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -67,36 +72,40 @@ import slimeknights.mantle.util.RegistryHelper;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @EventBusSubscriber(modid = Mantle.modId, value = Dist.CLIENT, bus = Bus.MOD)
 public class ClientEvents {
   /** Called on construct to initiatlize things that need early entry */
-  public static void onConstruct() {}
+  public static void onConstruct() {
+    registerEntityRenderers();
+    registerListeners();
+    RegisterGeometryLoadersCallback.EVENT.register();
+  }
 
   @SuppressWarnings("ConstantConditions")
-  @SubscribeEvent
-  static void registerEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
+  static void registerEntityRenderers() {
     if (MantleRegistrations.SIGN != null) {
-      event.registerBlockEntityRenderer(MantleRegistrations.SIGN, SignRenderer::new);
+      BlockEntityRenderers.register(MantleRegistrations.SIGN, SignRenderer::new);
     }
     if (MantleRegistrations.HANGING_SIGN != null) {
-      event.registerBlockEntityRenderer(MantleRegistrations.HANGING_SIGN, HangingSignRenderer::new);
+      BlockEntityRenderers.register(MantleRegistrations.HANGING_SIGN, HangingSignRenderer::new);
     }
   }
 
   @SuppressWarnings("removal")
-  @SubscribeEvent
-  static void registerListeners(RegisterClientReloadListenersEvent event) {
-    event.registerReloadListener(ModelHelper.LISTENER);
-    event.registerReloadListener(new BookLoader());
-    ResourceColorManager.init();
-    FluidTooltipHandler.init();
-    FluidTextureManager.init(event);
-    event.registerReloadListener(FluidCuboid.REGISTRY);
-    event.registerReloadListener(RenderItem.REGISTRY);
-    event.registerReloadListener(RenderItem.STATE_REGISTRY);
-    event.registerReloadListener(TextureColorHelper.RELOAD_LISTENER);
+  static void registerListeners() {
+    ResourceManagerHelper helper = ResourceManagerHelper.get(PackType.CLIENT_RESOURCES);
+    helper.registerReloadListener(ModelHelper.LISTENER);
+    helper.registerReloadListener(new BookLoader());
+    ResourceColorManager.init(helper);
+    FluidTooltipHandler.init(helper);
+    FluidTextureManager.init(helper);
+    helper.registerReloadListener(FluidCuboid.REGISTRY);
+    helper.registerReloadListener(RenderItem.REGISTRY);
+    helper.registerReloadListener(RenderItem.STATE_REGISTRY);
+    helper.registerReloadListener(TextureColorHelper.RELOAD_LISTENER);
   }
 
   @SubscribeEvent
@@ -108,9 +117,9 @@ public class ClientEvents {
   }
 
   @SubscribeEvent
-  static void registerModelLoaders(RegisterGeometryLoaders event) {
+  static void registerModelLoaders(Map<ResourceLocation, IGeometryLoader<?>> loaders) {
     // standard models - useful in resource packs for any model
-    event.register("connected", ConnectedModel.LOADER);
+    loaders.put(Mantle.getResource("connected"), ConnectedModel.LOADER);
     event.register("item_layer", MantleItemLayerModel.LOADER);
     event.register("colored_block", ColoredBlockModel.LOADER);
     event.register("fallback", FallbackModelLoader.INSTANCE);

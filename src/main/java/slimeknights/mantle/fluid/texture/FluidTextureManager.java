@@ -1,6 +1,7 @@
 package slimeknights.mantle.fluid.texture;
 
 import com.google.gson.JsonElement;
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
@@ -36,8 +37,8 @@ public class FluidTextureManager implements IEarlySafeManagerReloadListener {
   /**
    * Initializes this manager, registering it with the resource manager
    */
-  public static void init(RegisterClientReloadListenersEvent event) {
-    event.registerReloadListener(INSTANCE);
+  public static void init(ResourceManagerHelper helper) {
+    helper.registerReloadListener(INSTANCE);
   }
 
   @Override
