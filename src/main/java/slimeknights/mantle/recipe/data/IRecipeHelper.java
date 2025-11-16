@@ -1,7 +1,9 @@
 package slimeknights.mantle.recipe.data;
 
+import io.github.fabricators_of_create.porting_lib.util.RegistryObject;
 import net.fabricmc.fabric.api.resource.conditions.v1.ConditionJsonProvider;
 import net.fabricmc.fabric.api.resource.conditions.v1.DefaultResourceConditions;
+import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -13,8 +15,6 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraftforge.common.crafting.conditions.ICondition;
-import net.minecraftforge.registries.RegistryObject;
 import slimeknights.mantle.Mantle;
 import slimeknights.mantle.recipe.condition.TagFilledCondition;
 import slimeknights.mantle.registration.object.IdAwareObject;
@@ -184,8 +184,8 @@ public interface IRecipeHelper {
    * @param name  Forge tag name
    * @return  Condition for tag existing
    */
-  default ICondition tagCondition(String name) {
-    return new TagFilledCondition<>(ItemTags.create(Mantle.commonResource(name)));
+  default ConditionJsonProvider tagCondition(String name) {
+    return DefaultResourceConditions.tagsPopulated(TagKey.create(Registries.ITEM, Mantle.commonResource(name)));
   }
 
   /**

@@ -166,8 +166,8 @@ dependencies {
     compileOnly "org.projectlombok:lombok:1.18.22"
     annotationProcessor "org.projectlombok:lombok:1.18.22"
 
-    testCompileOnly "org.projectlombok:lombok:1.18.22"
-    testAnnotationProcessor 'org.projectlombok:lombok:1.18.22'
+    compileOnly("com.google.errorprone:error_prone_annotations:2.11.0")
+    annotationProcessor("com.google.errorprone:error_prone_annotations:2.11.0")
 
     modImplementation(include("me.alphamode:Star:${project.star_version}+${project.minecraft_version}"))
 }

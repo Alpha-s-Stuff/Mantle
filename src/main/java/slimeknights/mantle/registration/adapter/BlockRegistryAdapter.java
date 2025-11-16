@@ -1,5 +1,6 @@
 package slimeknights.mantle.registration.adapter;
 
+import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -24,8 +25,6 @@ import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
 import net.minecraft.world.level.block.state.properties.WoodType;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
-import net.minecraftforge.fluids.ForgeFlowingFluid;
-import net.minecraftforge.registries.IForgeRegistry;
 import slimeknights.mantle.block.MantleCeilingHangingSignBlock;
 import slimeknights.mantle.block.MantleStandingSignBlock;
 import slimeknights.mantle.block.MantleWallHangingSignBlock;
@@ -53,12 +52,12 @@ import static slimeknights.mantle.util.RegistryHelper.getHolder;
 public class BlockRegistryAdapter extends EnumRegistryAdapter<Block> {
 
   /** @inheritDoc */
-  public BlockRegistryAdapter(IForgeRegistry<Block> registry) {
+  public BlockRegistryAdapter(Registry<Block> registry) {
     super(registry);
   }
 
   /** @inheritDoc */
-  public BlockRegistryAdapter(IForgeRegistry<Block> registry, String modid) {
+  public BlockRegistryAdapter(Registry<Block> registry, String modid) {
     super(registry, modid);
   }
 

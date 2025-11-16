@@ -1,7 +1,8 @@
 package slimeknights.mantle.recipe.ingredient;
 
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import net.fabricmc.fabric.api.recipe.v1.ingredient.CustomIngredient;
+import net.fabricmc.fabric.api.recipe.v1.ingredient.CustomIngredientSerializer;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
@@ -9,9 +10,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraftforge.common.crafting.AbstractIngredient;
-import net.minecraftforge.common.crafting.IIngredientSerializer;
+import net.minecraft.world.item.crafting.Ingredient.ItemValue;
+import net.minecraft.world.item.crafting.Ingredient.TagValue;
 import org.jetbrains.annotations.Nullable;
+import slimeknights.mantle.Mantle;
 import slimeknights.mantle.data.loadable.Loadable;
 import slimeknights.mantle.data.loadable.Loadables;
 import slimeknights.mantle.data.loadable.array.ArrayLoadable;
@@ -27,15 +29,18 @@ import java.util.List;
 import java.util.stream.Stream;
 
 /** Simple ingredient checking for an item with a specific potion */
-public class PotionIngredient extends AbstractIngredient {
+public class PotionIngredient implements CustomIngredient {
   /** Ingredient serializer instance */
-  public static final LoadableIngredientSerializer<PotionIngredient> SERIALIZER = new LoadableIngredientSerializer<>(RecordLoadable.create(
+  public static final LoadableIngredientSerializer<PotionIngredient> SERIALIZER = new LoadableIngredientSerializer<>(Mantle.getResource("potion"), RecordLoadable.create(
     ItemsField.INSTANCE,
     new UnsyncedField<>(Loadables.ITEM_TAG.nullableField("tag", i -> i.itemTag)),
     Loadables.POTION.requiredField("potion", i -> i.potion),
     PotionIngredient::new
   ));
 
+  private final Ingredient.Value[] values;
+  @Nullable
+  private List<ItemStack> itemStacks;
   // item set field for serialization
   private final List<Item> items;
   // item field for serialization
@@ -44,13 +49,22 @@ public class PotionIngredient extends AbstractIngredient {
   private final Potion potion;
   protected PotionIngredient(List<Item> items, @Nullable TagKey<Item> itemTag, Potion potion) {
     // potion is added in directly to the parent value stream
-    super(Stream.concat(
+    this.values = Stream.concat(
       items.stream().map(item -> new ItemValue(PotionUtils.setPotion(new ItemStack(item), potion))),
-      Stream.ofNullable(itemTag).map(tag -> new PotionTagValue(tag, potion)))
-    );
+      Stream.ofNullable(itemTag).map(tag -> new PotionTagValue(tag, potion))
+    ).toArray(Ingredient.Value[]::new);
     this.items = items;
     this.itemTag = null;
     this.potion = potion;
+  }
+
+  @Override
+  public List<ItemStack> getMatchingStacks() {
+    if (this.itemStacks == null) {
+      this.itemStacks = Arrays.stream(this.values).flatMap((value) -> value.getItems().stream()).distinct().toList();
+    }
+
+    return this.itemStacks;
   }
 
   /** Creates a potion ingredient matching a list of items */
@@ -72,22 +86,35 @@ public class PotionIngredient extends AbstractIngredient {
   @Override
   public boolean test(@Nullable ItemStack stack) {
     // stack must match, any item must match, and potion must match
-    return stack != null && super.test(stack) && PotionUtils.getPotion(stack) == potion;
+    return stack != null && vanillaTest(stack) && PotionUtils.getPotion(stack) == potion;
+  }
+
+  protected boolean vanillaTest(ItemStack stack) {
+    if (isEmpty()) {
+      return stack.isEmpty();
+    } else {
+      for(ItemStack matchingStack : getMatchingStacks()) {
+        if (matchingStack.is(stack.getItem())) {
+          return true;
+        }
+      }
+
+      return false;
+    }
+  }
+
+  public boolean isEmpty() {
+    return this.values.length == 0;
   }
 
   @Override
-  public boolean isSimple() {
-    return false;
+  public boolean requiresTesting() {
+    return true;
   }
 
   @Override
-  public IIngredientSerializer<? extends Ingredient> getSerializer() {
+  public CustomIngredientSerializer<? extends CustomIngredient> getSerializer() {
     return SERIALIZER;
-  }
-
-  @Override
-  public JsonElement toJson() {
-    return SERIALIZER.serialize(this);
   }
 
   /** Custom field that syncs the item tag as items to the client */
@@ -116,7 +143,7 @@ public class PotionIngredient extends AbstractIngredient {
     @Override
     public void encode(FriendlyByteBuf buffer, PotionIngredient parent) {
       // sync both tag and item values to client
-      ITEM_LIST.encode(buffer, Arrays.stream(parent.getItems()).map(ItemStack::getItem).toList());
+      ITEM_LIST.encode(buffer, parent.getMatchingStacks().stream().map(ItemStack::getItem).toList());
     }
   }
 

@@ -40,15 +40,25 @@ public record LootTableInjection(ResourceLocation name, List<LootPoolInjection> 
     }
 
     /** Injects this into the given loot pool */
-    public void inject(LootTable table) {
-      LootPool pool = table.getPool(name);
-      //noinspection ConstantConditions method is annotated wrongly
-      if (pool != null) {
-        int oldLength = pool.entries.length;
-        pool.entries = Arrays.copyOf(pool.entries, oldLength + entries.length);
-        System.arraycopy(entries, 0, pool.entries, oldLength, entries.length);
-      } else {
-        Mantle.logger.warn("Failed to inject loot into {} pool {}", table.getLootTableId(), name);
+    public void inject(LootTable.Builder table, ResourceLocation lootTableId) {
+      for (int i = 0; i < table.pools.size(); i++) {
+        // Hack for determining loot table names
+        String id;
+        if (i == 0)
+          id = "main";
+        else
+          id = "pool" + i;
+        if (name.equals(id)) {
+          LootPool pool = table.pools.get(i);
+          //noinspection ConstantConditions method is annotated wrongly
+          if (pool != null) {
+            int oldLength = pool.entries.length;
+            pool.entries = Arrays.copyOf(pool.entries, oldLength + entries.length);
+            System.arraycopy(entries, 0, pool.entries, oldLength, entries.length);
+          } else {
+            Mantle.logger.warn("Failed to inject loot into {} pool {}", lootTableId, name);
+          }
+        }
       }
     }
   }

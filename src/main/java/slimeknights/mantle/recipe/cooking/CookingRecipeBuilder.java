@@ -59,7 +59,7 @@ public class CookingRecipeBuilder<T extends CookingRecipeBuilder<T>> extends Abs
 
 
   /**
-   * Sets the type of {@link #save(Consumer, ResourceLocation)} for the sake of {@link net.minecraftforge.common.crafting.ConditionalRecipe}.
+   * Sets the type of {@link #save(Consumer, ResourceLocation)} for the sake of {@link io.github.fabricators_of_create.porting_lib.data.ConditionalRecipe}.
    * Note you can also just directly use {@link #saveSmelting(Consumer, ResourceLocation)}, {@link #saveBlasting(Consumer, ResourceLocation)},
    * {@link #saveSmoking(Consumer, ResourceLocation)}, and {@link #saveCampfire(Consumer, ResourceLocation)} directly.
    */
@@ -143,6 +143,6 @@ public class CookingRecipeBuilder<T extends CookingRecipeBuilder<T>> extends Abs
     }
   }
 
-  /** Helper to change the cooking type in {@link #save(Consumer, ResourceLocation)} for the sake of {@link net.minecraftforge.common.crafting.ConditionalRecipe} */
+  /** Helper to change the cooking type in {@link #save(Consumer, ResourceLocation)} for the sake of {@link io.github.fabricators_of_create.porting_lib.data.ConditionalRecipe} */
   public enum CookingType { SMELTING, BLASTING, SMOKING, CAMPFIRE }
 }

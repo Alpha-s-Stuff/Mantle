@@ -74,7 +74,7 @@ public class FlowingFluidObject<F extends FlowingFluid> extends FluidObject<F> {
   }
 
   @Override
-  public FluidIngredient ingredient(int amount) {
+  public FluidIngredient ingredient(long amount) {
     return FluidIngredient.of(getTag(), amount);
   }
 }

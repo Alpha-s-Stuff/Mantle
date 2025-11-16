@@ -1,23 +1,26 @@
 package slimeknights.mantle.recipe.helper;
 
 import com.google.gson.JsonObject;
+import net.fabricmc.fabric.api.recipe.v1.ingredient.CustomIngredient;
+import net.fabricmc.fabric.api.recipe.v1.ingredient.CustomIngredientSerializer;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraftforge.common.crafting.CraftingHelper;
-import net.minecraftforge.common.crafting.IIngredientSerializer;
+import net.minecraft.resources.ResourceLocation;
 import slimeknights.mantle.data.loadable.record.RecordLoadable;
 
-import java.util.Objects;
-
 /** Ingredient serializer made using loadables */
-public record LoadableIngredientSerializer<T extends Ingredient>(RecordLoadable<T> loadable) implements IIngredientSerializer<T> {
+public record LoadableIngredientSerializer<T extends CustomIngredient>(ResourceLocation id, RecordLoadable<T> loadable) implements CustomIngredientSerializer<T> {
   @Override
-  public T parse(FriendlyByteBuf buffer) {
+  public T read(FriendlyByteBuf buffer) {
     return loadable.decode(buffer);
   }
 
   @Override
-  public T parse(JsonObject json) {
+  public ResourceLocation getIdentifier() {
+    return id;
+  }
+
+  @Override
+  public T read(JsonObject json) {
     return loadable.deserialize(json);
   }
 
@@ -27,10 +30,8 @@ public record LoadableIngredientSerializer<T extends Ingredient>(RecordLoadable<
   }
 
   /** Serializes the ingredient to JSON */
-  public JsonObject serialize(T ingredient) {
-    JsonObject json = new JsonObject();
-    json.addProperty("type", Objects.requireNonNull(CraftingHelper.getID(this)).toString());
+  @Override
+  public void write(JsonObject json, T ingredient) {
     loadable.serialize(ingredient, json);
-    return json;
   }
 }

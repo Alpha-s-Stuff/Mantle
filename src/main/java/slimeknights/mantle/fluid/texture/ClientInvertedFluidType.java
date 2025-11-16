@@ -1,10 +1,10 @@
 package slimeknights.mantle.fluid.texture;
 
+import io.github.fabricators_of_create.porting_lib.fluids.FluidType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.material.FluidState;
-import net.minecraftforge.fluids.FluidType;
 
 /** Client logic for {@link slimeknights.mantle.fluid.InvertedFluidType} */
 public class ClientInvertedFluidType extends ClientTextureFluidType {

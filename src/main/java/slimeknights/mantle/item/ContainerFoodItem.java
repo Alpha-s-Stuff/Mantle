@@ -1,7 +1,8 @@
 package slimeknights.mantle.item;
 
 import com.mojang.datafixers.util.Pair;
-import net.minecraft.nbt.CompoundTag;
+import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -14,8 +15,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.fluids.FluidStack;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -62,7 +61,7 @@ public class ContainerFoodItem extends Item {
 
   @Override
   public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
-    FoodProperties food = stack.getFoodProperties(null);
+    FoodProperties food = stack.getItem().getFoodProperties();
     if (food != null) {
       addEffectTooltip(food, tooltip);
     }
@@ -70,7 +69,7 @@ public class ContainerFoodItem extends Item {
 
   @Override
   public ItemStack finishUsingItem(ItemStack stack, Level level, LivingEntity living) {
-    ItemStack container = stack.getCraftingRemainingItem();
+    ItemStack container = stack.getRecipeRemainder();
     ItemStack result = super.finishUsingItem(stack, level, living);
     Player player = living instanceof Player p ? p : null;
     if (!container.isEmpty() && (player == null || !player.getAbilities().instabuild)) {
@@ -93,12 +92,11 @@ public class ContainerFoodItem extends Item {
     public FluidContainerFoodItem(Properties props, Supplier<FluidStack> fluid) {
       super(props);
       this.fluid = fluid;
+      initCapabilities();
     }
 
-    @Nullable
-    @Override
-    public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundTag nbt) {
-      return new ConstantFluidContainerWrapper(fluid.get(), stack);
+    public void initCapabilities() {
+      FluidStorage.ITEM.registerForItems((itemStack, context) -> new ConstantFluidContainerWrapper(fluid.get(), context), this);
     }
   }
 }

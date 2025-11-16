@@ -23,18 +23,8 @@ public class TagFilledCondition<T> extends TagCondition<T> implements LootItemCo
   }
 
   @Override
-  public ResourceLocation getID() {
-    return SERIALIZER.getID();
-  }
-
-  @Override
   public LootItemConditionType getType() {
     return MantleLoot.TAG_FILLED;
-  }
-
-  @Override
-  public boolean test(IContext context) {
-    return !context.getTag(tag).isEmpty();
   }
 
   @Override

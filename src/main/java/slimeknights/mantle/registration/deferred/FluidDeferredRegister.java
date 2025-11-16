@@ -1,5 +1,7 @@
 package slimeknights.mantle.registration.deferred;
 
+import io.github.fabricators_of_create.porting_lib.fluids.FluidType;
+import io.github.fabricators_of_create.porting_lib.util.RegistryObject;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import net.minecraft.core.registries.Registries;
@@ -14,12 +16,6 @@ import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fluids.FluidType;
-import net.minecraftforge.fluids.ForgeFlowingFluid;
-import net.minecraftforge.fluids.ForgeFlowingFluid.Properties;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
 import slimeknights.mantle.block.fluid.BurningLiquidBlock;
 import slimeknights.mantle.block.fluid.MobEffectLiquidBlock;
 import slimeknights.mantle.fluid.InvertedFluid;
@@ -53,11 +49,11 @@ public class FluidDeferredRegister extends DeferredRegisterWrapper<Fluid> {
   }
 
   @Override
-  public void register(IEventBus bus) {
-    super.register(bus);
-    fluidTypeRegister.register(bus);
-    blockRegister.register(bus);
-    itemRegister.register(bus);
+  public void register() {
+    super.register();
+    fluidTypeRegister.register();
+    blockRegister.register();
+    itemRegister.register();
   }
 
   /**

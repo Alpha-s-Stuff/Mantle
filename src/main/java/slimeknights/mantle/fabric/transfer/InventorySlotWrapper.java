@@ -2,6 +2,7 @@ package slimeknights.mantle.fabric.transfer;
 
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.item.base.SingleStackStorage;
+import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.fabricmc.fabric.impl.transfer.DebugMessages;
 import net.fabricmc.fabric.impl.transfer.item.ItemVariantImpl;
@@ -146,6 +147,11 @@ class InventorySlotWrapper extends SingleStackStorage {
       // Otherwise assume everything was taken from original so empty it.
       original.setCount(0);
     }
+  }
+
+  @Override
+  public StorageView<ItemVariant> getUnderlyingView() {
+    return this.storage.getSlot(slot).getUnderlyingView();
   }
 
   @Override

@@ -1,46 +1,107 @@
 accessWidener v2 named
 
+# ContainerScreen
+transitive-accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen topPos I
+transitive-accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen leftPos I
+transitive-extendable method net/minecraft/client/gui/screens/inventory/AbstractContainerScreen renderSlot (Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/world/inventory/Slot;)V
+transitive-extendable method net/minecraft/client/gui/screens/inventory/AbstractContainerScreen isHovering (Lnet/minecraft/world/inventory/Slot;DD)Z
+
+# Slot
+transitive-mutable field net/minecraft/world/inventory/Slot x I
+transitive-mutable field net/minecraft/world/inventory/Slot y I
+
+# Model utils
+transitive-accessible field net/minecraft/client/resources/model/WeightedBakedModel wrapped Lnet/minecraft/client/resources/model/BakedModel;
+transitive-accessible field net/minecraft/client/resources/model/MultiPartBakedModel selectors Ljava/util/List;
+
+# SimpleBlockModel
+transitive-accessible field net/minecraft/client/renderer/block/model/BlockModel parentLocation Lnet/minecraft/resources/ResourceLocation;
+transitive-accessible method net/minecraft/client/renderer/block/model/BlockModel bakeFace (Lnet/minecraft/client/renderer/block/model/BlockElement;Lnet/minecraft/client/renderer/block/model/BlockElementFace;Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;Lnet/minecraft/core/Direction;Lnet/minecraft/client/resources/model/ModelState;Lnet/minecraft/resources/ResourceLocation;)Lnet/minecraft/client/renderer/block/model/BakedQuad;
+transitive-accessible method net/minecraft/client/renderer/block/model/BlockModel$Deserializer parseTextureLocationOrReference (Lnet/minecraft/resources/ResourceLocation;Ljava/lang/String;)Lcom/mojang/datafixers/util/Either;
+transitive-accessible field net/minecraft/client/renderer/block/model/BlockModel parent Lnet/minecraft/client/renderer/block/model/BlockModel;
+
+# Recipe helper
+
+# Build reuse with advancements
+
+# Faucet fluid loader variants
+
+# Template
+transitive-accessible field net/minecraft/world/level/levelgen/structure/templatesystem/StructureTemplate palettes Ljava/util/List;
+
+# DimensionType
+
+# Ray trace for tags command
+transitive-accessible method net/minecraft/world/item/Item getPlayerPOVHitResult (Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/level/ClipContext$Fluid;)Lnet/minecraft/world/phys/BlockHitResult;
+
+# Fix hand swinging animations resetting cooldown
+transitive-accessible method net/minecraft/world/entity/LivingEntity getCurrentSwingDuration ()I
+
+# Block properties
+transitive-accessible method net/minecraft/world/level/block/Blocks never (Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/EntityType;)Ljava/lang/Boolean;
+
+# Colored block model face bakery
+transitive-accessible field net/minecraft/client/renderer/block/model/BlockModel FACE_BAKERY Lnet/minecraft/client/renderer/block/model/FaceBakery;
+transitive-accessible method net/minecraft/client/renderer/block/model/FaceBakery setupShape (Lorg/joml/Vector3f;Lorg/joml/Vector3f;)[F
+transitive-accessible method net/minecraft/client/renderer/block/model/FaceBakery recalculateWinding ([ILnet/minecraft/core/Direction;)V
+
+# Checking if tag types exist
+
+# ResourceLocation validation
+transitive-accessible method net/minecraft/resources/ResourceLocation isValidNamespace (Ljava/lang/String;)Z
+
+# LivingEntityPredicates head underwater
+transitive-accessible field net/minecraft/world/entity/Entity wasEyeInWater Z
+
+# Tag contents are protected getter for some reason, so fine, its public now
+
+# Attack indicators and alike
+accessible field net/minecraft/client/gui/Gui GUI_ICONS_LOCATION Lnet/minecraft/resources/ResourceLocation;
+
+# Retextured recipe extension
+accessible field net/minecraft/world/item/crafting/ShapedRecipe result Lnet/minecraft/world/item/ItemStack;
+
+# Loot table injections
+transitive-accessible field net/minecraft/world/level/storage/loot/LootPool entries [Lnet/minecraft/world/level/storage/loot/entries/LootPoolEntryContainer;
+transitive-mutable field net/minecraft/world/level/storage/loot/LootPool entries [Lnet/minecraft/world/level/storage/loot/entries/LootPoolEntryContainer;
+
+# Work around mods writing mixins into vanilla getters that perform very unsafe and expensive operations, might as well make it only their problem
+
+# Adjust tooltip sizing and placement on book screens
+
+# Checking the current container safely
+
+# Unicode book font
+
+# Sources command
+
+# Inverted fluid
+
+accessible field net/minecraft/world/level/storage/loot/LootTable$Builder pools Ljava/util/List;
+
 transitive-accessible class net/minecraft/world/item/crafting/Ingredient$Value
+transitive-accessible method net/minecraft/world/item/crafting/Ingredient$TagValue <init> (Lnet/minecraft/tags/TagKey;)V
 transitive-accessible class net/minecraft/client/renderer/block/model/ItemOverrides$BakedOverride
 transitive-accessible method net/minecraft/client/renderer/Sheets createSignMaterial (Lnet/minecraft/world/level/block/state/properties/WoodType;)Lnet/minecraft/client/resources/model/Material;
 transitive-accessible method net/minecraft/world/item/crafting/Ingredient$ItemValue <init> (Lnet/minecraft/world/item/ItemStack;)V
 transitive-accessible method net/minecraft/world/item/crafting/Ingredient <init> (Ljava/util/stream/Stream;)V
 transitive-accessible method net/minecraft/client/renderer/blockentity/BlockEntityRenderers register (Lnet/minecraft/world/level/block/entity/BlockEntityType;Lnet/minecraft/client/renderer/blockentity/BlockEntityRendererProvider;)V
-transitive-accessible method net/minecraft/client/renderer/block/model/FaceBakery recalculateWinding ([ILnet/minecraft/core/Direction;)V
-transitive-accessible method net/minecraft/world/entity/LivingEntity getCurrentSwingDuration ()I
-transitive-accessible method net/minecraft/world/item/Item getPlayerPOVHitResult (Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/level/ClipContext$Fluid;)Lnet/minecraft/world/phys/BlockHitResult;
 transitive-accessible method net/minecraft/world/level/block/LiquidBlock <init> (Lnet/minecraft/world/level/material/FlowingFluid;Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;)V
 transitive-accessible method net/minecraft/world/level/block/StairBlock <init> (Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;)V
-transitive-accessible method net/minecraft/world/level/block/Blocks never (Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/EntityType;)Ljava/lang/Boolean;
 transitive-accessible method net/minecraft/client/renderer/RenderType create (Ljava/lang/String;Lcom/mojang/blaze3d/vertex/VertexFormat;Lcom/mojang/blaze3d/vertex/VertexFormat$Mode;IZZLnet/minecraft/client/renderer/RenderType$CompositeState;)Lnet/minecraft/client/renderer/RenderType$CompositeRenderType;
 transitive-accessible method net/minecraft/client/renderer/block/model/ItemOverrides <init> ()V
 transitive-accessible method net/minecraft/client/resources/model/SimpleBakedModel$Builder <init> (ZZZLnet/minecraft/client/renderer/block/model/ItemTransforms;Lnet/minecraft/client/renderer/block/model/ItemOverrides;)V
-transitive-accessible method net/minecraft/client/renderer/block/model/BlockModel bakeFace (Lnet/minecraft/client/renderer/block/model/BlockElement;Lnet/minecraft/client/renderer/block/model/BlockElementFace;Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;Lnet/minecraft/core/Direction;Lnet/minecraft/client/resources/model/ModelState;Lnet/minecraft/resources/ResourceLocation;)Lnet/minecraft/client/renderer/block/model/BakedQuad;
-transitive-extendable method net/minecraft/client/gui/screens/inventory/AbstractContainerScreen renderSlot (Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/world/inventory/Slot;)V
-transitive-extendable method net/minecraft/client/gui/screens/inventory/AbstractContainerScreen isHovering (Lnet/minecraft/world/inventory/Slot;DD)Z
 transitive-extendable class net/minecraft/world/item/crafting/Ingredient
 transitive-accessible class net/minecraft/client/gui/screens/MenuScreens$ScreenConstructor
 transitive-accessible class net/minecraft/client/renderer/RenderType$CompositeRenderType
 transitive-accessible class net/minecraft/world/level/block/entity/BlockEntityType$BlockEntitySupplier
 transitive-accessible class net/minecraft/world/inventory/MenuType$MenuSupplier
 transitive-accessible method net/minecraft/client/renderer/texture/SpriteContents getFrameCount ()I
-transitive-accessible field net/minecraft/client/renderer/block/model/BlockModel parentLocation Lnet/minecraft/resources/ResourceLocation;
-transitive-accessible field net/minecraft/client/renderer/block/model/BlockModel parent Lnet/minecraft/client/renderer/block/model/BlockModel;
-transitive-accessible field net/minecraft/client/renderer/block/model/BlockModel FACE_BAKERY Lnet/minecraft/client/renderer/block/model/FaceBakery;
-transitive-accessible method net/minecraft/client/renderer/block/model/FaceBakery setupShape (Lorg/joml/Vector3f;Lorg/joml/Vector3f;)[F
 transitive-accessible method net/minecraft/client/renderer/block/model/FaceBakery applyElementRotation (Lorg/joml/Vector3f;Lnet/minecraft/client/renderer/block/model/BlockElementRotation;)V
-transitive-accessible method net/minecraft/client/renderer/block/model/BlockModel$Deserializer parseTextureLocationOrReference (Lnet/minecraft/resources/ResourceLocation;Ljava/lang/String;)Lcom/mojang/datafixers/util/Either;
-transitive-accessible field net/minecraft/client/resources/model/MultiPartBakedModel selectors Ljava/util/List;
-transitive-accessible field net/minecraft/client/resources/model/WeightedBakedModel wrapped Lnet/minecraft/client/resources/model/BakedModel;
 transitive-accessible field net/minecraft/world/entity/animal/MushroomCow$MushroomType blockState Lnet/minecraft/world/level/block/state/BlockState;
-transitive-accessible field net/minecraft/world/level/levelgen/structure/templatesystem/StructureTemplate palettes Ljava/util/List;
-transitive-accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen leftPos I
-transitive-accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen topPos I
 transitive-accessible field net/minecraft/world/inventory/DataSlot prevValue I
 transitive-accessible field com/mojang/blaze3d/vertex/VertexFormatElement count I
 transitive-accessible field net/minecraft/util/datafix/DataFixers SAME_NAMESPACED Ljava/util/function/BiFunction;
-transitive-mutable field net/minecraft/world/inventory/Slot x I
-transitive-mutable field net/minecraft/world/inventory/Slot y I
 accessible method net/minecraft/client/gui/GuiGraphics innerBlit (Lnet/minecraft/resources/ResourceLocation;IIIIIFFFF)V
 mutable field net/minecraft/client/renderer/block/model/BakedQuad shade Z
 accessible field net/minecraft/client/renderer/block/model/BakedQuad shade Z
@@ -48,11 +109,3 @@ accessible field net/minecraft/client/renderer/block/model/BlockModel textureMap
 
 accessible method net/minecraft/client/gui/GuiGraphics flushIfUnmanaged ()V
 accessible method net/minecraft/client/gui/GuiGraphics <init> (Lnet/minecraft/client/Minecraft;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;)V
-
-accessible field net/minecraft/client/gui/Gui GUI_ICONS_LOCATION Lnet/minecraft/resources/ResourceLocation;
-
-# ResourceLocation validation
-transitive-accessible method net/minecraft/resources/ResourceLocation isValidNamespace (Ljava/lang/String;)Z
-
-# LivingEntityPredicates head underwater
-transitive-accessible field net/minecraft/world/entity/Entity wasEyeInWater Z

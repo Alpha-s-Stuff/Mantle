@@ -126,7 +126,7 @@ public class Mantle implements ModInitializer {
     CraftingHelper.register(TagFilledCondition.SERIALIZER);
     CraftingHelper.register(TagCombinationCondition.SERIALIZER);
     CraftingHelper.register(FluidContainerIngredient.ID, FluidContainerIngredient.SERIALIZER);
-    CraftingHelper.register(getResource("potion"), PotionIngredient.SERIALIZER);
+    CustomIngredientSerializer.register(PotionIngredient.SERIALIZER);
 
     // fluid container transfer
     FluidContainerTransferManager.TRANSFER_LOADERS.registerDeserializer(EmptyFluidContainerTransfer.ID, EmptyFluidContainerTransfer.DESERIALIZER);

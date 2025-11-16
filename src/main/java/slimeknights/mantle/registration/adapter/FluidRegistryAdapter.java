@@ -1,9 +1,7 @@
 package slimeknights.mantle.registration.adapter;
 
+import net.minecraft.core.Registry;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraftforge.fluids.ForgeFlowingFluid;
-import net.minecraftforge.fluids.ForgeFlowingFluid.Properties;
-import net.minecraftforge.registries.IForgeRegistry;
 import slimeknights.mantle.registration.DelayedSupplier;
 import slimeknights.mantle.registration.FluidBuilder;
 
@@ -15,12 +13,12 @@ import java.util.function.Function;
 @SuppressWarnings("unused")
 public class FluidRegistryAdapter extends RegistryAdapter<Fluid> {
   /** @inheritDoc */
-  public FluidRegistryAdapter(IForgeRegistry<Fluid> registry) {
+  public FluidRegistryAdapter(Registry<Fluid> registry) {
     super(registry);
   }
 
   /** @inheritDoc */
-  public FluidRegistryAdapter(IForgeRegistry<Fluid> registry, String modId) {
+  public FluidRegistryAdapter(Registry<Fluid> registry, String modId) {
     super(registry, modId);
   }
 

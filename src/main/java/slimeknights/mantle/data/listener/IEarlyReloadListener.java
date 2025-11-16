@@ -1,5 +1,6 @@
 package slimeknights.mantle.data.listener;
 
+import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.profiling.ProfilerFiller;
@@ -13,7 +14,7 @@ import java.util.concurrent.Executor;
  * <p>
  * TODO 1.19: is there any reason to keep this alongside {@link IEarlySafeManagerReloadListener}?
  */
-public interface IEarlyReloadListener extends PreparableReloadListener {
+public interface IEarlyReloadListener extends IdentifiableResourceReloadListener {
   @Override
   default CompletableFuture<Void> reload(PreparationBarrier stage, ResourceManager resourceManager, ProfilerFiller preparationsProfiler, ProfilerFiller reloadProfiler, Executor backgroundExecutor, Executor gameExecutor) {
     return CompletableFuture.runAsync(() -> {

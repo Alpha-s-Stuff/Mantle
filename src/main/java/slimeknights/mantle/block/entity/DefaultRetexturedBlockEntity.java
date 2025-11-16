@@ -8,7 +8,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.client.model.data.ModelData;
 import slimeknights.mantle.block.RetexturedBlock;
 import slimeknights.mantle.util.RetexturedHelper;
 
@@ -29,7 +28,7 @@ public class DefaultRetexturedBlockEntity extends MantleBlockEntity implements I
 
   @Nonnull
   @Override
-  public ModelData getRenderData() {
+  public Block getRenderData() {
     return RetexturedHelper.getModelData(texture);
   }
 

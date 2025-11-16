@@ -1,5 +1,6 @@
 package slimeknights.mantle.registration.object;
 
+import io.github.fabricators_of_create.porting_lib.fluids.FluidType;
 import lombok.Getter;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
@@ -8,7 +9,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraftforge.fluids.FluidType;
 import slimeknights.mantle.Mantle;
 import slimeknights.mantle.recipe.helper.FluidOutput;
 import slimeknights.mantle.recipe.ingredient.FluidIngredient;
@@ -38,7 +38,7 @@ public class FluidObject<F extends Fluid> implements Supplier<F>, ItemLike, IdAw
   /** Main constructor */
   public FluidObject(ResourceLocation id, @Nullable String tagName, Supplier<? extends FluidType> type, Supplier<? extends F> still) {
     this.id = id;
-    this.commonTag = tagName == null ? null : FluidTags.create(Mantle.commonResource(tagName));
+    this.commonTag = tagName == null ? null : TagKey.create(Registries.FLUID, Mantle.commonResource(tagName));
     this.type = type;
     this.still = still;
   }
@@ -86,7 +86,7 @@ public class FluidObject<F extends Fluid> implements Supplier<F>, ItemLike, IdAw
    * @param amount     Ingredient amount
    * @return  Ingredient instance
    */
-  public FluidIngredient ingredient(int amount) {
+  public FluidIngredient ingredient(long amount) {
     if (commonTag != null) {
       return FluidIngredient.of(commonTag, amount);
     }
@@ -98,7 +98,7 @@ public class FluidObject<F extends Fluid> implements Supplier<F>, ItemLike, IdAw
    * @param amount     Result amount
    * @return  Result instance
    */
-  public FluidOutput result(int amount) {
+  public FluidOutput result(long amount) {
     if (commonTag != null) {
       return FluidOutput.fromTag(commonTag, amount);
     }

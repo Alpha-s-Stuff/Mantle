@@ -11,8 +11,6 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.storage.loot.LootContext;
-import net.minecraftforge.common.crafting.conditions.ICondition;
-import net.minecraftforge.common.crafting.conditions.IConditionSerializer;
 import slimeknights.mantle.Mantle;
 import slimeknights.mantle.util.JsonHelper;
 
@@ -22,7 +20,7 @@ import java.util.function.Function;
 
 /** Common logic for {@link TagEmptyCondition} and {@link TagFilledCondition} */
 @RequiredArgsConstructor
-public abstract class TagCondition<T> implements ICondition {
+public abstract class TagCondition<T> {
   @Getter
   protected final TagKey<T> tag;
   @Nullable
@@ -47,8 +45,7 @@ public abstract class TagCondition<T> implements ICondition {
   }
 
   /** Serializer logic for tag keys */
-  public record Serializer<C extends TagCondition<?>>(ResourceLocation getID, Function<TagKey<?>,C> constructor) implements IConditionSerializer<C>, net.minecraft.world.level.storage.loot.Serializer<C> {
-    @Override
+  public record Serializer<C extends TagCondition<?>>(ResourceLocation getID, Function<TagKey<?>,C> constructor) implements net.minecraft.world.level.storage.loot.Serializer<C> {
     public void write(JsonObject json, C value) {
       TagKey<?> tag = value.getTag();
       // save some space in JSON by not setting registry if item (most common)
@@ -58,7 +55,6 @@ public abstract class TagCondition<T> implements ICondition {
       json.addProperty("tag", tag.location().toString());
     }
 
-    @Override
     public C read(JsonObject json) {
       return constructor.apply(TagKey.create(
         // default to item registry if registry is unset

@@ -2,17 +2,17 @@ package slimeknights.mantle.loot;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import net.fabricmc.fabric.api.loot.v2.LootTableEvents;
+import net.fabricmc.fabric.api.loot.v2.LootTableSource;
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.fabricmc.fabric.api.resource.conditions.v1.ResourceConditions;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.GsonHelper;
+import net.minecraft.world.level.storage.loot.LootDataManager;
 import net.minecraft.world.level.storage.loot.LootTable;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.crafting.CraftingHelper;
-import net.minecraftforge.common.crafting.conditions.ICondition.IContext;
-import net.minecraftforge.event.AddReloadListenerEvent;
-import net.minecraftforge.event.LootTableLoadEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
 import slimeknights.mantle.Mantle;
 import slimeknights.mantle.data.listener.IEarlyReloadListener;
 import slimeknights.mantle.loot.LootTableInjection.LootPoolInjection;
@@ -30,21 +30,19 @@ import java.util.stream.Collectors;
 /** Class handling injecting additional entries into loot tables */
 public enum LootTableInjector implements IEarlyReloadListener {
   INSTANCE;
+  public static final ResourceLocation ID = Mantle.getResource("loot_table_injector");
 
   /** Datapack folder for the injector */
   public static final String FOLDER = "mantle/loot_injectors";
 
   /** Initializes the loot table injector */
   public static void init() {
-    MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, AddReloadListenerEvent.class, event -> {
-      event.addListener(INSTANCE);
-      INSTANCE.context = event.getConditionContext();
-    });
-    MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, LootTableLoadEvent.class, INSTANCE::lootTableLoad);
+    ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(INSTANCE);
+    LootTableEvents.MODIFY.register(INSTANCE::lootTableLoad);
   }
 
-  /** Condition context for preventing load */
-  private IContext context = IContext.EMPTY;
+//  /** Condition context for preventing load */
+//  private IContext context = IContext.EMPTY;
   /** Map of injections to use on loot table load */
   private Map<ResourceLocation,LootTableInjection> injections = Collections.emptyMap();
 
@@ -58,7 +56,7 @@ public enum LootTableInjector implements IEarlyReloadListener {
         JsonObject json = GsonHelper.fromJson(JsonHelper.DEFAULT_GSON, reader, JsonObject.class);
         if (json != null) {
           // skip if empty for easy removals
-          if (!json.keySet().isEmpty() && CraftingHelper.processConditions(json, "conditions", context)) {
+          if (!json.keySet().isEmpty() && ResourceConditions.objectMatchesConditions(json)) {
             // the builder allows us to merge from multiple sources, for efficiency
             // ensures a given table name and pool name both show just once
             LootTableInjection injection = LootTableInjection.LOADABLE.deserialize(json);
@@ -83,14 +81,18 @@ public enum LootTableInjector implements IEarlyReloadListener {
   }
 
   /** Called on loot table load to handle the actual injection */
-  private void lootTableLoad(LootTableLoadEvent event) {
-    LootTableInjection injection = injections.get(event.getName());
+  private void lootTableLoad(ResourceManager resourceManager, LootDataManager lootManager, ResourceLocation id, LootTable.Builder tableBuilder, LootTableSource source) {
+    LootTableInjection injection = injections.get(id);
     if (injection != null) {
       Mantle.logger.debug("Injecting into {} pools in the table {}", injection.pools().size(), injection.name());
-      LootTable table = event.getTable();
       for (LootPoolInjection pool : injection.pools()) {
-        pool.inject(table);
+        pool.inject(tableBuilder, id);
       }
     }
+  }
+
+  @Override
+  public ResourceLocation getFabricId() {
+    return ID;
   }
 }

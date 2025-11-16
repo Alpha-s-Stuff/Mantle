@@ -1,18 +1,18 @@
 package slimeknights.mantle.recipe.helper;
 
 import com.google.gson.JsonObject;
+import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraftforge.fluids.FluidStack;
 import slimeknights.mantle.data.loadable.Loadables;
 import slimeknights.mantle.data.loadable.common.FluidStackLoadable;
 import slimeknights.mantle.data.loadable.common.NBTLoadable;
 import slimeknights.mantle.data.loadable.field.LoadableField;
-import slimeknights.mantle.data.loadable.primitive.IntLoadable;
+import slimeknights.mantle.data.loadable.primitive.LongLoadable;
 import slimeknights.mantle.data.loadable.record.RecordLoadable;
 import slimeknights.mantle.util.typed.TypedMap;
 
@@ -47,7 +47,7 @@ public abstract class FluidOutput implements Supplier<FluidStack> {
   /**
    * Gets the size of the fluid. Equivelent to {@link #get()} then {@link FluidStack#getAmount()} but saves resolving the fluid.
    */
-  public abstract int getAmount();
+  public abstract long getAmount();
 
   /** Checks if the contents are empty without resolving the stack */
   public boolean isEmpty() {
@@ -92,7 +92,7 @@ public abstract class FluidOutput implements Supplier<FluidStack> {
    * @param amount Fluid size
    * @return  Output
    */
-  public static FluidOutput fromFluid(Fluid fluid, int amount) {
+  public static FluidOutput fromFluid(Fluid fluid, long amount) {
     return new OfFluid(fluid, amount);
   }
 
@@ -103,7 +103,7 @@ public abstract class FluidOutput implements Supplier<FluidStack> {
    * @param nbt    Stack NBT
    * @return Output
    */
-  public static FluidOutput fromTag(TagKey<Fluid> tag, int amount, @Nullable CompoundTag nbt) {
+  public static FluidOutput fromTag(TagKey<Fluid> tag, long amount, @Nullable CompoundTag nbt) {
     return new OfTagPreference(tag, amount, nbt);
   }
 
@@ -113,7 +113,7 @@ public abstract class FluidOutput implements Supplier<FluidStack> {
    * @param amount Stack amount
    * @return Output
    */
-  public static FluidOutput fromTag(TagKey<Fluid> tag, int amount) {
+  public static FluidOutput fromTag(TagKey<Fluid> tag, long amount) {
     return fromTag(tag, amount, null);
   }
 
@@ -122,7 +122,7 @@ public abstract class FluidOutput implements Supplier<FluidStack> {
    * @param buffer  Packet buffer instance
    */
   public void write(FriendlyByteBuf buffer) {
-    buffer.writeFluidStack(get());
+    get().writeToPacket(buffer);
   }
 
   /**
@@ -131,7 +131,7 @@ public abstract class FluidOutput implements Supplier<FluidStack> {
    * @return  Item output
    */
   public static FluidOutput read(FriendlyByteBuf buffer) {
-    return fromStack(buffer.readFluidStack());
+    return fromStack(FluidStack.readFromPacket(buffer));
   }
 
   /** Class for an output that is just an item, simplifies NBT for serializing as vanilla forces NBT to be set for tools and forge goes through extra steps when NBT is set */
@@ -139,7 +139,7 @@ public abstract class FluidOutput implements Supplier<FluidStack> {
   private static class OfFluid extends FluidOutput {
     private final Fluid fluid;
     @Getter
-    private final int amount;
+    private final long amount;
     private FluidStack cachedStack;
 
     @Override
@@ -170,7 +170,7 @@ public abstract class FluidOutput implements Supplier<FluidStack> {
     }
 
     @Override
-    public int getAmount() {
+    public long getAmount() {
       return stack.getAmount();
     }
 
@@ -186,7 +186,7 @@ public abstract class FluidOutput implements Supplier<FluidStack> {
     @Getter
     private final TagKey<Fluid> tag;
     @Getter
-    private final int amount;
+    private final long amount;
     @Nullable
     private final CompoundTag nbt;
     private FluidStack cachedResult = null;
@@ -245,7 +245,7 @@ public abstract class FluidOutput implements Supplier<FluidStack> {
       if (json.has("tag")) {
         return fromTag(
           Loadables.FLUID_TAG.getIfPresent(json, "tag", context),
-          IntLoadable.FROM_ONE.getIfPresent(json, "amount", context),
+          LongLoadable.FROM_ONE.getIfPresent(json, "amount", context),
           NBTLoadable.ALLOW_STRING.getOrDefault(json, "nbt", null));
       }
       return fromStack(stack.deserialize(json, context));

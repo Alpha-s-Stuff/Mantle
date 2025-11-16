@@ -1,21 +1,20 @@
 package slimeknights.mantle.item;
 
+import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
 import lombok.Getter;
-import net.minecraft.core.Direction;
+import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.StoragePreconditions;
+import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
+import net.fabricmc.fabric.api.transfer.v1.transaction.base.SnapshotParticipant;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /** Represents a capability handler for a container with a constant fluid */
-public class ConstantFluidContainerWrapper implements IFluidHandlerItem, ICapabilityProvider {
-  private final LazyOptional<IFluidHandlerItem> holder = LazyOptional.of(() -> this);
+public class ConstantFluidContainerWrapper extends SnapshotParticipant<Boolean> implements SingleSlotStorage<FluidVariant> {
 
   /** Contained fluid */
   private final FluidStack fluid;
@@ -24,77 +23,74 @@ public class ConstantFluidContainerWrapper implements IFluidHandlerItem, ICapabi
   /** Item stack representing the current state */
   @Getter
   @Nonnull
-  protected ItemStack container;
+  protected final ContainerItemContext container;
   /** Empty version of the container */
   private final ItemStack emptyStack;
 
-  public ConstantFluidContainerWrapper(FluidStack fluid, ItemStack container, ItemStack emptyStack) {
+  public ConstantFluidContainerWrapper(FluidStack fluid, ContainerItemContext container, ItemStack emptyStack) {
     this.fluid = fluid;
     this.container = container;
     this.emptyStack = emptyStack;
   }
 
-  public ConstantFluidContainerWrapper(FluidStack fluid, ItemStack container) {
-    this(fluid, container, container.getCraftingRemainingItem());
+  public ConstantFluidContainerWrapper(FluidStack fluid, ContainerItemContext container) {
+    this(fluid, container, container.getItemVariant().toStack().getRecipeRemainder());
   }
 
   @Override
-  public int getTanks() {
-    return 1;
-  }
-
-  @Override
-  public int getTankCapacity(int tank) {
+  public long getCapacity() {
     return fluid.getAmount();
   }
 
   @Override
-  public boolean isFluidValid(int tank, @Nonnull FluidStack stack) {
-    return stack.isEmpty() || stack.getFluid() == fluid.getFluid();
+  public boolean isResourceBlank() {
+    return empty || fluid.getType().isBlank();
+  }
+
+  @Override
+  public FluidVariant getResource() {
+    return fluid.getType();
   }
 
   @Nonnull
   @Override
-  public FluidStack getFluidInTank(int tank) {
-    return empty ? FluidStack.EMPTY : fluid;
+  public long getAmount() {
+    return fluid.getAmount();
   }
 
   @Override
-  public int fill(FluidStack resource, FluidAction action) {
+  public boolean supportsInsertion() {
+    return false;
+  }
+
+  @Override
+  public long insert(FluidVariant resource, long maxAmount, TransactionContext tx) {
     return 0;
   }
 
-  @Nonnull
   @Override
-  public FluidStack drain(FluidStack resource, FluidAction action) {
+  public long extract(FluidVariant resource, long maxAmount, TransactionContext tx) {
+    StoragePreconditions.notBlankNotNegative(resource, maxAmount);
+
     // cannot drain if: already drained, requested the wrong type, or requested too little
-    if (empty || resource.getFluid() != fluid.getFluid() || resource.getAmount() < fluid.getAmount()) {
-      return FluidStack.EMPTY;
+    if (empty || resource.getFluid() != fluid.getFluid() || maxAmount < fluid.getAmount()) {
+      return 0;
     }
-    if (action == FluidAction.EXECUTE) {
-      container = emptyStack;
+    updateSnapshots(tx);
+    if (container.exchange(ItemVariant.of(emptyStack), emptyStack.getCount(), tx) == emptyStack.getCount()) {
       empty = true;
+      return fluid.getAmount();
     }
-    return fluid.copy();
+    return 0;
   }
 
-  @Nonnull
   @Override
-  public FluidStack drain(int maxDrain, FluidAction action) {
-    // cannot drain if: already drained, requested the wrong type, or requested too little
-    if (empty || maxDrain < fluid.getAmount()) {
-      return FluidStack.EMPTY;
-    }
-    if (action == FluidAction.EXECUTE) {
-      container = emptyStack;
-      empty = true;
-    }
-    return fluid.copy();
+  protected Boolean createSnapshot() {
+    return empty;
   }
 
-  @Nonnull
   @Override
-  public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> capability, @Nullable Direction side) {
-    return ForgeCapabilities.FLUID_HANDLER_ITEM.orEmpty(capability, holder);
+  protected void readSnapshot(Boolean snapshot) {
+    empty = snapshot;
   }
 }

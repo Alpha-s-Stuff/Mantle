@@ -1,11 +1,9 @@
 package slimeknights.mantle.fluid.transfer;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.resource.conditions.v1.ConditionJsonProvider;
 import net.minecraft.data.CachedOutput;
-import net.minecraft.data.PackOutput;
 import net.minecraft.data.PackOutput.Target;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -61,29 +59,29 @@ public abstract class AbstractFluidContainerTransferProvider extends GenericData
   }
 
   /** Adds generic fill and empty for a container */
-  protected void addFillEmpty(String prefix, ItemLike item, ItemLike container, Fluid fluid, TagKey<Fluid> tag, int amount, boolean nbt, ConditionJsonProvider... conditions) {
+  protected void addFillEmpty(String prefix, ItemLike item, ItemLike container, Fluid fluid, TagKey<Fluid> tag, long amount, boolean nbt, ConditionJsonProvider... conditions) {
     addFillEmpty(prefix, item, container, FluidOutput.fromFluid(fluid, amount), FluidIngredient.of(tag, amount), nbt, conditions);
   }
 
   /** Adds generic fill and empty for a container */
-  protected void addFillEmpty(String prefix, ItemLike item, ItemLike container, TagKey<Fluid> tag, int amount, boolean nbt, ConditionJsonProvider... conditions) {
+  protected void addFillEmpty(String prefix, ItemLike item, ItemLike container, TagKey<Fluid> tag, long amount, boolean nbt, ConditionJsonProvider... conditions) {
     addFillEmpty(prefix, item, container, FluidOutput.fromTag(tag, amount), FluidIngredient.of(tag, amount), nbt, conditions);
   }
 
   /** Adds generic fill and empty for a container */
-  protected void addFillEmpty(String prefix, ItemLike item, ItemLike container, FluidObject<?> fluid, int amount, boolean nbt, ConditionJsonProvider... conditions) {
+  protected void addFillEmpty(String prefix, ItemLike item, ItemLike container, FluidObject<?> fluid, long amount, boolean nbt, ConditionJsonProvider... conditions) {
     addFillEmpty(prefix, item, container, fluid.result(amount), fluid.ingredient(amount), nbt, conditions);
   }
 
-  /** @deprecated use {@link #addFillEmpty(String, ItemLike, ItemLike, Fluid, TagKey, int, boolean, ConditionJsonProvider...)} */
+  /** @deprecated use {@link #addFillEmpty(String, ItemLike, ItemLike, Fluid, TagKey, long, boolean, ConditionJsonProvider...)} */
   @Deprecated(forRemoval = true)
-  protected void addFillEmpty(String prefix, ItemLike item, ItemLike container, Fluid fluid, TagKey<Fluid> tag, int amount, ConditionJsonProvider... conditions) {
+  protected void addFillEmpty(String prefix, ItemLike item, ItemLike container, Fluid fluid, TagKey<Fluid> tag, long amount, ConditionJsonProvider... conditions) {
     addFillEmpty(prefix, item, container, fluid, tag, amount, false, conditions);
   }
 
-  /** @deprecated use {@link #addFillEmpty(String, ItemLike, ItemLike, Fluid, TagKey, int, boolean, ConditionJsonProvider...)} */
+  /** @deprecated use {@link #addFillEmpty(String, ItemLike, ItemLike, Fluid, TagKey, long, boolean, ConditionJsonProvider...)} */
   @Deprecated(forRemoval = true)
-  protected void addFillEmptyNBT(String prefix, ItemLike item, ItemLike container, Fluid fluid, TagKey<Fluid> tag, int amount, ConditionJsonProvider... conditions) {
+  protected void addFillEmptyNBT(String prefix, ItemLike item, ItemLike container, Fluid fluid, TagKey<Fluid> tag, long amount, ConditionJsonProvider... conditions) {
     addFillEmpty(prefix, item, container, fluid, tag, amount, true, conditions);
   }
 
@@ -100,11 +98,7 @@ public abstract class AbstractFluidContainerTransferProvider extends GenericData
       JsonElement element = FluidContainerTransferManager.GSON.toJsonTree(transfer, IFluidContainerTransfer.class);
       assert element.isJsonObject();
       if (conditions.length != 0) {
-        JsonArray array = new JsonArray();
-        for (ConditionJsonProvider condition : conditions) {
-          array.add(CraftingHelper.serialize(condition));
-        }
-        element.getAsJsonObject().add("conditions", array);
+        ConditionJsonProvider.write(element.getAsJsonObject(), conditions);
       }
       return element;
     }
