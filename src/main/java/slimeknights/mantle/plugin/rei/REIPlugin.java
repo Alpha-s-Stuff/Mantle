@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 
 public class REIPlugin implements REIClientPlugin {
 
+  @SuppressWarnings({"unchecked", "rawtypes"})
   @Override
   public void registerExclusionZones(ExclusionZones registration) {
     registration.register(MultiModuleScreen.class, new MultiModuleContainerHandler());
