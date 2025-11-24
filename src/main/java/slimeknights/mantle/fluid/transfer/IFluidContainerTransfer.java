@@ -1,5 +1,11 @@
 package slimeknights.mantle.fluid.transfer;
 
+import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
+import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -43,7 +49,7 @@ public interface IFluidContainerTransfer extends IJsonSerializable {
    * @return  container after the transfer and the fluid transferred, null if the transfer failed
    */
   @Nullable
-  default TransferResult transfer(ItemStack stack, FluidStack fluid, IFluidHandler handler, TransferDirection direction) {
+  default TransferResult transfer(ItemStack stack, FluidStack fluid, Storage<FluidVariant> handler, TransferDirection direction, @Nullable TransactionContext tx) {
     return transfer(stack, fluid, handler);
   }
 
@@ -86,14 +92,18 @@ public interface IFluidContainerTransfer extends IJsonSerializable {
   interface WithDirection extends IFluidContainerTransfer {
     @Nullable
     @Override
-    TransferResult transfer(ItemStack stack, FluidStack fluid, IFluidHandler handler, TransferDirection direction);
+    TransferResult transfer(ItemStack stack, FluidStack fluid, Storage<FluidVariant> handler, TransferDirection direction, @Nullable TransactionContext tx);
 
     @SuppressWarnings("removal")
     @Nullable
     @Override
     @Deprecated(forRemoval = true)
-    default TransferResult transfer(ItemStack stack, FluidStack fluid, IFluidHandler handler) {
-      return transfer(stack, fluid, handler, TransferDirection.AUTO);
+    default TransferResult transfer(ItemStack stack, FluidStack fluid, Storage<FluidVariant> handler) {
+      try (Transaction tx = TransferUtil.getTransaction()) {
+        TransferResult result = transfer(stack, fluid, handler, TransferDirection.AUTO, tx);
+        tx.commit();
+        return result;
+      }
     }
   }
 }

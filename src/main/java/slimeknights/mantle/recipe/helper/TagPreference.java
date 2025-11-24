@@ -7,6 +7,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.level.material.Fluid;
 import slimeknights.mantle.config.Config;
 import slimeknights.mantle.util.LogicHelper;
 import slimeknights.mantle.util.RegistryHelper;

@@ -1,9 +1,9 @@
 package slimeknights.mantle.fluid.texture;
 
-import net.minecraft.data.PackOutput;
+import io.github.fabricators_of_create.porting_lib.data.ExistingFileHelper;
+import io.github.fabricators_of_create.porting_lib.fluids.FluidType;
+import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.common.data.ExistingFileHelper;
-import net.minecraftforge.fluids.FluidType;
 import slimeknights.mantle.data.client.DeanimateTextureGenerator;
 
 import java.util.Map.Entry;
@@ -15,13 +15,13 @@ public class FluidTextureCameraProvider extends DeanimateTextureGenerator {
   /** Fluid types from the provider to ignore */
   private final Set<FluidType> skip;
 
-  public FluidTextureCameraProvider(PackOutput packOutput, ExistingFileHelper existingFileHelper, AbstractFluidTextureProvider provider, Set<FluidType> skip) {
+  public FluidTextureCameraProvider(FabricDataOutput packOutput, ExistingFileHelper existingFileHelper, AbstractFluidTextureProvider provider, Set<FluidType> skip) {
     super(packOutput, existingFileHelper);
     this.provider = provider;
     this.skip = skip;
   }
 
-  public FluidTextureCameraProvider(PackOutput packOutput, ExistingFileHelper existingFileHelper, AbstractFluidTextureProvider provider) {
+  public FluidTextureCameraProvider(FabricDataOutput packOutput, ExistingFileHelper existingFileHelper, AbstractFluidTextureProvider provider) {
     this(packOutput, existingFileHelper, provider, Set.of());
   }
 

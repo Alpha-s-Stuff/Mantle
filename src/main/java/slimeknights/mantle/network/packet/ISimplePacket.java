@@ -25,7 +25,7 @@ import java.util.function.Supplier;
 /**
  * Packet interface to add common methods for registration
  */
-public interface ISimplePacket extends S2CPacket, C2SPacket {
+public interface ISimplePacket {
   /**
    * Encodes a packet for the buffer
    * @param buf  Buffer instance
@@ -37,17 +37,6 @@ public interface ISimplePacket extends S2CPacket, C2SPacket {
    * @param context  Packet context
    */
   void handle(Supplier<Context> context);
-
-  @Override
-  default void handle(MinecraftServer server, ServerPlayer player, ServerGamePacketListenerImpl handler, PacketSender responseSender, SimpleChannel channel) {
-    handle(new Context(server, handler, player, channel));
-  }
-
-  @Environment(EnvType.CLIENT)
-  @Override
-  default void handle(Minecraft client, ClientPacketListener listener, PacketSender responseSender, SimpleChannel channel) {
-    handle(new Context(client, listener, null, channel));
-  }
 
   public record Context(BlockableEventLoop<?> executor, PacketListener handler, @Nullable ServerPlayer sender, SimpleChannel channel) implements Supplier<Context> {
     public CompletableFuture<Void> enqueueWork(Runnable runnable) {

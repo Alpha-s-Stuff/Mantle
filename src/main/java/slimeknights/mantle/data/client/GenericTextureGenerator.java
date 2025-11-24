@@ -3,16 +3,16 @@ package slimeknights.mantle.data.client;
 import com.google.common.hash.Hashing;
 import com.google.gson.JsonObject;
 import com.mojang.blaze3d.platform.NativeImage;
+import io.github.fabricators_of_create.porting_lib.data.ExistingFileHelper;
+import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.minecraft.Util;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
-import net.minecraft.data.PackOutput;
 import net.minecraft.data.PackOutput.PathProvider;
 import net.minecraft.data.PackOutput.Target;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.Resource;
-import net.minecraftforge.common.data.ExistingFileHelper;
 import slimeknights.mantle.Mantle;
 import slimeknights.mantle.data.GenericDataProvider;
 
@@ -32,7 +32,7 @@ public abstract class GenericTextureGenerator extends GenericDataProvider {
   private final ExistingFileHelper.ResourceType resourceType;
 
   /** Constructor which marks files as existing */
-  public GenericTextureGenerator(PackOutput packOutput, @Nullable ExistingFileHelper existingFileHelper, String folder) {
+  public GenericTextureGenerator(FabricDataOutput packOutput, @Nullable ExistingFileHelper existingFileHelper, String folder) {
     super(packOutput, Target.RESOURCE_PACK, folder);
     this.existingFileHelper = existingFileHelper;
     if (existingFileHelper != null) {

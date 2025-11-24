@@ -5,6 +5,14 @@ import io.github.fabricators_of_create.porting_lib.fluids.sound.SoundAction;
 import io.github.fabricators_of_create.porting_lib.fluids.sound.SoundActions;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.storage.StorageUtil;
+import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -69,8 +77,30 @@ public class FluidTransferHelper {
    * @param maxFill  Maximum to transfer
    * @return  True if transfer succeeded
    */
-  public static FluidStack tryTransfer(IFluidHandler input, IFluidHandler output, int maxFill) {
-    return tryTransfer(input, output, input.drain(maxFill, FluidAction.SIMULATE));
+  public static FluidStack tryTransfer(Storage<FluidVariant> input, Storage<FluidVariant> output, long maxFill) {
+    return tryTransfer(input, output, maxFill, null);
+  }
+
+  /**
+   * Attempts to transfer fluid
+   * @param input    Fluid source
+   * @param output   Fluid destination
+   * @param maxFill  Maximum to transfer
+   * @return  True if transfer succeeded
+   */
+  public static FluidStack tryTransfer(Storage<FluidVariant> input, Storage<FluidVariant> output, long maxFill, @Nullable TransactionContext tx) {
+    FluidStack fluid = FluidStack.EMPTY;
+    try (Transaction ntx = Transaction.openNested(tx)) {
+      for (StorageView<FluidVariant> view : input.nonEmptyViews()) {
+        FluidVariant resource = view.getResource();
+        long extracted = view.extract(resource, maxFill, ntx);
+        fluid = new FluidStack(resource, extracted);
+        break;
+      }
+    }
+    if (fluid.isEmpty())
+      return FluidStack.EMPTY;
+    return tryTransfer(input, output, fluid, tx);
   }
 
   /**
@@ -80,28 +110,32 @@ public class FluidTransferHelper {
    * @param fluid    Fluid to transfer, will not be modified. Precondition is it must be valid to drain from the input.
    * @return  True if transfer succeeded
    */
-  public static FluidStack tryTransfer(IFluidHandler input, IFluidHandler output, FluidStack fluid) {
+  public static FluidStack tryTransfer(Storage<FluidVariant> input, Storage<FluidVariant> output, FluidStack fluid, @Nullable TransactionContext tx) {
     if (!fluid.isEmpty()) {
       // next, find out how much we can fill
-      int simulatedFill = output.fill(fluid.copy(), FluidAction.SIMULATE);
+      long simulatedFill = StorageUtil.simulateInsert(output, fluid.getType(), fluid.getAmount(), tx);
       if (simulatedFill > 0) {
-        // actually drain, use the fluid we successfully filled with just in case that changes
-        FluidStack drainedFluid = input.drain(new FluidStack(fluid, simulatedFill), FluidAction.EXECUTE);
-        if (!drainedFluid.isEmpty()) {
-          // actually fill
-          int actualFill = output.fill(drainedFluid.copy(), FluidAction.EXECUTE);
-          // failed to fill everything we drained, so try putting the extra back
-          if (actualFill < drainedFluid.getAmount()) {
-            int toReturn = drainedFluid.getAmount() - actualFill;
-            drainedFluid.setAmount(actualFill);
-            int returned = input.fill(new FluidStack(drainedFluid, toReturn), FluidAction.EXECUTE);
-            // failed to put the rest back, so all that's left to do is delete it
-            if (returned < toReturn) {
-              Mantle.logger.error("Lost {} fluid during transfer", toReturn - returned);
+        try (Transaction ntx = Transaction.openNested(tx)) {
+          // actually drain, use the fluid we successfully filled with just in case that changes
+          long drained = input.extract(fluid.getType(), simulatedFill, ntx);
+          FluidStack drainedFluid = new FluidStack(fluid.getType(), drained);
+          if (!drainedFluid.isEmpty()) {
+            // actually fill
+            long actualFill = output.insert(fluid.getType(), drained, ntx);
+            // failed to fill everything we drained, so try putting the extra back
+            if (actualFill < drainedFluid.getAmount()) {
+              long toReturn = drainedFluid.getAmount() - actualFill;
+              drainedFluid.setAmount(actualFill);
+              long returned = input.insert(fluid.getType(), toReturn, ntx);
+              // failed to put the rest back, so all that's left to do is delete it
+              if (returned < toReturn) {
+                Mantle.logger.error("Lost {} fluid during transfer", toReturn - returned);
+              }
             }
           }
+          ntx.commit();
+          return drainedFluid;
         }
-        return drainedFluid;
       }
     }
     return FluidStack.EMPTY;
@@ -129,16 +163,13 @@ public class FluidTransferHelper {
     }
   }
 
-  /** @deprecated use {@link #interactWithFilledBucket(Level, BlockPos, IFluidHandler, Player, InteractionHand, Direction)} or {@link #interactWithTank(Level, BlockPos, Player, InteractionHand, Direction, Direction)} */
+  /** @deprecated use {@link #interactWithFilledBucket(Level, BlockPos, Storage, Player, InteractionHand, Direction)} or {@link #interactWithTank(Level, BlockPos, Player, InteractionHand, Direction, Direction)} */
   @Deprecated(forRemoval = true)
   public static boolean interactWithBucket(Level world, BlockPos pos, Player player, InteractionHand hand, Direction hit, Direction offset) {
     if (player.getItemInHand(hand).getItem() instanceof BucketItem) {
-      BlockEntity te = world.getBlockEntity(pos);
-      if (te != null) {
-        LazyOptional<IFluidHandler> teCapability = te.getCapability(ForgeCapabilities.FLUID_HANDLER, hit);
-        if (teCapability.isPresent()) {
-          return interactWithFilledBucket(world, pos, teCapability.orElse(EmptyFluidHandler.INSTANCE), player, hand, offset).hasContainer();
-        }
+      Storage<FluidVariant> storage = FluidStorage.SIDED.find(world, pos, hit);
+      if (storage != null) {
+        return interactWithFilledBucket(world, pos, storage, player, hand, offset).hasContainer();
       }
     }
     return false;
@@ -154,22 +185,22 @@ public class FluidTransferHelper {
    * @param offset    Direction to place fish
    * @return {@link FluidInteractionResult} indicating the type of interaction that happened.
    */
-  public static FluidInteractionResult interactWithFilledBucket(Level world, BlockPos pos, IFluidHandler handler, Player player, InteractionHand hand, Direction offset) {
+  public static FluidInteractionResult interactWithFilledBucket(Level world, BlockPos pos, Storage<FluidVariant> handler, Player player, InteractionHand hand, Direction offset) {
     ItemStack held = player.getItemInHand(hand);
     if (held.getItem() instanceof BucketItem bucket) {
       Fluid fluid = bucket.getFluid();
       if (fluid != Fluids.EMPTY) {
         if (!world.isClientSide) {
-          FluidStack fluidStack = new FluidStack(bucket.getFluid(), FluidType.BUCKET_VOLUME);
+          FluidStack fluidStack = new FluidStack(bucket.getFluid(), FluidConstants.BUCKET);
           // must empty the whole bucket
-          if (handler.fill(fluidStack, FluidAction.SIMULATE) == FluidType.BUCKET_VOLUME) {
+          if (handler.fill(fluidStack, FluidAction.SIMULATE) == FluidConstants.BUCKET) {
             SoundEvent sound = getEmptySound(fluidStack);
             handler.fill(fluidStack, FluidAction.EXECUTE);
             bucket.checkExtraContent(player, world, held, pos.relative(offset));
             world.playSound(null, pos, sound, SoundSource.BLOCKS, 1.0F, 1.0F);
-            player.displayClientMessage(Component.translatable(KEY_FILLED, COMMA_FORMAT.format(FluidType.BUCKET_VOLUME), fluidStack.getDisplayName()), true);
+            player.displayClientMessage(Component.translatable(KEY_FILLED, COMMA_FORMAT.format(FluidConstants.BUCKET), fluidStack.getDisplayName()), true);
             if (!player.isCreative()) {
-              player.setItemInHand(hand, held.getCraftingRemainingItem());
+              player.setItemInHand(hand, held.getRecipeRemainder());
             }
             return FluidInteractionResult.DRAINED_STACK;
           }
@@ -230,9 +261,9 @@ public class FluidTransferHelper {
    * @param player    Player instance
    * @param hand      Hand used
    * @return {@link FluidInteractionResult} indicating the type of interaction that happened.
-   * @see #interactWithContainer(Level, BlockPos, IFluidHandler, Player, InteractionHand)
+   * @see #interactWithContainer(Level, BlockPos, Storage, Player, InteractionHand)
    */
-  public static FluidInteractionResult interactWithContainer(Level world, BlockPos pos, IFluidHandler teHandler, Player player, InteractionHand hand) {
+  public static FluidInteractionResult interactWithContainer(Level world, BlockPos pos, Storage<FluidVariant> teHandler, Player player, InteractionHand hand) {
     // fallback to JSON based transfer
     ItemStack stack = player.getItemInHand(hand);
     if (FluidContainerTransferManager.INSTANCE.mayHaveTransfer(stack)) {
@@ -336,7 +367,7 @@ public class FluidTransferHelper {
    * @param direction  Determines whether we may empty the item, fill, or both
    * @return  Resulting stack after transfer
    */
-  public static ItemStack interactWithTankSlot(IFluidHandler teHandler, ItemStack stack, TransferDirection direction) {
+  public static ItemStack interactWithTankSlot(Storage<FluidVariant> teHandler, ItemStack stack, TransferDirection direction) {
     TransferResult result = interactWithStack(teHandler, stack, direction);
     return result != null ? result.stack() : ItemStack.EMPTY;
   }
@@ -349,7 +380,7 @@ public class FluidTransferHelper {
    * @return  What was transferred and the resulting stack, or null if no transfer happened.
    */
   @Nullable
-  public static TransferResult interactWithStack(IFluidHandler teHandler, ItemStack stack, TransferDirection direction) {
+  public static TransferResult interactWithStack(Storage<FluidVariant> teHandler, ItemStack stack, TransferDirection direction) {
     if (!stack.isEmpty()) {
       // fallback to JSON based transfer
       if (FluidContainerTransferManager.INSTANCE.mayHaveTransfer(stack)) {
@@ -400,27 +431,27 @@ public class FluidTransferHelper {
 
   /**
    * Attempts to transfer fluid into the passed stack from the given handler.
-   * Similar to {@link #interactWithTankSlot(IFluidHandler, ItemStack, TransferDirection)} except filtered and unable to set direction.
+   * Similar to {@link #interactWithTankSlot(Storage, ItemStack, TransferDirection)} except filtered and unable to set direction.
    * @param teHandler  Tank handler
    * @param stack      Input stack, may be modified
    * @param fluid      Determines the fluid used to fill the item
    * @return  Resulting stack after transfer
    */
-  public static ItemStack fillFromTankSlot(IFluidHandler teHandler, ItemStack stack, FluidStack fluid) {
+  public static ItemStack fillFromTankSlot(Storage teHandler, ItemStack stack, FluidStack fluid) {
     TransferResult result = fillStack(teHandler, stack, fluid);
     return result != null ? result.stack() : ItemStack.EMPTY;
   }
 
   /**
    * Attempts to transfer fluid into the passed stack from the given handler.
-   * Similar to {@link #interactWithTankSlot(IFluidHandler, ItemStack, TransferDirection)} except filtered and unable to set direction.
+   * Similar to {@link #interactWithTankSlot(Storage, ItemStack, TransferDirection)} except filtered and unable to set direction.
    * @param teHandler  Tank handler
    * @param stack      Input stack, may be modified
    * @param fluid      Determines the fluid used to fill the item
    * @return  Resulting stack after transfer
    */
   @Nullable
-  public static TransferResult fillStack(IFluidHandler teHandler, ItemStack stack, FluidStack fluid) {
+  public static TransferResult fillStack(Storage<FluidVariant> teHandler, ItemStack stack, FluidStack fluid) {
     if (!stack.isEmpty()) {
       // fallback to JSON based transfer
       if (FluidContainerTransferManager.INSTANCE.mayHaveTransfer(stack)) {
@@ -453,7 +484,7 @@ public class FluidTransferHelper {
   
   /**
    * Same as {@link net.minecraft.world.item.ItemUtils#createFilledResult(ItemStack, Player, ItemStack)} but doesn't shrink results or check creative.
-   * Useful in UIs along {@link #interactWithTankSlot(IFluidHandler, ItemStack, TransferDirection)} or {@link #fillFromTankSlot(IFluidHandler, ItemStack, FluidStack)}
+   * Useful in UIs along {@link #interactWithTankSlot(Storage, ItemStack, TransferDirection)} or {@link #fillFromTankSlot(Storage, ItemStack, FluidStack)}
    */
   public static ItemStack getOrTransferFilled(Player player, ItemStack emptyStack, ItemStack filledStack) {
     // if no more helpd
@@ -478,7 +509,7 @@ public class FluidTransferHelper {
 
   /**
    * Combination of {@link #getOrTransferFilled(Player, ItemStack, ItemStack)} and {@link #playUISound(Player, SoundEvent)}.
-   * For working with {@link #interactWithStack(IFluidHandler, ItemStack, TransferDirection)} and {@link #fillStack(IFluidHandler, ItemStack, FluidStack)} in UIs.
+   * For working with {@link #interactWithStack(Storage, ItemStack, TransferDirection)} and {@link #fillStack(Storage, ItemStack, FluidStack)} in UIs.
    */
   public static ItemStack handleUIResult(Player player, ItemStack emptyStack, @Nullable TransferResult result) {
     if (result == null) {

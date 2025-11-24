@@ -8,6 +8,11 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
 import lombok.RequiredArgsConstructor;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.storage.StorageUtil;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
@@ -57,19 +62,22 @@ public class EmptyFluidContainerTransfer implements IFluidContainerTransfer.With
 
   @Nullable
   @Override
-  public TransferResult transfer(ItemStack stack, FluidStack fluid, IFluidHandler handler, TransferDirection direction) {
+  public TransferResult transfer(ItemStack stack, FluidStack fluid, Storage<FluidVariant> handler, TransferDirection direction, @Nullable TransactionContext tx) {
     if (!direction.canEmpty()) {
       return null;
     }
     FluidStack contained = getFluid(stack);
-    int simulated = handler.fill(contained.copy(), FluidAction.SIMULATE);
+    long simulated = StorageUtil.simulateInsert(handler, contained.getType(), contained.getAmount(), tx);
     if (simulated == contained.getAmount()) {
-      int actual = handler.fill(contained.copy(), FluidAction.EXECUTE);
-      if (actual > 0) {
-        if (actual != this.fluid.getAmount()) {
-          Mantle.logger.error("Wrong amount filled from {}, expected {}, filled {}", BuiltInRegistries.ITEM.getKey(stack.getItem()), this.fluid.getAmount(), actual);
+      try (Transaction ntx = Transaction.openNested(tx)) {
+        long actual = handler.insert(contained.getType(), contained.getAmount(), ntx);
+        ntx.commit();
+        if (actual > 0) {
+          if (actual != this.fluid.getAmount()) {
+            Mantle.logger.error("Wrong amount filled from {}, expected {}, filled {}", BuiltInRegistries.ITEM.getKey(stack.getItem()), this.fluid.getAmount(), actual);
+          }
+          return new TransferResult(result.copy(), contained, false);
         }
-        return new TransferResult(result.copy(), contained, false);
       }
     }
     return null;

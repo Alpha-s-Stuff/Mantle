@@ -27,6 +27,8 @@ import slimeknights.mantle.registration.FluidBuilder;
 import slimeknights.mantle.registration.RegistrationHelper;
 import slimeknights.mantle.registration.object.FlowingFluidObject;
 import slimeknights.mantle.registration.object.FluidObject;
+import slimeknights.mantle.util.SimpleFlowingFluid;
+import slimeknights.mantle.util.SimpleFlowingFluid.Properties;
 
 import javax.annotation.Nullable;
 import java.util.function.Function;
@@ -145,7 +147,7 @@ public class FluidDeferredRegister extends DeferredRegisterWrapper<Fluid> {
 
     /** Creates the default bucket */
     public Builder bucket() {
-      return bucket(itemRegister.register(name + "_bucket", () -> new BucketItem(stillDelayed, RegistrationHelper.BUCKET_PROPS)));
+      return bucket(itemRegister.register(name + "_bucket", () -> new BucketItem(stillDelayed.get(), RegistrationHelper.BUCKET_PROPS)));
     }
 
 
@@ -202,8 +204,8 @@ public class FluidDeferredRegister extends DeferredRegisterWrapper<Fluid> {
     }
 
     /** Builds a flowing fluid with the default constructors */
-    public FlowingFluidObject<ForgeFlowingFluid> flowing() {
-      return flowing(ForgeFlowingFluid.Source::new, ForgeFlowingFluid.Flowing::new);
+    public FlowingFluidObject<SimpleFlowingFluid> flowing() {
+      return flowing(SimpleFlowingFluid.Source::new, SimpleFlowingFluid.Flowing::new);
     }
 
     /** Builds a flowing fluid with the default constructors */

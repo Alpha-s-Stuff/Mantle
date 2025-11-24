@@ -1,10 +1,10 @@
 package slimeknights.mantle.data.client;
 
 import com.mojang.blaze3d.platform.NativeImage;
+import io.github.fabricators_of_create.porting_lib.data.ExistingFileHelper;
+import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.minecraft.data.CachedOutput;
-import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.common.data.ExistingFileHelper;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -17,12 +17,12 @@ import java.util.concurrent.CompletableFuture;
 public class DeanimateTextureGenerator extends GenericTextureGenerator {
   private static final Map<ResourceLocation,ResourceLocation> deanimate = new HashMap<>();
   private final String folder;
-  public DeanimateTextureGenerator(PackOutput packOutput, ExistingFileHelper existingFileHelper, String folder) {
+  public DeanimateTextureGenerator(FabricDataOutput packOutput, ExistingFileHelper existingFileHelper, String folder) {
     super(packOutput, existingFileHelper, folder);
     this.folder = folder;
   }
 
-  public DeanimateTextureGenerator(PackOutput packOutput, ExistingFileHelper existingFileHelper) {
+  public DeanimateTextureGenerator(FabricDataOutput packOutput, ExistingFileHelper existingFileHelper) {
     this(packOutput, existingFileHelper, "textures");
   }
 
