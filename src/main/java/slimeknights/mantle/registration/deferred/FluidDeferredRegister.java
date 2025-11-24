@@ -47,7 +47,7 @@ public class FluidDeferredRegister extends DeferredRegisterWrapper<Fluid> {
    * @return  Fluid to supply
    */
   public <I extends Fluid> RegistryObject<I> registerFluid(final String name, final Supplier<? extends I> sup) {
-    return register.register(name, sup.get());
+    return register.register(name, sup);
   }
 
   /**

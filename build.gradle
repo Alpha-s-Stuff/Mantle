@@ -8,10 +8,8 @@
 
 //file:noinspection GroovyAssignabilityCheck
 plugins {
-    id 'fabric-loom' version '0.12-SNAPSHOT'
+    id 'fabric-loom' version '1.12-SNAPSHOT'
     id 'maven-publish'
-    id 'io.github.juuxel.loom-quiltflower' version '1.+'
-    id 'org.quiltmc.quilt-mappings-on-loom' version '4.+'
 }
 
 repositories {
@@ -22,7 +20,7 @@ repositories {
     maven { url = "https://mvn.devos.one/releases/" }
     maven { url = "https://mvn.devos.one/snapshots/" }
     maven { url = "https://maven.terraformersmc.com/releases/" }
-    maven { url = "https://ladysnake.jfrog.io/artifactory/mods" }
+    maven { url = "https://maven.ladysnake.org/releases" }
     maven { url = "https://maven.jamieswhiteshirt.com/libs-release" }
     maven { url = "https://dvs1.progwml6.com/files/maven/" }
     maven { url = "https://maven.wispforest.io" }
@@ -112,10 +110,9 @@ dependencies {
     modImplementation("net.fabricmc:fabric-loader:${project.loader_version}")
     modImplementation("net.fabricmc.fabric-api:fabric-api:${project.fabric_version}")
 
-    modImplementation(include("io.github.ladysnake:satin:${project.satin_version}"))
-
-    modImplementation(include("me.alphamode:ForgeTags:2.1"))
-    modImplementation(include("io.github.fabricators_of_create:Porting-Lib:${project.port_lib_version}+1.18.2-dev.${project.port_lib_hash}"))
+    modImplementation("me.alphamode:ForgeTags:2.1")
+    modImplementation("io.github.fabricators_of_create:Porting-Lib:${project.port_lib_version}+${project.minecraft_version}")
+    modImplementation("io.github.tropheusj:serialization-hooks:${project.serialization_hooks_version}")
 
     // compile against the REI API but do not include it at runtime
     modCompileOnly("me.shedaniel:RoughlyEnoughItems-api-fabric:${project.rei_version}") { transitive = false }
@@ -133,9 +130,9 @@ dependencies {
     modImplementation("com.github.AlphaMode:fakeconfigtoml:master-SNAPSHOT") { exclude(group: "net.fabricmc.fabric-api") }
     implementation(include("com.google.code.findbugs:jsr305:3.0.2"))
 
-    modApi "com.terraformersmc:modmenu:3.2.3"
-    modApi("me.shedaniel.cloth:cloth-config-fabric:6.2.62") {
-        exclude(group: "net.fabricmc.fabric-api")
+    modImplementation "com.terraformersmc:modmenu:3.2.3"
+    modImplementation("me.shedaniel.cloth:cloth-config-fabric:6.2.62") {
+        exclude(group: "net.fabricmc")
     }
 
     // cca
@@ -146,16 +143,8 @@ dependencies {
     // reach attributes
     modImplementation(include("com.jamieswhiteshirt:reach-entity-attributes:${project.reach_entity_attributes_version}"))
 
-    compileOnly "org.projectlombok:lombok:1.18.22"
-    annotationProcessor "org.projectlombok:lombok:1.18.22"
-
-    testCompileOnly "org.projectlombok:lombok:1.18.22"
-    testAnnotationProcessor 'org.projectlombok:lombok:1.18.22'
-
-    annotationProcessor "net.fabricmc:fabric-mixin-compile-extensions:0.4.7"
-
-    api(include("com.github.LlamaLad7:MixinExtras:0.0.6"))
-    annotationProcessor(include("com.github.LlamaLad7:MixinExtras:0.0.6"))
+    compileOnly "org.projectlombok:lombok:1.18.30"
+    annotationProcessor "org.projectlombok:lombok:1.18.30"
 
     modImplementation(include("me.alphamode:Star:${project.star_version}+${project.minecraft_version}"))
 }
@@ -203,7 +192,7 @@ jar {
 
 task sourcesJar(type: Jar) {
     from sourceSets.main.allJava
-    classifier = 'sources'
+    archiveClassifier = 'sources'
 }
 
 tasks.withType(JavaCompile).configureEach {
