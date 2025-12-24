@@ -54,7 +54,10 @@ import java.util.function.Predicate;
 
 import static slimeknights.mantle.util.JsonHelper.DEFAULT_GSON;
 
-/** Command to generate recipes that disable smelting ingots in a furnace */
+/**
+ * Command to disable recipes based on various presets or by ID.
+ * @see RemoveDataCommand
+ */
 public class RemoveRecipesCommand {
   // success
   /** Translation key for successfully removing recipes */
@@ -65,8 +68,6 @@ public class RemoveRecipesCommand {
   private static final DynamicCommandExceptionType ITEM_NOT_FOUND = new DynamicCommandExceptionType(id -> Mantle.makeComponent("command", "item.not_found", id));
   /** Error on invalid preset */
   private static final DynamicCommandExceptionType PRESET_NOT_FOUND = new DynamicCommandExceptionType(id -> Mantle.makeComponent("command", "remove_recipes.preset_not_found", id));
-  /** Error when failing to save a single recipe */
-  private static final DynamicCommandExceptionType FAILED_SAVE = new DynamicCommandExceptionType(id -> Mantle.makeComponent("command", "remove_recipes.failed_id", id));
 
   // presets
   /** Loadable for saving a list of recipe types */
@@ -87,7 +88,7 @@ public class RemoveRecipesCommand {
    * @param context    Context to fetch the recipe type argument
    */
   public static void register(LiteralArgumentBuilder<CommandSourceStack> subCommand, CommandBuildContext context) {
-    subCommand.requires(sender -> sender.hasPermission(MantleCommand.PERMISSION_GAME_COMMANDS))
+    subCommand
       .then(Commands.literal("preset")
         .then(Commands.argument("preset", ResourceLocationArgument.id()).suggests(SUGGEST_PRESETS)
           .executes(RemoveRecipesCommand::runPreset)))
@@ -241,20 +242,10 @@ public class RemoveRecipesCommand {
     GeneratePackHelper.saveMcmeta(pack);
 
     // create the object for removing recipes
-    JsonObject json = new JsonObject();
-    json.add("conditions", CraftingHelper.serialize(new ICondition[]{FalseCondition.INSTANCE}));
-    String jsonString = DEFAULT_GSON.toJson(json);
-
     Path data = pack.resolve(PackType.SERVER_DATA.getDirectory());
     Path path = data.resolve(id.getNamespace() + "/recipes/" + id.getPath() + ".json");
-    try {
-      Files.createDirectories(path.getParent());
-      try (BufferedWriter writer = Files.newBufferedWriter(path)) {
-        writer.write(jsonString);
-      }
-    } catch(IOException e){
-      Mantle.logger.error("Couldn't save recipe {}", id, e);
-      throw FAILED_SAVE.create(id);
+    if (!GeneratePackHelper.saveConditionRemove(path, "conditions")) {
+      throw GeneratePackHelper.FAILED_SAVE.create(id);
     }
 
     // send success

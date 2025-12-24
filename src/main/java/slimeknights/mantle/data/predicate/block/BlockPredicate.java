@@ -19,8 +19,10 @@ import java.util.function.Predicate;
 public interface BlockPredicate extends IJsonPredicate<BlockState> {
   /** Predicate that matches any block */
   BlockPredicate ANY = simple(state -> true);
+  /** Predicate that matches no blocks */
+  BlockPredicate NONE = simple(state -> false);
   /** Loader for block state predicates */
-  RegistryPredicateRegistry<Block,BlockState> LOADER = new RegistryPredicateRegistry<>("Block Predicate", ANY, Loadables.BLOCK, BlockState::getBlock, "blocks", Loadables.BLOCK_TAG, (tag, state) -> state.is(tag));
+  RegistryPredicateRegistry<Block,BlockState> LOADER = new RegistryPredicateRegistry<>("Block Predicate", ANY, NONE, Loadables.BLOCK, BlockState::getBlock, "blocks", Loadables.BLOCK_TAG, (tag, state) -> state.is(tag));
 
   /** Gets an inverted condition */
   @Override

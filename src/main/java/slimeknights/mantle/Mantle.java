@@ -63,6 +63,7 @@ import slimeknights.mantle.recipe.condition.TagEmptyCondition;
 import slimeknights.mantle.recipe.condition.TagFilledCondition;
 import slimeknights.mantle.recipe.helper.TagPreference;
 import slimeknights.mantle.recipe.ingredient.FluidContainerIngredient;
+import slimeknights.mantle.recipe.ingredient.PotionDisplayIngredient;
 import slimeknights.mantle.recipe.ingredient.PotionIngredient;
 import slimeknights.mantle.registration.MantleRegistrations;
 import slimeknights.mantle.registration.RegistrationHelper;
@@ -126,6 +127,7 @@ public class Mantle implements ModInitializer {
     ResourceConditions.register(TagCombinationCondition.ID, TagCombinationCondition::test);
     CustomIngredientSerializer.register(FluidContainerIngredient.SERIALIZER);
     CustomIngredientSerializer.register(PotionIngredient.SERIALIZER);
+      CraftingHelper.register(getResource("potion_display"), PotionDisplayIngredient.SERIALIZER);
 
     // fluid container transfer
     FluidContainerTransferManager.TRANSFER_LOADERS.registerDeserializer(EmptyFluidContainerTransfer.ID, EmptyFluidContainerTransfer.DESERIALIZER);
@@ -143,7 +145,7 @@ public class Mantle implements ModInitializer {
       BlockPredicate.LOADER.register(getResource("block_properties"), BlockPropertiesPredicate.LOADER);
 
       // item predicates
-      ItemPredicate.LOADER.register(getResource("has_container"), ItemPredicate.MAY_HAVE_TRANSFER.getLoader());
+      ItemPredicate.LOADER.register(getResource("has_container"), ItemPredicate.HAS_CONTAINER.getLoader());
       ItemPredicate.LOADER.register(getResource("may_have_transfer"), ItemPredicate.MAY_HAVE_TRANSFER.getLoader());
 
       // entity predicates
@@ -157,7 +159,7 @@ public class Mantle implements ModInitializer {
       LivingEntityPredicate.LOADER.register(getResource("on_ground"), LivingEntityPredicate.ON_GROUND.getLoader());
       LivingEntityPredicate.LOADER.register(getResource("crouching"), LivingEntityPredicate.CROUCHING.getLoader());
       LivingEntityPredicate.LOADER.register(getResource("sprinting"), LivingEntityPredicate.SPRINTING.getLoader());
-      LivingEntityPredicate.LOADER.register(getResource("has_effect"), HasMobEffectPredicate.LOADER);
+      LivingEntityPredicate.LOADER.register(getResource("blocking"), LivingEntityPredicate.BLOCKING.getLoader());LivingEntityPredicate.LOADER.register(getResource("has_effect"), HasMobEffectPredicate.LOADER);
       LivingEntityPredicate.LOADER.register(getResource("block_at_entity"), BlockAtEntityPredicate.LOADER);
       LivingEntityPredicate.LOADER.register(getResource("eyes_in_water"), LivingEntityPredicate.EYES_IN_WATER.getLoader());
       LivingEntityPredicate.LOADER.register(getResource("feet_in_water"), LivingEntityPredicate.FEET_IN_WATER.getLoader());

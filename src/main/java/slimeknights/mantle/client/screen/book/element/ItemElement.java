@@ -84,13 +84,18 @@ public class ItemElement extends SizedBookElement {
   public void draw(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks, Font fontRenderer) {
     long nano = Util.getNanos();
 
-    if(nano > lastTime + ITEM_SWITCH_TIME) {
-      this.lastTime = nano;
-      this.currentItem++;
+    // don't cycle items during export
+    if (parent == null || parent.enableAnimations) {
+      if (nano > lastTime + ITEM_SWITCH_TIME){
+        this.lastTime = nano;
+        this.currentItem++;
 
-      if (this.currentItem >= this.itemCycle.size()) {
-        this.currentItem = 0;
+        if (this.currentItem >= this.itemCycle.size()) {
+          this.currentItem = 0;
+        }
       }
+    } else {
+      this.currentItem = 0;
     }
 
     if (this.currentItem < this.itemCycle.size()) {

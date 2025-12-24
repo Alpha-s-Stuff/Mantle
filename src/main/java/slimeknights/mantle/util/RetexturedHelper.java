@@ -2,6 +2,7 @@ package slimeknights.mantle.util;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
@@ -11,6 +12,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -18,6 +20,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import slimeknights.mantle.client.model.ModelProperty;
+import slimeknights.mantle.Mantle;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -29,6 +32,8 @@ import java.util.function.Predicate;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class RetexturedHelper {
+  /** Translation key for the texture ID in advanced tooltips. */
+  public static final String KEY_ID = Mantle.makeDescriptionId("block", "retextured.id");
   /** Tag name for texture blocks. Should not be used directly, use the utils to interact */
   public static final String TAG_TEXTURE = "texture";
   /** Property for tile entities containing a texture block */
@@ -173,12 +178,23 @@ public final class RetexturedHelper {
    * Adds the texture block to the tooltip
    * @param stack    Stack instance
    * @param tooltip  Tooltip
+   * @param flag     Tooltip flag instance
    */
-  public static void addTooltip(ItemStack stack, List<Component> tooltip) {
+  public static void addTooltip(ItemStack stack, List<Component> tooltip, TooltipFlag flag) {
     Block block = getTexture(stack);
     if (block != Blocks.AIR) {
-      tooltip.add(block.getName());
+      tooltip.add(block.getName().withStyle(ChatFormatting.GRAY));
+      // advanced includes the ID of the texture
+      if (flag.isAdvanced()) {
+        tooltip.add(Component.translatable(KEY_ID, BuiltInRegistries.BLOCK.getKey(block)).withStyle(ChatFormatting.DARK_GRAY));
+      }
     }
+  }
+
+  /** @deprecated use {@link #addTooltip(ItemStack, List, TooltipFlag)} */
+  @Deprecated(forRemoval = true)
+  public static void addTooltip(ItemStack stack, List<Component> tooltip) {
+    addTooltip(stack, tooltip, TooltipFlag.NORMAL);
   }
 
   /**

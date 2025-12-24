@@ -59,9 +59,12 @@ public class BookScreen extends Screen {
   @Nullable
   private static Font altFont;
 
-  // Used for the book to image exporter to disable arrows and mouse input
+  /** If true, shows next and previous page buttons. Set to false during export. */
   public boolean drawArrows = true;
+  /** If true, the mouse may be used to interact with book elements. Set to false during export. */
   public boolean mouseInput = true;
+  /** If true, animated elements can animate. Set to false during export to ensure first element consistently shows. */
+  public boolean enableAnimations = true;
 
   private ArrowButton previousArrow, nextArrow, backArrow, indexArrow;
 
@@ -708,10 +711,10 @@ public class BookScreen extends Screen {
     }
 
     for (BookElement element : this.leftElements) {
-      element.parent = this;
+      element.setParent(this);
     }
     for (BookElement element : this.rightElements) {
-      element.parent = this;
+      element.setParent(this);
     }
   }
 

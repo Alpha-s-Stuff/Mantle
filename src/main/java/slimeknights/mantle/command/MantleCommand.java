@@ -80,7 +80,11 @@ public class MantleCommand {
     });
     register(builder, "dump_loot_modifiers", DumpLootModifiers::register);
     register(builder, "harvest_tiers", HarvestTiersCommand::register);
-    register(builder, "remove_recipes", b -> RemoveRecipesCommand.register(b, context));
+    register(builder, "remove", b -> {
+      b = b.requires(sender -> sender.hasPermission(MantleCommand.PERMISSION_GAME_COMMANDS));
+      register(b, "recipes", b2 -> RemoveRecipesCommand.register(b2, context));
+      RemoveDataCommand.register(b);
+    });
     // sources assets is registered as a client command
     register(builder, "sources", b -> {
       register(b, "data", SourcesCommand::register);
