@@ -19,6 +19,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import slimeknights.mantle.client.model.ModelData;
 import slimeknights.mantle.client.model.ModelProperty;
 import slimeknights.mantle.Mantle;
 
@@ -161,14 +162,18 @@ public final class RetexturedHelper {
     }
   }
 
-  /** returns the block property as specified */
-  @Nullable
-  public static Block getModelData(Block block) {
+  /** Creates a builder with the block property as specified */
+  public static ModelData.Builder getModelDataBuilder(Block block) {
     // cannot support air, saves a conditional on usage
     if (block == Blocks.AIR) {
       block = null;
     }
-    return block;
+    return ModelData.builder().with(BLOCK_PROPERTY, block);
+  }
+
+  /** Creates model data with the block property as specified */
+  public static ModelData getModelData(Block block) {
+    return getModelDataBuilder(block).build();
   }
 
 

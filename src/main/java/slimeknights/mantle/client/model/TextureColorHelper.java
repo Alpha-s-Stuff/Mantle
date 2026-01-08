@@ -14,9 +14,9 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.client.model.data.ModelData;
 import org.apache.commons.lang3.math.NumberUtils;
 import slimeknights.mantle.Mantle;
+import slimeknights.mantle.client.model.util.ModelHelper;
 
 import java.awt.Color;
 import java.util.function.ToIntFunction;
@@ -46,7 +46,7 @@ public class TextureColorHelper {
       SpriteContents contents = sprite.contents();
       for (int x = 0; x < contents.width(); x++) {
         for (int y = 0; y < contents.height(); y++) {
-          int argb = sprite.getPixelRGBA(0, x, y);
+          int argb = sprite.contents().getPixelRGBA(0, x, y);
           // integer is in format of 0xAABBGGRR
           int cr = argb & 0xFF;
           int cg = argb >> 8 & 0xFF;
@@ -113,7 +113,7 @@ public class TextureColorHelper {
     if (model == mc.getModelManager().getMissingModel()) {
       return -1;
     }
-    return getAverageColor(model.getParticleIcon(ModelData.EMPTY));
+    return getAverageColor(ModelHelper.getParticleIcon(model, ModelData.EMPTY));
   };
 
   /** Gets the average color of an item's default particle icon */
@@ -128,7 +128,7 @@ public class TextureColorHelper {
     if (model == mc.getModelManager().getMissingModel()) {
       return -1;
     }
-    return getAverageColor(model.getParticleIcon(ModelData.EMPTY));
+    return getAverageColor(ModelHelper.getParticleIcon(model, ModelData.EMPTY));
   };
 
   /** Gets the average color of an blocks default particle icon */

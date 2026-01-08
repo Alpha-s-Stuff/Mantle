@@ -4,8 +4,6 @@ import com.mojang.datafixers.util.Either;
 import lombok.AllArgsConstructor;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.resources.model.Material;
-import net.minecraftforge.client.model.geometry.BlockGeometryBakingContext;
-import net.minecraftforge.client.model.geometry.IGeometryBakingContext;
 
 import javax.annotation.Nullable;
 import java.util.Iterator;
@@ -35,11 +33,11 @@ public class ModelTextureIteratable implements Iterable<Map<String,Either<Materi
    * @param fallback  Fallback in case the owner does not contain a block model
    * @return  Iteratable over block model texture maps
    */
-  public static ModelTextureIteratable of(IGeometryBakingContext owner, SimpleBlockModel fallback) {
-    if (owner instanceof BlockGeometryBakingContext blockOwner) {
-      return new ModelTextureIteratable(null, blockOwner.owner);
-    }
-    return new ModelTextureIteratable(fallback.getTextures(), fallback.getParent());
+  public static ModelTextureIteratable of(BlockModel owner, SimpleBlockModel fallback) {
+//    if (owner instanceof BlockGeometryBakingContext blockOwner) {
+      return new ModelTextureIteratable(null, owner);
+//    }
+//    return new ModelTextureIteratable(fallback.getTextures(), fallback.getParent());
   }
 
   @Override

@@ -10,16 +10,13 @@ import com.google.gson.JsonSyntaxException;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.JsonOps;
+import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.event.OnDatapackSyncEvent;
-import net.minecraftforge.network.PacketDistributor;
-import net.minecraftforge.network.PacketDistributor.PacketTarget;
-import net.minecraftforge.registries.IForgeRegistry;
 import org.jetbrains.annotations.Contract;
 import slimeknights.mantle.Mantle;
 import slimeknights.mantle.data.loadable.Loadable;
@@ -215,10 +212,10 @@ public class JsonHelper {
    * @deprecated use {@link slimeknights.mantle.data.loadable.Loadables}
    */
   @Deprecated(forRemoval = true)
-  public static <T> T convertToEntry(IForgeRegistry<T> registry, JsonElement element, String key) {
+  public static <T> T convertToEntry(Registry<T> registry, JsonElement element, String key) {
     ResourceLocation name = JsonHelper.convertToResourceLocation(element, key);
     if (registry.containsKey(name)) {
-      T value = registry.getValue(name);
+      T value = registry.get(name);
       if (value != null) {
         return value;
       }
@@ -237,7 +234,7 @@ public class JsonHelper {
    * @deprecated use {@link slimeknights.mantle.data.loadable.Loadables}
    */
   @Deprecated(forRemoval = true)
-  public static <T> T getAsEntry(IForgeRegistry<T> registry, JsonObject parent, String key) {
+  public static <T> T getAsEntry(Registry<T> registry, JsonObject parent, String key) {
     return convertToEntry(registry, JsonHelper.getElement(parent, key), key);
   }
 

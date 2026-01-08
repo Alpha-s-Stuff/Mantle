@@ -5,6 +5,7 @@ import dev.onyxstudios.cca.api.v3.component.ComponentRegistry;
 import dev.onyxstudios.cca.api.v3.entity.EntityComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.entity.EntityComponentInitializer;
 import dev.onyxstudios.cca.api.v3.entity.PlayerComponent;
+import io.github.fabricators_of_create.porting_lib.common.util.NonNullFunction;
 import io.github.fabricators_of_create.porting_lib.util.LazyOptional;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.nbt.CompoundTag;
@@ -18,7 +19,6 @@ import slimeknights.mantle.network.MantleNetwork;
 import slimeknights.mantle.network.packet.SwingArmPacket;
 
 import javax.annotation.Nullable;
-import java.util.function.Function;
 
 import static slimeknights.mantle.util.LogicHelper.orElseNull;
 
@@ -132,7 +132,7 @@ public class OffhandCooldownTracker implements PlayerComponent<OffhandCooldownTr
   /** Gets the tracker instance for the target entity */
   @Nullable
   public static OffhandCooldownTracker get(Player player) {
-    return orElseNull(player.getCapability(OffhandCooldownTracker.CAPABILITY));
+    return orElseNull(OffhandCooldownTracker.CAPABILITY.maybeGet(player));
   }
 
   /**

@@ -2,6 +2,8 @@ package slimeknights.mantle.command.client;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
+import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -18,9 +20,9 @@ public class ClearBookCacheCommand {
    * Registers this sub command with the root command
    * @param subCommand  Command builder
    */
-  public static void register(LiteralArgumentBuilder<CommandSourceStack> subCommand) {
+  public static void register(LiteralArgumentBuilder<FabricClientCommandSource> subCommand) {
     subCommand.requires(source -> source.getEntity() instanceof AbstractClientPlayer)
-              .then(Commands.argument("id", ResourceLocationArgument.id()).suggests(MantleClientCommand.REGISTERED_BOOKS)
+              .then(ClientCommandManager.argument("id", ResourceLocationArgument.id()).suggests(MantleClientCommand.REGISTERED_BOOKS)
                             .executes(ClearBookCacheCommand::runBook))
               .executes(ClearBookCacheCommand::runAll);
   }

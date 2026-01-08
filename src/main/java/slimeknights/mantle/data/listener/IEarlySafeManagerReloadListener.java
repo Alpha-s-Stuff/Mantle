@@ -1,5 +1,6 @@
 package slimeknights.mantle.data.listener;
 
+import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.profiling.ProfilerFiller;
@@ -8,7 +9,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
 /** Same as {@link ISafeManagerReloadListener}, but reloads earlier. Needed to work with some parts of models. */
-public interface IEarlySafeManagerReloadListener extends PreparableReloadListener {
+public interface IEarlySafeManagerReloadListener extends IdentifiableResourceReloadListener {
   @Override
   default CompletableFuture<Void> reload(PreparationBarrier stage, ResourceManager resourceManager, ProfilerFiller preparationsProfiler, ProfilerFiller reloadProfiler, Executor backgroundExecutor, Executor gameExecutor) {
     return CompletableFuture.runAsync(() -> {

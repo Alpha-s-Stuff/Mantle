@@ -1,5 +1,7 @@
 package slimeknights.mantle.data.loadable;
 
+import io.github.fabricators_of_create.porting_lib.loot.LootModifierManager;
+import io.github.fabricators_of_create.porting_lib.tool.ToolAction;
 import net.minecraft.ResourceLocationException;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
@@ -25,8 +27,6 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.storage.loot.entries.LootPoolEntryContainer;
-import net.minecraftforge.common.ToolAction;
-import net.minecraftforge.common.loot.LootModifierManager;
 import slimeknights.mantle.client.model.util.ModelHelper;
 import slimeknights.mantle.data.loadable.common.GsonLoadable;
 import slimeknights.mantle.data.loadable.common.RegistryLoadable;

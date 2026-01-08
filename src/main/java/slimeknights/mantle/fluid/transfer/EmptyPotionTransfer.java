@@ -2,13 +2,13 @@ package slimeknights.mantle.fluid.transfer;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
+import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraftforge.fluids.FluidStack;
 import slimeknights.mantle.Mantle;
 import slimeknights.mantle.data.loadable.common.IngredientLoadable;
 import slimeknights.mantle.data.loadable.primitive.IntLoadable;

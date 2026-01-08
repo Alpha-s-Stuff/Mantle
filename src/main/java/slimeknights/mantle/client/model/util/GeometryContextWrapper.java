@@ -1,36 +1,45 @@
 package slimeknights.mantle.client.model.util;
 
 import com.mojang.math.Transformation;
+import io.github.fabricators_of_create.porting_lib.models.geometry.IUnbakedGeometry;
+import io.github.fabricators_of_create.porting_lib.models.geometry.VisibilityData;
+import net.minecraft.client.renderer.block.model.BlockElement;
+import net.minecraft.client.renderer.block.model.BlockModel;
+import net.minecraft.client.renderer.block.model.ItemOverride;
+import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.Material;
+import net.minecraft.client.resources.model.ModelBaker;
+import net.minecraft.client.resources.model.ModelState;
+import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.client.RenderTypeGroup;
-import net.minecraftforge.client.model.geometry.IGeometryBakingContext;
-import org.jetbrains.annotations.Nullable;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.function.Function;
 
 /**
- * Wrapper around a {@link IGeometryBakingContext} instance to allow easier extending, mostly for dynamic textures
+ * Wrapper around a {@link BlockModel} instance to allow easier extending, mostly for dynamic textures
  */
 @SuppressWarnings("WeakerAccess")
-public class GeometryContextWrapper implements IGeometryBakingContext {
-  private final IGeometryBakingContext base;
+public class GeometryContextWrapper extends BlockModel {
+  private final BlockModel base;
 
   /**
    * Creates a new configuration wrapper
    * @param base  Base model configuration
    */
-  public GeometryContextWrapper(IGeometryBakingContext base) {
+  public GeometryContextWrapper(BlockModel base) {
+    super(base.parentLocation, base.getElements(), base.textureMap, base.hasAmbientOcclusion(), base.getGuiLight(), base.getTransforms(), base.getOverrides());
+    this.name = base.name;
     this.base = base;
   }
 
   @Override
-  public String getModelName() {
-    return base.getModelName();
-  }
-
-  @Override
-  public boolean hasMaterial(String name) {
-    return base.hasMaterial(name);
+  public boolean hasTexture(String name) {
+    return base.hasTexture(name);
   }
 
   @Override
@@ -39,18 +48,83 @@ public class GeometryContextWrapper implements IGeometryBakingContext {
   }
 
   @Override
-  public boolean isGui3d() {
-    return base.isGui3d();
+  public List<BlockElement> getElements() {
+    return base.getElements();
   }
 
   @Override
-  public boolean useBlockLight() {
-    return base.useBlockLight();
+  public boolean hasAmbientOcclusion() {
+    return base.hasAmbientOcclusion();
   }
 
   @Override
-  public boolean useAmbientOcclusion() {
-    return base.useAmbientOcclusion();
+  public GuiLight getGuiLight() {
+    return base.getGuiLight();
+  }
+
+  @Override
+  public boolean isResolved() {
+    return base.isResolved();
+  }
+
+  @Override
+  public List<ItemOverride> getOverrides() {
+    return base.getOverrides();
+  }
+
+  @Override
+  public Collection<ResourceLocation> getDependencies() {
+    return base.getDependencies();
+  }
+
+  @Override
+  public void resolveParents(Function<ResourceLocation, UnbakedModel> function) {
+    base.resolveParents(function);
+  }
+
+  @Override
+  public BakedModel bake(ModelBaker modelBaker, Function<Material, TextureAtlasSprite> function, ModelState modelState, ResourceLocation resourceLocation) {
+    return base.bake(modelBaker, function, modelState, resourceLocation);
+  }
+
+  @Override
+  public BakedModel bake(ModelBaker modelBaker, BlockModel blockModel, Function<Material, TextureAtlasSprite> function, ModelState modelState, ResourceLocation resourceLocation, boolean bl) {
+    return base.bake(modelBaker, blockModel, function, modelState, resourceLocation, bl);
+  }
+
+  @Override
+  public BlockModel getRootModel() {
+    return base.getRootModel();
+  }
+
+  @Override
+  public String toString() {
+    return base.toString();
+  }
+
+  @Override
+  public ItemOverrides getOverrides(ModelBaker pModelBakery, BlockModel pModel, Function<Material, TextureAtlasSprite> textureGetter) {
+    return base.getOverrides(pModelBakery, pModel, textureGetter);
+  }
+
+  @Override
+  public void setCustomGeometry(IUnbakedGeometry<?> geometry) {
+    base.setCustomGeometry(geometry);
+  }
+
+  @Override
+  public IUnbakedGeometry<?> getCustomGeometry() {
+    return base.getCustomGeometry();
+  }
+
+  @Override
+  public VisibilityData getVisibilityData() {
+    return base.getVisibilityData();
+  }
+
+  @Override
+  public void setRootTransform(Transformation rootTransform) {
+    base.setRootTransform(rootTransform);
   }
 
   @Override
@@ -64,17 +138,7 @@ public class GeometryContextWrapper implements IGeometryBakingContext {
   }
 
   @Override
-  public @Nullable ResourceLocation getRenderTypeHint() {
-    return base.getRenderTypeHint();
-  }
-
-  @Override
   public boolean isComponentVisible(String component, boolean fallback) {
     return base.isComponentVisible(component, fallback);
-  }
-
-  @Override
-  public RenderTypeGroup getRenderType(ResourceLocation name) {
-    return base.getRenderType(name);
   }
 }

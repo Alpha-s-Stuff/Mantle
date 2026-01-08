@@ -4,7 +4,10 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
+import io.github.fabricators_of_create.porting_lib.models.geometry.IGeometryLoader;
+import io.github.fabricators_of_create.porting_lib.models.geometry.IUnbakedGeometry;
 import lombok.RequiredArgsConstructor;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -15,10 +18,6 @@ import net.minecraft.client.resources.model.ModelState;
 import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
-import net.minecraftforge.client.model.geometry.IGeometryBakingContext;
-import net.minecraftforge.client.model.geometry.IGeometryLoader;
-import net.minecraftforge.client.model.geometry.IUnbakedGeometry;
-import net.minecraftforge.fml.ModList;
 
 import java.util.function.Function;
 
@@ -51,7 +50,7 @@ public enum FallbackModelLoader implements IGeometryLoader<FallbackModelLoader.B
       }
 
       // if the mod is loaded, try loading the given model
-      if (modId == null || ModList.get().isLoaded(modId)) {
+      if (modId == null || FabricLoader.getInstance().isModLoaded(modId)) {
         try {
           // use a model wrapper to ensure the child model gets the proper context
           // this means its not possible to extend the fallback model, but that is not normally possible with loaders
@@ -73,12 +72,12 @@ public enum FallbackModelLoader implements IGeometryLoader<FallbackModelLoader.B
    */
   record BlockModelWrapper(BlockModel model) implements IUnbakedGeometry<BlockModelWrapper> {
     @Override
-    public BakedModel bake(IGeometryBakingContext owner, ModelBaker baker, Function<Material,TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides, ResourceLocation modelLocation) {
+    public BakedModel bake(BlockModel owner, ModelBaker baker, Function<Material,TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides, ResourceLocation modelLocation, boolean isGui3d) {
       return model.bake(baker, model, spriteGetter, modelTransform, modelLocation, true);
     }
 
     @Override
-    public void resolveParents(Function<ResourceLocation,UnbakedModel> modelGetter, IGeometryBakingContext context) {
+    public void resolveParents(Function<ResourceLocation,UnbakedModel> modelGetter, BlockModel context) {
       model.resolveParents(modelGetter);
     }
   }

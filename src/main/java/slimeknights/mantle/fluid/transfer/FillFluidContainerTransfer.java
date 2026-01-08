@@ -6,15 +6,18 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
+import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
 import lombok.RequiredArgsConstructor;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.storage.StorageUtil;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
 import org.apache.commons.lang3.function.TriFunction;
 import org.jetbrains.annotations.Nullable;
 import slimeknights.mantle.Mantle;
@@ -53,19 +56,22 @@ public class FillFluidContainerTransfer implements IFluidContainerTransfer.WithD
 
   @Nullable
   @Override
-  public TransferResult transfer(ItemStack stack, FluidStack fluid, IFluidHandler handler, TransferDirection direction) {
+  public TransferResult transfer(ItemStack stack, FluidStack fluid, Storage<FluidVariant> handler, TransferDirection direction, @Nullable TransactionContext tx) {
     if (!direction.canFill()) {
       return null;
     }
-    int amount = this.fluid.getAmount(fluid.getFluid());
+    long amount = this.fluid.getAmount(fluid.getFluid());
     FluidStack toDrain = new FluidStack(fluid, amount);
-    FluidStack simulated = handler.drain(toDrain.copy(), FluidAction.SIMULATE);
-    if (simulated.getAmount() == amount) {
-      FluidStack actual = handler.drain(toDrain.copy(), FluidAction.EXECUTE);
-      if (actual.getAmount() != amount) {
-        Mantle.logger.error("Wrong amount drained from {}, expected {}, filled {}", BuiltInRegistries.ITEM.getKey(stack.getItem()), fluid.getAmount(), actual.getAmount());
+    long simulated = StorageUtil.simulateExtract(handler, fluid.getType(), amount, tx);
+    if (simulated == amount) {
+      try (Transaction ntx = Transaction.openNested(tx)) {
+        long actual = handler.extract(fluid.getType(), amount, ntx);
+        if (actual != amount) {
+          Mantle.logger.error("Wrong amount drained from {}, expected {}, filled {}", BuiltInRegistries.ITEM.getKey(stack.getItem()), fluid.getAmount(), actual);
+        }
+        ntx.commit();
+        return new TransferResult(getFilled(toDrain), toDrain, true);
       }
-      return new TransferResult(getFilled(toDrain), toDrain, true);
     }
     return null;
   }

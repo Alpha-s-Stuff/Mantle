@@ -3,7 +3,7 @@ package slimeknights.mantle.data.predicate;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
-import net.minecraftforge.common.crafting.conditions.ICondition;
+import net.fabricmc.fabric.api.resource.conditions.v1.ConditionJsonProvider;
 import slimeknights.mantle.Mantle;
 import slimeknights.mantle.data.loadable.Loadable;
 import slimeknights.mantle.data.loadable.mapping.ConditionalLoadable.ConditionalObject;
@@ -187,14 +187,14 @@ public class PredicateRegistry<T> extends DefaultingLoaderRegistry<IJsonPredicat
   @Getter
   @RequiredArgsConstructor
   public class ConditionalPredicate implements IJsonPredicate<T>, ConditionalObject<IJsonPredicate<T>> {
-    private final ICondition[] conditions;
+    private final ConditionJsonProvider[] conditions;
     private final IJsonPredicate<T> ifTrue;
     private final IJsonPredicate<T> ifFalse;
 
     @Override
     public boolean matches(T input) {
       // should be unused, but just in case
-      for (ICondition condition : conditions) {
+      for (ConditionJsonProvider condition : conditions) {
         if (!condition.test(DataLoadedConditionContext.INSTANCE)) {
           return ifFalse.matches(input);
         }

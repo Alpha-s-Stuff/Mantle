@@ -7,8 +7,12 @@ import com.google.gson.JsonObject;
 import com.mojang.datafixers.util.Either;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.math.Transformation;
+import io.github.fabricators_of_create.porting_lib.models.CompositeModel;
+import io.github.fabricators_of_create.porting_lib.models.geometry.IGeometryLoader;
+import io.github.fabricators_of_create.porting_lib.models.geometry.IUnbakedGeometry;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
@@ -22,11 +26,6 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.client.model.CompositeModel;
-import net.minecraftforge.client.model.geometry.BlockGeometryBakingContext;
-import net.minecraftforge.client.model.geometry.IGeometryBakingContext;
-import net.minecraftforge.client.model.geometry.IGeometryLoader;
-import net.minecraftforge.client.model.geometry.IUnbakedGeometry;
 import slimeknights.mantle.client.model.util.MantleItemLayerModel;
 import slimeknights.mantle.client.model.util.ModelTextureIteratable;
 import slimeknights.mantle.util.JsonHelper;
@@ -68,22 +67,23 @@ public class NBTKeyModel implements IUnbakedGeometry<NBTKeyModel> {
   private Map<String,Material> textures = Collections.emptyMap();
 
   @Override
-  public void resolveParents(Function<ResourceLocation,UnbakedModel> modelGetter, IGeometryBakingContext owner) {
+  public void resolveParents(Function<ResourceLocation,UnbakedModel> modelGetter, BlockModel owner) {
     textures = new HashMap<>();
     // must have a default
     Material defaultTexture = owner.getMaterial("default");
     textures.put("default", defaultTexture);
     // fetch others, not sure if there is a better way to get all defined textures
-    if (owner instanceof BlockGeometryBakingContext blockContext) {
-      ModelTextureIteratable iterable = new ModelTextureIteratable(null, blockContext.owner);
+//    if (owner instanceof BlockGeometryBakingContext blockContext) {
+      BlockModel blockContext = owner;
+      ModelTextureIteratable iterable = new ModelTextureIteratable(null, blockContext);
       for (Map<String,Either<Material,String>> map : iterable) {
         for (String key : map.keySet()) {
-          if (!textures.containsKey(key) && owner.hasMaterial(key)) {
+          if (!textures.containsKey(key) && owner.hasTexture(key)) {
             textures.put(key, owner.getMaterial(key));
           }
         }
       }
-    }
+//    }
     // fetch extra textures
     if (extraTexturesKey != null) {
       for (Pair<String,ResourceLocation> extra : EXTRA_TEXTURES.get(extraTexturesKey)) {
@@ -96,15 +96,15 @@ public class NBTKeyModel implements IUnbakedGeometry<NBTKeyModel> {
   }
 
   /** Bakes a model for the given texture */
-  private static BakedModel bakeModel(IGeometryBakingContext owner, Material texture, Function<Material,TextureAtlasSprite> spriteGetter, Transformation rotation, ItemOverrides overrides) {
+  private static BakedModel bakeModel(BlockModel owner, Material texture, Function<Material,TextureAtlasSprite> spriteGetter, Transformation rotation, ItemOverrides overrides) {
     TextureAtlasSprite sprite = spriteGetter.apply(texture);
-    CompositeModel.Baked.Builder builder = CompositeModel.Baked.builder(owner, sprite, overrides, owner.getTransforms());
+    CompositeModel.Baked.Builder builder = CompositeModel.Baked.builder(owner, true, sprite, overrides, owner.getTransforms());
     builder.addQuads(MantleItemLayerModel.getDefaultRenderType(owner), MantleItemLayerModel.getQuadsForSprite(-1, -1, sprite, rotation, 0));
     return builder.build();
   }
 
   @Override
-  public BakedModel bake(IGeometryBakingContext owner, ModelBaker baker, Function<Material,TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides, ResourceLocation modelLocation) {
+  public BakedModel bake(BlockModel owner, ModelBaker baker, Function<Material,TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides, ResourceLocation modelLocation) {
     // setup transforms
     Transformation transform = MantleItemLayerModel.applyTransform(modelTransform, owner.getRootTransform()).getRotation();
     // build variants map

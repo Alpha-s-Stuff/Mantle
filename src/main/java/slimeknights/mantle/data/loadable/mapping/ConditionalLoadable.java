@@ -1,10 +1,8 @@
 package slimeknights.mantle.data.loadable.mapping;
 
 import com.google.gson.JsonObject;
+import net.fabricmc.fabric.api.resource.conditions.v1.ConditionJsonProvider;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.common.crafting.CraftingHelper;
-import net.minecraftforge.common.crafting.conditions.ICondition;
-import net.minecraftforge.common.crafting.conditions.ICondition.IContext;
 import slimeknights.mantle.data.loadable.field.ContextKey;
 import slimeknights.mantle.data.loadable.record.RecordLoadable;
 import slimeknights.mantle.data.registry.GenericLoaderRegistry;
@@ -61,7 +59,7 @@ public record ConditionalLoadable<T extends IHaveLoader>(GenericLoaderRegistry<T
   /** Interface for the serializable version of {@link ConditionalLoadable} */
   public interface ConditionalObject<T> extends IHaveLoader {
     /** Conditions on the object */
-    ICondition[] conditions();
+    ConditionJsonProvider[] conditions();
 
     /** Object to use when conditions are true */
     T ifTrue();

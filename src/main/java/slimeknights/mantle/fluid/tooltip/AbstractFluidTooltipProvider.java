@@ -3,6 +3,7 @@ package slimeknights.mantle.fluid.tooltip;
 import com.google.gson.JsonObject;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.minecraft.Util;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.PackOutput;
@@ -27,9 +28,9 @@ public abstract class AbstractFluidTooltipProvider extends GenericDataProvider {
   private final Map<ResourceLocation,FluidUnitListBuilder> builders = new HashMap<>();
   private final String modId;
 
-  public AbstractFluidTooltipProvider(PackOutput output, String modId) {
+  public AbstractFluidTooltipProvider(FabricDataOutput output) {
     super(output, Target.RESOURCE_PACK, FluidTooltipHandler.FOLDER, FluidTooltipHandler.GSON);
-    this.modId = modId;
+    this.modId = output.getModId();
   }
 
   /** Adds all relevant fluids to the maps */
@@ -108,18 +109,18 @@ public abstract class AbstractFluidTooltipProvider extends GenericDataProvider {
     private final List<FluidUnit> units = new ArrayList<>();
 
     /** Adds a unit with a full translation key */
-    public FluidUnitListBuilder addUnitRaw(String key, int amount) {
+    public FluidUnitListBuilder addUnitRaw(String key, long amount) {
       units.add(new FluidUnit(key, amount));
       return this;
     }
 
     /** Adds a unit local to the current mod */
-    public FluidUnitListBuilder addUnit(String key, int amount) {
+    public FluidUnitListBuilder addUnit(String key, long amount) {
       return addUnitRaw(Util.makeDescriptionId("gui", id("fluid." + key)), amount);
     }
 
     /** Adds a unit local to the given mod */
-    public FluidUnitListBuilder addUnit(String key, String domain, int amount) {
+    public FluidUnitListBuilder addUnit(String key, String domain, long amount) {
       return addUnitRaw(Util.makeDescriptionId("gui", new ResourceLocation(domain, "fluid." + key)), amount);
     }
 

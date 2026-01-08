@@ -1,8 +1,13 @@
 package slimeknights.mantle.command;
 
+import com.google.common.base.Preconditions;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
+import net.fabricmc.fabric.api.resource.conditions.v1.ConditionJsonProvider;
+import net.fabricmc.fabric.api.resource.conditions.v1.ResourceConditions;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.SharedConstants;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.ClickEvent.Action;
@@ -11,11 +16,8 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.world.level.storage.LevelResource;
-import net.minecraftforge.common.crafting.CraftingHelper;
-import net.minecraftforge.common.crafting.conditions.FalseCondition;
-import net.minecraftforge.common.crafting.conditions.ICondition;
-import net.minecraftforge.fml.ModList;
 import slimeknights.mantle.Mantle;
+import slimeknights.mantle.recipe.condition.FalseCondition;
 import slimeknights.mantle.util.JsonHelper;
 
 import java.io.BufferedWriter;
@@ -23,6 +25,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 
 /** Helpers for commands generating packs */
 public class GeneratePackHelper {
@@ -36,7 +39,7 @@ public class GeneratePackHelper {
   /** Gets the path to the datapack */
   public static Path getDatapackPath(MinecraftServer server, String packName) {
     // if we have JSON Things, do a global datapack
-    if (ModList.get().isLoaded("jsonthings")) {
+    if (FabricLoader.getInstance().isModLoaded("jsonthings")) {
       return server.getServerDirectory().toPath().resolve("thingpacks/" + packName);
     }
     // TODO: consider option to put in the standard datapacks folder via config property
@@ -69,16 +72,30 @@ public class GeneratePackHelper {
     }
   }
 
-  /** Saves a JSON that removes the given resource using forge conditions */
+  /** Saves a JSON that removes the given resource using fabric conditions */
   public static boolean saveConditionRemove(Path path, String conditionKey) {
     JsonObject json = new JsonObject();
-    json.add(conditionKey, CraftingHelper.serialize(new ICondition[]{FalseCondition.INSTANCE}));
+    json.add(conditionKey, serializeCondition(FalseCondition.INSTANCE));
     return saveJson(json, path);
   }
 
-  /** Saves a JSON that removes the given resource using forge conditions */
+  /** Fabric copy of {@link ConditionJsonProvider#write(JsonObject, ConditionJsonProvider...)} but returns a condition array instead of passing a json object */
+  private static JsonArray serializeCondition(ConditionJsonProvider ...conditions) {
+    Preconditions.checkArgument(conditions.length > 0, "Must write at least one condition."); // probably a programmer error
+
+    JsonArray array = new JsonArray();
+
+    for (ConditionJsonProvider condition : conditions) {
+      Objects.requireNonNull(condition, "condition cannot be null");
+      array.add(condition.toJson());
+    }
+
+    return array;
+  }
+
+  /** Saves a JSON that removes the given resource using fabric conditions */
   public static boolean saveConditionRemove(Path path) {
-    return saveConditionRemove(path, "forge:conditions");
+    return saveConditionRemove(path, ResourceConditions.CONDITIONS_KEY);
   }
 
   /** Creates a mcmeta to make a valid pack */

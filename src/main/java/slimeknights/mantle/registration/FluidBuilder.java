@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.material.Fluid;
+import slimeknights.mantle.util.SimpleFlowingFluid;
 
 import javax.annotation.Nullable;
 import java.util.function.Supplier;
@@ -85,8 +86,8 @@ public class FluidBuilder<T extends FluidBuilder<T>> {
    * @param flowing  Flowing supplier
    * @return  Forge fluid properties
    */
-  public ForgeFlowingFluid.Properties build(Supplier<? extends FluidType> type, Supplier<? extends Fluid> still, Supplier<? extends Fluid> flowing) {
-    return new ForgeFlowingFluid.Properties(type, still, flowing)
+  public SimpleFlowingFluid.Properties build(Supplier<? extends FluidType> type, Supplier<? extends Fluid> still, Supplier<? extends Fluid> flowing) {
+    return new SimpleFlowingFluid.Properties(type, still, flowing)
         .slopeFindDistance(this.slopeFindDistance)
         .levelDecreasePerBlock(this.levelDecreasePerBlock)
         .explosionResistance(this.explosionResistance)

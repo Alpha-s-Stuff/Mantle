@@ -1,26 +1,25 @@
 package slimeknights.mantle.datagen;
 
-import net.minecraft.data.PackOutput;
-import net.minecraftforge.fluids.FluidType;
+import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import org.jetbrains.annotations.ApiStatus.Internal;
-import slimeknights.mantle.Mantle;
 import slimeknights.mantle.fluid.tooltip.AbstractFluidTooltipProvider;
 import slimeknights.mantle.fluid.tooltip.FluidTooltipHandler;
 
 /** Mantle datagen for fluid tooltips. For mods, don't use this, use {@link AbstractFluidTooltipProvider} */
 @Internal
 public class MantleFluidTooltipProvider extends AbstractFluidTooltipProvider {
-  public MantleFluidTooltipProvider(PackOutput packOutput) {
-    super(packOutput, Mantle.modId);
+  public MantleFluidTooltipProvider(FabricDataOutput packOutput) {
+    super(packOutput);
   }
 
   @Override
   protected void addFluids() {
-    add("buckets").addUnit("bucket", FluidType.BUCKET_VOLUME);
+    add("buckets").addUnit("bucket", FluidConstants.BUCKET);
     addRedirect(FluidTooltipHandler.DEFAULT_ID, id("buckets"));
     // water divides into bottles then "drops"
     add("water", MantleTags.Fluids.WATER)
-      .addUnit("bucket", FluidType.BUCKET_VOLUME)
+      .addUnit("bucket", FluidConstants.BUCKET)
       .addUnit("bottle", MantleValues.BOTTLE)
       .addUnit("drop", MantleValues.DROP);
     // potions and soup don't bother with buckets, stick with the directly useful units

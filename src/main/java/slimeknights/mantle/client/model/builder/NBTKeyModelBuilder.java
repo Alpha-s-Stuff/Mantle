@@ -1,12 +1,12 @@
 package slimeknights.mantle.client.model.builder;
 
 import com.google.gson.JsonObject;
+import io.github.fabricators_of_create.porting_lib.data.ExistingFileHelper;
+import io.github.fabricators_of_create.porting_lib.models.generators.CustomLoaderBuilder;
+import io.github.fabricators_of_create.porting_lib.models.generators.ModelBuilder;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.client.model.generators.CustomLoaderBuilder;
-import net.minecraftforge.client.model.generators.ModelBuilder;
-import net.minecraftforge.common.data.ExistingFileHelper;
 import slimeknights.mantle.Mantle;
 
 /** Loader for {@link slimeknights.mantle.client.model.NBTKeyModel} */

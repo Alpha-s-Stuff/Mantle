@@ -1,13 +1,15 @@
 package slimeknights.mantle.datagen;
 
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
+
 /** Contains some constants used for values shared across SlimeKnights mods */
 public interface MantleValues {
   /** Amount of mb of a bowl, such as mushroom stew or beetroot soup */
-  int BOWL = 250;
+  long BOWL = 20250;
   /** Amount of mb of a bottle, such as a potion or honey bottle */
-  int BOTTLE = 250;
+  long BOTTLE = FluidConstants.BOTTLE;
   /** Division of water */
-  int DROP = BOTTLE / 5;
+  long DROP = BOTTLE / 5;
   /** Division of an edible bowl or bottle */
-  int SIP = BOWL / 5;
+  long SIP = BOWL / 5;
 }

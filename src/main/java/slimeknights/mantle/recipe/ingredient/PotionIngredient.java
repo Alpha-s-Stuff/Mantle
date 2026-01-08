@@ -1,6 +1,8 @@
 package slimeknights.mantle.recipe.ingredient;
 
 import com.google.gson.JsonElement;
+import net.fabricmc.fabric.api.recipe.v1.ingredient.CustomIngredientSerializer;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -9,8 +11,10 @@ import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
-import net.minecraftforge.common.crafting.IIngredientSerializer;
+import net.minecraft.world.item.crafting.Ingredient.TagValue;
+import net.minecraft.world.item.crafting.Ingredient.ItemValue;
 import org.jetbrains.annotations.Nullable;
+import slimeknights.mantle.Mantle;
 import slimeknights.mantle.data.loadable.Loadables;
 import slimeknights.mantle.data.loadable.record.RecordLoadable;
 import slimeknights.mantle.recipe.helper.LoadableIngredientSerializer;
@@ -22,8 +26,9 @@ import java.util.stream.Stream;
 
 /** Simple ingredient checking for an item with a specific potion */
 public class PotionIngredient extends ItemIngredient {
+  public static final ResourceLocation ID = Mantle.getResource("potion");
   /** Ingredient serializer instance */
-  public static final LoadableIngredientSerializer<PotionIngredient> SERIALIZER = new LoadableIngredientSerializer<>(RecordLoadable.create(
+  public static final LoadableIngredientSerializer<PotionIngredient> SERIALIZER = new LoadableIngredientSerializer<>(ID, RecordLoadable.create(
     ItemsField.INSTANCE, TAG_FIELD,
     Loadables.POTION.defaultField("potion", Potions.EMPTY, false, i -> i.potion),
     PotionIngredient::new
@@ -66,13 +71,8 @@ public class PotionIngredient extends ItemIngredient {
   }
 
   @Override
-  public IIngredientSerializer<? extends Ingredient> getSerializer() {
+  public CustomIngredientSerializer<? extends AbstractIngredient> getSerializer() {
     return SERIALIZER;
-  }
-
-  @Override
-  public JsonElement toJson() {
-    return SERIALIZER.serialize(this);
   }
 
   /** Tag value that sets the potion on each returned item */

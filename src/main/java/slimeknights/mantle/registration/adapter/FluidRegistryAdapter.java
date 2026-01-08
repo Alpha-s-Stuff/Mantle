@@ -4,6 +4,8 @@ import net.minecraft.core.Registry;
 import net.minecraft.world.level.material.Fluid;
 import slimeknights.mantle.registration.DelayedSupplier;
 import slimeknights.mantle.registration.FluidBuilder;
+import slimeknights.mantle.util.SimpleFlowingFluid;
+import slimeknights.mantle.util.SimpleFlowingFluid.Properties;
 
 import java.util.function.Function;
 
@@ -12,11 +14,6 @@ import java.util.function.Function;
  */
 @SuppressWarnings("unused")
 public class FluidRegistryAdapter extends RegistryAdapter<Fluid> {
-  /** @inheritDoc */
-  public FluidRegistryAdapter(Registry<Fluid> registry) {
-    super(registry);
-  }
-
   /** @inheritDoc */
   public FluidRegistryAdapter(Registry<Fluid> registry, String modId) {
     super(registry, modId);
@@ -31,7 +28,7 @@ public class FluidRegistryAdapter extends RegistryAdapter<Fluid> {
    * @param <F>       Fluid type
    * @return  Still fluid instance
    */
-  public <F extends ForgeFlowingFluid> F register(FluidBuilder<?> builder, Function<Properties, F> still, Function<Properties,F> flowing, String name) {
+  public <F extends SimpleFlowingFluid> F register(FluidBuilder<?> builder, Function<Properties, F> still, Function<Properties,F> flowing, String name) {
     // have to create still and flowing later, as the props need these suppliers
     DelayedSupplier<Fluid> stillDelayed = new DelayedSupplier<>();
     DelayedSupplier<Fluid> flowingDelayed = new DelayedSupplier<>();
@@ -56,7 +53,7 @@ public class FluidRegistryAdapter extends RegistryAdapter<Fluid> {
    * @param name     Fluid name
    * @return  Still fluid
    */
-  public ForgeFlowingFluid register(FluidBuilder<?> builder, String name) {
-    return register(builder, ForgeFlowingFluid.Source::new, ForgeFlowingFluid.Flowing::new, name);
+  public SimpleFlowingFluid register(FluidBuilder<?> builder, String name) {
+    return register(builder, SimpleFlowingFluid.Source::new, SimpleFlowingFluid.Flowing::new, name);
   }
 }

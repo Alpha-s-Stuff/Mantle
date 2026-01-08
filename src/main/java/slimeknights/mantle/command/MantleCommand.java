@@ -3,14 +3,13 @@ package slimeknights.mantle.command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.storage.loot.LootDataType;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.RegisterCommandsEvent;
 import slimeknights.mantle.command.argument.TagSourceArgument;
 import slimeknights.mantle.command.tags.ModifyTagCommand;
 
@@ -65,9 +64,8 @@ public class MantleCommand {
   }
 
   /** Event listener to register the Mantle command */
-  private static void registerCommand(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext registryAccess, Commands.CommandSelection environment) {
+  private static void registerCommand(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext context, Commands.CommandSelection environment) {
     LiteralArgumentBuilder<CommandSourceStack> builder = Commands.literal("mantle");
-    CommandBuildContext context = event.getBuildContext();
 
     // sub commands
     register(builder, "tags", b -> {

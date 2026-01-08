@@ -58,6 +58,7 @@ import slimeknights.mantle.loot.LootTableInjector;
 import slimeknights.mantle.loot.MantleLoot;
 import slimeknights.mantle.network.MantleNetwork;
 import slimeknights.mantle.recipe.MantleRecipes;
+import slimeknights.mantle.recipe.condition.FalseCondition;
 import slimeknights.mantle.recipe.condition.TagCombinationCondition;
 import slimeknights.mantle.recipe.condition.TagEmptyCondition;
 import slimeknights.mantle.recipe.condition.TagFilledCondition;
@@ -125,9 +126,10 @@ public class Mantle implements ModInitializer {
     ResourceConditions.register(TagEmptyCondition.ID, TagEmptyCondition.SERIALIZER::test);
     ResourceConditions.register(TagFilledCondition.ID, TagEmptyCondition.SERIALIZER::test);
     ResourceConditions.register(TagCombinationCondition.ID, TagCombinationCondition::test);
+    ResourceConditions.register(FalseCondition.ID, FalseCondition::test);
     CustomIngredientSerializer.register(FluidContainerIngredient.SERIALIZER);
     CustomIngredientSerializer.register(PotionIngredient.SERIALIZER);
-      CraftingHelper.register(getResource("potion_display"), PotionDisplayIngredient.SERIALIZER);
+    CustomIngredientSerializer.register(PotionDisplayIngredient.SERIALIZER);
 
     // fluid container transfer
     FluidContainerTransferManager.TRANSFER_LOADERS.registerDeserializer(EmptyFluidContainerTransfer.ID, EmptyFluidContainerTransfer.DESERIALIZER);

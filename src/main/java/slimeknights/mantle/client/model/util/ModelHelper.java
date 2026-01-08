@@ -3,11 +3,13 @@ package slimeknights.mantle.client.model.util;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import io.github.fabricators_of_create.porting_lib.models.CustomParticleIconModel;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraft.util.GsonHelper;
@@ -117,5 +119,12 @@ public class ModelHelper {
     } else {
       throw new JsonParseException("Invalid '" + key + "' " + i + " found, only 0/90/180/270 allowed");
     }
+  }
+
+  /** Fabric only method used to get the particle icon of a baked model with support for porting lib. */
+  public static TextureAtlasSprite getParticleIcon(BakedModel model, Object data) {
+    if (model instanceof CustomParticleIconModel particleModel)
+      return particleModel.getParticleIcon(data);
+    return model.getParticleIcon();
   }
 }

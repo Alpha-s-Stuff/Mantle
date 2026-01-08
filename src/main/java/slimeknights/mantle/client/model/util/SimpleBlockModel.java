@@ -8,7 +8,14 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import com.mojang.datafixers.util.Either;
 import com.mojang.math.Transformation;
+import io.github.fabricators_of_create.porting_lib.models.QuadTransformers;
+import io.github.fabricators_of_create.porting_lib.models.UnbakedGeometryHelper;
+import io.github.fabricators_of_create.porting_lib.models.geometry.IGeometryLoader;
+import io.github.fabricators_of_create.porting_lib.models.geometry.IUnbakedGeometry;
 import lombok.Getter;
+import net.fabricmc.fabric.api.renderer.v1.RendererAccess;
+import net.fabricmc.fabric.api.renderer.v1.mesh.QuadEmitter;
+import net.fabricmc.fabric.api.renderer.v1.render.RenderContext.QuadTransform;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockElement;
 import net.minecraft.client.renderer.block.model.BlockElementFace;
@@ -20,21 +27,13 @@ import net.minecraft.client.resources.model.Material;
 import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.model.ModelState;
-import net.minecraft.client.resources.model.SimpleBakedModel;
-import net.minecraft.client.resources.model.SimpleBakedModel.Builder;
 import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.inventory.InventoryMenu;
-import net.minecraftforge.client.RenderTypeGroup;
-import net.minecraftforge.client.model.IQuadTransformer;
-import net.minecraftforge.client.model.QuadTransformers;
-import net.minecraftforge.client.model.geometry.IGeometryBakingContext;
-import net.minecraftforge.client.model.geometry.IGeometryLoader;
-import net.minecraftforge.client.model.geometry.IUnbakedGeometry;
-import net.minecraftforge.client.model.geometry.UnbakedGeometryHelper;
 import slimeknights.mantle.Mantle;
+import slimeknights.mantle.client.model.util.MantleBakedModel.Builder;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -103,7 +102,7 @@ public class SimpleBlockModel implements IUnbakedGeometry<SimpleBlockModel> {
   /* Textures */
 
   @Override
-  public void resolveParents(Function<ResourceLocation,UnbakedModel> modelGetter, IGeometryBakingContext owner) {
+  public void resolveParents(Function<ResourceLocation,UnbakedModel> modelGetter, BlockModel owner) {
     // no work if no parent or the parent is fetched already
     if (parent != null || parentLocation == null) {
       return;
@@ -113,7 +112,7 @@ public class SimpleBlockModel implements IUnbakedGeometry<SimpleBlockModel> {
     Set<UnbakedModel> chain = Sets.newLinkedHashSet();
 
     // load the first model directly
-    parent = getParent(modelGetter, chain, parentLocation, owner.getModelName());
+    parent = getParent(modelGetter, chain, parentLocation, owner.name);
     // null means no model, so set missing
     if (parent == null) {
       parent = getMissing(modelGetter);
@@ -180,8 +179,8 @@ public class SimpleBlockModel implements IUnbakedGeometry<SimpleBlockModel> {
   /* Baking */
 
   /** Creates a new builder instance from the given context */
-  public static SimpleBakedModel.Builder bakedBuilder(IGeometryBakingContext owner, ItemOverrides overrides) {
-    return new SimpleBakedModel.Builder(owner.useAmbientOcclusion(), owner.useBlockLight(), owner.isGui3d(), owner.getTransforms(), overrides);
+  public static MantleBakedModel.Builder bakedBuilder(BlockModel owner, ItemOverrides overrides, boolean isGui3d) {
+    return new MantleBakedModel.Builder(owner.hasAmbientOcclusion(), owner.getGuiLight().lightLikeBlock(), isGui3d, owner.getTransforms(), overrides);
   }
 
   /**
@@ -194,7 +193,7 @@ public class SimpleBlockModel implements IUnbakedGeometry<SimpleBlockModel> {
    * @param quadTransformer  Additional forge transforms
    * @param location         Model location
    */
-  public static void bakePart(Builder builder, IGeometryBakingContext owner, BlockElement part, Function<Material,TextureAtlasSprite> spriteGetter, ModelState transform, IQuadTransformer quadTransformer, ResourceLocation location) {
+  public static void bakePart(Builder builder, BlockModel owner, BlockElement part, Function<Material,TextureAtlasSprite> spriteGetter, ModelState transform, QuadTransform quadTransformer, ResourceLocation location) {
     for(Direction direction : part.faces.keySet()) {
       BlockElementFace face = part.faces.get(direction);
       // ensure the name is not prefixed (it always is)
@@ -204,28 +203,22 @@ public class SimpleBlockModel implements IUnbakedGeometry<SimpleBlockModel> {
       }
       // bake the face
       TextureAtlasSprite sprite = spriteGetter.apply(owner.getMaterial(texture));
+      QuadEmitter emitter = builder.getEmitter();
       BakedQuad bakedQuad = BlockModel.bakeFace(part, face, sprite, direction, transform, location);
-      quadTransformer.processInPlace(bakedQuad);
       // apply cull face
       //noinspection ConstantConditions  Its nullable, just annotated wrongly
-      if (face.cullForDirection == null) {
-        builder.addUnculledFace(bakedQuad);
-      } else {
-        builder.addCulledFace(Direction.rotate(transform.getRotation().getMatrix(), face.cullForDirection), bakedQuad);
-      }
+      Direction cullFace = face.cullForDirection == null ? null : Direction.rotate(transform.getRotation().getMatrix(), face.cullForDirection);
+      emitter.fromVanilla(bakedQuad, RendererAccess.INSTANCE.getRenderer().materialFinder().find(), cullFace);
+      // emit the quad if the transforms allows it
+      if (quadTransformer.transform(emitter))
+        emitter.emit();
     }
-  }
-
-  /** Gets the render type group from the given model context */
-  public static RenderTypeGroup getRenderTypeGroup(IGeometryBakingContext owner) {
-    ResourceLocation renderTypeHint = owner.getRenderTypeHint();
-    return renderTypeHint != null ? owner.getRenderType(renderTypeHint) : RenderTypeGroup.EMPTY;
   }
 
   /**
    * Applies the transformation to the model state for an item layer model.
    */
-  public static IQuadTransformer applyTransform(ModelState modelState, Transformation transformation) {
+  public static QuadTransform applyTransform(ModelState modelState, Transformation transformation) {
     if (transformation.isIdentity()) {
       return QuadTransformers.empty();
     } else {
@@ -243,39 +236,39 @@ public class SimpleBlockModel implements IUnbakedGeometry<SimpleBlockModel> {
    * @param location      Model bake location
    * @return  Baked model
    */
-  public static BakedModel bakeModel(IGeometryBakingContext owner, List<BlockElement> elements, Function<Material,TextureAtlasSprite> spriteGetter, ModelState transform, ItemOverrides overrides, ResourceLocation location) {
+  public static BakedModel bakeModel(BlockModel owner, List<BlockElement> elements, Function<Material,TextureAtlasSprite> spriteGetter, ModelState transform, ItemOverrides overrides, ResourceLocation location, boolean isGui3d) {
     // iterate parts, adding to the builder
     TextureAtlasSprite particle = spriteGetter.apply(owner.getMaterial("particle"));
-    SimpleBakedModel.Builder builder = bakedBuilder(owner, overrides).particle(particle);
-    IQuadTransformer quadTransformer = applyTransform(transform, owner.getRootTransform());
+    MantleBakedModel.Builder builder = bakedBuilder(owner, overrides, isGui3d).particle(particle);
+    QuadTransform quadTransformer = applyTransform(transform, owner.getRootTransform());
     for(BlockElement part : elements) {
       bakePart(builder, owner, part, spriteGetter, transform, quadTransformer, location);
     }
-    return builder.build(getRenderTypeGroup(owner));
+    return builder.build();
   }
 
   @Override
-  public BakedModel bake(IGeometryBakingContext owner, ModelBaker baker, Function<Material,TextureAtlasSprite> spriteGetter, ModelState transform, ItemOverrides overrides, ResourceLocation location) {
-    return bakeModel(owner, this.getElements(), spriteGetter, transform, overrides, location);
+  public BakedModel bake(BlockModel owner, ModelBaker baker, Function<Material,TextureAtlasSprite> spriteGetter, ModelState transform, ItemOverrides overrides, ResourceLocation location, boolean isGui3d) {
+    return bakeModel(owner, this.getElements(), spriteGetter, transform, overrides, location, isGui3d);
   }
 
   /**
-   * Same as {@link #bakeDynamic(IGeometryBakingContext, ModelState)} but allows swapping the element list. Makes colored block model easier to work with.
+   * Same as {@link #bakeDynamic(BlockModel, ModelState)} but allows swapping the element list. Makes colored block model easier to work with.
    * @param owner         Model configuration
    * @param transform     Transform to apply
    * @return  Baked model
    */
-  public BakedModel bakeWithElements(IGeometryBakingContext owner, List<BlockElement> elements, ModelState transform) {
-    return bakeModel(owner, elements, Material::sprite, transform, ItemOverrides.EMPTY, BAKE_LOCATION);
+  public BakedModel bakeWithElements(BlockModel owner, List<BlockElement> elements, ModelState transform) {
+    return bakeModel(owner, elements, Material::sprite, transform, ItemOverrides.EMPTY, BAKE_LOCATION, true);
   }
 
   /**
-   * Same as {@link #bake(IGeometryBakingContext, ModelBaker, Function, ModelState, ItemOverrides, ResourceLocation)}, but passes in sensible defaults for values unneeded in dynamic models
+   * Same as {@link #bake(BlockModel, ModelBaker, Function, ModelState, ItemOverrides, ResourceLocation, boolean)}, but passes in sensible defaults for values unneeded in dynamic models
    * @param owner         Model configuration
    * @param transform     Transform to apply
    * @return  Baked model
    */
-  public BakedModel bakeDynamic(IGeometryBakingContext owner, ModelState transform) {
+  public BakedModel bakeDynamic(BlockModel owner, ModelState transform) {
     return bakeWithElements(owner, this.getElements(), transform);
   }
 

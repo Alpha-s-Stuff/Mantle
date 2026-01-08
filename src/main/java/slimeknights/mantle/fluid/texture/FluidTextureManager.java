@@ -1,15 +1,14 @@
 package slimeknights.mantle.fluid.texture;
 
 import com.google.gson.JsonElement;
+import io.github.fabricators_of_create.porting_lib.fluids.FluidType;
+import io.github.fabricators_of_create.porting_lib.fluids.PortingLibFluids;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.GsonHelper;
-import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
-import net.minecraftforge.fluids.FluidType;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.IForgeRegistry;
 import slimeknights.mantle.Mantle;
 import slimeknights.mantle.data.listener.IEarlySafeManagerReloadListener;
 import slimeknights.mantle.util.JsonHelper;
@@ -21,6 +20,7 @@ import java.util.Map;
 
 /** Manager for handling fluid textures */
 public class FluidTextureManager implements IEarlySafeManagerReloadListener {
+  public static final ResourceLocation ID = Mantle.getResource("fluid_texture_manager");
   /** Folder containing the logic */
   public static final String FOLDER = "mantle/fluid_texture";
 
@@ -50,13 +50,13 @@ public class FluidTextureManager implements IEarlySafeManagerReloadListener {
 
     // start building fluid type map
     Map<FluidType, FluidTexture> map = new HashMap<>();
-    IForgeRegistry<FluidType> fluidTypeRegistry = ForgeRegistries.FLUID_TYPES.get();
+    Registry<FluidType> fluidTypeRegistry = PortingLibFluids.FLUID_TYPES;
 
 
     for (Map.Entry<ResourceLocation,JsonElement> entry : jsons.entrySet()) {
       ResourceLocation id = entry.getKey();
       // first step is to find the matching fluid type, if there is none ignore the file
-      FluidType type = fluidTypeRegistry.getValue(id);
+      FluidType type = fluidTypeRegistry.get(id);
       if (type == null || !id.equals(fluidTypeRegistry.getKey(type))) {
         Mantle.logger.debug("Ignoring fluid texture {} as no fluid type exists with that name", id);
       } else {
@@ -98,5 +98,10 @@ public class FluidTextureManager implements IEarlySafeManagerReloadListener {
   /** Gets the still texture for the given fluid */
   public static int getColor(FluidType fluid) {
     return getData(fluid).color();
+  }
+
+  @Override
+  public ResourceLocation getFabricId() {
+    return ID;
   }
 }

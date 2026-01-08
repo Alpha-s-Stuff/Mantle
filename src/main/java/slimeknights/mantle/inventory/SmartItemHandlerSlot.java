@@ -1,5 +1,9 @@
 package slimeknights.mantle.inventory;
 
+import io.github.fabricators_of_create.porting_lib.transfer.item.SlotItemHandler;
+import io.github.fabricators_of_create.porting_lib.transfer.item.SlottedStackStorage;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.SlottedStorage;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 

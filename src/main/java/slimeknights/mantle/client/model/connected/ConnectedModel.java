@@ -18,6 +18,7 @@ import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockElement;
 import net.minecraft.client.renderer.block.model.BlockElementFace;
 import net.minecraft.client.renderer.block.model.BlockFaceUV;
+import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
@@ -78,11 +79,11 @@ public class ConnectedModel implements IUnbakedGeometry<ConnectedModel> {
   /** List of sides to check when getting block directions */
   private final Set<Direction> sides;
 
-  /** Map of full texture name to the resulting material, filled during {@link #resolveParents(Function, IGeometryBakingContext)} */
+  /** Map of full texture name to the resulting material, filled during {@link #resolveParents(Function, BlockModel)} */
   private Map<String,Material> extraTextures;
 
   @Override
-  public void resolveParents(Function<ResourceLocation,UnbakedModel> modelGetter, IGeometryBakingContext owner) {
+  public void resolveParents(Function<ResourceLocation,UnbakedModel> modelGetter, BlockModel owner) {
     model.resolveParents(modelGetter, owner);
     // for all connected textures, add suffix textures
     Map<String, Material> extraTextures = new HashMap<>();
@@ -90,7 +91,7 @@ public class ConnectedModel implements IUnbakedGeometry<ConnectedModel> {
       // fetch data from the base texture
       String name = entry.getKey();
       // skip if missing
-      if (!owner.hasMaterial(name)) {
+      if (!owner.hasTexture(name)) {
         continue;
       }
       Material base = owner.getMaterial(name);
@@ -110,7 +111,7 @@ public class ConnectedModel implements IUnbakedGeometry<ConnectedModel> {
         if (!extraTextures.containsKey(suffixedName)) {
           Material mat;
           // allow overriding a specific texture
-          if (owner.hasMaterial(suffixedName)) {
+          if (owner.hasTexture(suffixedName)) {
             mat = owner.getMaterial(suffixedName);
           } else {
             mat = new Material(atlas, new ResourceLocation(namespace, path + "/" + suffix));
@@ -125,20 +126,20 @@ public class ConnectedModel implements IUnbakedGeometry<ConnectedModel> {
   }
 
   @Override
-  public BakedModel bake(IGeometryBakingContext owner, ModelBaker baker, Function<Material,TextureAtlasSprite> spriteGetter, ModelState transform, ItemOverrides overrides, ResourceLocation location) {
-    BakedModel baked = model.bake(owner, baker, spriteGetter, transform, overrides, location);
+  public BakedModel bake(BlockModel owner, ModelBaker baker, Function<Material,TextureAtlasSprite> spriteGetter, ModelState transform, ItemOverrides overrides, ResourceLocation location, boolean isGui3d) {
+    BakedModel baked = model.bake(owner, baker, spriteGetter, transform, overrides, location, isGui3d);
     return new Baked(this, new ExtraTextureContext(owner, extraTextures), transform, baked);
   }
 
   @SuppressWarnings("WeakerAccess")
   protected static class Baked extends DynamicBakedWrapper<BakedModel> {
     private final ConnectedModel parent;
-    private final IGeometryBakingContext owner;
+    private final BlockModel owner;
     private final ModelState transforms;
     private final BakedModel[] cache = new BakedModel[64];
     private final Map<String,String> nameMappingCache = new ConcurrentHashMap<>();
     private final ModelTextureIteratable modelTextures;
-    public Baked(ConnectedModel parent, IGeometryBakingContext owner, ModelState transforms, BakedModel baked) {
+    public Baked(ConnectedModel parent, BlockModel owner, ModelState transforms, BakedModel baked) {
       super(baked);
       this.parent = parent;
       this.owner = owner;

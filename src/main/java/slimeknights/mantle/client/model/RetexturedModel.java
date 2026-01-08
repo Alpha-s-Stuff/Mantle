@@ -12,9 +12,9 @@ import io.github.fabricators_of_create.porting_lib.models.geometry.IGeometryLoad
 import io.github.fabricators_of_create.porting_lib.models.geometry.IUnbakedGeometry;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import net.fabricmc.fabric.api.renderer.v1.render.RenderContext;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -23,13 +23,14 @@ import net.minecraft.client.resources.model.Material;
 import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ModelState;
 import net.minecraft.client.resources.model.UnbakedModel;
-import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -41,7 +42,6 @@ import slimeknights.mantle.client.model.util.ModelTextureIteratable;
 import slimeknights.mantle.client.model.util.SimpleBlockModel;
 import slimeknights.mantle.util.RetexturedHelper;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,6 +49,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * Model that dynamically retextures a list of textures based on data from {@link RetexturedHelper}.
@@ -63,14 +64,14 @@ public class RetexturedModel implements IUnbakedGeometry<RetexturedModel> {
   private final Set<String> retextured;
 
   @Override
-  public void resolveParents(Function<ResourceLocation,UnbakedModel> modelGetter, IGeometryBakingContext context) {
+  public void resolveParents(Function<ResourceLocation,UnbakedModel> modelGetter, BlockModel context) {
     model.resolveParents(modelGetter, context);
   }
 
   @Override
-  public BakedModel bake(IGeometryBakingContext owner, ModelBaker baker, Function<Material,TextureAtlasSprite> spriteGetter, ModelState transform, ItemOverrides overrides, ResourceLocation location) {
+  public BakedModel bake(BlockModel owner, ModelBaker baker, Function<Material,TextureAtlasSprite> spriteGetter, ModelState transform, ItemOverrides overrides, ResourceLocation location, boolean isGui3d) {
     // bake the model and return
-    BakedModel baked = model.bake(owner, baker, spriteGetter, transform, overrides, location);
+    BakedModel baked = model.bake(owner, baker, spriteGetter, transform, overrides, location, isGui3d);
     return new Baked(baked, owner, model, transform, getAllRetextured(owner, this.model, retextured));
   }
 
@@ -81,7 +82,7 @@ public class RetexturedModel implements IUnbakedGeometry<RetexturedModel> {
    * @param originalSet  Original list of names to retexture
    * @return  Set of textures including parent textures
    */
-  public static Set<String> getAllRetextured(IGeometryBakingContext owner, SimpleBlockModel model, Set<String> originalSet) {
+  public static Set<String> getAllRetextured(BlockModel owner, SimpleBlockModel model, Set<String> originalSet) {
     Set<String> retextured = Sets.newHashSet(originalSet);
     for (Map<String,Either<Material, String>> textures : ModelTextureIteratable.of(owner, model)) {
       textures.forEach((name, either) ->
@@ -139,14 +140,14 @@ public class RetexturedModel implements IUnbakedGeometry<RetexturedModel> {
     /** Cache of texture name to baked model */
     private final Map<ResourceLocation,BakedModel> cache = new ConcurrentHashMap<>();
     /* Properties for rebaking */
-    private final IGeometryBakingContext owner;
+    private final BlockModel owner;
     private final SimpleBlockModel model;
     private final ModelState transform;
     /** List of texture names that are retextured */
     private final Set<String> retextured;
     private final ItemOverrides overrides = new RetexturedOverride();
 
-    public Baked(BakedModel baked, IGeometryBakingContext owner, SimpleBlockModel model, ModelState transform, Set<String> retextured) {
+    public Baked(BakedModel baked, BlockModel owner, SimpleBlockModel model, ModelState transform, Set<String> retextured) {
       super(baked);
       this.model = model;
       this.owner = owner;
@@ -173,25 +174,45 @@ public class RetexturedModel implements IUnbakedGeometry<RetexturedModel> {
     }
 
     @Override
-    public TextureAtlasSprite getParticleIcon(ModelData data) {
+    public TextureAtlasSprite getParticleIcon(Object obj) {
       // if particle is retextured, fetch particle from the cached model
-      if (retextured.contains("particle")) {
-        Block block = data.get(RetexturedHelper.BLOCK_PROPERTY);
-        if (block != null) {
-          return getCachedModel(block).getParticleIcon(data);
+      if (obj instanceof ModelData data) {
+        if (retextured.contains("particle")) {
+          Block block = data.get(RetexturedHelper.BLOCK_PROPERTY);
+          if (block != null) {
+            return ModelHelper.getParticleIcon(getCachedModel(block), data);
+          }
         }
       }
-      return originalModel.getParticleIcon(data);
+      return ModelHelper.getParticleIcon(wrapped, obj);
     }
 
-    @Nonnull
     @Override
-    public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction direction, RandomSource random, ModelData data, @Nullable RenderType renderType) {
-      Block block = data.get(RetexturedHelper.BLOCK_PROPERTY);
-      if (block == null) {
-        return originalModel.getQuads(state, direction, random, data, null);
+    public void emitBlockQuads(BlockAndTintGetter blockView, BlockState state, BlockPos pos, Supplier<RandomSource> randomSupplier, RenderContext context) {
+      Object renderData = blockView.getBlockEntityRenderData(pos);
+      if (renderData instanceof ModelData data) {
+        Block block = data.get(RetexturedHelper.BLOCK_PROPERTY);
+        if (block == null) {
+          wrapped.emitBlockQuads(blockView, state, pos, randomSupplier, context);
+          return;
+        }
+        getCachedModel(block).emitBlockQuads(blockView, state, pos, randomSupplier, context);
+        return;
       }
-      return getCachedModel(block).getQuads(state, direction, random, data, null);
+      super.emitBlockQuads(blockView, state, pos, randomSupplier, context);
+    }
+
+    @Override
+    public void emitItemQuads(ItemStack stack, Supplier<RandomSource> randomSupplier, RenderContext context) {
+      // Fabric we don't really need this because of item overrides but i'll implement it anyway.
+      Block block = RetexturedHelper.getTexture(stack);
+      if (block == Blocks.AIR) {
+        wrapped.emitItemQuads(stack, randomSupplier, context);
+        return;
+      }
+
+      // if valid, use the block
+      getCachedModel(block).emitItemQuads(stack, randomSupplier, context);
     }
 
     @Override
@@ -235,18 +256,18 @@ public class RetexturedModel implements IUnbakedGeometry<RetexturedModel> {
      * @param retextured  Set of textures that should be retextured
      * @param texture     New texture to replace those in the set
      */
-    public RetexturedContext(IGeometryBakingContext base, Set<String> retextured, ResourceLocation texture) {
+    public RetexturedContext(BlockModel base, Set<String> retextured, ResourceLocation texture) {
       super(base);
       this.retextured = retextured;
       this.texture = new Material(InventoryMenu.BLOCK_ATLAS, texture);
     }
 
     @Override
-    public boolean hasMaterial(String name) {
+    public boolean hasTexture(String name) {
       if (retextured.contains(name)) {
         return !MissingTextureAtlasSprite.getLocation().equals(texture.texture());
       }
-      return super.hasMaterial(name);
+      return super.hasTexture(name);
     }
 
     @Override

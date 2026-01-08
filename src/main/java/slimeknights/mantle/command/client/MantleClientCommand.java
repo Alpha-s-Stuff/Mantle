@@ -2,6 +2,8 @@ package slimeknights.mantle.command.client;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.client.Minecraft;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -9,8 +11,6 @@ import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.commands.synchronization.SuggestionProviders;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.FileToIdConverter;
-import net.minecraftforge.client.event.RegisterClientCommandsEvent;
-import net.minecraftforge.common.MinecraftForge;
 import slimeknights.mantle.Mantle;
 import slimeknights.mantle.client.book.BookLoader;
 
@@ -40,7 +40,7 @@ public class MantleClientCommand {
       -> SharedSuggestionProvider.suggestResource(BuiltInRegistries.ITEM.keySet(), builder));
 
     // add command listener
-    MinecraftForge.EVENT_BUS.addListener(MantleClientCommand::registerCommand);
+    CommandRegistrationCallback.EVENT.register(MantleClientCommand::registerCommand);
   }
 
   /** Registers a sub command for the root Mantle client command */

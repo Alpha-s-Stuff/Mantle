@@ -44,6 +44,7 @@ transitive-accessible method net/minecraft/world/level/block/Blocks never (Lnet/
 transitive-accessible field net/minecraft/client/renderer/block/model/BlockModel FACE_BAKERY Lnet/minecraft/client/renderer/block/model/FaceBakery;
 transitive-accessible method net/minecraft/client/renderer/block/model/FaceBakery setupShape (Lorg/joml/Vector3f;Lorg/joml/Vector3f;)[F
 transitive-accessible method net/minecraft/client/renderer/block/model/FaceBakery recalculateWinding ([ILnet/minecraft/core/Direction;)V
+transitive-accessible method net/minecraft/client/renderer/block/model/FaceBakery makeVertices (Lnet/minecraft/client/renderer/block/model/BlockFaceUV;Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;Lnet/minecraft/core/Direction;[FLcom/mojang/math/Transformation;Lnet/minecraft/client/renderer/block/model/BlockElementRotation;Z)[I
 
 # Checking if tag types exist
 
@@ -68,6 +69,7 @@ transitive-mutable field net/minecraft/world/level/storage/loot/LootPool entries
 # Work around mods writing mixins into vanilla getters that perform very unsafe and expensive operations, might as well make it only their problem
 
 # Adjust tooltip sizing and placement on book screens
+transitive-accessible method net/minecraft/client/gui/GuiGraphics renderTooltipInternal (Lnet/minecraft/client/gui/Font;Ljava/util/List;IILnet/minecraft/client/gui/screens/inventory/tooltip/ClientTooltipPositioner;)V
 
 # Checking the current container safely
 

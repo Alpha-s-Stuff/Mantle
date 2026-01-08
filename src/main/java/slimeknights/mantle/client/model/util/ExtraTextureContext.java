@@ -1,9 +1,9 @@
 package slimeknights.mantle.client.model.util;
 
+import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.InventoryMenu;
-import net.minecraftforge.client.model.geometry.IGeometryBakingContext;
 
 import java.util.Map;
 
@@ -18,7 +18,7 @@ public class ExtraTextureContext extends GeometryContextWrapper {
    * @param base      Base configuration
    * @param textures  Textures map, any textures in this map will take precedence over those in the base configuration
    */
-  public ExtraTextureContext(IGeometryBakingContext base, Map<String,Material> textures) {
+  public ExtraTextureContext(BlockModel base, Map<String,Material> textures) {
     super(base);
     this.textures = textures;
   }
@@ -29,7 +29,7 @@ public class ExtraTextureContext extends GeometryContextWrapper {
    * @param name     Texture name, if it matches texture is returned
    * @param texture  Texture path
    */
-  public ExtraTextureContext(IGeometryBakingContext base, String name, ResourceLocation texture) {
+  public ExtraTextureContext(BlockModel base, String name, ResourceLocation texture) {
     super(base);
     this.textures = Map.of(name, new Material(InventoryMenu.BLOCK_ATLAS, texture));
   }
@@ -44,7 +44,7 @@ public class ExtraTextureContext extends GeometryContextWrapper {
   }
 
   @Override
-  public boolean hasMaterial(String name) {
-    return textures.containsKey(name) || super.hasMaterial(name);
+  public boolean hasTexture(String name) {
+    return textures.containsKey(name) || super.hasTexture(name);
   }
 }

@@ -6,7 +6,9 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
-import net.minecraftforge.common.crafting.AbstractIngredient;
+import net.minecraft.world.item.crafting.Ingredient.Value;
+import net.minecraft.world.item.crafting.Ingredient.TagValue;
+import net.minecraft.world.item.crafting.Ingredient.ItemValue;
 import slimeknights.mantle.data.loadable.Loadable;
 import slimeknights.mantle.data.loadable.Loadables;
 import slimeknights.mantle.data.loadable.array.ArrayLoadable;
@@ -16,7 +18,6 @@ import slimeknights.mantle.data.loadable.field.UnsyncedField;
 import slimeknights.mantle.util.typed.TypedMap;
 
 import javax.annotation.Nullable;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -82,7 +83,7 @@ public abstract class ItemIngredient extends AbstractIngredient {
     @Override
     public void encode(FriendlyByteBuf buffer, ItemIngredient parent) {
       // sync both tag and item values to client
-      ITEM_LIST.encode(buffer, Arrays.stream(parent.getItems()).map(ItemStack::getItem).toList());
+      ITEM_LIST.encode(buffer, parent.getMatchingStacks().stream().map(ItemStack::getItem).toList());
     }
   }
 }

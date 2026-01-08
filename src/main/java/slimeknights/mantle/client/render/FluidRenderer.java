@@ -8,19 +8,22 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.VertexFormat;
+import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
+import net.fabricmc.fabric.api.transfer.v1.client.fluid.FluidVariantRenderHandler;
+import net.fabricmc.fabric.api.transfer.v1.client.fluid.FluidVariantRendering;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributeHandler;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidType;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import slimeknights.mantle.client.render.FluidCuboid.FluidFace;
@@ -264,13 +267,15 @@ public class FluidRenderer {
     }
 
     // fluid attributes, fetch once for all fluids to save effort
-    IClientFluidTypeExtensions clientFluid = IClientFluidTypeExtensions.of(fluid.getFluid());
-    TextureAtlasSprite still = getBlockSprite(clientFluid.getStillTexture(fluid));
-    TextureAtlasSprite flowing = getBlockSprite(clientFluid.getFlowingTexture(fluid));
-    int color = clientFluid.getTintColor(fluid);
-    FluidType type = fluid.getFluid().getFluidType();
-    light = withBlockLight(light, type.getLightLevel(fluid));
-    boolean isGas = type.isLighterThanAir();
+    FluidVariantRenderHandler clientFluid = FluidVariantRendering.getHandlerOrDefault(fluid.getFluid());
+    TextureAtlasSprite[] sprites = clientFluid.getSprites(fluid.getType());
+    TextureAtlasSprite missingSprite = getBlockSprite(MissingTextureAtlasSprite.getLocation());
+    TextureAtlasSprite still = sprites == null ? missingSprite : sprites[0];
+    TextureAtlasSprite flowing = sprites == null ? missingSprite : sprites[1];
+    int color = clientFluid.getColor(fluid.getType(), null, null);
+    FluidVariantAttributeHandler type = FluidVariantAttributes.getHandlerOrDefault(fluid.getFluid());
+    light = withBlockLight(light, type.getLuminance(fluid.getType()));
+    boolean isGas = type.isLighterThanAir(fluid.getType());
 
     // render all given cuboids
     for (FluidCuboid cube : cubes) {
@@ -319,13 +324,15 @@ public class FluidRenderer {
     }
 
     // fluid attributes
-    IClientFluidTypeExtensions clientFluid = IClientFluidTypeExtensions.of(fluid.getFluid());
-    TextureAtlasSprite still = getBlockSprite(clientFluid.getStillTexture(fluid));
-    TextureAtlasSprite flowing = getBlockSprite(clientFluid.getFlowingTexture(fluid));
-    FluidType type = fluid.getFluid().getFluidType();
-    boolean isGas = type.isLighterThanAir();
-    int color = clientFluid.getTintColor(fluid);
-    light = withBlockLight(light, type.getLightLevel(fluid));
+    FluidVariantRenderHandler clientFluid = FluidVariantRendering.getHandlerOrDefault(fluid.getFluid());
+    TextureAtlasSprite[] sprites = clientFluid.getSprites(fluid.getType());
+    TextureAtlasSprite missingSprite = getBlockSprite(MissingTextureAtlasSprite.getLocation());
+    TextureAtlasSprite still = sprites == null ? missingSprite : sprites[0];
+    TextureAtlasSprite flowing = sprites == null ? missingSprite : sprites[1];
+    FluidVariantAttributeHandler type = FluidVariantAttributes.getHandlerOrDefault(fluid.getFluid());
+    boolean isGas = type.isLighterThanAir(fluid.getType());
+    int color = clientFluid.getColor(fluid.getType(), null, null);
+    light = withBlockLight(light, type.getLuminance(fluid.getType()));
 
     // determine height based on fluid amount
     Vector3f from = cube.getFromScaled();

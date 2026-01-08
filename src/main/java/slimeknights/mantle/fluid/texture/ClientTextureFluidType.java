@@ -3,6 +3,7 @@ package slimeknights.mantle.fluid.texture;
 import com.mojang.blaze3d.shaders.FogShape;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import io.github.fabricators_of_create.porting_lib.fluids.FluidType;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
@@ -10,8 +11,6 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.FogRenderer.FogMode;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor;
-import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
-import net.minecraftforge.fluids.FluidType;
 import org.joml.Vector3f;
 import slimeknights.mantle.client.render.FluidRenderer;
 
