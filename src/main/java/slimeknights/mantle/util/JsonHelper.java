@@ -312,17 +312,17 @@ public class JsonHelper {
   }
 
   /** Called when the player logs in to send packets */
-  public static void syncPackets(OnDatapackSyncEvent event, NetworkWrapper network, ISimplePacket... packets) {
+  public static void syncPackets(ServerPlayer targetedPlayer, boolean joined, NetworkWrapper network, ISimplePacket... packets) {
     // send to single player
-    ServerPlayer targetedPlayer = event.getPlayer();
-    if (targetedPlayer != null) {
-      sendPackets(network, targetedPlayer, packets);
-    } else {
-      // send to all players
-      for (ServerPlayer player : event.getPlayerList().getPlayers()) {
-        sendPackets(network, player, packets);
-      }
-    }
+    sendPackets(network, targetedPlayer, packets); // Fabric fires the event for all players so player is never null
+//    if (targetedPlayer != null) {
+//      sendPackets(network, targetedPlayer, packets);
+//    } else {
+//      // send to all players
+//      for (ServerPlayer player : event.getPlayerList().getPlayers()) {
+//        sendPackets(network, player, packets);
+//      }
+//    }
   }
 
   /**

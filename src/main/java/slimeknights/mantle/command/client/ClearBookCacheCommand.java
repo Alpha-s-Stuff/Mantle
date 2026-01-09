@@ -5,8 +5,6 @@ import com.mojang.brigadier.context.CommandContext;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.client.player.AbstractClientPlayer;
-import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.ResourceLocationArgument;
 import net.minecraft.resources.ResourceLocation;
 import slimeknights.mantle.client.book.BookLoader;
@@ -32,8 +30,8 @@ public class ClearBookCacheCommand {
    * @param context  Command context
    * @return  Integer return
    */
-  private static int runBook(CommandContext<CommandSourceStack> context) {
-    ResourceLocation book = ResourceLocationArgument.getId(context, "id");
+  private static int runBook(CommandContext<FabricClientCommandSource> context) {
+    ResourceLocation book = context.getArgument("id", ResourceLocation.class);//ResourceLocationArgument.getId(context, "id");
     clearBookCache(book);
     return 0;
   }
@@ -43,7 +41,7 @@ public class ClearBookCacheCommand {
    * @param context  Command context
    * @return  Integer return
    */
-  private static int runAll(CommandContext<CommandSourceStack> context) {
+  private static int runAll(CommandContext<FabricClientCommandSource> context) {
     clearBookCache(null);
     return 0;
   }

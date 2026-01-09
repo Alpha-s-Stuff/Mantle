@@ -1,10 +1,14 @@
 package slimeknights.mantle.command.client;
 
+import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
+import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.client.Minecraft;
+import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
@@ -21,7 +25,7 @@ import java.util.function.Consumer;
  */
 public class MantleClientCommand {
   /** Suggestion provider that lists registered book ids **/
-  public static SuggestionProvider<CommandSourceStack> REGISTERED_BOOKS;
+  public static SuggestionProvider<FabricClientCommandSource> REGISTERED_BOOKS;
 
   /** Registers all Mantle client command related content */
   @SuppressWarnings("deprecation")
@@ -40,19 +44,19 @@ public class MantleClientCommand {
       -> SharedSuggestionProvider.suggestResource(BuiltInRegistries.ITEM.keySet(), builder));
 
     // add command listener
-    CommandRegistrationCallback.EVENT.register(MantleClientCommand::registerCommand);
+    ClientCommandRegistrationCallback.EVENT.register(MantleClientCommand::registerCommand);
   }
 
   /** Registers a sub command for the root Mantle client command */
-  private static void register(LiteralArgumentBuilder<CommandSourceStack> root, String name, Consumer<LiteralArgumentBuilder<CommandSourceStack>> consumer) {
-    LiteralArgumentBuilder<CommandSourceStack> subCommand = Commands.literal(name);
+  private static void register(LiteralArgumentBuilder<FabricClientCommandSource> root, String name, Consumer<LiteralArgumentBuilder<FabricClientCommandSource>> consumer) {
+    LiteralArgumentBuilder<FabricClientCommandSource> subCommand = ClientCommandManager.literal(name);
     consumer.accept(subCommand);
     root.then(subCommand);
   }
 
   /** Event listener to register the Mantle client command */
-  private static void registerCommand(RegisterClientCommandsEvent event) {
-    LiteralArgumentBuilder<CommandSourceStack> builder = Commands.literal("mantle");
+  private static void registerCommand(CommandDispatcher<FabricClientCommandSource> dispatcher, CommandBuildContext registryAccess) {
+    LiteralArgumentBuilder<FabricClientCommandSource> builder = ClientCommandManager.literal("mantle");
 
     // sub commands
     register(builder, "book", BookCommand::register);
@@ -63,6 +67,6 @@ public class MantleClientCommand {
     });
 
     // register final command
-    event.getDispatcher().register(builder);
+    dispatcher.register(builder);
   }
 }

@@ -3,13 +3,14 @@ package slimeknights.mantle.client.render;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import lombok.Getter;
+import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
 import org.joml.Vector3f;
 import slimeknights.mantle.Mantle;
 import slimeknights.mantle.data.datamap.BlockStateDataMapLoader;
@@ -46,7 +47,7 @@ public record FaucetFluid(List<FluidCuboid> side, List<FluidCuboid> center, bool
   /**
    * Call during the event to register the reload listener
    */
-  public static void initialize(RegisterClientReloadListenersEvent event) {
+  public static void initialize(ResourceManagerHelper event) {
     if (initialized) {
       return;
     }
@@ -110,7 +111,8 @@ public record FaucetFluid(List<FluidCuboid> side, List<FluidCuboid> center, bool
   }
 
   /** Loader implementation */
-  public static class Loader extends BlockStateDataMapLoader<FaucetFluid> {
+  public static class Loader extends BlockStateDataMapLoader<FaucetFluid> implements IdentifiableResourceReloadListener {
+    public static final ResourceLocation ID = Mantle.getResource("faucet_fluid_loader");
     /** Name of the default fluid model, shared between Ceramics and Tinkers Construct */
     private static final ResourceLocation DEFAULT_NAME = Mantle.getResource("_default");
     @Getter
@@ -140,6 +142,11 @@ public record FaucetFluid(List<FluidCuboid> side, List<FluidCuboid> center, bool
     @Override
     public FaucetFluid get(BlockState state) {
       return get(state, defaultInstance);
+    }
+
+    @Override
+    public ResourceLocation getFabricId() {
+      return ID;
     }
 
     /** Nested loadable to allow us to swap out the default instance for the deserializer */

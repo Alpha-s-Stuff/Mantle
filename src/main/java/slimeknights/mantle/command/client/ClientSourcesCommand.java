@@ -4,6 +4,8 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
+import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.client.Minecraft;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -21,13 +23,13 @@ public class ClientSourcesCommand {
   private static final List<SourceFolder> FOLDERS = new ArrayList<>();
 
   /** Registers this command with the builder */
-  public static void register(LiteralArgumentBuilder<CommandSourceStack> subCommand) {
-    subCommand.then(Commands.literal("path")
-      .then(Commands.argument("path", ResourceLocationArgument.id())
+  public static void register(LiteralArgumentBuilder<FabricClientCommandSource> subCommand) {
+    subCommand.then(ClientCommandManager.literal("path")
+      .then(ClientCommandManager.argument("path", ResourceLocationArgument.id())
         .executes(context -> SourcesCommand.run(context, Minecraft.getInstance().getResourceManager(), ResourceLocationArgument.getId(context, "path")))));
     for (SourceFolder source : FOLDERS) {
-      subCommand.then(Commands.literal(source.argument())
-        .then(Commands.argument("id", ResourceLocationArgument.id()).suggests(source.suggestionProvider())
+      subCommand.then(ClientCommandManager.literal(source.argument())
+        .then(ClientCommandManager.argument("id", ResourceLocationArgument.id()).suggests(source.suggestionProvider())
           .executes(context -> run(context, source.folder(), ResourceLocationArgument.getId(context, "id"), source.extension()))));
     }
   }

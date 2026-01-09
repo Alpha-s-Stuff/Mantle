@@ -1,25 +1,15 @@
 package slimeknights.mantle.network.packet;
 
-import io.github.fabricators_of_create.porting_lib.util.NetworkDirection;
-import me.pepperbell.simplenetworking.C2SPacket;
-import me.pepperbell.simplenetworking.S2CPacket;
-import me.pepperbell.simplenetworking.SimpleChannel;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import net.fabricmc.api.EnvironmentInterface;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.PacketListener;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.util.thread.BlockableEventLoop;
+import slimeknights.mantle.network.channel.NetworkDirection;
+import slimeknights.mantle.network.channel.SimpleChannel;
 
 import javax.annotation.Nullable;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
 import java.util.function.Supplier;
 
 /**
@@ -38,7 +28,7 @@ public interface ISimplePacket {
    */
   void handle(Supplier<Context> context);
 
-  public record Context(BlockableEventLoop<?> executor, PacketListener handler, @Nullable ServerPlayer sender, SimpleChannel channel) implements Supplier<Context> {
+  public record Context(BlockableEventLoop<?> executor, PacketListener handler, @Nullable ServerPlayer sender, NetworkDirection networkDirection, PacketSender packetDistributor, SimpleChannel channel) {
     public CompletableFuture<Void> enqueueWork(Runnable runnable) {
       // Must check ourselves as Minecraft will sometimes delay tasks even when they are received on the client thread
       // Same logic as ThreadTaskExecutor#runImmediately without the join
@@ -56,15 +46,10 @@ public interface ISimplePacket {
     }
 
     public NetworkDirection getDirection() {
-      return sender() == null ? NetworkDirection.PLAY_TO_SERVER : NetworkDirection.PLAY_TO_CLIENT;
+      return networkDirection;
     }
 
     public void setPacketHandled(boolean value) {
-    }
-
-    @Override
-    public Context get() {
-      return this;
     }
   }
 }

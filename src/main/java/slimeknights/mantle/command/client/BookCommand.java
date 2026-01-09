@@ -11,6 +11,8 @@ import com.mojang.blaze3d.vertex.VertexSorting;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
+import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Screenshot;
@@ -48,14 +50,14 @@ public class BookCommand {
    * Registers this sub command with the root command
    * @param subCommand  Command builder
    */
-  public static void register(LiteralArgumentBuilder<CommandSourceStack> subCommand) {
+  public static void register(LiteralArgumentBuilder<FabricClientCommandSource> subCommand) {
     subCommand.requires(source -> source.hasPermission(MantleCommand.PERMISSION_GAME_COMMANDS) && source.getEntity() instanceof AbstractClientPlayer)
-      .then(Commands.literal("open")
-        .then(Commands.argument("id", ResourceLocationArgument.id()).suggests(MantleClientCommand.REGISTERED_BOOKS)
+      .then(ClientCommandManager.literal("open")
+        .then(ClientCommandManager.argument("id", ResourceLocationArgument.id()).suggests(MantleClientCommand.REGISTERED_BOOKS)
           .executes(BookCommand::openBook)))
-      .then(Commands.literal("export_images")
-        .then(Commands.argument("id", ResourceLocationArgument.id()).suggests(MantleClientCommand.REGISTERED_BOOKS)
-          .then(Commands.argument("scale", IntegerArgumentType.integer(1, 16))
+      .then(ClientCommandManager.literal("export_images")
+        .then(ClientCommandManager.argument("id", ResourceLocationArgument.id()).suggests(MantleClientCommand.REGISTERED_BOOKS)
+          .then(ClientCommandManager.argument("scale", IntegerArgumentType.integer(1, 16))
             .executes(BookCommand::exportImagesWithScale))
           .executes(BookCommand::exportImages)));
   }
@@ -65,8 +67,8 @@ public class BookCommand {
    * @param context  Command context
    * @return  Integer return
    */
-  private static int openBook(CommandContext<CommandSourceStack> context) {
-    ResourceLocation book = ResourceLocationArgument.getId(context, "id");
+  private static int openBook(CommandContext<FabricClientCommandSource> context) {
+    ResourceLocation book = context.getArgument("id", ResourceLocation.class);//ResourceLocationArgument.getId(context, "id");
 
     BookData bookData = BookLoader.getBook(book);
     if(bookData != null) {
@@ -87,8 +89,8 @@ public class BookCommand {
    * @param context  Command context
    * @return  Integer return
    */
-  private static int exportImagesWithScale(CommandContext<CommandSourceStack> context) {
-    ResourceLocation book = ResourceLocationArgument.getId(context, "id");
+  private static int exportImagesWithScale(CommandContext<FabricClientCommandSource> context) {
+    ResourceLocation book = context.getArgument("id", ResourceLocation.class);//ResourceLocationArgument.getId(context, "id");
     int scale = context.getArgument("scale", Integer.class);
 
     return doExportImages(book, scale);
@@ -99,8 +101,8 @@ public class BookCommand {
    * @param context  Command context
    * @return  Integer return
    */
-  private static int exportImages(CommandContext<CommandSourceStack> context) {
-    ResourceLocation book = ResourceLocationArgument.getId(context, "id");
+  private static int exportImages(CommandContext<FabricClientCommandSource> context) {
+    ResourceLocation book = context.getArgument("id", ResourceLocation.class);//ResourceLocationArgument.getId(context, "id");
 
     return doExportImages(book, 2);
   }

@@ -1,7 +1,5 @@
 package slimeknights.mantle.network;
 
-import io.github.fabricators_of_create.porting_lib.util.NetworkDirection;
-import me.pepperbell.simplenetworking.SimpleChannel;
 import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
@@ -13,6 +11,9 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.chunk.LevelChunk;
 import slimeknights.mantle.Mantle;
+import slimeknights.mantle.network.channel.NetworkDirection;
+import slimeknights.mantle.network.channel.PacketDistributor;
+import slimeknights.mantle.network.channel.SimpleChannel;
 import slimeknights.mantle.network.packet.ISimplePacket;
 
 import javax.annotation.Nullable;
@@ -42,12 +43,7 @@ public class NetworkWrapper {
   }
 
   public NetworkWrapper(ResourceLocation channelName, String version) {
-    this.network = NetworkRegistry.ChannelBuilder
-      .named(channelName)
-      .clientAcceptedVersions(version::equals)
-      .serverAcceptedVersions(version::equals)
-      .networkProtocolVersion(() -> version)
-      .simpleChannel();
+    this.network = new SimpleChannel(channelName);
   }
 
   /**
@@ -69,7 +65,7 @@ public class NetworkWrapper {
    * @param direction  Network direction for validation. Pass null for no direction
    * @param <MSG>  Packet class type
    */
-  public <MSG> void registerPacket(Class<MSG> clazz, BiConsumer<MSG, FriendlyByteBuf> encoder, Function<FriendlyByteBuf, MSG> decoder, BiConsumer<MSG,Supplier<NetworkEvent.Context>> consumer, @Nullable NetworkDirection direction) {
+  public <MSG> void registerPacket(Class<MSG> clazz, BiConsumer<MSG, FriendlyByteBuf> encoder, Function<FriendlyByteBuf, MSG> decoder, BiConsumer<MSG,Supplier<ISimplePacket.Context>> consumer, @Nullable NetworkDirection direction) {
     registerPacketNoLogger(clazz, encoder, wrapLogger(clazz, decoder), consumer, direction);
   }
 
@@ -82,7 +78,7 @@ public class NetworkWrapper {
    * @param direction  Network direction for validation. Pass null for no direction
    * @param <MSG>  Packet class type
    */
-  public <MSG> void registerPacketNoLogger(Class<MSG> clazz, BiConsumer<MSG, FriendlyByteBuf> encoder, Function<FriendlyByteBuf, MSG> decoder, BiConsumer<MSG,Supplier<NetworkEvent.Context>> consumer, @Nullable NetworkDirection direction) {
+  public <MSG> void registerPacketNoLogger(Class<MSG> clazz, BiConsumer<MSG, FriendlyByteBuf> encoder, Function<FriendlyByteBuf, MSG> decoder, BiConsumer<MSG,Supplier<ISimplePacket.Context>> consumer, @Nullable NetworkDirection direction) {
     this.network.registerMessage(this.id++, clazz, encoder, decoder, consumer, Optional.ofNullable(direction));
   }
 

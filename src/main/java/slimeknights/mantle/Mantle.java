@@ -57,6 +57,7 @@ import slimeknights.mantle.item.LecternBookItem;
 import slimeknights.mantle.loot.LootTableInjector;
 import slimeknights.mantle.loot.MantleLoot;
 import slimeknights.mantle.network.MantleNetwork;
+import slimeknights.mantle.network.channel.SimpleChannel;
 import slimeknights.mantle.recipe.MantleRecipes;
 import slimeknights.mantle.recipe.condition.FalseCondition;
 import slimeknights.mantle.recipe.condition.TagCombinationCondition;
@@ -113,7 +114,7 @@ public class Mantle implements ModInitializer {
   }
 
   private void commonSetup() {
-    MantleNetwork.INSTANCE.network.initServerListener();
+    SimpleChannel.initServerListener(MantleNetwork.INSTANCE.network);
     MantleNetwork.registerPackets();
     MantleCommand.init();
 //    OffhandCooldownTracker.register();

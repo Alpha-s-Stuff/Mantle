@@ -1,6 +1,7 @@
 package slimeknights.mantle.registration.deferred;
 
 import io.github.fabricators_of_create.porting_lib.fluids.FluidType;
+import io.github.fabricators_of_create.porting_lib.fluids.PortingLibFluids;
 import io.github.fabricators_of_create.porting_lib.util.RegistryObject;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -35,7 +36,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
- * Deferred register solving the nightmare that is registering fluids with Forge
+ * Deferred register solving the nightmare that is registering fluids with Forge and Fabric
  */
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class FluidDeferredRegister extends DeferredRegisterWrapper<Fluid> {
@@ -45,7 +46,7 @@ public class FluidDeferredRegister extends DeferredRegisterWrapper<Fluid> {
 
   public FluidDeferredRegister(String modID) {
     super(Registries.FLUID, modID);
-    this.fluidTypeRegister = SynchronizedDeferredRegister.create(ForgeRegistries.Keys.FLUID_TYPES, modID);
+    this.fluidTypeRegister = SynchronizedDeferredRegister.create(PortingLibFluids.FLUID_TYPE_REGISTRY, modID);
     this.blockRegister = SynchronizedDeferredRegister.create(Registries.BLOCK, modID);
     this.itemRegister = SynchronizedDeferredRegister.create(Registries.ITEM, modID);
   }
