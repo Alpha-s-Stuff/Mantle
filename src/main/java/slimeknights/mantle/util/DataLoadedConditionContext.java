@@ -14,10 +14,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /** Condition context to use when data has already been loaded, used in books for processing their conditions for instance. */
-public enum DataLoadedConditionContext implements ICondition.IContext {
+public enum DataLoadedConditionContext/* implements ICondition.IContext*/ {
   INSTANCE;
 
-  @Override
+//  @Override
   public <T> Collection<Holder<T>> getTag(TagKey<T> key) {
     Registry<T> registry = RegistryHelper.getRegistry(key.registry());
     if (registry != null) {
@@ -29,7 +29,7 @@ public enum DataLoadedConditionContext implements ICondition.IContext {
     return Set.of();
   }
 
-  @Override
+//  @Override
   public <T> Map<ResourceLocation,Collection<Holder<T>>> getAllTags(ResourceKey<? extends Registry<T>> key) {
     Registry<T> registry = RegistryHelper.getRegistry(key);
     if (registry != null) {

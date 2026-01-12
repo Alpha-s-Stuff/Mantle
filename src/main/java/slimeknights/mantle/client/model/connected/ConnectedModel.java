@@ -13,6 +13,7 @@ import io.github.fabricators_of_create.porting_lib.models.geometry.IGeometryLoad
 import io.github.fabricators_of_create.porting_lib.models.geometry.IUnbakedGeometry;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import net.fabricmc.fabric.api.renderer.v1.render.RenderContext;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockElement;
@@ -37,6 +38,7 @@ import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import slimeknights.mantle.block.IMultipartConnectedBlock;
+import slimeknights.mantle.client.model.ModelData;
 import slimeknights.mantle.client.model.ModelProperty;
 import slimeknights.mantle.client.model.util.ColoredBlockModel;
 import slimeknights.mantle.client.model.util.DynamicBakedWrapper;
@@ -58,6 +60,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 /**
  * Model that handles generating variants for connected textures
@@ -341,64 +344,76 @@ public class ConnectedModel implements IUnbakedGeometry<ConnectedModel> {
       return connections;
     }
 
-    @Nonnull
-    @Override
-    public ModelData getModelData(BlockAndTintGetter world, BlockPos pos, BlockState state, ModelData tileData) {
-      // if the data is already defined, return it, will happen in multipart models
-      if (tileData.get(CONNECTIONS) != null) {
-        return tileData;
-      }
-
-      // gather connections data
-      Transformation rotation = transforms.getRotation();
-      return tileData.derive()
-                     .with(CONNECTIONS, getConnections(dir -> parent.sides.contains(dir) && parent.connectionPredicate.test(state, world.getBlockState(pos.relative(rotation.rotateTransform(dir))))))
-                     .build();
-    }
-
     /**
      * Shared logic to get quads from a connections array
      * @param connections  Byte with 6 bits for the 6 different sides
      * @param state        Block state instance
      * @param side         Cullface
      * @param rand         Random instance
-     * @param data         Model data instance
      * @return             Model quads for the given side
      */
-    protected synchronized List<BakedQuad> getCachedQuads(byte connections, @Nullable BlockState state, @Nullable Direction side, RandomSource rand, ModelData data, @Nullable RenderType renderType) {
+    protected synchronized List<BakedQuad> getCachedQuads(byte connections, @Nullable BlockState state, @Nullable Direction side, RandomSource rand) {
       // bake a new model if the orientation is not yet baked
       if (cache[connections] == null) {
         cache[connections] = applyConnections(connections);
       }
 
       // get the model for the given orientation
-      return cache[connections].getQuads(state, side, rand, data, renderType);
+      return cache[connections].getQuads(state, side, rand);
     }
 
-    @Nonnull
+    /**
+     * Shared logic to get quads from a connections array
+     * @param connections  Byte with 6 bits for the 6 different sides
+     * @param level        The level the model is in
+     * @param pos          Block pos
+     * @param state        Block state instance
+     * @param rand         Random instance
+     * @return             Model quads for the given side
+     */
+    protected synchronized void emitCachedQuads(byte connections, BlockAndTintGetter level, BlockPos pos, @Nullable BlockState state, Supplier<RandomSource> rand, RenderContext context) {
+      // bake a new model if the orientation is not yet baked
+      if (cache[connections] == null) {
+        cache[connections] = applyConnections(connections);
+      }
+
+      // get the model for the given orientation
+      cache[connections].emitBlockQuads(level, state, pos, rand, context);
+    }
+
     @Override
-    public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, RandomSource rand, ModelData data, @Nullable RenderType renderType) {
+    public void emitBlockQuads(BlockAndTintGetter blockView, BlockState state, BlockPos pos, Supplier<RandomSource> randomSupplier, RenderContext context) {
+      ModelData data = ModelData.EMPTY;
+      if (blockView.getBlockEntityRenderData(pos) instanceof ModelData modelData)
+        data = modelData;
+
       // try model data first
       Byte connections = data.get(CONNECTIONS);
-      // if model data failed, try block state
-      // temporary fallback until Forge has model data in multipart/weighted random
+      // if the data is not already defined, compute it
       if (connections == null) {
-        // no state? return original
-        if (state == null) {
-          return originalModel.getQuads(null, side, rand, data, renderType);
-        }
-        // this will return original if the state is missing all properties
+        // gather connections data
         Transformation rotation = transforms.getRotation();
-        connections = getConnections((dir) -> {
-          if (!parent.sides.contains(dir)) {
-            return false;
-          }
-          BooleanProperty prop = IMultipartConnectedBlock.CONNECTED_DIRECTIONS.get(rotation.rotateTransform(dir));
-          return state.hasProperty(prop) && state.getValue(prop);
-        });
+        connections = getConnections(dir -> parent.sides.contains(dir) && parent.connectionPredicate.test(state, blockView.getBlockState(pos.relative(rotation.rotateTransform(dir)))));
       }
-      // get quads using connections
-      return getCachedQuads(connections, state, side, rand, data, renderType);
+      // emit quads using connections
+      emitCachedQuads(connections, blockView, pos, state, randomSupplier, context);
+    }
+
+    @Override // Fallback override
+    public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, RandomSource rand) {
+      // no state? return original
+      if (state == null) {
+        return wrapped.getQuads(null, side, rand);
+      }
+      // this will return original if the state is missing all properties
+      Transformation rotation = transforms.getRotation();
+      return getCachedQuads(getConnections((dir) -> {
+        if (!parent.sides.contains(dir)) {
+          return false;
+        }
+        BooleanProperty prop = IMultipartConnectedBlock.CONNECTED_DIRECTIONS.get(rotation.rotateTransform(dir));
+        return state.hasProperty(prop) && state.getValue(prop);
+      }), state, side, rand);
     }
   }
 

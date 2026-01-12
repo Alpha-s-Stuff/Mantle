@@ -4,6 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import lombok.Getter;
+import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -27,7 +28,7 @@ import java.util.Map.Entry;
 import java.util.function.BiConsumer;
 
 /** Simple loader mapping from a registry object to a piece of data parsed from JSON. Supports parenting to reuse data from another file */
-public class RegistryDataMapLoader<R,D> extends SimpleJsonResourceReloadListener {
+public class RegistryDataMapLoader<R,D> extends SimpleJsonResourceReloadListener implements IdentifiableResourceReloadListener {
   /** Merges data from the parent JSON into the passed JSOn */
   public static final BiConsumer<JsonObject,JsonObject> COPY_PARENT_DATA = (json, parentJson) -> {
     for (Entry<String,JsonElement> entry : parentJson.entrySet()) {
@@ -38,6 +39,8 @@ public class RegistryDataMapLoader<R,D> extends SimpleJsonResourceReloadListener
     }
   };
 
+  @Getter
+  private final ResourceLocation fabricId;
   private final String name;
   @Getter
   private final String folder;
@@ -50,25 +53,28 @@ public class RegistryDataMapLoader<R,D> extends SimpleJsonResourceReloadListener
 
   /**
    * Creates a new data loader instance
+   * @param id          Id for fabric to use to sort dependence
    * @param name        Name for error messages
    * @param registry    Vanilla registry representing keys in the map
    * @param dataLoader  Loadable for parsing values
    * @param folder      Folder to load data from
    */
-  public RegistryDataMapLoader(String name, String folder, Registry<R> registry, RecordLoadable<D> dataLoader) {
-    this(name, folder, registry, dataLoader, COPY_PARENT_DATA);
+  public RegistryDataMapLoader(ResourceLocation id, String name, String folder, Registry<R> registry, RecordLoadable<D> dataLoader) {
+    this(id, name, folder, registry, dataLoader, COPY_PARENT_DATA);
   }
 
   /**
    * Creates a new data loader instance
+   * @param id          Id for fabric to use to sort dependence
    * @param name        Name for error messages
    * @param registry    Vanilla registry representing keys in the map
    * @param dataLoader  Loadable for parsing values
    * @param folder      Folder to load data from
    * @param merger      Logic to copy data from the parent into the target element
    */
-  public RegistryDataMapLoader(String name, String folder, Registry<R> registry, RecordLoadable<D> dataLoader, BiConsumer<JsonObject,JsonObject> merger) {
+  public RegistryDataMapLoader(ResourceLocation id, String name, String folder, Registry<R> registry, RecordLoadable<D> dataLoader, BiConsumer<JsonObject,JsonObject> merger) {
     super(JsonHelper.DEFAULT_GSON, folder);
+    this.fabricId = id;
     this.name = name;
     this.registry = registry;
     this.dataLoader = dataLoader;

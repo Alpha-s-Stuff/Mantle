@@ -2,6 +2,7 @@ package slimeknights.mantle.data.loadable.mapping;
 
 import com.google.gson.JsonObject;
 import net.fabricmc.fabric.api.resource.conditions.v1.ConditionJsonProvider;
+import net.fabricmc.fabric.api.resource.conditions.v1.ResourceConditions;
 import net.minecraft.network.FriendlyByteBuf;
 import slimeknights.mantle.data.loadable.field.ContextKey;
 import slimeknights.mantle.data.loadable.record.RecordLoadable;
@@ -22,9 +23,9 @@ public record ConditionalLoadable<T extends IHaveLoader>(GenericLoaderRegistry<T
   public T deserialize(JsonObject json, TypedMap context) {
     // allow passing in the condition context via the loadable context
     // if missing, assume tags are invalid
-    IContext conditionContext = context.getOrDefault(ContextKey.CONDITION_CONTEXT, IContext.TAGS_INVALID);
+//    IContext conditionContext = context.getOrDefault(ContextKey.CONDITION_CONTEXT, IContext.TAGS_INVALID); TODO: fabric we have no condition context
     // if the condition matches, use the true value
-    if (CraftingHelper.processConditions(json, "conditions", conditionContext)) {
+    if (ResourceConditions.objectMatchesConditions(json)) {
       return registry.getIfPresent(json, "if_true");
     }
     // loader can define a default instance for false if they have one. Otherwise false is required.
@@ -38,7 +39,7 @@ public record ConditionalLoadable<T extends IHaveLoader>(GenericLoaderRegistry<T
   @Override
   public void serialize(T object, JsonObject json) {
     ConditionalObject<T> conditional = (ConditionalObject<T>) object;
-    json.add("conditions", CraftingHelper.serialize(conditional.conditions()));
+    ConditionJsonProvider.write(json, conditional.conditions());
     json.add("if_true", registry.serialize(conditional.ifTrue()));
     T ifFalse = conditional.ifFalse();
     if (ifFalse != defaultIfFalse) {

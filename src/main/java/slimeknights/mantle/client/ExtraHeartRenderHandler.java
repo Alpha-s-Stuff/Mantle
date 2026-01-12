@@ -2,6 +2,8 @@ package slimeknights.mantle.client;
 
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
+import io.github.fabricators_of_create.porting_lib.event.client.OverlayRenderCallback;
+import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
@@ -12,12 +14,6 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.client.event.RenderGuiOverlayEvent;
-import net.minecraftforge.client.gui.overlay.ForgeGui;
-import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import slimeknights.mantle.Mantle;
 import slimeknights.mantle.config.Config;
 import slimeknights.mantle.config.Config.HeartRenderer;
@@ -25,6 +21,7 @@ import slimeknights.mantle.config.Config.HeartRenderer;
 import java.util.Random;
 
 public class ExtraHeartRenderHandler {
+  public static final ResourceLocation EXTRA_HEARTS_PHASE = Mantle.getResource("extra_hearts");
   private static final ResourceLocation ICON_HEARTS = new ResourceLocation(Mantle.modId, "textures/gui/extra_hearts.png");
   private static final ResourceLocation ICON_VANILLA = Gui.GUI_ICONS_LOCATION;
   /** Number of heart color variants */
@@ -73,27 +70,34 @@ public class ExtraHeartRenderHandler {
   private long lastHealthTime = 0;
   private final Random rand = new Random();
 
+  public void registerEvents() {
+    OverlayRenderCallback.EVENT.addPhaseOrdering(Event.DEFAULT_PHASE, EXTRA_HEARTS_PHASE);
+    OverlayRenderCallback.EVENT.register(EXTRA_HEARTS_PHASE, this::renderHealthbar);
+  }
+
   /* HUD */
 
   /**
    * Event listener
-   * @param event  Event instance
+   * @param graphics  Graphics instance
+   * @param partialTicks
+   * @param window
+   * @param type
    */
-  @SubscribeEvent(priority = EventPriority.LOW)
-  public void renderHealthbar(RenderGuiOverlayEvent.Pre event) {
+  public boolean renderHealthbar(GuiGraphics graphics, float partialTicks, Window window, OverlayRenderCallback.Types type) {
     HeartRenderer renderer = Config.HEART_RENDERER.get();
-    if (renderer == HeartRenderer.DISABLE || event.isCanceled() || event.getOverlay() != VanillaGuiOverlay.PLAYER_HEALTH.type()) {
-      return;
+    if (renderer == HeartRenderer.DISABLE || type != OverlayRenderCallback.Types.PLAYER_HEALTH) {
+      return false;
     }
     // ensure its visible
-    if (!(mc.gui instanceof ForgeGui gui) || mc.options.hideGui || !gui.shouldDrawSurvivalElements()) {
-      return;
+    if (mc.options.hideGui || !shouldDrawSurvivalElements()) {
+      return false;
     }
     Entity renderViewEnity = this.mc.getCameraEntity();
     if (!(renderViewEnity instanceof Player player)) {
-      return;
+      return false;
     }
-    gui.setupOverlayRenderState(true, false);
+//    gui.setupOverlayRenderState(true, false);
 
     this.mc.getProfiler().push("health");
 
@@ -122,9 +126,9 @@ public class ExtraHeartRenderHandler {
     this.rand.setSeed(tickCount * 312871L);
 
     // setup window size
-    Window window = this.mc.getWindow();
+    int leftHeight = 39;
     int left = window.getGuiScaledWidth() / 2 - 91;
-    int top = window.getGuiScaledHeight() - gui.leftHeight;
+    int top = window.getGuiScaledHeight() - leftHeight;
 
     // grab max health as the max of it or the health we will display
     // cap it to 20, as this just determines heart count
@@ -174,7 +178,6 @@ public class ExtraHeartRenderHandler {
     boolean compactAbsorption = showHearts < 10 && absorb <= 2 * (10 - showHearts);
 
     // time to draw heart backgrounds
-    GuiGraphics graphics = event.getGuiGraphics();
 
     // render max health backgrounds
     int absorptionOffset = ROW_HEIGHT;
@@ -222,16 +225,21 @@ public class ExtraHeartRenderHandler {
 
     // prepare the GUI for the event
     RenderSystem.setShaderTexture(0, ICON_VANILLA);
-    gui.leftHeight += ROW_HEIGHT;
+    leftHeight += ROW_HEIGHT; // Fabric I don't think this actually matters
     if (!compactAbsorption && absorb > 0) {
-      gui.leftHeight += absorptionOffset;
+      leftHeight += absorptionOffset;
     }
 
-    event.setCanceled(true);
+//    event.setCanceled(true);
     RenderSystem.disableBlend();
     this.mc.getProfiler().pop();
     //noinspection UnstableApiUsage  I do what I want (more accurately, we override the renderer but want to let others still respond in post)
-    MinecraftForge.EVENT_BUS.post(new RenderGuiOverlayEvent.Post(event.getWindow(), graphics, event.getPartialTick(), VanillaGuiOverlay.PLAYER_HEALTH.type()));
+//    MinecraftForge.EVENT_BUS.post(new RenderGuiOverlayEvent.Post(event.getWindow(), graphics, event.getPartialTick(), VanillaGuiOverlay.PLAYER_HEALTH.type()));
+    return true;
+  }
+
+  public boolean shouldDrawSurvivalElements() {
+    return mc.gameMode.canHurtPlayer() && mc.getCameraEntity() instanceof Player;
   }
 
   /** Computes the color U offset for a given heart index */

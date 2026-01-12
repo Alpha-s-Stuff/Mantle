@@ -4,7 +4,7 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.fabricators_of_create.porting_lib.event.client.OverlayRenderCallback;
-import io.github.fabricators_of_create.porting_lib.event.common.ModsLoadedCallback;
+import io.github.fabricators_of_create.porting_lib.event.client.OverlayRenderCallback.Types;
 import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
 import io.github.fabricators_of_create.porting_lib.models.geometry.IGeometryLoader;
 import io.github.fabricators_of_create.porting_lib.models.geometry.RegisterGeometryLoadersCallback;
@@ -20,7 +20,6 @@ import net.minecraft.client.Options;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.ChatScreen;
-import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.blockentity.HangingSignRenderer;
 import net.minecraft.client.renderer.blockentity.SignRenderer;
@@ -58,7 +57,6 @@ import slimeknights.mantle.fluid.tooltip.FluidTooltipHandler;
 import slimeknights.mantle.network.MantleNetwork;
 import slimeknights.mantle.network.channel.SimpleChannel;
 import slimeknights.mantle.registration.MantleRegistrations;
-import slimeknights.mantle.registration.RegistrationHelper;
 import slimeknights.mantle.util.OffhandCooldownTracker;
 import slimeknights.mantle.util.RegistryHelper;
 
@@ -67,7 +65,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-@EventBusSubscriber(modid = Mantle.modId, value = Dist.CLIENT, bus = Bus.MOD)
 public class ClientEvents {
   /** Called on construct to initiatlize things that need early entry */
   public static void onConstruct() {
@@ -122,15 +119,14 @@ public class ClientEvents {
     loaders.put(Mantle.getResource("retextured"), RetexturedModel.LOADER);
   }
 
-  @SubscribeEvent
-  static void commonSetup(FMLCommonSetupEvent event) {
-    MinecraftForge.EVENT_BUS.register(new ExtraHeartRenderHandler());
+  static void commonSetup() {
+    new ExtraHeartRenderHandler().registerEvents();
     OverlayRenderCallback.EVENT.register(ClientEvents::renderOffhandAttackIndicator);
     OverlayRenderCallback.EVENT.register(ClientEvents::renderGaugeTooltip);
   }
 
   // registered with FORGE bus
-  private static boolean renderOffhandAttackIndicator(GuiGraphics graphics, float partialTicks, Window window, OverlayRenderCallback.Types type) {
+  private static boolean renderOffhandAttackIndicator(GuiGraphics graphics, float partialTicks, Window window, OverlayRenderCallback.Types overlay) {
     // must have a player, not be in spectator, and have the indicator enabled
     Minecraft minecraft = Minecraft.getInstance();
     Options settings = minecraft.options;
@@ -140,11 +136,10 @@ public class ClientEvents {
     }
 
     // only care about hotbar and crosshair
-    NamedGuiOverlay overlay = event.getOverlay();
     // will be true for hotbar, false for crosshair
-    boolean isHotbar = VanillaGuiOverlay.HOTBAR.type() == overlay;
-    if (!isHotbar && VanillaGuiOverlay.CROSSHAIR.type() != overlay) {
-      return;
+    boolean isHotbar = Types.HOTBAR == overlay;
+    if (!isHotbar && Types.CROSSHAIRS != overlay) {
+      return false;
     }
 
     // fetch the current cooldown

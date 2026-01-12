@@ -135,7 +135,7 @@ public class ColoredBlockModel extends SimpleBlockModel {
   }
 
   @Override
-  public BakedModel bake(BlockModel owner, ModelBaker baker, Function<Material,TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides, ResourceLocation modelLocation) {
+  public BakedModel bake(BlockModel owner, ModelBaker baker, Function<Material,TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides, ResourceLocation modelLocation, boolean isGui3d) {
     return bakeModel(owner, getElements(), colorData, spriteGetter, modelTransform, overrides, modelLocation);
   }
 

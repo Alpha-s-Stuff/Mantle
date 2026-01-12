@@ -1,7 +1,7 @@
 package slimeknights.mantle.fluid;
 
 import io.github.fabricators_of_create.porting_lib.fluids.FluidType;
-import slimeknights.mantle.fluid.texture.ClientInvertedFluidType;
+//import slimeknights.mantle.fluid.texture.ClientInvertedFluidType;
 
 import java.util.function.Consumer;
 
@@ -11,8 +11,8 @@ public class InvertedFluidType extends FluidType {
     super(properties);
   }
 
-  @Override
-  public void initializeClient(Consumer<IClientFluidTypeExtensions> consumer) {
-    consumer.accept(new ClientInvertedFluidType(this));
-  }
+//  @Override
+//  public void initializeClient(Consumer<IClientFluidTypeExtensions> consumer) {
+//    consumer.accept(new ClientInvertedFluidType(this));
+//  }
 }

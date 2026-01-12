@@ -1,7 +1,7 @@
 package slimeknights.mantle.fluid;
 
 import io.github.fabricators_of_create.porting_lib.fluids.FluidType;
-import slimeknights.mantle.fluid.texture.ClientTextureFluidType;
+//import slimeknights.mantle.fluid.texture.ClientTextureFluidType;
 
 import java.util.function.Consumer;
 
@@ -14,8 +14,8 @@ public class TextureFluidType extends FluidType {
     super(properties);
   }
 
-  @Override
-  public void initializeClient(Consumer<IClientFluidTypeExtensions> consumer) {
-    consumer.accept(new ClientTextureFluidType(this));
-  }
+//  @Override
+//  public void initializeClient(Consumer<IClientFluidTypeExtensions> consumer) {
+//    consumer.accept(new ClientTextureFluidType(this));
+//  }
 }

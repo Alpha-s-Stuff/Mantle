@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
 import net.fabricmc.fabric.api.resource.conditions.v1.ConditionJsonProvider;
+import net.fabricmc.fabric.api.resource.conditions.v1.ResourceConditions;
 import slimeknights.mantle.Mantle;
 import slimeknights.mantle.data.loadable.Loadable;
 import slimeknights.mantle.data.loadable.mapping.ConditionalLoadable.ConditionalObject;
@@ -90,7 +91,7 @@ public class PredicateRegistry<T> extends DefaultingLoaderRegistry<IJsonPredicat
    * @param conditions List of conditions that must match. to use {@code ifTrue}
    * @return  Predicate for datagen.
    */
-  public IJsonPredicate<T> conditional(IJsonPredicate<T> ifTrue, IJsonPredicate<T> ifFalse, ICondition... conditions) {
+  public IJsonPredicate<T> conditional(IJsonPredicate<T> ifTrue, IJsonPredicate<T> ifFalse, ConditionJsonProvider... conditions) {
     return new ConditionalPredicate(conditions, ifTrue, ifFalse);
   }
 
@@ -101,7 +102,7 @@ public class PredicateRegistry<T> extends DefaultingLoaderRegistry<IJsonPredicat
    * @return  Predicate for datagen.
    */
   @SuppressWarnings("unused") // API
-  public IJsonPredicate<T> conditional(IJsonPredicate<T> ifTrue, ICondition... conditions) {
+  public IJsonPredicate<T> conditional(IJsonPredicate<T> ifTrue, ConditionJsonProvider... conditions) {
     if (noneInstance == null) {
       throw new UnsupportedOperationException(getName() + " does not support unset ifFalse");
     }
@@ -195,7 +196,7 @@ public class PredicateRegistry<T> extends DefaultingLoaderRegistry<IJsonPredicat
     public boolean matches(T input) {
       // should be unused, but just in case
       for (ConditionJsonProvider condition : conditions) {
-        if (!condition.test(DataLoadedConditionContext.INSTANCE)) {
+        if (!ResourceConditions.get(condition.getConditionId()).test(condition.toJson())/*condition.test(DataLoadedConditionContext.INSTANCE)*/) { // TODO: this is hacky af and we should probably not use fabrics resource conditions
           return ifFalse.matches(input);
         }
       }

@@ -4,12 +4,14 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Transformation;
+import io.github.fabricators_of_create.porting_lib.models.CompositeModel;
 import io.github.fabricators_of_create.porting_lib.models.ItemLayerModel;
 import io.github.fabricators_of_create.porting_lib.models.geometry.IGeometryLoader;
 import io.github.fabricators_of_create.porting_lib.models.geometry.IUnbakedGeometry;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.texture.SpriteContents;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -21,6 +23,8 @@ import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.resources.ResourceLocation;
+import slimeknights.mantle.client.model.util.fabric.QuadBakingVertexConsumer;
+import slimeknights.mantle.client.model.util.fabric.TransformingVertexPipeline;
 import slimeknights.mantle.data.loadable.Loadable;
 import slimeknights.mantle.data.loadable.Loadables;
 import slimeknights.mantle.data.loadable.common.ColorLoadable;
@@ -65,9 +69,9 @@ public class MantleItemLayerModel implements IUnbakedGeometry<MantleItemLayerMod
   }
 
   @Override
-  public void resolveParents(Function<ResourceLocation,UnbakedModel> modelGetter, IGeometryBakingContext owner) {
+  public void resolveParents(Function<ResourceLocation,UnbakedModel> modelGetter, BlockModel owner) {
     List<Material> builder = new ArrayList<>();
-    for (int i = 0; owner.hasMaterial("layer" + i); i++) {
+    for (int i = 0; owner.hasTexture("layer" + i); i++) {
       builder.add(owner.getMaterial("layer" + i));
     }
     textures = List.copyOf(builder);
@@ -95,12 +99,12 @@ public class MantleItemLayerModel implements IUnbakedGeometry<MantleItemLayerMod
   }
 
   @Override
-  public BakedModel bake(IGeometryBakingContext owner, ModelBaker baker, Function<Material,TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides, ResourceLocation modelLocation) {
+  public BakedModel bake(BlockModel owner, ModelBaker baker, Function<Material,TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides, ResourceLocation modelLocation, boolean isGui3d) {
     if (textures.isEmpty()) {
       throw new IllegalStateException("Empty textures list");
     }
     // determine particle texture
-    TextureAtlasSprite particle = spriteGetter.apply(owner.hasMaterial("particle") ? owner.getMaterial("particle") : textures.get(0));
+    TextureAtlasSprite particle = spriteGetter.apply(owner.hasTexture("particle") ? owner.getMaterial("particle") : textures.get(0));
 
     // setup quad building
     record QuadGroup(RenderTypeGroup renderType, Collection<BakedQuad> quads) {}
@@ -120,7 +124,7 @@ public class MantleItemLayerModel implements IUnbakedGeometry<MantleItemLayerMod
     }
 
     // build final model
-    CompositeModel.Baked.Builder modelBuilder = CompositeModel.Baked.builder(owner, particle, overrides, owner.getTransforms());
+    CompositeModel.Baked.Builder modelBuilder = CompositeModel.Baked.builder(owner, isGui3d, particle, overrides, owner.getTransforms());
     quadBuilder.build(quadGroup -> modelBuilder.addQuads(quadGroup.renderType, quadGroup.quads));
     return modelBuilder.build();
   }
@@ -168,7 +172,7 @@ public class MantleItemLayerModel implements IUnbakedGeometry<MantleItemLayerMod
       for(int v = 0; v < vMax; v++) {
         ptu = true;
         for(int u = 0; u < uMax; u++) {
-          int alpha = sprite.getPixelRGBA(f, u, vMax - v - 1) >> 24 & 0xFF;
+          int alpha = sprite.contents().getPixelRGBA(f, u, vMax - v - 1) >> 24 & 0xFF;
           boolean t = alpha / 255f <= 0.1f;
 
           if (!t && alpha < 255) {
@@ -311,7 +315,7 @@ public class MantleItemLayerModel implements IUnbakedGeometry<MantleItemLayerMod
       if (hasFrames) {
         for(int v = 0; v < vMax; v++) {
           for(int u = 0; u < uMax; u++) {
-            int alpha = sprite.getPixelRGBA(0, u, vMax - v - 1) >> 24 & 0xFF;
+            int alpha = sprite.contents().getPixelRGBA(0, u, vMax - v - 1) >> 24 & 0xFF;
             if (alpha / 255f > 0.1f) {
               pixels.set(u, v, uMax, vMax);
             }

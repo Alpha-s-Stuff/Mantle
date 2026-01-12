@@ -1,8 +1,9 @@
 package slimeknights.mantle.client.render;
 
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
+import slimeknights.mantle.Mantle;
 import slimeknights.mantle.data.datamap.RegistryDataMapLoader;
 import slimeknights.mantle.data.loadable.record.RecordLoadable;
 
@@ -23,7 +24,7 @@ public record ChannelFluids(FluidCuboid down, Center center, Side side) {
     ChannelFluids::new);
   /** Registry for loading channel fluids */
   @SuppressWarnings("deprecation")
-  public static final RegistryDataMapLoader<Block,ChannelFluids> REGISTRY = new RegistryDataMapLoader<>("Channel fluids", "mantle/model/channel_fluids", BuiltInRegistries.BLOCK, LOADABLE);
+  public static final RegistryDataMapLoader<Block,ChannelFluids> REGISTRY = new RegistryDataMapLoader<>(Mantle.getResource("channel_fluids"), "Channel fluids", "mantle/model/channel_fluids", BuiltInRegistries.BLOCK, LOADABLE);
 
   /** Used to prevent being initialized multiple times */
   private static boolean initialized = false;
@@ -31,12 +32,12 @@ public record ChannelFluids(FluidCuboid down, Center center, Side side) {
   /**
    * Call during the event to register the reload listener
    */
-  public static void initialize(RegisterClientReloadListenersEvent event) {
+  public static void initialize(ResourceManagerHelper helper) {
     if (initialized) {
       return;
     }
     initialized = true;
-    event.registerReloadListener(REGISTRY);
+    helper.registerReloadListener(REGISTRY);
   }
 
   /** Gets a fluid for the center */

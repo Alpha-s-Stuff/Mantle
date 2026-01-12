@@ -1,27 +1,27 @@
-package slimeknights.mantle.fluid.texture;
-
-import io.github.fabricators_of_create.porting_lib.fluids.FluidType;
-import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.BlockAndTintGetter;
-import net.minecraft.world.level.material.FluidState;
-
-/** Client logic for {@link slimeknights.mantle.fluid.InvertedFluidType} */
-public class ClientInvertedFluidType extends ClientTextureFluidType {
-  private ResourceLocation lastFlowing;
-  private ResourceLocation invertedFlowing;
-  public ClientInvertedFluidType(FluidType type) {
-    super(type);
-  }
-
-  @Override
-  public ResourceLocation getFlowingTexture(FluidState state, BlockAndTintGetter getter, BlockPos pos) {
-    ResourceLocation flowing = getFlowingTexture();
-    if (flowing == lastFlowing) {
-      return invertedFlowing;
-    }
-    invertedFlowing = flowing.withSuffix("_inverted");
-    lastFlowing = flowing;
-    return invertedFlowing;
-  }
-}
+//package slimeknights.mantle.fluid.texture;
+//
+//import io.github.fabricators_of_create.porting_lib.fluids.FluidType;
+//import net.minecraft.core.BlockPos;
+//import net.minecraft.resources.ResourceLocation;
+//import net.minecraft.world.level.BlockAndTintGetter;
+//import net.minecraft.world.level.material.FluidState;
+//
+///** Client logic for {@link slimeknights.mantle.fluid.InvertedFluidType} */
+//public class ClientInvertedFluidType extends ClientTextureFluidType {
+//  private ResourceLocation lastFlowing;
+//  private ResourceLocation invertedFlowing;
+//  public ClientInvertedFluidType(FluidType type) {
+//    super(type);
+//  }
+//
+//  @Override
+//  public ResourceLocation getFlowingTexture(FluidState state, BlockAndTintGetter getter, BlockPos pos) {
+//    ResourceLocation flowing = getFlowingTexture();
+//    if (flowing == lastFlowing) {
+//      return invertedFlowing;
+//    }
+//    invertedFlowing = flowing.withSuffix("_inverted");
+//    lastFlowing = flowing;
+//    return invertedFlowing;
+//  }
+//}
